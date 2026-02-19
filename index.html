@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="light" />
+  <title>Coût de Revient Pâtisserie — Simulateur</title>
+  <meta name="description"
+    content="Calculez le coût de revient de vos pâtisseries, comparez 5 niveaux de qualité et optimisez votre rentabilité." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="./base.css" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+
+<body>
+  <!-- Header -->
+  <header class="site-header site-header--landing">
+    <div class="header__brand">
+      <span class="header__icon">🧁</span>
+      <div class="header__text-wrap">
+        <h1 class="header__title">Gourmet Revient</h1>
+        <span class="header__subtitle">Expertise Pâtissière</span>
+      </div>
+    </div>
+    <nav class="header__nav">
+      <ul class="header__links" id="navLinks">
+        <li><a href="#contexte">Le Projet</a></li>
+        <li><a href="#selection">Simulateur</a></li>
+        <li><a href="#methode">Méthode</a></li>
+      </ul>
+      <div id="userNav" class="user-nav"></div>
+      <button class="burger-menu" id="burgerBtn" aria-label="Menu">
+        <span class="burger-bar"></span>
+        <span class="burger-bar"></span>
+        <span class="burger-bar"></span>
+      </button>
+    </nav>
+  </header>
+
+  <!-- Section 1: Hero -->
+  <section class="landing-hero">
+    <div class="landing-hero__content">
+      <h1 class="hero-title">Optimisation des coûts et rentabilité en pâtisserie artisanale</h1>
+      <p class="hero-subtitle">Outil interactif de calcul du coût de revient et simulation de marge conçu pour les
+        professionnels de la pâtisserie.</p>
+      <div class="hero-actions">
+        <a href="#selection" class="btn-primary">Commencer la simulation</a>
+        <a href="#methode" class="btn-outline">En savoir plus</a>
+      </div>
+    </div>
+    <div class="hero-bg-overlay"></div>
+  </section>
+
+  <!-- Section 2: Objectifs & Contexte -->
+  <section class="landing-contexte section-padding" id="contexte">
+    <div class="container">
+      <div class="grid-2">
+        <div class="contexte-text">
+          <h2 class="section-title">Objectif du projet</h2>
+          <p class="section-desc">Ce projet a été développé dans le cadre du <strong>Chef d'Œuvre du CAP
+              Pâtissier</strong>. L'enjeu est de concilier la passion de l'artisanat avec la rigueur de la gestion
+            économique.</p>
+          <div class="skills-list">
+            <div class="skill-item">
+              <span class="skill-icon">📊</span>
+              <div>
+                <strong>Gestion</strong>
+                <p>Maîtrise des marges et des seuils de rentabilité.</p>
+              </div>
+            </div>
+            <div class="skill-item">
+              <span class="skill-icon">🧪</span>
+              <div>
+                <strong>Technologie</strong>
+                <p>Analyse des matières premières et influence sur la qualité.</p>
+              </div>
+            </div>
+            <div class="skill-item">
+              <span class="skill-icon">⚙️</span>
+              <div>
+                <strong>Organisation</strong>
+                <p>Optimisation du temps de production (MO) et des ressources.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="contexte-visual">
+          <div class="visual-card">
+            <span class="visual-label">Julian PERESSON</span>
+            <span class="visual-tag">Candidat CAP Pâtissier</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 3: Carrousel (Selection) -->
+  <section class="landing-carousel" id="selection">
+    <div class="carousel-overlay-text">
+      <h2 class="section-title text-center">Sélectionnez votre création</h2>
+      <p class="text-center">Choisissez une pâtisserie pour analyser sa structure de coût</p>
+    </div>
+
+    <main class="stage carousel-stage" aria-live="polite">
+      <!-- Global Quality Slider -->
+      <div class="home-quality-container">
+        <div class="quality-toggle-wrap" id="homeQualityToggle">
+          <input type="range" id="homeQualityRange" min="0" max="3" step="1" value="2" class="quality-mini-slider" />
+          <div class="quality-mini-labels">
+            <span>Industriel</span>
+            <span>Standard</span>
+            <span class="active">Artisanal</span>
+            <span>Premium</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Background canvas (moving gradient) -->
+      <canvas id="bg" aria-hidden="true"></canvas>
+
+      <!-- Cards container -->
+      <section id="cards" class="cards" aria-label="Carrousel des pâtisseries"></section>
+
+      <div class="stage-hint">Faites glisser pour explorer</div>
+    </main>
+  </section>
+
+  <!-- Section 4: Méthode de calcul -->
+  <section class="landing-methode section-padding" id="methode">
+    <div class="container">
+      <h2 class="section-title text-center">Méthode de calcul</h2>
+      <p class="text-center section-intro">Une approche rigoureuse pour une rentabilité sécurisée.</p>
+
+      <div class="formula-grid">
+        <div class="formula-card">
+          <h3 class="formula-title">Le Coût de Revient</h3>
+          <div class="formula-box">
+            <code>Coût Matière + Main d'Œuvre + Charges Fixes + Énergie</code>
+          </div>
+          <p class="formula-desc">Somme de toutes les dépenses directes et indirectes liées à la fabrication d'une
+            portion.</p>
+        </div>
+
+        <div class="formula-card">
+          <h3 class="formula-title">Le Prix de Vente HT</h3>
+          <div class="formula-box">
+            <code>Coût de Revient ÷ (1 - Taux de marge)</code>
+          </div>
+          <p class="formula-desc">Déterminé selon la marge brute souhaitée pour couvrir les futurs investissements.</p>
+        </div>
+
+        <div class="formula-card">
+          <h3 class="formula-title">Seuil de Rentabilité</h3>
+          <div class="formula-box">
+            <code>Charges Fixes / Marge sur Coût Variable</code>
+          </div>
+          <p class="formula-desc">Le point mort à partir duquel l'activité commence à générer un bénéfice réel.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="landing-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <span class="footer-icon">🧁</span>
+          <div>
+            <strong>Gourmet Revient</strong>
+            <p>Outil pédagogique de simulation de coûts en pâtisserie.</p>
+          </div>
+        </div>
+        <div class="footer-attribution-large">
+          <p>Julian PERESSON</p>
+          <span>Projet Chef d'Œuvre — CAP Pâtissier 2026</span>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 — Tous droits réservés.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Loader -->
+  <div id="loader" class="loader" aria-label="Chargement" aria-live="assertive">
+    <div class="loader__content">
+      <div class="loader__ring" aria-hidden="true"></div>
+      <p class="loader__text">Préparation de l'excellence…</p>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="./data.js"></script>
+  <script src="auth.js"></script>
+  <script src="./script.js" defer></script>
+</body>
+
+</html>
