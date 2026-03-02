@@ -142,9 +142,26 @@ function getTranslatedEvent(dateStr) {
 function updateVacationZone() {
   const selector = $('#vacationZoneSelector');
   if (!selector) return;
-  localStorage.setItem(STORAGE_KEYS.vacationZone, selector.value);
+  const zone = selector.value;
+  localStorage.setItem(STORAGE_KEYS.vacationZone, zone);
+
+  // Update UI text in real-time
+  const titleEl = document.getElementById('planningCalendarTitle');
+  const legendEl = document.getElementById('planningHolidayLegend');
+
+  if (titleEl) {
+    // We can also make the title dynamic if desired
+    titleEl.textContent = t('plan.calendar.title');
+  }
+  if (legendEl) {
+    // The i18n system now handles the {zone} placeholder
+    legendEl.textContent = t('plan.legend.holidays', { zone: zone });
+  }
+
   renderAnnualCalendar();
-  showToast(t('plan.toast.updated') || 'Zone mise à jour');
+  if (typeof showToast === 'function') {
+    showToast(t('plan.toast.updated') || 'Zone mise à jour');
+  }
 }
 
 function getTranslatedHoliday(label) {
@@ -199,22 +216,72 @@ function calcTotalMaterialCost() {
   return APP.recipe.ingredients.reduce((sum, ing) => sum + calcIngredientCost(ing), 0);
 }
 
-function calcFullCost(margin) {
-  const portions = APP.recipe.portions || 10;
-  const totalMaterial = calcTotalMaterialCost();
-  const costPerPortion = totalMaterial / portions;
+function calcFullCost(margin, customRecipe = null) {
+  const r = customRecipe || APP.recipe;
+  const portions = r.portions || 10;
+  const totalMaterial = r.ingredients.reduce((sum, ing) => sum + calcIngredientCost(ing), 0);
+
+  // Use either live UI values or saved values
+  let laborRate = 0, fixedCharges = 0, productions = 1, energyRate = 0, amortization = 0;
+
+  // Only use DOM values if we are processing the CURRENT active recipe
+  const isCurrent = (r === APP.recipe);
+  const advEl = $('#advLaborRate');
+
+  if (isCurrent && advEl && APP.currentStep === 4) {
+    laborRate = parseFloat($('#advLaborRate').value) || 0;
+    fixedCharges = parseFloat($('#advFixedCharges').value) || 0;
+    productions = Math.max(1, parseInt($('#advProductions').value) || 1);
+    energyRate = parseFloat($('#advEnergy').value) || 0;
+    amortization = parseFloat($('#advAmortization').value) || 0;
+  } else if (r.advanced) {
+    laborRate = r.advanced.laborRate || 0;
+    fixedCharges = r.advanced.fixedCharges || 0;
+    productions = r.advanced.productions || 1;
+    energyRate = r.advanced.energyRate || 0;
+    amortization = r.advanced.amortization || 0;
+  }
+
+  const prepTime = parseFloat(r.prepTime) || 0;
+  const cookTime = parseFloat(r.cookTime) || 0;
+  const totalTimeH = (prepTime + cookTime) / 60;
+
+  const laborCost = laborRate * totalTimeH;
+  const energyCost = energyRate * (cookTime / 60);
+  const fixedShare = fixedCharges / productions;
+  const amortShare = amortization / productions;
+
+  const additionalCosts = laborCost + energyCost + fixedShare + amortShare;
+  const totalFullCost = totalMaterial + additionalCosts;
+
+  const costPerPortion = totalFullCost / portions;
   const marginRate = (margin || APP.margin) / 100;
+
+  // Selling price based on FULL cost
   const sellingPrice = marginRate < 1 ? costPerPortion / (1 - marginRate) : costPerPortion * 10;
   const marginPerPortion = sellingPrice - costPerPortion;
   const marginPct = sellingPrice > 0 ? (marginPerPortion / sellingPrice) * 100 : 0;
 
   return {
     totalMaterial: round2(totalMaterial),
+    additionalCosts: round2(additionalCosts),
+    laborCost: round2(laborCost),
+    energyCost: round2(energyCost),
+    fixedShare: round2(fixedShare),
+    amortShare: round2(amortShare),
+    totalFullCost: round2(totalFullCost),
     costPerPortion: round2(costPerPortion),
     sellingPrice: round2(sellingPrice),
     marginPerPortion: round2(marginPerPortion),
     marginPct: round2(marginPct),
-    portions
+    portions,
+    prepTime,
+    cookTime,
+    laborRate,
+    energyRate,
+    fixedCharges,
+    amortization,
+    productions
   };
 }
 
@@ -353,6 +420,17 @@ function collectCurrentStepData() {
   }
   if (APP.currentStep === 2) collectIngredients();
   if (APP.currentStep === 3) collectProcedure();
+  if (APP.currentStep === 4) {
+    if ($('#advLaborRate')) {
+      APP.recipe.advanced = {
+        laborRate: parseFloat($('#advLaborRate').value) || 0,
+        fixedCharges: parseFloat($('#advFixedCharges').value) || 0,
+        productions: parseInt($('#advProductions').value) || 1,
+        energyRate: parseFloat($('#advEnergy').value) || 0,
+        amortization: parseFloat($('#advAmortization').value) || 0
+      };
+    }
+  }
 }
 
 function populateStep1() {
@@ -579,6 +657,24 @@ function collectProcedure() {
 
 function renderCostAnalysis() {
   collectIngredients();
+
+  // Populate advanced inputs from saved data if available
+  if (APP.recipe.advanced) {
+    const adv = APP.recipe.advanced;
+    const setVal = (id, val) => {
+      const el = document.getElementById(id);
+      if (el && !el.dataset.initialized) {
+        el.value = val;
+        el.dataset.initialized = 'true';
+      }
+    };
+    setVal('advLaborRate', adv.laborRate);
+    setVal('advFixedCharges', adv.fixedCharges);
+    setVal('advProductions', adv.productions);
+    setVal('advEnergy', adv.energyRate);
+    setVal('advAmortization', adv.amortization);
+  }
+
   const costs = calcFullCost(APP.margin);
 
   // KPI Cards
@@ -623,55 +719,39 @@ function renderAdvancedCostKPI(costs) {
   const grid = $('#advancedKpiGrid');
   if (!grid) return;
 
-  const laborRate = parseFloat($('#advLaborRate')?.value) || 0;
-  const fixedCharges = parseFloat($('#advFixedCharges')?.value) || 0;
-  const productions = Math.max(1, parseInt($('#advProductions')?.value) || 1);
-  const energyRate = parseFloat($('#advEnergy')?.value) || 0;
-  const amortization = parseFloat($('#advAmortization')?.value) || 0;
-
-  const prepTime = parseFloat(APP.recipe.prepTime) || 0;
-  const cookTime = parseFloat(APP.recipe.cookTime) || 0;
-  const totalTimeH = (prepTime + cookTime) / 60;
-  const portions = APP.recipe.portions || 1;
-
-  const laborCost = laborRate * totalTimeH;
-  const energyCost = energyRate * (cookTime / 60);
-  const fixedShare = fixedCharges / productions;
-  const amortShare = amortization / productions;
-
-  const fullCost = costs.totalMaterial + laborCost + energyCost + fixedShare + amortShare;
-  const fullPerPortion = fullCost / portions;
+  const totalTimeH = (costs.prepTime + costs.cookTime) / 60;
+  const additionalSum = costs.laborCost + costs.energyCost + costs.fixedShare + costs.amortShare;
 
   grid.innerHTML = `
     <div class="kpi-card">
       <div class="kpi-label">${t('s4.adv.kpi.labor')}</div>
-      <div class="kpi-value">${laborCost.toFixed(2)} €</div>
-      <div class="kpi-sub">${laborRate.toFixed(2)} €/h × ${totalTimeH.toFixed(1)}h</div>
+      <div class="kpi-value">${costs.laborCost.toFixed(2)} €</div>
+      <div class="kpi-sub">${costs.laborRate.toFixed(2)} €/h × ${totalTimeH.toFixed(1)}h</div>
     </div>
     <div class="kpi-card">
       <div class="kpi-label">${t('s4.adv.kpi.energy')}</div>
-      <div class="kpi-value">${energyCost.toFixed(2)} €</div>
-      <div class="kpi-sub">${energyRate.toFixed(2)} €/h × ${(cookTime / 60).toFixed(1)}h</div>
+      <div class="kpi-value">${costs.energyCost.toFixed(2)} €</div>
+      <div class="kpi-sub">${costs.energyRate.toFixed(2)} €/h × ${(costs.cookTime / 60).toFixed(1)}h</div>
     </div>
     <div class="kpi-card">
       <div class="kpi-label">${t('s4.adv.kpi.fixed')}</div>
-      <div class="kpi-value">${fixedShare.toFixed(2)} €</div>
-      <div class="kpi-sub">${fixedCharges.toFixed(0)} € / ${productions}</div>
+      <div class="kpi-value">${costs.fixedShare.toFixed(2)} €</div>
+      <div class="kpi-sub">${costs.fixedCharges.toFixed(0)} € / ${costs.productions}</div>
     </div>
     <div class="kpi-card">
       <div class="kpi-label">${t('s4.adv.kpi.amort')}</div>
-      <div class="kpi-value">${amortShare.toFixed(2)} €</div>
-      <div class="kpi-sub">${amortization.toFixed(0)} € / ${productions}</div>
+      <div class="kpi-value">${costs.amortShare.toFixed(2)} €</div>
+      <div class="kpi-sub">${costs.amortization.toFixed(0)} € / ${costs.productions}</div>
     </div>
     <div class="kpi-card accent">
       <div class="kpi-label">${t('s4.adv.kpi.full_cost')}</div>
-      <div class="kpi-value" style="font-size:1.3rem">${fullCost.toFixed(2)} €</div>
-      <div class="kpi-sub">${t('ui.kpi.total_material')}: ${costs.totalMaterial.toFixed(2)} € + ${(laborCost + energyCost + fixedShare + amortShare).toFixed(2)} €</div>
+      <div class="kpi-value" style="font-size:1.3rem">${costs.totalFullCost.toFixed(2)} €</div>
+      <div class="kpi-sub">${t('ui.kpi.total_material')}: ${costs.totalMaterial.toFixed(2)} € + ${additionalSum.toFixed(2)} €</div>
     </div>
     <div class="kpi-card success">
       <div class="kpi-label">${t('s4.adv.kpi.full_portion')}</div>
-      <div class="kpi-value" style="font-size:1.3rem">${fullPerPortion.toFixed(2)} €</div>
-      <div class="kpi-sub">${fullCost.toFixed(2)} € / ${portions} ${portions > 1 ? t('unit.portions') : t('unit.portion')}</div>
+      <div class="kpi-value" style="font-size:1.3rem">${costs.costPerPortion.toFixed(2)} €</div>
+      <div class="kpi-sub">${costs.totalFullCost.toFixed(2)} € / ${costs.portions} ${costs.portions > 1 ? t('unit.portions') : t('unit.portion')}</div>
     </div>
   `;
 }
@@ -835,12 +915,22 @@ function renderSummary() {
               <span class="fin-label">${t('ui.kpi.total_material')}</span>
               <span class="fin-value">${costs.totalMaterial.toFixed(2)} €</span>
             </div>
+            ${costs.additionalCosts > 0 ? `
+            <div class="fin-row" style="font-size: 0.8rem; color: var(--text-muted); padding-left: 0.5rem; border-left: 2px solid var(--surface-border);">
+              <span>${t('s4.adv.kpi.labor')} + ${t('s4.adv.kpi.energy')} + ...</span>
+              <span>+ ${costs.additionalCosts.toFixed(2)} €</span>
+            </div>
+            <div class="fin-row" style="font-weight: 700; border-top: 1px dashed var(--surface-border); margin-top: 0.2rem; padding-top: 0.2rem;">
+              <span>${t('s4.adv.kpi.full_cost')}</span>
+              <span>${costs.totalFullCost.toFixed(2)} €</span>
+            </div>
+            ` : ''}
             <div class="fin-row">
               <span class="fin-label">${t('s1.portions')}</span>
               <span class="fin-value">${costs.portions}</span>
             </div>
             <div class="fin-row highlight">
-              <span class="fin-label">${t('ui.kpi.per_portion')}</span>
+              <span class="fin-label">${costs.additionalCosts > 0 ? t('s4.adv.kpi.full_portion') : t('ui.kpi.per_portion')}</span>
               <span class="fin-value">${costs.costPerPortion.toFixed(2)} €</span>
             </div>
             <div class="fin-row highlight">
@@ -934,6 +1024,13 @@ function loadRecipe(id) {
   APP.margin = recipe.margin || 70;
 
   populateStep1();
+
+  // Reset initialization for advanced inputs
+  ['advLaborRate', 'advFixedCharges', 'advProductions', 'advEnergy', 'advAmortization'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) delete el.dataset.initialized;
+  });
+
   goToStep(1);
   showToast(t('recipe.toast.loaded', { name: recipe.name }), 'success');
 }
@@ -961,19 +1058,17 @@ function renderSavedRecipes() {
 
   empty.style.display = 'none';
   grid.innerHTML = APP.savedRecipes.map(r => {
-    const costs = (() => {
-      const total = r.ingredients.reduce((s, i) => s + calcIngredientCost(i), 0);
-      const portions = r.portions || 10;
-      return { total: round2(total), perPortion: round2(total / portions) };
-    })();
+    const costs = calcFullCost(r.margin || 70, r);
     const locale = (typeof getLang === 'function') ? (getLang() === 'en' ? 'en-GB' : (getLang() === 'es' ? 'es-ES' : 'fr-FR')) : 'fr-FR';
     const date = new Date(r.savedAt).toLocaleDateString(locale);
+
+    const costLabel = costs.additionalCosts > 0 ? t('s4.adv.kpi.full_cost') : t('label.cost');
 
     return `
       <div class="saved-card">
         <div class="sc-name">${escapeHtml(r.name)}</div>
         <div class="sc-meta">${escapeHtml(r.category || t('lab.cat.all'))} · ${r.portions} portions · ${date}</div>
-        <div class="sc-cost">${t('label.cost')}: ${costs.total.toFixed(2)} € · ${costs.perPortion.toFixed(2)} €/${t('unit.portion')}</div>
+        <div class="sc-cost">${costLabel}: ${costs.totalFullCost.toFixed(2)} € · ${costs.costPerPortion.toFixed(2)} €/${t('unit.portion')}</div>
         <div class="sc-actions">
           <button class="btn btn-outline btn-sm" onclick="loadRecipe('${r.id}')">${t('nav.home') === 'Home' ? 'Load' : (t('nav.home') === 'Inicio' ? 'Cargar' : 'Charger')}</button>
           <button class="btn btn-danger btn-sm" onclick="deleteRecipe('${r.id}')">${t('nav.home') === 'Home' ? 'Delete' : (t('nav.home') === 'Inicio' ? 'Eliminar' : 'Supprimer')}</button>
@@ -1043,6 +1138,13 @@ function loadExampleRecipe(idx) {
   };
 
   populateStep1();
+
+  // Reset initialization for advanced inputs
+  ['advLaborRate', 'advFixedCharges', 'advProductions', 'advEnergy', 'advAmortization'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) delete el.dataset.initialized;
+  });
+
   goToStep(1);
   showToast(t('recipe.toast.loaded', { name: APP.recipe.name }), 'success');
 }
@@ -1432,9 +1534,17 @@ function newRecipe() {
     cookTime: 30,
     description: '',
     ingredients: [],
-    steps: []
+    steps: [],
+    advanced: null
   };
   APP.margin = 70;
+
+  // Reset initialization state for advanced inputs
+  ['advLaborRate', 'advFixedCharges', 'advProductions', 'advEnergy', 'advAmortization'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) delete el.dataset.initialized;
+  });
+
   goToStep(0);
 }
 
@@ -2037,6 +2147,7 @@ function saveTeamMembers() {
   if (owner === currentUser) {
     const teamName = $('#teamNameInput')?.value || '';
     localStorage.setItem(`gourmet_team_name_${owner}`, teamName);
+    renderSharedList();
   }
 }
 
@@ -2403,10 +2514,21 @@ function renderNotifications() {
       if (n.type === 'leave_request') msg = t('plan.notif.leave_req', { from: capitalizeFirstLetter(n.from), name: capitalizeFirstLetter(n.memberName) });
       if (n.type === 'invite') msg = t('plan.notif.invite', { from: capitalizeFirstLetter(n.from) });
 
+      let actions = '';
+      if (n.type === 'invite' && n.status === 'pending') {
+        actions = `
+          <div style="display:flex; gap:0.5rem; margin-top:0.5rem;" onclick="event.stopPropagation()">
+            <button onclick="acceptInvite('${n.id}')" class="btn btn-sm btn-accent" style="padding:2px 8px; font-size:0.75rem; border-radius:4px;">${t('plan.btn.approve').split(' ')[0]}</button>
+            <button onclick="rejectInvite('${n.id}')" class="btn btn-sm btn-outline" style="padding:2px 8px; font-size:0.75rem; border-radius:4px; color:var(--danger); border-color:var(--danger);">${t('plan.btn.reject').split(' ')[0]}</button>
+          </div>
+        `;
+      }
+
       return `
         <div class="notif-item ${n.read ? 'read' : 'unread'}" onclick="handleNotifClick('${n.id}')">
           <div style="font-size:0.8rem; margin-bottom:0.3rem;">${msg}</div>
-          <div style="font-size:0.7rem; color:var(--text-muted);">${new Date(n.timestamp).toLocaleString('fr-FR')}</div>
+          ${actions}
+          <div style="font-size:0.7rem; color:var(--text-muted); opacity:0.7; margin-top:0.3rem;">${new Date(n.timestamp).toLocaleString('fr-FR')}</div>
         </div>
       `;
     }).join('');
@@ -2422,12 +2544,79 @@ function handleNotifClick(id) {
 
   if (notif.type === 'leave_request') {
     document.getElementById('navHub').click(); // Show on dashboard
-  } else if (notif.type === 'invite') {
+  } else if (notif.type === 'invite' && notif.status === 'accepted') {
     // Already shared, just inform
     showToast(t('plan.toast.invited', { name: notif.from }), 'info');
   }
 }
 
+function acceptInvite(id) {
+  const notif = APP.notifications.find(n => n.id === id);
+  if (!notif) return;
+
+  const currentUser = localStorage.getItem(STORAGE_KEYS.currentUser);
+  const owner = notif.from;
+  const ownerKey = owner.toLowerCase();
+
+  // 1. Update shared list (Owner grants access to Invited User)
+  const shared = JSON.parse(localStorage.getItem(STORAGE_KEYS.sharedPlannings) || '{}');
+  if (!shared[ownerKey]) shared[ownerKey] = [];
+  if (!shared[ownerKey].includes(currentUser.toLowerCase())) {
+    shared[ownerKey].push(currentUser.toLowerCase());
+  }
+  localStorage.setItem(STORAGE_KEYS.sharedPlannings, JSON.stringify(shared));
+
+  // 2. Synchronize Team (Invited User becomes member of Owner's team)
+  const teamKey = `${STORAGE_KEYS.teamMembers}_${ownerKey}`;
+  let ownerTeam = JSON.parse(localStorage.getItem(teamKey) || '[]');
+
+  // Ensure owner is Chef in their own team
+  let ownerInTeam = ownerTeam.find(m => m.name.toLowerCase() === ownerKey);
+  if (!ownerInTeam) {
+    ownerTeam.push({ id: 'owner_' + Date.now(), name: owner, role: 'Chef de Labo', colorIdx: 0 });
+  }
+
+  // Add guest to owner's team
+  const usersDb = JSON.parse(localStorage.getItem(STORAGE_KEYS.users) || '{}');
+  const guestData = usersDb[currentUser.toLowerCase()];
+  const isFemale = guestData?.gender === 'female';
+  const alreadyInTeam = ownerTeam.find(m => m.name.toLowerCase() === currentUser.toLowerCase());
+
+  if (!alreadyInTeam) {
+    ownerTeam.push({
+      id: 'member_' + Date.now(),
+      name: currentUser,
+      role: isFemale ? 'Apprentie' : 'Apprenti',
+      colorIdx: ownerTeam.length
+    });
+  }
+  localStorage.setItem(teamKey, JSON.stringify(ownerTeam));
+
+  // 3. Update Notif Status
+  notif.status = 'accepted';
+  notif.read = true;
+  saveNotifications();
+  renderNotifications();
+
+  // 4. Global Refresh
+  renderInvitations();
+  if (APP.viewOwner === owner) {
+    loadTeamMembers();
+    renderTeam();
+  }
+
+  showToast(t('plan.toast.invited', { name: owner }), 'success');
+}
+
+function rejectInvite(id) {
+  const notif = APP.notifications.find(n => n.id === id);
+  if (!notif) return;
+  notif.status = 'rejected';
+  notif.read = true;
+  saveNotifications();
+  renderNotifications();
+  showToast("Invitation refusée", 'info');
+}
 
 function inviteUserToPlanning() {
   const username = $('#inviteUser').value.trim();
@@ -2435,74 +2624,23 @@ function inviteUserToPlanning() {
   if (!username) return;
 
   const usersDb = JSON.parse(localStorage.getItem(STORAGE_KEYS.users) || '{}');
-  const invitedUserData = usersDb[username.toLowerCase()];
-  if (!invitedUserData) {
+  if (!usersDb[username.toLowerCase()]) {
     showToast(t('plan.toast.user_not_found'), 'error');
     return;
   }
 
-  const shared = JSON.parse(localStorage.getItem(STORAGE_KEYS.sharedPlannings) || '{}');
-  const ownerKey = currentUser.toLowerCase();
-
-  // 1. Handle Sharing Permissions
-  if (!shared[ownerKey]) shared[ownerKey] = [];
-  if (shared[ownerKey].includes(username.toLowerCase())) {
-    showToast(t('plan.toast.already_access'), 'info');
-    return;
-  }
-  shared[ownerKey].push(username.toLowerCase());
-  localStorage.setItem(STORAGE_KEYS.sharedPlannings, JSON.stringify(shared));
-
-  // 2. Automatically sync Team Members for the Owner
-  // Ensure owner is Chef de Labo in their own team
-  const teamKey = `${STORAGE_KEYS.teamMembers}_${ownerKey}`;
-  let ownerTeam = JSON.parse(localStorage.getItem(teamKey) || '[]');
-
-  const ownerInTeam = ownerTeam.find(m => m.name.toLowerCase() === ownerKey);
-  if (!ownerInTeam) {
-    ownerTeam.push({
-      id: 'owner_' + Date.now(),
-      name: currentUser,
-      role: 'Chef de Labo',
-      colorIdx: 0
-    });
-  } else {
-    ownerInTeam.role = 'Chef de Labo';
-  }
-
-  // Add the invited person as Worker/Apprentice with Gender support
-  const alreadyInTeam = ownerTeam.find(m => m.name.toLowerCase() === username.toLowerCase());
-  if (!alreadyInTeam) {
-    const isFemale = invitedUserData.gender === 'female';
-    // Default role logic: Apprentice/Worker based on gender
-    const defaultRole = isFemale ? 'Apprentie' : 'Apprenti';
-
-    ownerTeam.push({
-      id: 'member_' + Date.now(),
-      name: username,
-      role: defaultRole,
-      colorIdx: ownerTeam.length
-    });
-  }
-
-  localStorage.setItem(teamKey, JSON.stringify(ownerTeam));
-
-  // 3. Send Notification
+  // 1. Send Notification (Invite only, actual sharing happens on acceptance)
   addNotification(username, {
     id: 'inv_' + Date.now(),
     type: 'invite',
     from: currentUser,
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
+    status: 'pending'
   });
 
   showToast(t('plan.toast.invite_sent', { name: username }), 'success');
   $('#inviteUser').value = '';
   $('#inviteAutocomplete').style.display = 'none';
-
-  // Refresh UI
-  loadTeamMembers();
-  renderTeam();
-  renderSharedList();
 }
 
 function handleInviteAutocomplete() {
@@ -2550,7 +2688,10 @@ function renderSharedList() {
     return;
   }
 
-  container.innerHTML = '<div style="font-size:0.7rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; margin-bottom:0.5rem;">Cofondateur(s)</div>' +
+  const owner = currentUser?.toLowerCase();
+  const teamName = localStorage.getItem(`gourmet_team_name_${owner}`) || t('plan.shared.co_founder');
+
+  container.innerHTML = `<div style="font-size:0.7rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; margin-bottom:0.5rem;">${teamName}</div>` +
     list.map(u => `
       <div style="display:flex; justify-content:space-between; align-items:center; background:var(--bg-alt); padding:0.5rem; border-radius:var(--radius-sm); margin-bottom:0.3rem;">
         <span style="font-size:0.85rem; font-weight:600;">@${capitalizeFirstLetter(u)}</span>
@@ -2582,31 +2723,70 @@ function removeShare(user) {
 
 function renderInvitations() {
   const currentUser = localStorage.getItem(STORAGE_KEYS.currentUser);
+  if (!currentUser) return;
+
   const allShared = JSON.parse(localStorage.getItem(STORAGE_KEYS.sharedPlannings) || '{}');
   const invitedTo = [];
 
   for (const owner in allShared) {
-    if (allShared[owner].includes(currentUser?.toLowerCase())) {
+    if (owner.toLowerCase() !== currentUser.toLowerCase() && allShared[owner].includes(currentUser.toLowerCase())) {
       invitedTo.push(owner);
     }
   }
 
-  const navArea = $('#mainNav');
-  $$('.shared-nav-btn').forEach(btn => btn.remove());
+  const selector = $('#planningOwnerSelector');
+  if (!selector) return;
+
+  // Clear existing options except the first one (Mon Planning)
+  while (selector.options.length > 1) {
+    selector.remove(1);
+  }
 
   invitedTo.forEach(owner => {
     const teamName = localStorage.getItem(`gourmet_team_name_${owner.toLowerCase()}`) || owner;
-    const btn = document.createElement('button');
-    btn.className = 'nav-link shared-nav-btn';
-    btn.style.color = 'var(--accent)';
-    btn.textContent = `📅 ${teamName}`;
-    btn.onclick = () => {
-      APP.viewOwner = owner;
-      document.getElementById('navPlanning').click();
-      showToast(t('plan.shared.viewing', { name: teamName }), 'info');
-    };
-    navArea.appendChild(btn);
+    const option = document.createElement('option');
+    option.value = owner;
+    option.textContent = teamName;
+    selector.appendChild(option);
   });
+
+  // Show dropdown only if > 2 plannings (Mine + 2+ others)
+  const wrap = $('.planning-selector-wrap');
+  if (wrap) {
+    wrap.style.display = (invitedTo.length >= 2) ? 'block' : 'none';
+  }
+
+  // Default to first invitation if available and not already viewing someone
+  if (invitedTo.length > 0 && !APP.viewOwner) {
+    APP.viewOwner = invitedTo[0];
+    loadTeamMembers();
+    renderTeam();
+    renderLeaves();
+  }
+
+  // Sync selector value
+  if (APP.viewOwner && APP.viewOwner !== currentUser) {
+    selector.value = APP.viewOwner;
+  } else {
+    selector.value = 'current';
+  }
+}
+
+function switchPlanningView(owner) {
+  const currentUser = localStorage.getItem(STORAGE_KEYS.currentUser);
+  if (owner === 'current' || owner === currentUser) {
+    APP.viewOwner = currentUser;
+    showToast(t('plan.selector.personal'), 'info');
+  } else {
+    APP.viewOwner = owner;
+    const teamName = localStorage.getItem(`gourmet_team_name_${owner.toLowerCase()}`) || owner;
+    showToast(t('plan.shared.viewing', { name: teamName }), 'info');
+  }
+
+  loadTeamMembers();
+  renderTeam();
+  renderLeaves();
+  renderAnnualCalendar();
 }
 
 function addTeamMember() {
@@ -2785,6 +2965,7 @@ function renderAnnualCalendar() {
       let classes = ['day-cell'];
       let toolTip = `${weekday} ${day} ${monthNames[month]}`;
       let indicators = '';
+      let cellStyle = '';
 
       // Weekends
       if (date.getDay() === 0 || date.getDay() === 6) classes.push('sunday-day');
@@ -2803,19 +2984,26 @@ function renderAnnualCalendar() {
       }
 
       // Staff Leaves
-      const onLeave = (APP.staffLeaves || []).filter(l => fullDateStr >= l.start && fullDateStr <= l.end);
+      const onLeave = (APP.staffLeaves || []).filter(l => fullDateStr >= l.start && fullDateStr <= l.end && l.status === 'approved');
       if (onLeave.length > 0) {
         classes.push('leave-active-day');
         const names = onLeave.map(l => l.memberName).join(', ');
         toolTip += ` - 🌴 ${t('plan.leave.employee')}s: ${names}`;
-        indicators = `<span class="leave-dots">${onLeave.slice(0, 3).map(l => {
-          const c = getMemberColor(l.memberId);
-          return `<span style="color:${c.dot}">●</span>`;
-        }).join('')}</span>`;
+
+        const firstMemberColor = getMemberColor(onLeave[0].memberId);
+        if (onLeave.length === 1) {
+          cellStyle = `background-color: ${firstMemberColor.bg} !important; border-bottom: 3px solid ${firstMemberColor.dot} !important; color: ${firstMemberColor.text} !important;`;
+        } else {
+          indicators = `<div class="leave-indicators" style="background: ${firstMemberColor.dot}; position:absolute; bottom:0; left:0; right:0; height:4px; border-radius:0 0 4px 4px;"></div>`;
+          indicators += `<span class="leave-dots" style="bottom: 6px;">${onLeave.slice(0, 3).map(l => {
+            const c = getMemberColor(l.memberId);
+            return `<span style="color:${c.dot}">●</span>`;
+          }).join('')}</span>`;
+        }
       }
 
       html += `
-        <div class="${classes.join(' ')}" title="${toolTip}">
+        <div class="${classes.join(' ')}" title="${toolTip}" style="${cellStyle}">
           <span class="wd-mini">${weekday}</span>
           <span class="d-num">${day}</span>
           ${indicators}
@@ -3018,6 +3206,7 @@ function init() {
       if (typeof renderTeam === 'function') renderTeam();
       if (typeof renderLeaves === 'function') renderLeaves();
       if (typeof renderAnnualCalendar === 'function') renderAnnualCalendar();
+      updateVacationZone(); // Refresh labels
     }
     if (isVisible('#appLaboratoire')) {
       if (typeof renderDevis === 'function') renderDevis();

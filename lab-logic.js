@@ -60,12 +60,17 @@ function createLabEquipmentCard(eq) {
 
     const eqNameTrans = t('eq.name.' + eq.id);
     const eqName = eqNameTrans !== 'eq.name.' + eq.id ? eqNameTrans : eq.name;
+    const qty = eq.qty || 1;
+    const totalItemPrice = eq.selected.price * qty;
 
     card.innerHTML = `${boostTag}${essTag}
     <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
       <div style="font-size:2rem">${eq.icon}</div>
-      <div>
-        <h3 class="card-title" style="margin:0; font-size:1rem">${eqName}</h3>
+      <div style="flex:1">
+        <h3 class="card-title" style="margin:0; font-size:1rem; display:flex; justify-content:space-between; align-items:center;">
+          <span>${eqName}</span>
+          ${qty > 1 ? `<span style="background:var(--accent); color:#fff; font-size:0.7rem; padding:2px 6px; border-radius:10px; font-weight:800;">×${qty}</span>` : ''}
+        </h3>
         <span class="card-subtitle" style="margin:0; font-size:0.75rem">${eq.sub}</span>
       </div>
     </div>
@@ -74,7 +79,10 @@ function createLabEquipmentCard(eq) {
       <p style="margin:0; color:var(--text-muted); font-size:0.8rem">${eq.selected.model}</p>
     </div>
     <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--surface-border); padding-top:10px;">
-      <span style="font-weight:800; color:var(--accent); font-size:1.1rem">${formatLabPrice(eq.selected.price)}</span>
+      <div style="display:flex; flex-direction:column;">
+        <span style="font-weight:800; color:var(--accent); font-size:1.1rem">${formatLabPrice(totalItemPrice)}</span>
+        ${qty > 1 ? `<span style="font-size:0.65rem; color:var(--text-muted);">${formatLabPrice(eq.selected.price)} / ${t('unit.piece')}</span>` : ''}
+      </div>
       <span style="background:var(--bg-alt); padding:3px 8px; border-radius:4px; font-size:0.7rem; font-weight:700">${levelTrans}</span>
     </div>`;
     return card;
@@ -169,10 +177,10 @@ const PLAN_ZONES = {
 };
 
 const PLAN_ZONE_MAP = {
-    'four': 'cuisson', 'fermentation': 'cuisson', 'induction': 'cuisson',
+    'four': 'cuisson', 'four-sole': 'cuisson', 'fermentation': 'cuisson', 'induction': 'cuisson',
     'frigo': 'froid', 'congelateur': 'froid', 'cellule': 'froid', 'chambre-froide': 'froid',
     'etageres': 'stockage', 'armoire': 'stockage',
-    'batteur': 'prepa', 'robot-coupe': 'prepa', 'laminoir': 'prepa', 'tempereuse': 'prepa',
+    'batteur': 'prepa', 'robot-coupe': 'prepa', 'laminoir': 'prepa', 'tempereuse': 'prepa', 'petrin': 'prepa',
     'evier': 'lavage',
     'porte': 'infra', 'table': 'prepa'
 };
@@ -225,7 +233,11 @@ function generatePlan2D() {
         config.results.forEach(r => {
             const dim = window.EQUIPMENT_DIMS ? window.EQUIPMENT_DIMS[r.id] : null;
             if (dim && dim.floor) {
-                rawEqList.push({ id: r.id, name: r.name || dim.label, zone: PLAN_ZONE_MAP[r.id] || 'prepa', ...dim });
+                const qty = r.qty || 1;
+                for (let q = 0; q < qty; q++) {
+                    const name = qty > 1 ? `${r.name || dim.label} ${q + 1}` : (r.name || dim.label);
+                    rawEqList.push({ id: r.id, name: name, zone: PLAN_ZONE_MAP[r.id] || 'prepa', ...dim });
+                }
             }
         });
     }

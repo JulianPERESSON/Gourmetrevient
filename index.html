@@ -618,9 +618,9 @@
             <div style="margin-top:2rem; max-width:400px; margin-left:auto; margin-right:auto;">
               <div
                 style="display:flex; justify-content:space-between; font-size:0.8rem; font-weight:700; color:var(--text-secondary); margin-bottom:0.5rem;">
-                <span>5 000 €</span><span>50 000 €</span>
+                <span>5 000 €</span><span>500 000 €</span>
               </div>
-              <input type="range" id="budgetSlider" min="5000" max="50000" step="500" value="15000"
+              <input type="range" id="budgetSlider" min="5000" max="500000" step="5000" value="15000"
                 style="width:100%; accent-color:var(--accent); cursor:pointer;" />
             </div>
           </div>
@@ -645,6 +645,9 @@
             <div class="card" data-mode="traiteur"
               style="flex:1; min-width:120px; cursor:pointer; text-align:center; padding:1rem;">🍽️<br><span
                 data-i18n="lab.mode.traiteur">Traiteur</span></div>
+            <div class="card" data-mode="boulangerie"
+              style="flex:1; min-width:120px; cursor:pointer; text-align:center; padding:1rem;">🥖<br><span
+                data-i18n="lab.mode.boulangerie">Boulangerie</span></div>
           </div>
         </section>
 
@@ -974,7 +977,7 @@
             <div class="legend-items">
               <div class="legend-item"><span class="day-cell-mini event-day"></span> <span
                   data-i18n="plan.legend.events">Événements Clés</span></div>
-              <div class="legend-item"><span class="day-cell-mini holiday-day"></span> <span
+              <div class="legend-item"><span class="day-cell-mini holiday-day"></span> <span id="planningHolidayLegend"
                   data-i18n="plan.legend.holidays">Vacances Scolaires</span></div>
               <div class="legend-item"><span class="day-cell-mini sunday-day"></span> <span
                   data-i18n="plan.legend.sundays">Dimanches & Fériés</span></div>
@@ -992,11 +995,17 @@
           <div class="calendar-header"
             style="margin-bottom:2.5rem; display:flex; justify-content:space-between; align-items:flex-end;">
             <div>
-              <h2 class="dash-greeting" data-i18n="plan.calendar.title">Planning d'Activité <span
-                  class="accent">2026</span></h2>
+              <h2 class="dash-greeting" data-i18n="plan.calendar.title"><span id="planningCalendarTitle">Planning
+                  d'Activité</span> <span class="accent">2026</span></h2>
               <p class="dash-subtitle" data-i18n="plan.calendar.desc">Organisation annuelle du laboratoire et des
-                équipes.
-              </p>
+                équipes.</p>
+
+              <div class="planning-selector-wrap" style="margin-top: 1rem;">
+                <select id="planningOwnerSelector" class="form-select" onchange="switchPlanningView(this.value)"
+                  style="max-width: 250px; font-weight: 700; border-color: var(--accent); color: var(--accent);">
+                  <option value="current" data-i18n="plan.selector.personal">Mon Planning</option>
+                </select>
+              </div>
             </div>
             <button class="btn btn-outline btn-sm" id="btnClearPlanning" onclick="clearPlanning()"
               style="color:var(--danger); border-color:var(--danger); margin-bottom: 0.5rem;"
@@ -1424,6 +1433,7 @@
       if (selector) selector.value = savedZone;
 
       if (typeof renderAnnualCalendar === 'function') renderAnnualCalendar();
+      if (typeof updateVacationZone === 'function') updateVacationZone();
     }
 
     function showAdmin() {
