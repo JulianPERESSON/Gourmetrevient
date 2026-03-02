@@ -1,0 +1,3041 @@
+/*
+  =====================================================================
+  APP.JS — GourmetRevient Professional Recipe Cost Calculator
+  Modular Vanilla JavaScript
+  =====================================================================
+*/
+
+// ============================================================================
+// STATE
+// ============================================================================
+
+const APP = {
+  currentStep: 0, // 0 = hero, 1-5 = steps
+  recipe: {
+    id: null,
+    name: '',
+    category: '',
+    portions: 10,
+    prepTime: 60,
+    cookTime: 30,
+    description: '',
+    ingredients: [],
+    steps: []
+  },
+  margin: 70, // percentage
+  savedRecipes: [],
+  ingredientDb: [],
+  teamMembers: [],
+  staffLeaves: [],
+  viewOwner: null, // User cuya data estamos viendo
+  notifications: []
+};
+
+const STORAGE_KEYS = {
+  users: 'gourmet_users_db',
+  currentUser: 'gourmet_current_user',
+  ingredientDb: 'gourmetrevient_ingredient_db',
+  teamMembers: 'gourmet_team_members',
+  staffLeaves: 'gourmet_staff_leaves',
+  sharedPlannings: 'gourmet_shared_plannings',
+  notifications: 'gourmet_notifications',
+  vacationZone: 'gourmet_vacation_zone'
+};
+
+// Default ingredient database (pre-loaded)
+const DEFAULT_INGREDIENT_DB = [
+  { name: 'Farine T55', unit: 'g', pricePerUnit: 0.65, priceRef: 'kg' },
+  { name: 'Farine T45', unit: 'g', pricePerUnit: 0.80, priceRef: 'kg' },
+  { name: 'Beurre AOP', unit: 'g', pricePerUnit: 7.50, priceRef: 'kg' },
+  { name: 'Beurre doux', unit: 'g', pricePerUnit: 6.80, priceRef: 'kg' },
+  { name: 'Sucre semoule', unit: 'g', pricePerUnit: 0.85, priceRef: 'kg' },
+  { name: 'Sucre glace', unit: 'g', pricePerUnit: 2.10, priceRef: 'kg' },
+  { name: 'Lait entier', unit: 'ml', pricePerUnit: 0.85, priceRef: 'L' },
+  { name: 'Crème 35% MG', unit: 'ml', pricePerUnit: 4.20, priceRef: 'L' },
+  { name: 'Œufs entiers', unit: 'pièce', pricePerUnit: 0.15, priceRef: 'pièce' },
+  { name: 'Jaunes d\'œufs', unit: 'pièce', pricePerUnit: 0.15, priceRef: 'pièce' },
+  { name: 'Blancs d\'œufs', unit: 'pièce', pricePerUnit: 0.10, priceRef: 'pièce' },
+  { name: 'Chocolat noir 64%', unit: 'g', pricePerUnit: 11.50, priceRef: 'kg' },
+  { name: 'Poudre d\'amandes', unit: 'g', pricePerUnit: 9.50, priceRef: 'kg' },
+  { name: 'Vanille (gousse)', unit: 'pièce', pricePerUnit: 1.80, priceRef: 'pièce' },
+  { name: 'Sel', unit: 'g', pricePerUnit: 0.50, priceRef: 'kg' },
+  { name: 'Maïzena', unit: 'g', pricePerUnit: 2.80, priceRef: 'kg' },
+  { name: 'Praliné noisette', unit: 'g', pricePerUnit: 14.50, priceRef: 'kg' },
+  { name: 'Cacao poudre', unit: 'g', pricePerUnit: 12.00, priceRef: 'kg' },
+  { name: 'Gélatine', unit: 'g', pricePerUnit: 22.00, priceRef: 'kg' },
+  { name: 'Levure fraîche', unit: 'g', pricePerUnit: 6.50, priceRef: 'kg' },
+  { name: 'Fraises fraîches', unit: 'g', pricePerUnit: 4.50, priceRef: 'kg' },
+  { name: 'Noisettes torréfiées', unit: 'g', pricePerUnit: 12.50, priceRef: 'kg' },
+  { name: 'Amandes effilées', unit: 'g', pricePerUnit: 9.50, priceRef: 'kg' },
+  { name: 'Rhum ambré', unit: 'ml', pricePerUnit: 18.00, priceRef: 'L' },
+  { name: 'Kirsch', unit: 'ml', pricePerUnit: 22.00, priceRef: 'L' },
+];
+
+// Planning Constants - 2026 (Zone C - Toulouse)
+const HOLIDAYS_A_2026 = [
+  { start: "2025-12-20", end: "2026-01-05", label: "Vacances de Noël" },
+  { start: "2026-02-07", end: "2026-02-23", label: "Vacances d'Hiver" },
+  { start: "2026-04-04", end: "2026-04-20", label: "Vacances de Printemps" },
+  { start: "2026-05-14", end: "2026-05-17", label: "Pont de l'Ascension" },
+  { start: "2026-07-04", end: "2026-08-31", label: "Vacances d'Été" },
+  { start: "2026-10-17", end: "2026-11-02", label: "Vacances de la Toussaint" },
+  { start: "2026-12-19", end: "2027-01-04", label: "Vacances de Noël" }
+];
+const HOLIDAYS_B_2026 = [
+  { start: "2025-12-20", end: "2026-01-05", label: "Vacances de Noël" },
+  { start: "2026-02-14", end: "2026-03-02", label: "Vacances d'Hiver" },
+  { start: "2026-04-11", end: "2026-04-27", label: "Vacances de Printemps" },
+  { start: "2026-05-14", end: "2026-05-17", label: "Pont de l'Ascension" },
+  { start: "2026-07-04", end: "2026-08-31", label: "Vacances d'Été" },
+  { start: "2026-10-17", end: "2026-11-02", label: "Vacances de la Toussaint" },
+  { start: "2026-12-19", end: "2027-01-04", label: "Vacances de Noël" }
+];
+const HOLIDAYS_C_2026 = [
+  { start: "2025-12-20", end: "2026-01-05", label: "Vacances de Noël" },
+  { start: "2026-02-21", end: "2026-03-09", label: "Vacances d'Hiver" },
+  { start: "2026-04-18", end: "2026-05-04", label: "Vacances de Printemps" },
+  { start: "2026-05-14", end: "2026-05-17", label: "Pont de l'Ascension" },
+  { start: "2026-07-04", end: "2026-08-31", label: "Vacances d'Été" },
+  { start: "2026-10-17", end: "2026-11-02", label: "Vacances de la Toussaint" },
+  { start: "2026-12-19", end: "2027-01-04", label: "Vacances de Noël" }
+];
+const HOLIDAYS_2026 = { A: HOLIDAYS_A_2026, B: HOLIDAYS_B_2026, C: HOLIDAYS_C_2026 };
+
+const PASTRY_EVENTS_2026 = {
+  "01-01": "Jour de l'An",
+  "01-06": "Épiphanie (Galettes)",
+  "02-02": "Chandeleur (Crêpes)",
+  "02-14": "Saint Valentin (Cœur)",
+  "02-17": "Mardi Gras (Beignets)",
+  "04-05": "Pâques (Chocolats)",
+  "04-06": "Lundi de Pâques",
+  "05-01": "Fête du Travail",
+  "05-08": "Victoire 1945",
+  "05-14": "Ascension",
+  "05-24": "Pentecôte",
+  "05-25": "Lundi de Pentecôte",
+  "05-31": "Fête des Mères",
+  "06-21": "Fête des Pères / Musique",
+  "07-14": "Fête Nationale",
+  "08-15": "Assomption",
+  "11-01": "Toussaint",
+  "11-11": "Armistice 1918",
+  "12-25": "Noël (Bûches)",
+  "12-31": "Réveillon St Sylvestre"
+};
+
+// --- Localization Helpers ---
+function getTranslatedEvent(dateStr) {
+  const keys = {
+    "01-01": "event.nye", "01-06": "event.epiphany", "02-02": "event.candlemass",
+    "02-14": "event.valentine", "02-17": "event.mardigras", "04-05": "event.easter",
+    "04-06": "event.easter_monday", "05-01": "event.labor", "05-08": "event.vday_1945",
+    "05-14": "event.ascension", "05-24": "event.pentecost", "05-25": "event.pentecost_monday",
+    "05-31": "event.mothers", "06-21": "event.fathers", "07-14": "event.nat_day",
+    "08-15": "event.assumption", "11-01": "event.all_saints", "11-11": "event.armistice",
+    "12-25": "event.christmas", "12-31": "event.nye_eve"
+  };
+  const key = keys[dateStr];
+  return key ? t(key) : PASTRY_EVENTS_2026[dateStr];
+}
+
+function updateVacationZone() {
+  const selector = $('#vacationZoneSelector');
+  if (!selector) return;
+  localStorage.setItem(STORAGE_KEYS.vacationZone, selector.value);
+  renderAnnualCalendar();
+  showToast(t('plan.toast.updated') || 'Zone mise à jour');
+}
+
+function getTranslatedHoliday(label) {
+  const keys = {
+    "Vacances d'Hiver": "holiday.winter",
+    "Vacances de Printemps": "holiday.spring",
+    "Vacances d'Été": "holiday.summer",
+    "Vacances de la Toussaint": "holiday.autumn",
+    "Vacances de Noël": "holiday.xmas"
+  };
+  const key = keys[label];
+  return key ? t(key) : label;
+}
+
+// ============================================================================
+// UTILITIES
+// ============================================================================
+
+const $ = (sel) => document.querySelector(sel);
+const $$ = (sel) => document.querySelectorAll(sel);
+// round2 is already defined in data.js
+
+function generateId() {
+  return 'r_' + Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+// ============================================================================
+// INGREDIENT COST CALCULATION
+// ============================================================================
+
+function calcIngredientCost(ing) {
+  const qty = parseFloat(ing.quantity) || 0;
+  const price = parseFloat(ing.pricePerUnit) || 0;
+  const unit = ing.unit || 'g';
+
+  // pricePerUnit is per kg, per L, or per pièce
+  if (unit === 'g') return (qty / 1000) * price;
+  if (unit === 'kg') return qty * price;
+  if (unit === 'ml') return (qty / 1000) * price;
+  if (unit === 'L') return qty * price;
+  if (unit === 'pièce') return qty * price;
+  return qty * price;
+}
+
+function calcTotalMaterialCost() {
+  return APP.recipe.ingredients.reduce((sum, ing) => sum + calcIngredientCost(ing), 0);
+}
+
+function calcFullCost(margin) {
+  const portions = APP.recipe.portions || 10;
+  const totalMaterial = calcTotalMaterialCost();
+  const costPerPortion = totalMaterial / portions;
+  const marginRate = (margin || APP.margin) / 100;
+  const sellingPrice = marginRate < 1 ? costPerPortion / (1 - marginRate) : costPerPortion * 10;
+  const marginPerPortion = sellingPrice - costPerPortion;
+  const marginPct = sellingPrice > 0 ? (marginPerPortion / sellingPrice) * 100 : 0;
+
+  return {
+    totalMaterial: round2(totalMaterial),
+    costPerPortion: round2(costPerPortion),
+    sellingPrice: round2(sellingPrice),
+    marginPerPortion: round2(marginPerPortion),
+    marginPct: round2(marginPct),
+    portions
+  };
+}
+
+// ============================================================================
+// LOCAL STORAGE
+// ============================================================================
+
+function getViewOwner() {
+  return APP.viewOwner || localStorage.getItem(STORAGE_KEYS.currentUser) || 'Ami';
+}
+
+function getUserRecipesKey() {
+  const owner = getViewOwner();
+  return `gourmetrevient_recipes_${owner.toLowerCase()}`;
+}
+
+function getUserTeamKey() {
+  const owner = getViewOwner();
+  return `${STORAGE_KEYS.teamMembers}_${owner.toLowerCase()}`;
+}
+
+function getUserLeavesKey() {
+  const owner = getViewOwner();
+  return `${STORAGE_KEYS.staffLeaves}_${owner.toLowerCase()}`;
+}
+
+function getUserLabPlanKey() {
+  const owner = getViewOwner();
+  return `gourmet_lab_plan_${owner.toLowerCase()}`;
+}
+
+function getUserPlacementsKey() {
+  const owner = getViewOwner();
+  return `labpatiss_placements_${owner.toLowerCase()}`;
+}
+
+function loadSavedRecipes() {
+  try {
+    const key = getUserRecipesKey();
+    const data = localStorage.getItem(key);
+    APP.savedRecipes = data ? JSON.parse(data) : [];
+  } catch { APP.savedRecipes = []; }
+}
+
+function saveSavedRecipes() {
+  const key = getUserRecipesKey();
+  localStorage.setItem(key, JSON.stringify(APP.savedRecipes));
+}
+
+function loadIngredientDb() {
+  try {
+    const data = localStorage.getItem(STORAGE_KEYS.ingredientDb);
+    APP.ingredientDb = data ? JSON.parse(data) : [...DEFAULT_INGREDIENT_DB];
+    if (APP.ingredientDb.length === 0) APP.ingredientDb = [...DEFAULT_INGREDIENT_DB];
+  } catch { APP.ingredientDb = [...DEFAULT_INGREDIENT_DB]; }
+}
+
+function saveIngredientDb() {
+  localStorage.setItem(STORAGE_KEYS.ingredientDb, JSON.stringify(APP.ingredientDb));
+}
+
+function addToIngredientDb(ing) {
+  const exists = APP.ingredientDb.find(i =>
+    i.name.toLowerCase() === ing.name.toLowerCase()
+  );
+  if (!exists && ing.name.trim()) {
+    APP.ingredientDb.push({
+      name: ing.name,
+      unit: ing.unit,
+      pricePerUnit: ing.pricePerUnit,
+      priceRef: ing.priceRef || getPriceRef(ing.unit)
+    });
+    saveIngredientDb();
+  }
+}
+
+function getPriceRef(unit) {
+  if (unit === 'g' || unit === 'kg') return 'kg';
+  if (unit === 'ml' || unit === 'L') return 'L';
+  return 'pièce';
+}
+
+// ============================================================================
+// NAVIGATION
+// ============================================================================
+
+function goToStep(step) {
+  // Collect data from current step before navigating
+  if (APP.currentStep >= 1) collectCurrentStepData();
+
+  APP.currentStep = step;
+
+  // Show/hide hero
+  $('#heroSection').style.display = step === 0 ? 'block' : 'none';
+  $('#stepIndicator').style.display = step === 0 ? 'none' : 'flex';
+  $('#savedSection').style.display = 'none';
+
+  // Show/hide step content
+  for (let i = 1; i <= 5; i++) {
+    const el = $(`#step${i}`);
+    if (el) {
+      el.classList.toggle('active', i === step);
+    }
+  }
+
+  // Update step indicator
+  $$('.step-dot').forEach((dot, idx) => {
+    const s = idx + 1;
+    dot.classList.remove('active', 'completed');
+    if (s === step) dot.classList.add('active');
+    else if (s < step) dot.classList.add('completed');
+  });
+
+  $$('.step-line').forEach((line, idx) => {
+    line.classList.toggle('active', idx + 1 < step);
+  });
+
+  // Render step-specific content
+  if (step === 2) renderIngredients();
+  if (step === 3) renderProcedure();
+  if (step === 4) renderCostAnalysis();
+  if (step === 5) renderSummary();
+
+  // Scroll to top
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function collectCurrentStepData() {
+  if (APP.currentStep === 1) {
+    APP.recipe.name = $('#recipeName').value.trim();
+    APP.recipe.category = $('#recipeCategory').value.trim();
+    APP.recipe.portions = parseInt($('#recipePortions').value) || 10;
+    APP.recipe.prepTime = parseInt($('#recipePrepTime').value) || 0;
+    APP.recipe.cookTime = parseInt($('#recipeCookTime').value) || 0;
+    APP.recipe.description = $('#recipeDesc').value.trim();
+  }
+  if (APP.currentStep === 2) collectIngredients();
+  if (APP.currentStep === 3) collectProcedure();
+}
+
+function populateStep1() {
+  $('#recipeName').value = APP.recipe.name;
+  $('#recipeCategory').value = APP.recipe.category;
+  $('#recipePortions').value = APP.recipe.portions;
+  $('#recipePrepTime').value = APP.recipe.prepTime;
+  $('#recipeCookTime').value = APP.recipe.cookTime;
+  $('#recipeDesc').value = APP.recipe.description;
+}
+
+// ============================================================================
+// STEP 2 — INGREDIENTS
+// ============================================================================
+
+function renderIngredients() {
+  const container = $('#ingredientsList');
+  container.innerHTML = '';
+
+  APP.recipe.ingredients.forEach((ing, idx) => {
+    container.appendChild(createIngredientRow(ing, idx));
+  });
+
+  updateIngredientsTotal();
+}
+
+function createIngredientRow(ing, idx) {
+  const row = document.createElement('div');
+  row.className = 'ing-row';
+  row.dataset.idx = idx;
+
+  const cost = calcIngredientCost(ing);
+  const priceRef = getPriceRef(ing.unit);
+
+  row.innerHTML = `
+    <div class="ing-name autocomplete-wrap">
+      <input type="text" class="form-input ing-input" data-field="name" value="${escapeHtml(t(ing.name))}" placeholder="${t('ui.ph.name')}" />
+      <div class="autocomplete-list" id="ac-${idx}"></div>
+    </div>
+    <div class="ing-qty">
+      <input type="number" class="form-input ing-input" data-field="quantity" value="${ing.quantity}" min="0" step="any" placeholder="${t('ui.ph.qty')}" />
+    </div>
+    <div class="ing-unit">
+      <select class="form-input ing-input" data-field="unit">
+        <option value="g" ${ing.unit === 'g' ? 'selected' : ''}>g</option>
+        <option value="kg" ${ing.unit === 'kg' ? 'selected' : ''}>kg</option>
+        <option value="ml" ${ing.unit === 'ml' ? 'selected' : ''}>ml</option>
+        <option value="L" ${ing.unit === 'L' ? 'selected' : ''}>L</option>
+        <option value="pièce" ${ing.unit === 'pièce' ? 'selected' : ''}>${t('unit.portion')}</option>
+      </select>
+    </div>
+    <div class="ing-price">
+      <input type="number" class="form-input ing-input" data-field="pricePerUnit" value="${ing.pricePerUnit}" min="0" step="0.01" placeholder="€/${priceRef}" title="${t('ui.ph.price')}" />
+    </div>
+    <div class="ing-cost">${cost.toFixed(2)} €</div>
+    <button class="btn-remove" data-remove="${idx}" title="${t('ui.btn.delete')}">✕</button>
+  `;
+
+  // Input events
+  row.querySelectorAll('.ing-input').forEach(input => {
+    input.addEventListener('input', () => onIngredientChange(row, idx));
+    input.addEventListener('change', () => onIngredientChange(row, idx));
+  });
+
+  // Autocomplete on name field
+  const nameInput = row.querySelector('[data-field="name"]');
+  const acList = row.querySelector('.autocomplete-list');
+  nameInput.addEventListener('input', () => showAutocomplete(nameInput, acList, idx));
+  nameInput.addEventListener('focus', () => showAutocomplete(nameInput, acList, idx));
+  nameInput.addEventListener('blur', () => setTimeout(() => acList.classList.remove('show'), 200));
+
+  // Remove button
+  row.querySelector('[data-remove]').addEventListener('click', () => {
+    APP.recipe.ingredients.splice(idx, 1);
+    renderIngredients();
+  });
+
+  return row;
+}
+
+function onIngredientChange(row, idx) {
+  const ing = APP.recipe.ingredients[idx];
+  const nameInput = row.querySelector('[data-field="name"]');
+  const qtyInput = row.querySelector('[data-field="quantity"]');
+  const unitSelect = row.querySelector('[data-field="unit"]');
+  const priceInput = row.querySelector('[data-field="pricePerUnit"]');
+
+  ing.name = nameInput.value;
+  ing.quantity = parseFloat(qtyInput.value) || 0;
+  ing.unit = unitSelect.value;
+  ing.pricePerUnit = parseFloat(priceInput.value) || 0;
+
+  const cost = calcIngredientCost(ing);
+  row.querySelector('.ing-cost').textContent = cost.toFixed(2) + ' €';
+
+  // Update price placeholder
+  const priceRef = getPriceRef(ing.unit);
+  priceInput.placeholder = `€/${priceRef}`;
+
+  updateIngredientsTotal();
+}
+
+function updateIngredientsTotal() {
+  const total = calcTotalMaterialCost();
+  $('#ingredientsTotal').textContent = total.toFixed(2) + ' €';
+}
+
+function addIngredient(preset = null) {
+  const ing = preset || {
+    name: '',
+    quantity: 0,
+    unit: 'g',
+    pricePerUnit: 0
+  };
+  APP.recipe.ingredients.push(ing);
+  renderIngredients();
+
+  // Focus the last name input
+  const rows = $$('.ing-row');
+  if (rows.length > 0) {
+    const lastRow = rows[rows.length - 1];
+    const nameInput = lastRow.querySelector('[data-field="name"]');
+    if (nameInput) nameInput.focus();
+  }
+}
+
+function collectIngredients() {
+  const container = $('#ingredientsList');
+  if (!container) return;
+  const rows = container.querySelectorAll('.ing-row');
+  APP.recipe.ingredients = [];
+  rows.forEach(row => {
+    const name = row.querySelector('[data-field="name"]').value.trim();
+    const quantity = parseFloat(row.querySelector('[data-field="quantity"]').value) || 0;
+    const unit = row.querySelector('[data-field="unit"]').value;
+    const pricePerUnit = parseFloat(row.querySelector('[data-field="pricePerUnit"]').value) || 0;
+    if (name) {
+      APP.recipe.ingredients.push({ name, quantity, unit, pricePerUnit });
+    }
+  });
+}
+
+// Autocomplete
+function showAutocomplete(input, listEl, idx) {
+  const val = input.value.toLowerCase().trim();
+  if (val.length < 1) { listEl.classList.remove('show'); return; }
+
+  const matches = APP.ingredientDb.filter(i =>
+    i.name.toLowerCase().includes(val)
+  ).slice(0, 8);
+
+  if (matches.length === 0) { listEl.classList.remove('show'); return; }
+
+  listEl.innerHTML = matches.map(m => `
+    <div class="autocomplete-item" data-name="${escapeHtml(m.name)}" data-unit="${m.unit}" data-price="${m.pricePerUnit}">
+      <span>${escapeHtml(m.name)}</span>
+      <span class="ac-price">${m.pricePerUnit.toFixed(2)} €/${m.priceRef}</span>
+    </div>
+  `).join('');
+
+  listEl.classList.add('show');
+
+  listEl.querySelectorAll('.autocomplete-item').forEach(item => {
+    item.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      const ing = APP.recipe.ingredients[idx];
+      ing.name = item.dataset.name;
+      ing.unit = item.dataset.unit;
+      ing.pricePerUnit = parseFloat(item.dataset.price);
+      renderIngredients();
+    });
+  });
+}
+
+// ============================================================================
+// STEP 3 — PROCEDURE
+// ============================================================================
+
+function renderProcedure() {
+  const container = $('#procedureList');
+  container.innerHTML = '';
+
+  APP.recipe.steps.forEach((step, idx) => {
+    container.appendChild(createProcedureStep(step, idx));
+  });
+}
+
+function createProcedureStep(text, idx) {
+  const div = document.createElement('div');
+  div.className = 'procedure-step';
+  div.innerHTML = `
+    <div class="step-num">${idx + 1}</div>
+    <input type="text" class="form-input proc-input" value="${escapeHtml(t(text))}" placeholder="${t('ui.ph.step')}" />
+    <button class="btn-remove" data-remove-step="${idx}" title="${t('ui.btn.delete')}">✕</button>
+  `;
+
+  div.querySelector('[data-remove-step]').addEventListener('click', () => {
+    APP.recipe.steps.splice(idx, 1);
+    renderProcedure();
+  });
+
+  return div;
+}
+
+function addProcedureStep() {
+  APP.recipe.steps.push('');
+  renderProcedure();
+  const inputs = $$('.proc-input');
+  if (inputs.length > 0) inputs[inputs.length - 1].focus();
+}
+
+function collectProcedure() {
+  const inputs = $$('.proc-input');
+  APP.recipe.steps = [];
+  inputs.forEach(input => {
+    const val = input.value.trim();
+    if (val) APP.recipe.steps.push(val);
+  });
+}
+
+// ============================================================================
+// STEP 4 — COST ANALYSIS
+// ============================================================================
+
+function renderCostAnalysis() {
+  collectIngredients();
+  const costs = calcFullCost(APP.margin);
+
+  // KPI Cards
+  $('#kpiGrid').innerHTML = `
+    <div class="kpi-card">
+      <div class="kpi-label">${t('ui.kpi.total_material')}</div>
+      <div class="kpi-value">${costs.totalMaterial.toFixed(2)} €</div>
+      <div class="kpi-sub">${t('label.per_portion')} ${costs.portions} ${costs.portions > 1 ? t('unit.portions') : t('unit.portion')}</div>
+    </div>
+    <div class="kpi-card accent">
+      <div class="kpi-label">${t('ui.kpi.per_portion')}</div>
+      <div class="kpi-value">${costs.costPerPortion.toFixed(2)} €</div>
+      <div class="kpi-sub">${t('label.cost')} / ${t('unit.portion')}</div>
+    </div>
+    <div class="kpi-card success">
+      <div class="kpi-label">${t('ui.kpi.suggested_price')}</div>
+      <div class="kpi-value">${costs.sellingPrice.toFixed(2)} €</div>
+      <div class="kpi-sub">${t('s4.margin')} ${APP.margin}%</div>
+    </div>
+    <div class="kpi-card warning">
+      <div class="kpi-label">${t('ui.kpi.margin_portion')}</div>
+      <div class="kpi-value">${costs.marginPerPortion.toFixed(2)} €</div>
+      <div class="kpi-sub">${costs.marginPct.toFixed(1)}% ${t('s4.margin')}</div>
+    </div>
+  `;
+
+  // Donut chart
+  renderDonutChart();
+
+  // Batch scaling
+  renderBatchScaling(costs);
+
+  // Margin slider value
+  $('#marginValue').textContent = APP.margin + '%';
+  $('#marginSlider').value = APP.margin;
+
+  // Advanced cost KPI
+  renderAdvancedCostKPI(costs);
+}
+
+function renderAdvancedCostKPI(costs) {
+  const grid = $('#advancedKpiGrid');
+  if (!grid) return;
+
+  const laborRate = parseFloat($('#advLaborRate')?.value) || 0;
+  const fixedCharges = parseFloat($('#advFixedCharges')?.value) || 0;
+  const productions = Math.max(1, parseInt($('#advProductions')?.value) || 1);
+  const energyRate = parseFloat($('#advEnergy')?.value) || 0;
+  const amortization = parseFloat($('#advAmortization')?.value) || 0;
+
+  const prepTime = parseFloat(APP.recipe.prepTime) || 0;
+  const cookTime = parseFloat(APP.recipe.cookTime) || 0;
+  const totalTimeH = (prepTime + cookTime) / 60;
+  const portions = APP.recipe.portions || 1;
+
+  const laborCost = laborRate * totalTimeH;
+  const energyCost = energyRate * (cookTime / 60);
+  const fixedShare = fixedCharges / productions;
+  const amortShare = amortization / productions;
+
+  const fullCost = costs.totalMaterial + laborCost + energyCost + fixedShare + amortShare;
+  const fullPerPortion = fullCost / portions;
+
+  grid.innerHTML = `
+    <div class="kpi-card">
+      <div class="kpi-label">${t('s4.adv.kpi.labor')}</div>
+      <div class="kpi-value">${laborCost.toFixed(2)} €</div>
+      <div class="kpi-sub">${laborRate.toFixed(2)} €/h × ${totalTimeH.toFixed(1)}h</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">${t('s4.adv.kpi.energy')}</div>
+      <div class="kpi-value">${energyCost.toFixed(2)} €</div>
+      <div class="kpi-sub">${energyRate.toFixed(2)} €/h × ${(cookTime / 60).toFixed(1)}h</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">${t('s4.adv.kpi.fixed')}</div>
+      <div class="kpi-value">${fixedShare.toFixed(2)} €</div>
+      <div class="kpi-sub">${fixedCharges.toFixed(0)} € / ${productions}</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">${t('s4.adv.kpi.amort')}</div>
+      <div class="kpi-value">${amortShare.toFixed(2)} €</div>
+      <div class="kpi-sub">${amortization.toFixed(0)} € / ${productions}</div>
+    </div>
+    <div class="kpi-card accent">
+      <div class="kpi-label">${t('s4.adv.kpi.full_cost')}</div>
+      <div class="kpi-value" style="font-size:1.3rem">${fullCost.toFixed(2)} €</div>
+      <div class="kpi-sub">${t('ui.kpi.total_material')}: ${costs.totalMaterial.toFixed(2)} € + ${(laborCost + energyCost + fixedShare + amortShare).toFixed(2)} €</div>
+    </div>
+    <div class="kpi-card success">
+      <div class="kpi-label">${t('s4.adv.kpi.full_portion')}</div>
+      <div class="kpi-value" style="font-size:1.3rem">${fullPerPortion.toFixed(2)} €</div>
+      <div class="kpi-sub">${fullCost.toFixed(2)} € / ${portions} ${portions > 1 ? t('unit.portions') : t('unit.portion')}</div>
+    </div>
+  `;
+}
+
+function renderDonutChart() {
+  const container = $('#chartContainer');
+  const ingredients = APP.recipe.ingredients.filter(i => i.name && calcIngredientCost(i) > 0);
+  const total = calcTotalMaterialCost();
+
+  if (total === 0 || ingredients.length === 0) {
+    container.innerHTML = `<p style="color:var(--text-muted); text-align:center;">${t('ui.chart.empty')}</p>`;
+    return;
+  }
+
+  // Colors for chart segments
+  const colors = [
+    '#e67e22', '#3498db', '#2ecc71', '#e74c3c', '#9b59b6',
+    '#f39c12', '#1abc9c', '#34495e', '#d35400', '#2980b9',
+    '#27ae60', '#c0392b', '#8e44ad', '#f1c40f', '#16a085'
+  ];
+
+  // Build segments
+  const segments = ingredients.map((ing, i) => ({
+    name: t(ing.name),
+    cost: calcIngredientCost(ing),
+    color: colors[i % colors.length]
+  })).sort((a, b) => b.cost - a.cost);
+
+  // SVG donut
+  const radius = 70;
+  const circumference = 2 * Math.PI * radius;
+  let offset = 0;
+
+  const circles = segments.map(seg => {
+    const pct = seg.cost / total;
+    const dash = pct * circumference;
+    const circle = `<circle cx="100" cy="100" r="${radius}"
+      stroke="${seg.color}" stroke-dasharray="${dash} ${circumference - dash}"
+      stroke-dashoffset="${-offset}" />`;
+    offset += dash;
+    return circle;
+  }).join('');
+
+  // Legend
+  const legend = segments.map(seg => {
+    const pct = ((seg.cost / total) * 100).toFixed(1);
+    return `<div class="legend-item">
+      <div class="legend-color" style="background:${seg.color}"></div>
+      <span>${escapeHtml(seg.name)}</span>
+      <span class="legend-pct">${pct}%</span>
+    </div>`;
+  }).join('');
+
+  container.innerHTML = `
+    <div class="donut-wrap">
+      <svg viewBox="0 0 200 200">
+        ${circles}
+      </svg>
+      <div class="donut-center">
+        <div class="dc-value">${total.toFixed(2)} €</div>
+        <div class="dc-label">${t('label.total')}</div>
+      </div>
+    </div>
+    <div class="chart-legend">
+      ${legend}
+    </div>
+  `;
+}
+
+function renderBatchScaling(costs) {
+  const batches = [1, 10, 100];
+  const grid = $('#batchGrid');
+  grid.innerHTML = batches.map(n => {
+    const totalCost = round2(costs.totalMaterial * n);
+    const totalRevenue = round2(costs.sellingPrice * costs.portions * n);
+    const totalProfit = round2(totalRevenue - totalCost);
+    const label = n === 1 ? t('ui.batch.count').replace('{n}', n) : t('ui.batch.count_plural').replace('{n}', n);
+    return `
+      <div class="batch-card">
+        <div class="batch-label">${label}</div>
+        <div class="batch-value">${totalCost.toFixed(2)} €</div>
+        <div class="batch-sub">${t('ui.batch.material_cost')}</div>
+        <div style="margin-top:0.5rem; font-size:0.8rem; color:var(--success); font-weight:700;">
+          ${t('ui.batch.revenue')}: ${totalRevenue.toFixed(2)} € · ${t('ui.batch.profit')}: ${totalProfit.toFixed(2)} €
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ============================================================================
+// STEP 5 — SUMMARY
+// ============================================================================
+
+function renderSummary() {
+  collectCurrentStepData();
+  const costs = calcFullCost(APP.margin);
+  const r = APP.recipe;
+
+  $('#summarySubtitle').textContent = r.name
+    ? `${r.name} — ${r.portions} ${r.portions > 1 ? t('unit.portions') : t('unit.portion')} · ${r.category || t('label.unclassified')}`
+    : t('s5.subtitle.empty');
+
+  // Ingredients table
+  let ingRows = r.ingredients.filter(i => i.name).map(ing => {
+    const cost = calcIngredientCost(ing);
+    const priceRef = getPriceRef(ing.unit);
+    const unitLabel = ing.unit === 'pièce' ? t('unit.portion') : ing.unit;
+    return `<tr>
+      <td>${escapeHtml(t(ing.name))}</td>
+      <td>${ing.quantity} ${unitLabel}</td>
+      <td>${ing.pricePerUnit.toFixed(2)} €/${priceRef}</td>
+      <td style="font-weight:700; color:var(--accent)">${cost.toFixed(2)} €</td>
+    </tr>`;
+  }).join('');
+
+  // Procedure list
+  let procHtml = r.steps.filter(s => s).map((s, i) => `<li>${escapeHtml(t(s))}</li>`).join('');
+
+  // Time display
+  const prepH = Math.floor(r.prepTime / 60);
+  const prepM = r.prepTime % 60;
+  const prepStr = prepH > 0 ? `${prepH}h${prepM > 0 ? (prepM < 10 ? '0' + prepM : prepM) : ''}` : `${prepM} min`;
+  const cookH = Math.floor(r.cookTime / 60);
+  const cookM = r.cookTime % 60;
+  const cookStr = cookH > 0 ? `${cookH}h${cookM > 0 ? (cookM < 10 ? '0' + cookM : cookM) : ''}` : `${cookM} min`;
+
+  $('#summaryContent').innerHTML = `
+    ${r.description ? `<p style="color:var(--text-secondary); margin-bottom:1.2rem; font-style:italic;">${escapeHtml(r.description)}</p>` : ''}
+    <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:1.5rem;">
+      ⏱ ${t('ui.label.prep')}: ${prepStr} · ${t('ui.label.cook')}: ${cookStr} · ${r.portions} ${r.portions > 1 ? t('unit.portions') : t('unit.portion')}
+    </p>
+
+    <div class="summary-sections-grid">
+      <div class="summary-section">
+        <h3>🥄 ${t('step.ingredients')}</h3>
+        <table class="summary-table">
+          <thead>
+            <tr><th>${t('s5.table.ingredient')}</th><th>${t('s5.table.quantity')}</th><th>${t('s5.table.price')}</th><th>${t('s5.table.cost')}</th></tr>
+          </thead>
+          <tbody>${ingRows || `<tr><td colspan="4" style="color:var(--text-muted)">${t('label.no_ingredient')}</td></tr>`}</tbody>
+          <tfoot>
+            <tr><td colspan="3"><strong>${t('ui.label.total_material')}</strong></td><td><strong>${costs.totalMaterial.toFixed(2)} €</strong></td></tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <div class="summary-right-col">
+        ${r.steps.length > 0 ? `
+        <div class="summary-section">
+          <h3>👨‍🍳 ${t('step.procedure')}</h3>
+          <div class="summary-procedures">
+            <ol>${procHtml}</ol>
+          </div>
+        </div>` : ''}
+
+        <div class="summary-section">
+          <h3>📊 ${t('ui.label.financial_analysis')}</h3>
+          <div class="summary-financials">
+            <div class="fin-row">
+              <span class="fin-label">${t('ui.kpi.total_material')}</span>
+              <span class="fin-value">${costs.totalMaterial.toFixed(2)} €</span>
+            </div>
+            <div class="fin-row">
+              <span class="fin-label">${t('s1.portions')}</span>
+              <span class="fin-value">${costs.portions}</span>
+            </div>
+            <div class="fin-row highlight">
+              <span class="fin-label">${t('ui.kpi.per_portion')}</span>
+              <span class="fin-value">${costs.costPerPortion.toFixed(2)} €</span>
+            </div>
+            <div class="fin-row highlight">
+              <span class="fin-label">${t('ui.kpi.suggested_price')}</span>
+              <span class="fin-value">${costs.sellingPrice.toFixed(2)} €</span>
+            </div>
+            <div class="fin-row">
+              <span class="fin-label">${t('ui.kpi.margin_portion')}</span>
+              <span class="fin-value">${costs.marginPerPortion.toFixed(2)} €</span>
+            </div>
+            <div class="fin-row">
+              <span class="fin-label">${t('dash.avg_margin')}</span>
+              <span class="fin-value">${costs.marginPct.toFixed(1)}%</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="summary-section" style="margin-top:1.5rem;">
+          <h3>📦 ${t('ui.label.scaling')}</h3>
+          <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:0.8rem; text-align:center;">
+             <div style="background:var(--bg-alt); padding:0.8rem; border-radius:var(--radius-sm); border:1px solid var(--surface-border);">
+                <div style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; font-weight:700;">${t('ui.batch.count').replace('{n}', 1)}</div>
+                <div style="font-size:1.1rem; font-weight:800; color:var(--primary); margin-top:0.2rem;">${costs.totalMaterial.toFixed(2)} €</div>
+             </div>
+             <div style="background:var(--bg-alt); padding:0.8rem; border-radius:var(--radius-sm); border:1px solid var(--surface-border);">
+                <div style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; font-weight:700;">${t('ui.batch.count_plural').replace('{n}', 10)}</div>
+                <div style="font-size:1.1rem; font-weight:800; color:var(--primary); margin-top:0.2rem;">${(costs.totalMaterial * 10).toFixed(2)} €</div>
+             </div>
+             <div style="background:var(--bg-alt); padding:0.8rem; border-radius:var(--radius-sm); border:1px solid var(--surface-border);">
+                <div style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; font-weight:700;">${t('ui.batch.count_plural').replace('{n}', 100)}</div>
+                <div style="font-size:1.1rem; font-weight:800; color:var(--primary); margin-top:0.2rem;">${(costs.totalMaterial * 100).toFixed(2)} €</div>
+             </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pdf-footer-credits" style="display:none;">
+      ${t('s5.footer.credits')}
+    </div>
+  `;
+}
+
+// ============================================================================
+// SAVE / LOAD / DELETE RECIPES
+// ============================================================================
+
+function saveCurrentRecipe() {
+  collectCurrentStepData();
+  const r = APP.recipe;
+
+  if (!r.name.trim()) {
+    showToast(t('toast.recipe.name_required'), 'error');
+    return;
+  }
+
+  if (!r.id) r.id = generateId();
+
+  const toSave = {
+    ...JSON.parse(JSON.stringify(r)),
+    savedAt: new Date().toISOString(),
+    margin: APP.margin
+  };
+
+  // Update if exists, otherwise add
+  const idx = APP.savedRecipes.findIndex(s => s.id === r.id);
+  if (idx >= 0) {
+    APP.savedRecipes[idx] = toSave;
+  } else {
+    APP.savedRecipes.push(toSave);
+  }
+
+  saveSavedRecipes();
+
+  // Save new ingredients to DB
+  r.ingredients.forEach(ing => {
+    if (ing.name.trim() && ing.pricePerUnit > 0) {
+      addToIngredientDb(ing);
+    }
+  });
+
+  showToast(t('toast.recipe.saved'), 'success');
+  renderSavedRecipes();
+  updateDashboard();
+}
+
+function loadRecipe(id) {
+  const recipe = APP.savedRecipes.find(r => r.id === id);
+  if (!recipe) return;
+
+  APP.recipe = JSON.parse(JSON.stringify(recipe));
+  APP.margin = recipe.margin || 70;
+
+  populateStep1();
+  goToStep(1);
+  showToast(t('recipe.toast.loaded', { name: recipe.name }), 'success');
+}
+
+function deleteRecipe(id) {
+  const idx = APP.savedRecipes.findIndex(r => r.id === id);
+  if (idx >= 0) {
+    const name = APP.savedRecipes[idx].name;
+    APP.savedRecipes.splice(idx, 1);
+    saveSavedRecipes();
+    renderSavedRecipes();
+    showToast(t('recipe.toast.deleted', { name }), 'success');
+  }
+}
+
+function renderSavedRecipes() {
+  const grid = $('#savedGrid');
+  const empty = $('#savedEmpty');
+
+  if (APP.savedRecipes.length === 0) {
+    grid.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+
+  empty.style.display = 'none';
+  grid.innerHTML = APP.savedRecipes.map(r => {
+    const costs = (() => {
+      const total = r.ingredients.reduce((s, i) => s + calcIngredientCost(i), 0);
+      const portions = r.portions || 10;
+      return { total: round2(total), perPortion: round2(total / portions) };
+    })();
+    const locale = (typeof getLang === 'function') ? (getLang() === 'en' ? 'en-GB' : (getLang() === 'es' ? 'es-ES' : 'fr-FR')) : 'fr-FR';
+    const date = new Date(r.savedAt).toLocaleDateString(locale);
+
+    return `
+      <div class="saved-card">
+        <div class="sc-name">${escapeHtml(r.name)}</div>
+        <div class="sc-meta">${escapeHtml(r.category || t('lab.cat.all'))} · ${r.portions} portions · ${date}</div>
+        <div class="sc-cost">${t('label.cost')}: ${costs.total.toFixed(2)} € · ${costs.perPortion.toFixed(2)} €/${t('unit.portion')}</div>
+        <div class="sc-actions">
+          <button class="btn btn-outline btn-sm" onclick="loadRecipe('${r.id}')">${t('nav.home') === 'Home' ? 'Load' : (t('nav.home') === 'Inicio' ? 'Cargar' : 'Charger')}</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteRecipe('${r.id}')">${t('nav.home') === 'Home' ? 'Delete' : (t('nav.home') === 'Inicio' ? 'Eliminar' : 'Supprimer')}</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function toggleSavedRecipes() {
+  const section = $('#savedSection');
+  const isHidden = section.style.display === 'none';
+  section.style.display = isHidden ? 'block' : 'none';
+  if (isHidden) {
+    renderSavedRecipes();
+    section.scrollIntoView({ behavior: 'smooth' });
+  }
+}
+
+// ============================================================================
+// LOAD EXAMPLE RECIPE
+// ============================================================================
+
+// ============================================================================
+// HELPERS
+// ============================================================================
+
+function loadExampleRecipe(idx) {
+  const allRecipes = typeof RECIPES !== 'undefined' ? RECIPES : [];
+  if (allRecipes.length === 0 || idx >= allRecipes.length) {
+    showToast(t('recipe.toast.not_found'), 'error');
+    return;
+  }
+
+  const example = allRecipes[idx];
+
+  const displayName = t(`data.recipe.${example.id}.name`);
+  const tName = displayName !== `data.recipe.${example.id}.name` ? displayName : example.name;
+
+  const displayCat = t(example.category);
+  const tCat = displayCat !== example.category ? displayCat : example.category;
+
+  APP.recipe = {
+    id: null,
+    name: tName,
+    category: tCat,
+    portions: example.portions,
+    prepTime: example.prepTime,
+    cookTime: example.cookTime,
+    description: t(`data.recipe.${example.id}.desc`) || example.description,
+    ingredients: example.ingredients.map(ing => {
+      let unit = ing.unit;
+      let pricePerUnit = 0;
+      if (unit === 'pcs') unit = t('unit.piece');
+      if (ing.pricePerKg !== undefined) { pricePerUnit = ing.pricePerKg; }
+      else if (ing.pricePerL !== undefined) { pricePerUnit = ing.pricePerL; }
+      else if (ing.pricePerPc !== undefined) { pricePerUnit = ing.pricePerPc; unit = t('unit.piece'); }
+
+      // Keep the original name for the DB ingredients so t() can handle it
+      return { name: ing.name, quantity: ing.quantity, unit, pricePerUnit };
+    }),
+    steps: example.steps.map((step, sIdx) => {
+      const stepKey = `data.recipe.${example.id}.step.${sIdx}`;
+      const tStep = t(stepKey);
+      return tStep !== stepKey ? tStep : step;
+    })
+  };
+
+  populateStep1();
+  goToStep(1);
+  showToast(t('recipe.toast.loaded', { name: APP.recipe.name }), 'success');
+}
+
+// Function to export a recipe directly from the library without loading it in the editor
+function exportRecipePdfDirect(idx) {
+  const allRecipes = typeof RECIPES !== 'undefined' ? RECIPES : [];
+  if (allRecipes.length === 0 || idx >= allRecipes.length) return;
+
+  const example = allRecipes[idx];
+
+  // Store current recipe to restore it later
+  const oldRecipe = JSON.parse(JSON.stringify(APP.recipe));
+  const oldStep = APP.currentStep;
+
+  // Temporarily load this recipe for rendering
+  loadExampleRecipe(idx);
+
+  // Render the summary (it's hidden but we need it in the DOM)
+  renderSummary();
+
+  // Call the main export function
+  exportPdf();
+
+  // Restore previous state after a delay or after PDF starts
+  setTimeout(() => {
+    APP.recipe = oldRecipe;
+    APP.currentStep = oldStep;
+    goToStep(oldStep);
+    renderSummary(); // refresh hidden summary back to original
+  }, 1000);
+}
+
+// ============================================================================
+// RECIPE LIBRARY (CHEF D'OEUVRE)
+// ============================================================================
+
+function renderLibraryRecipes() {
+  const container = $('#recipeLibraryCarousel');
+  const btnPrev = $('#carouselPrevBtn');
+  const btnNext = $('#carouselNextBtn');
+
+  if (!container) return;
+
+  const allRecipes = typeof RECIPES !== 'undefined' ? RECIPES : [];
+  if (allRecipes.length === 0) {
+    container.innerHTML = '<p style="color:var(--text-muted); padding: 2rem;">Aucune recette dans la bibliothèque.</p>';
+    return;
+  }
+
+  // Slice to only take the first 10 as requested
+  const top10 = allRecipes.slice(0, 10);
+
+  container.innerHTML = top10.map((r, idx) => {
+    // Determine an emoji based on category
+    let emoji = '🍰';
+    const cat = r.category.toLowerCase();
+    if (cat.includes('viennoiserie')) emoji = '🥐';
+    if (cat.includes('chocolat')) emoji = '🍫';
+    if (cat.includes('fruit') || cat.includes('tarte')) emoji = '🍓';
+    if (cat.includes('base')) emoji = '🥣';
+    const tCatRaw = t(r.category);
+    const tCat = tCatRaw !== r.category ? tCatRaw : r.category;
+    const tNameRaw = t(`data.recipe.${r.id}.name`);
+    const displayName = tNameRaw !== `data.recipe.${r.id}.name` ? tNameRaw : r.name;
+
+    const hasImage = r.image && r.image.trim() !== '';
+    const imgHtml = hasImage
+      ? `<img src="${r.image}" class="carousel-card-img" alt="${escapeHtml(displayName)}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">`
+      : '';
+
+    return `
+      <div class="carousel-card" onclick="loadExampleRecipe(${idx})">
+        <div class="carousel-card-img-wrapper">
+          ${imgHtml}
+          <div class="carousel-card-img-placeholder" style="${hasImage ? 'display:none;' : ''}">${emoji}</div>
+        </div>
+        <span class="carousel-badge">${escapeHtml(tCat)}</span>
+        <h4 class="carousel-card-title">${escapeHtml(displayName)}</h4>
+        <div class="carousel-card-meta">
+          <span>⏱ ${r.prepTime} min</span>
+          <span>⚖️ ${r.yield || r.portions || '10'} ${t('unit.portions')}</span>
+        </div>
+        <button class="carousel-pdf-btn" onclick="event.stopPropagation(); exportRecipePdfDirect(${idx})" title="${t('recipe.lib.export_pdf')}">📄 PDF</button>
+      </div>
+    `;
+  }).join('');
+
+  // Add scroll logic
+  if (btnPrev && btnNext) {
+    btnPrev.onclick = () => {
+      container.scrollBy({ left: -350, behavior: 'smooth' });
+    };
+    btnNext.onclick = () => {
+      container.scrollBy({ left: 350, behavior: 'smooth' });
+    };
+
+    // DRAG TO SCROLL LOGIC
+    let isDown = false;
+    let startX;
+    let scrollLeft;
+    let hasMoved = false;
+
+    container.addEventListener('mousedown', (e) => {
+      isDown = true;
+      hasMoved = false;
+      container.style.cursor = 'grabbing';
+      container.style.userSelect = 'none';
+      container.style.scrollSnapType = 'none'; // Disable snap while dragging
+      startX = e.pageX - container.offsetLeft;
+      scrollLeft = container.scrollLeft;
+    });
+
+    container.addEventListener('mouseleave', () => {
+      isDown = false;
+      container.style.cursor = 'grab';
+    });
+
+    container.addEventListener('mouseup', (e) => {
+      isDown = false;
+      container.style.cursor = 'grab';
+      container.style.scrollSnapType = 'x mandatory'; // Re-enable snap
+    });
+
+    container.addEventListener('mousemove', (e) => {
+      if (!isDown) return;
+      e.preventDefault();
+      const x = e.pageX - container.offsetLeft;
+      const walk = (x - startX) * 2;
+      if (Math.abs(walk) > 5) hasMoved = true;
+      container.scrollLeft = scrollLeft - walk;
+    });
+
+    // Touch Support
+    container.addEventListener('touchstart', (e) => {
+      isDown = true;
+      hasMoved = false;
+      container.style.scrollSnapType = 'none';
+      startX = e.touches[0].pageX - container.offsetLeft;
+      scrollLeft = container.scrollLeft;
+    });
+
+    container.addEventListener('touchend', () => {
+      isDown = false;
+      container.style.scrollSnapType = 'x mandatory';
+    });
+
+    container.addEventListener('touchmove', (e) => {
+      if (!isDown) return;
+      const x = e.touches[0].pageX - container.offsetLeft;
+      const walk = (x - startX) * 1.5;
+      if (Math.abs(walk) > 5) hasMoved = true;
+      container.scrollLeft = scrollLeft - walk;
+    });
+
+    // Support both click and drag: prevent navigation if dragged
+    container.addEventListener('click', (e) => {
+      if (hasMoved) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    }, true);
+
+    // Initial state
+    container.style.cursor = 'grab';
+
+    // Optional: Hide/Show buttons based on scroll position
+    container.onscroll = () => {
+      const sL = container.scrollLeft;
+      const maxScroll = container.scrollWidth - container.clientWidth;
+      btnPrev.style.opacity = sL <= 0 ? '0.3' : '1';
+      btnPrev.style.pointerEvents = sL <= 0 ? 'none' : 'auto';
+      btnNext.style.opacity = sL >= maxScroll - 5 ? '0.3' : '1';
+      btnNext.style.pointerEvents = sL >= maxScroll - 5 ? 'none' : 'auto';
+    };
+    // Trigger scroll check once
+    setTimeout(() => container.dispatchEvent(new Event('scroll')), 100);
+  }
+}
+
+// ============================================================================
+// PORTFOLIO
+// ============================================================================
+
+function renderPortfolio() {
+  const container = $('#portfolioGallery');
+  if (!container) return;
+
+  // We reuse the beautifully crafted recipes from data.js
+  const allRecipes = typeof RECIPES !== 'undefined' ? RECIPES : [];
+  if (allRecipes.length === 0) {
+    container.innerHTML = `<p style="text-align:center; color:var(--text-muted); width:100%;">${t('portfolio.empty')}</p>`;
+    return;
+  }
+
+  // Generate cards
+  container.innerHTML = allRecipes.map((r, idx) => {
+    // Generate an abstract pastel color hash based on the id just in case there's no image
+    const hue = (idx * 137.5) % 360;
+    const fallBackColor = `hsl(${hue}, 70%, 85%)`;
+
+    // Specific styling for certain images (dezoom or position)
+    const dezoomIds = ['saint-honore', 'fraisier', 'baba-au-rhum', 'tarte-fruits-rouges-fleur', 'tarte-bourdaloue', 'tarte-fleur-rouge'];
+    const extraClass = dezoomIds.includes(r.id) ? ' dezoom' : '';
+    const extraStyle = r.id === 'tarte-bourdaloue' ? ' style="object-position: top !important;"' : '';
+    const tCatRaw = t(r.category);
+    const tCat = tCatRaw !== r.category ? tCatRaw : r.category;
+    const tNameRaw = t(`data.recipe.${r.id}.name`);
+    const displayName = tNameRaw !== `data.recipe.${r.id}.name` ? tNameRaw : r.name;
+
+    // We use the image from local if provided, otherwise fallback background
+    const imgOrFallback = r.image
+      ? `<img class="portfolio-img${extraClass}" src="${r.image}" alt="${escapeHtml(displayName)}"${extraStyle} onerror="this.onerror=null; this.src=''; this.parentElement.style.background='${fallBackColor}'; this.style.display='none';">`
+      : `<div style="width:100%; height:100%; background:${fallBackColor};"></div>`;
+
+    return `
+      <div class="portfolio-item" onclick="loadExampleRecipe(${idx}); document.getElementById('navRecettes').click();">
+        ${imgOrFallback}
+        <div class="portfolio-overlay">
+          <h3 class="portfolio-title">${escapeHtml(displayName)}</h3>
+          <span style="font-size: 0.85rem; opacity: 0.9;">${escapeHtml(tCat)}</span>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ============================================================================
+// EXPORT — JSON
+// ============================================================================
+
+function exportJson() {
+  collectCurrentStepData();
+  const data = JSON.stringify(APP.recipe, null, 2);
+  const blob = new Blob([data], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${APP.recipe.name || 'recette'}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast(t('toast.recipe.exported_json'), 'success');
+}
+
+// ============================================================================
+// EXPORT — PDF
+// ============================================================================
+
+function exportPdf() {
+  const summaryCard = $('#summaryCard');
+  if (!summaryCard) return;
+
+  const recipeName = APP.recipe.name || 'recette';
+  showToast(`${t('toast.pdf.preparing')} ${recipeName}...`, 'info');
+
+  // Clone the summary
+  const pdfClone = summaryCard.cloneNode(true);
+
+  // Setup the clone to be visible but off-stage
+  pdfClone.id = "pdf-export-temp-node";
+  pdfClone.style.position = 'fixed';
+  pdfClone.style.top = '0';
+  pdfClone.style.left = '0';
+  pdfClone.style.zIndex = '-9999'; // Behind everything
+  pdfClone.style.display = 'block'; // Force block
+  pdfClone.style.visibility = 'visible'; // Force visibility
+  pdfClone.style.opacity = '1';
+  pdfClone.style.width = '780px';
+  pdfClone.style.height = 'auto';
+  pdfClone.style.backgroundColor = 'white';
+
+  pdfClone.classList.add('pdf-export-mode');
+
+  // Clean UI elements
+  const uiElements = pdfClone.querySelectorAll('.export-actions, .step-nav, .btn, button');
+  uiElements.forEach(el => el.remove());
+
+  const pdfFooter = pdfClone.querySelector('.pdf-footer-credits');
+  if (pdfFooter) {
+    pdfFooter.style.display = 'block';
+    console.log("PDF Footer enabled in clone");
+  }
+
+  // Clean filename
+  const safeFilename = recipeName.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/gi, '_').toLowerCase();
+
+  document.body.appendChild(pdfClone);
+
+  const opt = {
+    margin: 8,
+    filename: `${safeFilename}_fiche.pdf`,
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: {
+      scale: 2,
+      useCORS: true,
+      backgroundColor: '#ffffff',
+      logging: false
+    },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+  };
+
+  // Wait for layout calculation
+  setTimeout(() => {
+    html2pdf().from(pdfClone).set(opt).save().then(() => {
+      if (document.body.contains(pdfClone)) document.body.removeChild(pdfClone);
+      showToast(t('toast.pdf.done'), 'success');
+    }).catch((err) => {
+      console.error('PDF Export Error:', err);
+      if (document.body.contains(pdfClone)) document.body.removeChild(pdfClone);
+      showToast(t('toast.pdf.error'), 'error');
+    });
+  }, 300); // 300ms is safer
+}
+
+// ============================================================================
+// INGREDIENT DATABASE MODAL
+// ============================================================================
+
+function showIngredientDbModal() {
+  const modal = $('#dbModal');
+  modal.style.display = 'flex';
+  renderDbIngredients();
+}
+
+function hideIngredientDbModal() {
+  $('#dbModal').style.display = 'none';
+}
+
+function renderDbIngredients() {
+  const container = $('#dbIngredientsList');
+  container.innerHTML = APP.ingredientDb.map((ing, i) => `
+    <div class="autocomplete-item" style="padding:0.65rem 0.75rem; cursor:pointer; border-bottom:1px solid var(--surface-border);"
+         data-db-idx="${i}">
+      <span>${escapeHtml(ing.name)} · <small style="color:var(--text-muted)">${ing.unit}</small></span>
+      <span class="ac-price">${ing.pricePerUnit.toFixed(2)} €/${ing.priceRef}</span>
+    </div>
+  `).join('');
+
+  container.querySelectorAll('[data-db-idx]').forEach(item => {
+    item.addEventListener('click', () => {
+      const ing = APP.ingredientDb[parseInt(item.dataset.dbIdx)];
+      addIngredient({
+        name: ing.name,
+        quantity: 0,
+        unit: ing.unit,
+        pricePerUnit: ing.pricePerUnit
+      });
+      hideIngredientDbModal();
+    });
+  });
+}
+
+// ============================================================================
+// TOAST NOTIFICATIONS
+// ============================================================================
+
+function showToast(message, type = 'info') {
+  // Remove existing toasts
+  document.querySelectorAll('.toast').forEach(t => t.remove());
+
+  const toast = document.createElement('div');
+  toast.className = `toast toast-${type}`;
+  toast.textContent = message;
+  document.body.appendChild(toast);
+
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateY(20px)';
+    toast.style.transition = 'all 0.3s ease';
+    setTimeout(() => toast.remove(), 300);
+  }, 3000);
+}
+
+// ============================================================================
+// NEW RECIPE (RESET)
+// ============================================================================
+
+function newRecipe() {
+  APP.recipe = {
+    id: null,
+    name: '',
+    category: '',
+    portions: 10,
+    prepTime: 60,
+    cookTime: 30,
+    description: '',
+    ingredients: [],
+    steps: []
+  };
+  APP.margin = 70;
+  goToStep(0);
+}
+
+// ============================================================================
+// EVENT BINDINGS
+// ============================================================================
+
+function bindEvents() {
+  // Hero CTAs
+  $('#btnCreateRecipe').addEventListener('click', () => {
+    newRecipe();
+    populateStep1();
+    goToStep(1);
+  });
+  // Step navigation
+  $('#btnBackToHero').addEventListener('click', () => goToStep(0));
+  $('#btnToStep2').addEventListener('click', () => {
+    // Validate step 1
+    if (!$('#recipeName').value.trim()) {
+      showToast(t('toast.recipe.name_required'), 'error');
+      $('#recipeName').focus();
+      return;
+    }
+    goToStep(2);
+  });
+  $('#btnToStep1').addEventListener('click', () => goToStep(1));
+  $('#btnToStep3').addEventListener('click', () => goToStep(3));
+  $('#btnToStep2b').addEventListener('click', () => goToStep(2));
+  $('#btnToStep4').addEventListener('click', () => goToStep(4));
+  $('#btnToStep3b').addEventListener('click', () => goToStep(3));
+  $('#btnToStep5').addEventListener('click', () => goToStep(5));
+  $('#btnToStep4b').addEventListener('click', () => goToStep(4));
+  $('#btnNewRecipe').addEventListener('click', newRecipe);
+
+  // Step indicator click navigation
+  $$('.step-dot').forEach(dot => {
+    dot.addEventListener('click', () => {
+      const step = parseInt(dot.dataset.step);
+      if (step <= APP.currentStep || step === APP.currentStep + 1) {
+        goToStep(step);
+      }
+    });
+  });
+
+  // Ingredients
+  $('#btnAddIngredient').addEventListener('click', () => addIngredient());
+  $('#btnAddFromDb').addEventListener('click', showIngredientDbModal);
+  $('#dbModalClose').addEventListener('click', hideIngredientDbModal);
+
+  // Close DB modal on backdrop click
+  $('#dbModal').addEventListener('click', (e) => {
+    if (e.target.id === 'dbModal') hideIngredientDbModal();
+  });
+
+  // Procedure
+  $('#btnAddStep').addEventListener('click', addProcedureStep);
+
+  // Margin slider
+  $('#marginSlider').addEventListener('input', (e) => {
+    APP.margin = parseInt(e.target.value);
+    renderCostAnalysis();
+  });
+
+  // Advanced cost inputs
+  ['advLaborRate', 'advFixedCharges', 'advProductions', 'advEnergy', 'advAmortization'].forEach(id => {
+    const el = $('#' + id);
+    if (el) el.addEventListener('input', () => renderCostAnalysis());
+  });
+
+  // Exports
+  $('#btnExportPdf').addEventListener('click', exportPdf);
+  $('#btnExportJson').addEventListener('click', exportJson);
+  $('#btnSaveRecipe').addEventListener('click', saveCurrentRecipe);
+
+  // Saved recipes
+  $('#btnSavedRecipes').addEventListener('click', toggleSavedRecipes);
+
+  // Logout
+  const btnLogout = $('#btnLogout');
+  if (btnLogout) {
+    btnLogout.addEventListener('click', () => {
+      localStorage.removeItem('gourmet_auth');
+      localStorage.removeItem('gourmet_current_user');
+      location.reload();
+    });
+  }
+
+  // Profile Dropdown
+  $('#btnProfile').addEventListener('click', (e) => {
+    e.stopPropagation();
+    toggleProfileDropdown();
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.profile-dropdown')) {
+      $('#profileDropdown').classList.remove('show');
+    }
+  });
+
+  // PIN Modal
+  $('#btnChangePin').addEventListener('click', showPinModal);
+  $('#pinModalClose').addEventListener('click', hidePinModal);
+  $('#btnSaveProfile').addEventListener('click', saveNewProfile);
+  $('#pinModal').addEventListener('click', (e) => {
+    if (e.target.id === 'pinModal') hidePinModal();
+  });
+
+  // Planning & Sharing
+  $('#btnAddMember').addEventListener('click', addTeamMember);
+  $('#btnAddLeave').addEventListener('click', addLeave);
+  $('#memberName').addEventListener('keypress', (e) => { if (e.key === 'Enter') addTeamMember(); });
+  $('#memberName').addEventListener('input', handleMemberAutocomplete);
+  $('#btnInviteUser').addEventListener('click', inviteUserToPlanning);
+  $('#inviteUser').addEventListener('input', handleInviteAutocomplete);
+  $('#inviteUser').addEventListener('keypress', (e) => { if (e.key === 'Enter') inviteUserToPlanning(); });
+  $('#teamNameInput').addEventListener('change', saveTeamMembers);
+
+  // Notifications
+  $('#notificationArea').addEventListener('click', (e) => {
+    e.stopPropagation();
+    const dropdown = $('#notifDropdown');
+    dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('#notificationArea')) {
+      $('#notifDropdown').style.display = 'none';
+    }
+    if (!e.target.closest('#inviteUser')) {
+      $('#inviteAutocomplete').style.display = 'none';
+    }
+    if (!e.target.closest('#memberName')) {
+      $('#memberAutocomplete').style.display = 'none';
+    }
+  });
+
+  // Navigation context reset
+  $('#navPlanning').addEventListener('click', () => {
+    // When clicking the main planning link, we view our own
+    const currentUser = localStorage.getItem(STORAGE_KEYS.currentUser);
+    if (APP.viewOwner !== currentUser) {
+      APP.viewOwner = currentUser;
+      loadTeamMembers();
+      renderTeam();
+      renderLeaves();
+      renderAnnualCalendar();
+      renderSharedList();
+    }
+  });
+  // Gender selection in profile
+  $$('.gender-btn-profile').forEach(btn => {
+    btn.addEventListener('click', () => {
+      $$('.gender-btn-profile').forEach(b => b.classList.remove('active', 'btn-primary'));
+      $$('.gender-btn-profile').forEach(b => b.classList.add('btn-outline'));
+      btn.classList.add('active', 'btn-primary');
+      btn.classList.remove('btn-outline');
+    });
+  });
+
+  // Admin Moderation
+  const adminUserModalClose = $('#adminUserModalClose');
+  if (adminUserModalClose) adminUserModalClose.addEventListener('click', () => $('#adminUserModal').style.display = 'none');
+
+  const btnAdminToggle = $('#btnAdminToggle');
+  if (btnAdminToggle) btnAdminToggle.addEventListener('click', toggleAdminStatus);
+
+  const btnBanToggle = $('#btnBanToggle');
+  if (btnBanToggle) btnBanToggle.addEventListener('click', toggleBanStatus);
+
+  const btnDeleteUserModal = $('#btnDeleteUserModal');
+  if (btnDeleteUserModal) btnDeleteUserModal.addEventListener('click', () => {
+    if (selectedModerationUser) {
+      deleteUser(selectedModerationUser);
+      $('#adminUserModal').style.display = 'none';
+    }
+  });
+
+  const adminModal = $('#adminUserModal');
+  if (adminModal) {
+    adminModal.addEventListener('click', (e) => {
+      if (e.target.id === 'adminUserModal') adminModal.style.display = 'none';
+    });
+  }
+}
+
+// ============================================================================
+// AUTHENTICATION
+// ============================================================================
+
+function checkAuth() {
+  const isAuth = localStorage.getItem('gourmet_auth') === 'true';
+  const overlay = $('#authOverlay');
+
+  if (isAuth) {
+    overlay.classList.add('hidden');
+    document.body.classList.remove('auth-pending');
+    $('#userProfileArea').style.display = 'flex';
+    updateDashboard();
+    loadSavedRecipes();
+    updateDashboard();
+  } else {
+    overlay.classList.remove('hidden');
+    document.body.classList.add('auth-pending');
+    $('#userProfileArea').style.display = 'none';
+
+    let authMode = 'login'; // 'login' or 'register'
+
+    const switchMode = (mode) => {
+      authMode = mode;
+      $$('.auth-tab').forEach(tab => tab.classList.toggle('active', tab.dataset.mode === mode));
+
+      if (mode === 'login') {
+        $('#authTitle').textContent = t('auth.title.secure');
+        $('#authDescription').innerHTML = t('auth.desc.login');
+        $('#pinGroup').style.display = 'block';
+        $('#registerInfo').style.display = 'none';
+        $('#btnAuthSubmit').textContent = t('auth.btn.login');
+        $('#btnAuthSubmit').style.display = 'block';
+        $('#genderSelection').style.display = 'none';
+      } else {
+        $('#authTitle').textContent = t('auth.title.register');
+        $('#authDescription').innerHTML = t('auth.desc.register');
+        $('#pinGroup').style.display = 'none';
+        $('#registerInfo').style.display = 'flex';
+        $('#btnAuthSubmit').textContent = t('auth.btn.continue');
+        $('#btnAuthSubmit').style.display = 'block';
+        $('#genderSelection').style.display = 'none';
+      }
+      $('#authError').style.display = 'none';
+    };
+
+    $$('.auth-tab').forEach(tab => {
+      tab.onclick = () => switchMode(tab.dataset.mode);
+    });
+
+    $('#btnAuthSubmit').onclick = () => {
+      const user = $('#authUsername').value.trim();
+      const pin = $('#authPin').value;
+      const error = $('#authError');
+      const genderSel = $('#genderSelection');
+
+      if (user === '') {
+        error.style.display = 'block';
+        error.textContent = t('auth.error.empty');
+        return;
+      }
+
+      let usersDb = JSON.parse(localStorage.getItem(STORAGE_KEYS.users) || '{}');
+      const userKey = user.toLowerCase();
+
+      // Special case for pre-existing admin or developers
+      if (userKey === 'ju' && !usersDb[userKey]) {
+        usersDb[userKey] = { pin: '2503', gender: 'male', email: 'admin@gourmetrevient.fr' };
+        localStorage.setItem(STORAGE_KEYS.users, JSON.stringify(usersDb));
+      }
+
+      if (authMode === 'login') {
+        if (!usersDb[userKey]) {
+          error.style.display = 'block';
+          error.textContent = t('auth.error.unknown');
+          error.style.animation = 'none';
+          setTimeout(() => error.style.animation = 'shake 0.4s ease-in-out', 10);
+          return;
+        }
+
+        if (usersDb[userKey].pin !== pin) {
+          error.style.display = 'block';
+          error.textContent = t('auth.error.pin');
+          error.style.animation = 'none';
+          setTimeout(() => error.style.animation = 'shake 0.4s ease-in-out', 10);
+          return;
+        }
+
+        if (usersDb[userKey].isBanned) {
+          error.style.display = 'block';
+          error.textContent = t('auth.error.banned');
+          return;
+        }
+
+        loginSuccess(user);
+      } else {
+        // Registration mode
+        if (usersDb[userKey]) {
+          error.style.display = 'block';
+          error.textContent = t('auth.error.taken');
+          return;
+        }
+
+        // Proceed to gender selection
+        genderSel.style.display = 'block';
+        error.style.display = 'none';
+        $('#btnAuthSubmit').style.display = 'none';
+        $('#registerInfo').style.display = 'none';
+        $('#authTitle').textContent = t('auth.title.gender');
+        $('#authDescription').innerHTML = t('auth.desc.gender');
+
+        $$('.gender-btn').forEach(btn => {
+          btn.onclick = () => {
+            const gender = btn.dataset.gender;
+            usersDb[userKey] = {
+              pin: '0000',
+              gender: gender,
+              createdAt: new Date().toISOString()
+            };
+            localStorage.setItem(STORAGE_KEYS.users, JSON.stringify(usersDb));
+            loginSuccess(user);
+          };
+        });
+      }
+    };
+
+    function loginSuccess(user) {
+      localStorage.setItem('gourmet_auth', 'true');
+      localStorage.setItem(STORAGE_KEYS.currentUser, user);
+      location.reload();
+    }
+
+    $('#authUsername').onkeypress = (e) => { if (e.key === 'Enter') $('#btnAuthSubmit').click(); };
+    $('#authPin').onkeypress = (e) => { if (e.key === 'Enter') $('#btnAuthSubmit').click(); };
+  }
+}
+
+function updateDashboard() {
+  const name = localStorage.getItem(STORAGE_KEYS.currentUser) || 'Artisan';
+  let usersDb = JSON.parse(localStorage.getItem(STORAGE_KEYS.users) || '{}');
+  const userKey = name.toLowerCase();
+  const gender = usersDb[userKey]?.gender || 'male';
+
+  const welcome = $('#welcomeUserName');
+  if (welcome) welcome.textContent = name;
+  const headerName = $('#userNameHeader');
+  if (headerName) headerName.textContent = name;
+
+  const greeting = $('.dash-greeting');
+  if (greeting) {
+    const greetingText = t('dash.greeting');
+    if (greeting.firstChild && greeting.firstChild.nodeType === 3) {
+      greeting.firstChild.textContent = greetingText + (greetingText.endsWith(' ') ? '' : ' ');
+    }
+  }
+
+  const emoji = $('#welcomeGenderEmoji');
+  const label = $('#userGenderLabel');
+  const avatar = $('#dashUserAvatar');
+  const hAvatar = $('#headerAvatar');
+
+  const g = t('dash.greeting').toLowerCase();
+  const prefix = g.includes('hola') ? 'Tu' : (g.includes('hello') ? 'Your' : 'Votre');
+
+  if (gender === 'female') {
+    if (emoji) emoji.textContent = '👩‍🍳';
+    if (label) label.textContent = prefix;
+    if (avatar) { avatar.innerHTML = ''; avatar.textContent = '👩‍🍳'; }
+    if (hAvatar) { hAvatar.innerHTML = ''; hAvatar.textContent = '👩‍🍳'; }
+  } else {
+    if (emoji) emoji.textContent = '👨‍🍳';
+    if (label) label.textContent = prefix;
+    if (avatar) { avatar.innerHTML = ''; avatar.textContent = '👨‍🍳'; }
+    if (hAvatar) { hAvatar.innerHTML = ''; hAvatar.textContent = '👨‍🍳'; }
+  }
+  // 0. Update Admin Tab Visibility
+  const navAdmin = $('#navAdmin');
+  if (navAdmin) {
+    if (userKey === 'ju' && usersDb[userKey]?.pin === '2503') {
+      navAdmin.style.display = 'block';
+    } else {
+      navAdmin.style.display = 'none';
+    }
+  }
+
+  // 1. Update Date
+  const locale = (typeof getLang === 'function') ? (getLang() === 'en' ? 'en-GB' : (getLang() === 'es' ? 'es-ES' : 'fr-FR')) : 'fr-FR';
+  const dateEl = $('#dashDateHeader');
+  if (dateEl) {
+    const options = { day: 'numeric', month: 'long', year: 'numeric' };
+    dateEl.textContent = new Date().toLocaleDateString(locale, options);
+  }
+
+  // 2. Update Stats
+  const recipeCount = APP.savedRecipes.length;
+  if ($('#statRecipeCount')) $('#statRecipeCount').textContent = recipeCount;
+
+  const statLab = $('#statLaboStatus');
+  const labKey = getUserLabPlanKey();
+  const isLabDone = localStorage.getItem(labKey) !== null;
+  if (statLab) statLab.textContent = isLabDone ? t('dash.lab_done') : t('dash.lab_progress');
+
+  // 4. Populate Recent Recipes
+  const recentList = $('#dashRecentRecipes');
+  if (recentList) {
+    const recent = [...APP.savedRecipes].sort((a, b) => new Date(b.savedAt) - new Date(a.savedAt)).slice(0, 3);
+
+    if (recent.length === 0) {
+      recentList.innerHTML = `
+        <div class="empty-state" style="text-align:center; padding:1.5rem; color:var(--text-muted);">
+          <p>${t('dash.no_recent')}</p>
+        </div>`;
+    } else {
+      recentList.innerHTML = recent.map(r => {
+        const totalCost = r.ingredients.reduce((s, i) => s + (i.pricePerUnit * (i.unit === 'g' || i.unit === 'ml' ? i.quantity / 1000 : i.quantity)), 0);
+        return `
+          <div class="recent-recipe-item" onclick="loadRecipe('${r.id}'); document.getElementById('navRecettes').click();">
+            <div class="rr-info">
+              <h4>${escapeHtml(r.name)}</h4>
+              <span>${escapeHtml(r.category || 'Pâtisserie')} · ${new Date(r.savedAt).toLocaleDateString(locale)}</span>
+            </div>
+            <div class="rr-cost">${totalCost.toFixed(2)} €</div>
+          </div>
+        `;
+      }).join('');
+    }
+  }
+
+  // 5. Update Chef Notifications
+  renderPendingLeavesDashboard();
+}
+
+// ============================================================================
+// CHEF TIPS SYSTEM
+// ============================================================================
+
+let lastTipIndex = -1;
+function updateRandomTip() {
+  const tipTextEl = $('#dashTipBody');
+  if (!tipTextEl) return;
+
+  const count = 11; // Number of tips available in i18n (tip.1 to tip.11)
+  let newIndex;
+  do {
+    newIndex = Math.floor(Math.random() * count) + 1;
+  } while (newIndex === lastTipIndex);
+
+  lastTipIndex = newIndex;
+
+  // Flash animation
+  tipTextEl.style.transition = 'none';
+  tipTextEl.style.opacity = '0';
+
+  setTimeout(() => {
+    tipTextEl.innerHTML = `<strong>${t('dash.tip_prefix')}</strong> ${t('tip.' + newIndex)}`;
+    tipTextEl.style.transition = 'opacity 0.5s ease-in-out';
+    tipTextEl.style.opacity = '1';
+  }, 300);
+}
+
+// ============================================================================
+// PROFILE & PIN CHANGE
+// ============================================================================
+
+function toggleProfileDropdown() {
+  $('#profileDropdown').classList.toggle('show');
+}
+
+function showPinModal() {
+  $('#pinModal').style.display = 'flex';
+  $('#profileDropdown').classList.remove('show');
+
+  const user = localStorage.getItem(STORAGE_KEYS.currentUser);
+  if (!user) return;
+
+  const userKey = user.toLowerCase();
+  let usersDb = JSON.parse(localStorage.getItem(STORAGE_KEYS.users) || '{}');
+  const userData = usersDb[userKey] || {};
+  const gender = userData.gender || 'male';
+  const email = userData.email || '';
+  const role = userData.role || 'Chef de Labo';
+
+  $('#profileEmail').value = email;
+  $('#profileRole').value = role;
+
+  $$('.gender-btn-profile').forEach(btn => {
+    if (btn.dataset.gender === gender) {
+      btn.classList.add('active', 'btn-primary');
+      btn.classList.remove('btn-outline');
+    } else {
+      btn.classList.remove('active', 'btn-primary');
+      btn.classList.add('btn-outline');
+    }
+  });
+}
+
+function hidePinModal() {
+  $('#pinModal').style.display = 'none';
+}
+
+function saveNewProfile() {
+  const pin1 = $('#newPin').value;
+  const pin2 = $('#confirmPin').value;
+  const user = localStorage.getItem(STORAGE_KEYS.currentUser);
+  const activeGenderBtn = document.querySelector('.gender-btn-profile.active');
+  const gender = activeGenderBtn ? activeGenderBtn.dataset.gender : null;
+
+  const email = $('#profileEmail').value;
+
+  let usersDb = JSON.parse(localStorage.getItem(STORAGE_KEYS.users) || '{}');
+  const userKey = user.toLowerCase();
+
+  // Ensure user entry exists
+  if (!usersDb[userKey]) usersDb[userKey] = {};
+
+  if (pin1) {
+    if (pin1.length < 4) {
+      showToast(t('toast.pin.short'), 'error');
+      return;
+    }
+    if (pin1 !== pin2) {
+      showToast(t('toast.pin.mismatch'), 'error');
+      return;
+    }
+    usersDb[userKey].pin = pin1;
+  }
+
+  // Persist gender, email, and role
+  usersDb[userKey].gender = gender || usersDb[userKey].gender || 'male';
+  usersDb[userKey].email = email;
+  usersDb[userKey].role = $('#profileRole').value;
+
+  localStorage.setItem(STORAGE_KEYS.users, JSON.stringify(usersDb));
+  showToast(t('toast.profile.updated'), 'success');
+  hidePinModal();
+  updateDashboard();
+
+  $('#newPin').value = '';
+  $('#confirmPin').value = '';
+}
+
+function getGenderedRole(role, isFemale) {
+  if (!role.includes('/') && !role.includes('(')) return role;
+
+  if (role.includes('/')) {
+    const parts = role.split('/').map(p => p.trim());
+    return isFemale ? parts[1] : parts[0];
+  }
+
+  if (role.includes('(')) {
+    if (isFemale) {
+      if (role.toLowerCase().includes('apprenti')) return 'Apprentie';
+      if (role.toLowerCase().includes('ouvrier')) return 'Ouvrière';
+      if (role.toLowerCase().includes('chef')) return 'Cheffe';
+      return role.replace(/\(|\)/g, '');
+    }
+    return role.replace(/\(.*\)/, '');
+  }
+  return role;
+}
+
+// ============================================================================
+// PLANNING & TEAM MANAGEMENT
+// ============================================================================
+
+const TEAM_COLORS = [
+  { bg: '#dbeafe', border: '#3b82f6', text: '#1e40af', dot: '#3b82f6' }, // Bleu
+  { bg: '#dcfce7', border: '#22c55e', text: '#166534', dot: '#22c55e' }, // Vert
+  { bg: '#fef3c7', border: '#f59e0b', text: '#92400e', dot: '#f59e0b' }, // Ambre
+  { bg: '#fce7f3', border: '#ec4899', text: '#9d174d', dot: '#ec4899' }, // Rose
+  { bg: '#e0e7ff', border: '#6366f1', text: '#3730a3', dot: '#6366f1' }, // Indigo
+  { bg: '#ffedd5', border: '#f97316', text: '#9a3412', dot: '#f97316' }, // Orange
+  { bg: '#f3e8ff', border: '#a855f7', text: '#6b21a8', dot: '#a855f7' }, // Violet
+  { bg: '#ccfbf1', border: '#14b8a6', text: '#115e59', dot: '#14b8a6' }, // Turquoise
+  { bg: '#fee2e2', border: '#ef4444', text: '#991b1b', dot: '#ef4444' }, // Rouge
+  { bg: '#f0fdf4', border: '#10b981', text: '#065f46', dot: '#10b981' }, // Émeraude
+  { bg: '#fff7ed', border: '#fb923c', text: '#7c2d12', dot: '#fb923c' }, // Sorbet
+  { bg: '#faf5ff', border: '#c084fc', text: '#581c87', dot: '#c084fc' }, // Mauve
+];
+
+function getMemberColor(memberId) {
+  const member = APP.teamMembers.find(m => m.id === memberId);
+  if (member && member.colorIdx !== undefined) return TEAM_COLORS[member.colorIdx % TEAM_COLORS.length];
+  const idx = APP.teamMembers.findIndex(m => m.id === memberId);
+  return TEAM_COLORS[(idx >= 0 ? idx : 0) % TEAM_COLORS.length];
+}
+
+function loadTeamMembers() {
+  const teamKey = getUserTeamKey();
+  const data = localStorage.getItem(teamKey);
+  APP.teamMembers = data ? JSON.parse(data) : [];
+  APP.teamMembers.forEach((m, i) => { if (m.colorIdx === undefined) m.colorIdx = i; });
+
+  const leavesKey = getUserLeavesKey();
+  const leaveData = localStorage.getItem(leavesKey);
+  APP.staffLeaves = leaveData ? JSON.parse(leaveData) : [];
+
+  const owner = getViewOwner().toLowerCase();
+  const teamName = localStorage.getItem(`gourmet_team_name_${owner}`) || '';
+  const nameInput = $('#teamNameInput');
+  if (nameInput) {
+    nameInput.value = teamName;
+    nameInput.disabled = (localStorage.getItem(STORAGE_KEYS.currentUser)?.toLowerCase() !== owner);
+  }
+}
+
+function saveTeamMembers() {
+  const teamKey = getUserTeamKey();
+  const leavesKey = getUserLeavesKey();
+  localStorage.setItem(teamKey, JSON.stringify(APP.teamMembers));
+  localStorage.setItem(leavesKey, JSON.stringify(APP.staffLeaves));
+
+  const owner = getViewOwner().toLowerCase();
+  const currentUser = localStorage.getItem(STORAGE_KEYS.currentUser)?.toLowerCase();
+  if (owner === currentUser) {
+    const teamName = $('#teamNameInput')?.value || '';
+    localStorage.setItem(`gourmet_team_name_${owner}`, teamName);
+  }
+}
+
+function checkPermissions() {
+  const currentUser = localStorage.getItem(STORAGE_KEYS.currentUser);
+  const owner = getViewOwner();
+  const isOwner = currentUser?.toLowerCase() === owner.toLowerCase();
+
+  const usersDb = JSON.parse(localStorage.getItem(STORAGE_KEYS.users) || '{}');
+  const userKey = currentUser?.toLowerCase();
+  const isJuAdmin = userKey === 'ju' && usersDb[userKey]?.pin === '2503';
+
+  const teamKey = getUserTeamKey();
+  const team = JSON.parse(localStorage.getItem(teamKey) || '[]');
+  const myEntry = team.find(m => m.name.toLowerCase() === userKey);
+
+  // Use profile role if available, fallback to team entry or default roles
+  const profileRole = usersDb[userKey]?.role || 'Consultant';
+  let role = myEntry ? myEntry.role : (isOwner ? profileRole : 'Consultant');
+
+  // No longer auto-promoting owners to Chef. They must explicitly have the role.
+  const isChef = (role === 'Chef de Labo');
+
+  // Owners and super admin (Ju) can always manage their team
+  const canModifyTeam = isOwner || isJuAdmin;
+  const canModifyLeaves = (isChef && isOwner) || isJuAdmin;
+
+  if ($('#btnAddMember')) {
+    $('#btnAddMember').parentElement.style.display = canModifyTeam ? 'block' : 'none';
+  }
+
+  if ($('#btnInviteUser')) {
+    $('#btnInviteUser').parentElement.style.display = isOwner ? 'block' : 'none';
+  }
+
+  const leaveForm = document.querySelector('.leave-form');
+  if (leaveForm) {
+    leaveForm.style.display = isOwner ? 'block' : 'none';
+  }
+
+  const leaveBtn = $('#btnAddLeave');
+  if (leaveBtn) {
+    leaveBtn.textContent = isChef ? t('plan.leave.btn') : t('plan.leave.request_btn');
+  }
+
+  // Dashboard Workflow visibility
+  const chefWorkflow = $('#chefWorkflowArea');
+  if (chefWorkflow) {
+    chefWorkflow.style.display = (isChef || isJuAdmin) ? 'block' : 'none';
+  }
+
+  const clearBtn = $('#btnClearPlanning');
+  if (clearBtn) {
+    clearBtn.style.display = (isChef || isJuAdmin) ? 'block' : 'none';
+  }
+
+  return { isChef, isOwner, isJuAdmin, canModify: canModifyLeaves, role };
+}
+
+function renderTeam() {
+  const container = $('#teamMemberList');
+  const select = $('#leaveMemberId');
+  if (!container) return;
+  const { isChef, isOwner, isJuAdmin } = checkPermissions();
+  const canRemove = (isOwner && isChef) || isJuAdmin;
+
+  if (APP.teamMembers.length === 0) {
+    container.innerHTML = `<p style="color:var(--text-muted); font-size:0.85rem;">${t('plan.team.no_members')}</p>`;
+    if (select) select.innerHTML = `<option value="">${t('plan.team.no_employee')}</option>`;
+    return;
+  }
+
+  container.innerHTML = APP.teamMembers.map(m => {
+    const c = getMemberColor(m.id);
+    return `
+    <div class="team-member">
+      <div class="member-main-content">
+        <span class="member-dot" style="background:${c.dot}"></span>
+        <div class="member-info">
+          <h4>${capitalizeFirstLetter(escapeHtml(m.name))}</h4>
+          <span>${escapeHtml(m.role)}</span>
+        </div>
+      </div>
+      <div class="member-actions-group">
+        ${canRemove ? `
+          <button class="action-btn edit-btn" onclick="editMemberRole('${m.id}')" title="${t('plan.team.assign_role')}">⚙️</button>
+          <button class="action-btn remove-btn" onclick="removeTeamMember('${m.id}')" title="${t('ui.btn.delete')}">✕</button>
+        ` : ''}
+      </div>
+    </div>`;
+  }).join('');
+
+  if (select) {
+    select.innerHTML = `<option value="">— ${t('plan.leave.choose')} —</option>` +
+      APP.teamMembers.map(m => {
+        const c = getMemberColor(m.id);
+        return `<option value="${m.id}" style="border-left:3px solid ${c.dot};">${capitalizeFirstLetter(escapeHtml(m.name))}</option>`;
+      }).join('');
+
+    // Auto-select if user is in team
+    const currentUser = localStorage.getItem(STORAGE_KEYS.currentUser);
+    const myEntry = APP.teamMembers.find(m => m.name.toLowerCase() === currentUser?.toLowerCase());
+    if (myEntry) select.value = myEntry.id;
+  }
+}
+
+function addLeave() {
+  const memberId = $('#leaveMemberId').value;
+  const start = $('#leaveStart').value;
+  const end = $('#leaveEnd').value;
+  const { isChef, isOwner } = checkPermissions();
+
+  if (!memberId || !start || !end) {
+    showToast(t('plan.leave.empty_fields'), 'error');
+    return;
+  }
+
+  const member = APP.teamMembers.find(m => m.id === memberId);
+  const currentUser = localStorage.getItem(STORAGE_KEYS.currentUser);
+  const owner = getViewOwner();
+
+  if (isChef && isOwner) {
+    // Direct add
+    APP.staffLeaves.push({
+      id: Date.now().toString(),
+      memberId,
+      memberName: member ? member.name : 'Inconnu',
+      start,
+      end,
+      status: 'approved'
+    });
+    saveTeamMembers();
+    renderLeaves();
+    renderAnnualCalendar();
+    showToast(t('plan.leave.registered_for', { name: member ? member.name : '' }), 'success');
+  } else {
+    // Request permission
+    const requestId = 'req_' + Date.now();
+    addNotification(owner, {
+      id: requestId,
+      type: 'leave_request',
+      status: 'pending',
+      from: currentUser,
+      memberId,
+      memberName: member ? member.name : currentUser,
+      start,
+      end,
+      timestamp: new Date().toISOString()
+    });
+    showToast(t('plan.leave.sent'), 'info');
+  }
+
+  // Reset inputs
+  $('#leaveStart').value = '';
+  $('#leaveEnd').value = '';
+}
+
+function renderPendingLeavesDashboard() {
+  const container = $('#pendingLeavesDashboard');
+  const countBadge = $('#pendingRequestsCount');
+  if (!container) return;
+
+  const { isChef, isJuAdmin } = checkPermissions();
+  const area = $('#chefWorkflowArea');
+  if (!isChef && !isJuAdmin) {
+    if (area) area.style.display = 'none';
+    return;
+  }
+
+  const pending = APP.notifications.filter(n => n.type === 'leave_request' && !n.handled);
+
+  if (countBadge) {
+    countBadge.textContent = pending.length;
+    countBadge.style.display = pending.length > 0 ? 'inline-block' : 'none';
+  }
+
+  if (area) {
+    area.style.display = pending.length > 0 ? 'block' : 'none';
+  }
+
+  if (pending.length === 0) {
+    container.innerHTML = '<p style="color:var(--text-muted); font-size:0.9rem; text-align:center; padding:1.5rem;">Aucune demande en attente.</p>';
+    return;
+  }
+
+  container.innerHTML = pending.map(n => {
+    const s = new Date(n.start);
+    const e = new Date(n.end);
+    const days = Math.round((e - s) / (1000 * 60 * 60 * 24)) + 1;
+
+    return `
+      <div class="pending-leave-card card" style="margin-bottom:1rem; padding:1.2rem; border-left:4px solid var(--accent-light);">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1rem;">
+          <div>
+            <div style="font-weight:700; font-size:1.1rem; color:var(--text);">${capitalizeFirstLetter(n.memberName)}</div>
+            <div style="font-size:0.85rem; color:var(--text-secondary);">${t('plan.leave.requested_by', { name: capitalizeFirstLetter(n.from) })}</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-weight:800; color:var(--accent); font-size:0.9rem;">${days} ${days > 1 ? t('plan.leave.days') : t('plan.leave.day')}</div>
+            <div style="font-size:0.75rem; color:var(--text-muted);">${new Date(n.timestamp).toLocaleDateString()}</div>
+          </div>
+        </div>
+        <div style="background:var(--bg-alt); padding:0.8rem; border-radius:var(--radius-sm); margin-bottom:1.2rem; display:flex; gap:1.5rem; font-size:0.95rem;">
+          <div><span style="color:var(--text-muted); font-size:0.8rem; display:block;">${t('plan.leave.from_short')}</span> <b>${s.toLocaleDateString()}</b></div>
+          <div><span style="color:var(--text-muted); font-size:0.8rem; display:block;">${t('plan.leave.to_short')}</span> <b>${e.toLocaleDateString()}</b></div>
+        </div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.8rem;">
+          <button class="btn btn-primary btn-sm" onclick="handleLeaveAction('${n.id}', 'approve')">${t('plan.btn.approve')}</button>
+          <button class="btn btn-outline btn-sm" onclick="handleLeaveAction('${n.id}', 'reject')" style="color:var(--danger); border-color:var(--danger);">${t('plan.btn.reject')}</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function handleLeaveAction(requestId, action) {
+  const notif = APP.notifications.find(n => n.id === requestId);
+  if (!notif) return;
+
+  if (action === 'approve') {
+    APP.staffLeaves.push({
+      id: Date.now().toString(),
+      memberId: notif.memberId,
+      memberName: notif.memberName,
+      start: notif.start,
+      end: notif.end,
+      status: 'approved'
+    });
+    saveTeamMembers();
+    showToast(t('plan.leave.approved', { name: notif.memberName }), 'success');
+  } else {
+    showToast(t('plan.leave.denied_for', { name: notif.memberName }), 'info');
+  }
+
+  // Update notification status
+  notif.status = action === 'approve' ? 'approved' : 'denied';
+  notif.handled = true;
+  notif.read = true;
+  saveNotifications();
+
+  // Re-render
+  renderPendingLeavesDashboard();
+  renderNotifications();
+  renderAnnualCalendar();
+}
+
+function removeLeave(id) {
+  const { isChef, isOwner, isJuAdmin } = checkPermissions();
+  if (!isJuAdmin && (!isChef || !isOwner)) {
+    showToast(t('plan.leave.error.admin_only'), 'error');
+    return;
+  }
+
+  if (!confirm(t('plan.leave.confirm_delete'))) return;
+
+  APP.staffLeaves = APP.staffLeaves.filter(l => l.id !== id);
+  saveTeamMembers();
+  renderLeaves();
+  renderAnnualCalendar();
+  showToast(t('plan.leave.deleted'), 'info');
+}
+
+function clearPlanning() {
+  const { isChef, isJuAdmin } = checkPermissions();
+  if (!isChef && !isJuAdmin) return;
+
+  if (!confirm(t('plan.confirm_clear_all'))) return;
+
+  APP.staffLeaves = [];
+  saveTeamMembers();
+  renderLeaves();
+  renderAnnualCalendar();
+  showToast(t('plan.toast.cleared'), 'success');
+}
+
+function renderLeaves() {
+  const container = $('#leaveList');
+  if (!container) return;
+  const { isChef, isOwner } = checkPermissions();
+
+  if (APP.staffLeaves.length === 0) {
+    container.innerHTML = `<p style="color:var(--text-muted); font-size:0.8rem; text-align:center; padding:0.5rem 0;">${t('plan.leave.none')}</p>`;
+    return;
+  }
+
+  const sorted = [...APP.staffLeaves].sort((a, b) => new Date(a.start) - new Date(b.start));
+
+  container.innerHTML = `<div style="font-size:0.7rem; font-weight:700; text-transform:uppercase; color:var(--text-muted); letter-spacing:0.5px; margin-bottom:0.6rem;">${t('plan.leave.registered')} (${sorted.length})</div>` +
+    sorted.map(l => {
+      const s = new Date(l.start);
+      const e = new Date(l.end);
+      const sStr = s.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+      const eStr = e.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+      const days = Math.round((e - s) / (1000 * 60 * 60 * 24)) + 1;
+      const c = getMemberColor(l.memberId);
+      const canRemove = isOwner && isChef;
+      return `
+      <div class="leave-card" style="border-left-color:${c.dot}; background:${c.bg}">
+        <span class="member-dot" style="background:${c.dot}"></span>
+        <div class="leave-card-left">
+          <div class="leave-card-name">${capitalizeFirstLetter(escapeHtml(l.memberName))}</div>
+          <div class="leave-card-dates">📅 ${sStr} → ${eStr} <span class="leave-card-days" style="color:${c.text}">(${days}${t('plan.leave.day').charAt(0)})</span></div>
+        </div>
+        ${canRemove ? `<button class="remove-member" onclick="removeLeave('${l.id}')" title="Supprimer ce congé">✕</button>` : ''}
+      </div>
+    `;
+    }).join('');
+}
+
+// ============================================================================
+// SHARING & NOTIFICATIONS SYSTEM
+// ============================================================================
+
+function loadNotifications() {
+  const user = localStorage.getItem(STORAGE_KEYS.currentUser);
+  if (!user) return;
+  const allNotifs = JSON.parse(localStorage.getItem(STORAGE_KEYS.notifications) || '{}');
+  APP.notifications = allNotifs[user.toLowerCase()] || [];
+  renderNotifications();
+}
+
+function saveNotifications() {
+  const user = localStorage.getItem(STORAGE_KEYS.currentUser);
+  if (!user) return;
+  const allNotifs = JSON.parse(localStorage.getItem(STORAGE_KEYS.notifications) || '{}');
+  allNotifs[user.toLowerCase()] = APP.notifications;
+  localStorage.setItem(STORAGE_KEYS.notifications, JSON.stringify(allNotifs));
+}
+
+function addNotification(targetUser, notif) {
+  const allNotifs = JSON.parse(localStorage.getItem(STORAGE_KEYS.notifications) || '{}');
+  const userKey = targetUser.toLowerCase();
+  if (!allNotifs[userKey]) allNotifs[userKey] = [];
+  allNotifs[userKey].push(notif);
+  localStorage.setItem(STORAGE_KEYS.notifications, JSON.stringify(allNotifs));
+
+  if (targetUser.toLowerCase() === localStorage.getItem(STORAGE_KEYS.currentUser)?.toLowerCase()) {
+    APP.notifications.push(notif);
+    renderNotifications();
+  }
+}
+
+function renderNotifications() {
+  const badge = $('#notifBadge');
+  const list = $('#notifList');
+  const area = $('#notificationArea');
+  if (!area) return;
+
+  const unreadCount = APP.notifications.filter(n => !n.read).length;
+  if (unreadCount > 0) {
+    badge.style.display = 'block';
+    badge.textContent = unreadCount;
+    area.style.display = 'block';
+  } else {
+    badge.style.display = 'none';
+    area.style.display = 'block'; // Always show bell if logged in
+  }
+
+  if (APP.notifications.length === 0) {
+    list.innerHTML = '<div class="notif-empty">Aucune nouvelle notification</div>';
+  } else {
+    list.innerHTML = [...APP.notifications].reverse().map(n => {
+      let msg = '';
+      if (n.type === 'leave_request') msg = t('plan.notif.leave_req', { from: capitalizeFirstLetter(n.from), name: capitalizeFirstLetter(n.memberName) });
+      if (n.type === 'invite') msg = t('plan.notif.invite', { from: capitalizeFirstLetter(n.from) });
+
+      return `
+        <div class="notif-item ${n.read ? 'read' : 'unread'}" onclick="handleNotifClick('${n.id}')">
+          <div style="font-size:0.8rem; margin-bottom:0.3rem;">${msg}</div>
+          <div style="font-size:0.7rem; color:var(--text-muted);">${new Date(n.timestamp).toLocaleString('fr-FR')}</div>
+        </div>
+      `;
+    }).join('');
+  }
+}
+
+function handleNotifClick(id) {
+  const notif = APP.notifications.find(n => n.id === id);
+  if (!notif) return;
+  notif.read = true;
+  saveNotifications();
+  renderNotifications();
+
+  if (notif.type === 'leave_request') {
+    document.getElementById('navHub').click(); // Show on dashboard
+  } else if (notif.type === 'invite') {
+    // Already shared, just inform
+    showToast(t('plan.toast.invited', { name: notif.from }), 'info');
+  }
+}
+
+
+function inviteUserToPlanning() {
+  const username = $('#inviteUser').value.trim();
+  const currentUser = localStorage.getItem(STORAGE_KEYS.currentUser);
+  if (!username) return;
+
+  const usersDb = JSON.parse(localStorage.getItem(STORAGE_KEYS.users) || '{}');
+  const invitedUserData = usersDb[username.toLowerCase()];
+  if (!invitedUserData) {
+    showToast(t('plan.toast.user_not_found'), 'error');
+    return;
+  }
+
+  const shared = JSON.parse(localStorage.getItem(STORAGE_KEYS.sharedPlannings) || '{}');
+  const ownerKey = currentUser.toLowerCase();
+
+  // 1. Handle Sharing Permissions
+  if (!shared[ownerKey]) shared[ownerKey] = [];
+  if (shared[ownerKey].includes(username.toLowerCase())) {
+    showToast(t('plan.toast.already_access'), 'info');
+    return;
+  }
+  shared[ownerKey].push(username.toLowerCase());
+  localStorage.setItem(STORAGE_KEYS.sharedPlannings, JSON.stringify(shared));
+
+  // 2. Automatically sync Team Members for the Owner
+  // Ensure owner is Chef de Labo in their own team
+  const teamKey = `${STORAGE_KEYS.teamMembers}_${ownerKey}`;
+  let ownerTeam = JSON.parse(localStorage.getItem(teamKey) || '[]');
+
+  const ownerInTeam = ownerTeam.find(m => m.name.toLowerCase() === ownerKey);
+  if (!ownerInTeam) {
+    ownerTeam.push({
+      id: 'owner_' + Date.now(),
+      name: currentUser,
+      role: 'Chef de Labo',
+      colorIdx: 0
+    });
+  } else {
+    ownerInTeam.role = 'Chef de Labo';
+  }
+
+  // Add the invited person as Worker/Apprentice with Gender support
+  const alreadyInTeam = ownerTeam.find(m => m.name.toLowerCase() === username.toLowerCase());
+  if (!alreadyInTeam) {
+    const isFemale = invitedUserData.gender === 'female';
+    // Default role logic: Apprentice/Worker based on gender
+    const defaultRole = isFemale ? 'Apprentie' : 'Apprenti';
+
+    ownerTeam.push({
+      id: 'member_' + Date.now(),
+      name: username,
+      role: defaultRole,
+      colorIdx: ownerTeam.length
+    });
+  }
+
+  localStorage.setItem(teamKey, JSON.stringify(ownerTeam));
+
+  // 3. Send Notification
+  addNotification(username, {
+    id: 'inv_' + Date.now(),
+    type: 'invite',
+    from: currentUser,
+    timestamp: new Date().toISOString()
+  });
+
+  showToast(t('plan.toast.invite_sent', { name: username }), 'success');
+  $('#inviteUser').value = '';
+  $('#inviteAutocomplete').style.display = 'none';
+
+  // Refresh UI
+  loadTeamMembers();
+  renderTeam();
+  renderSharedList();
+}
+
+function handleInviteAutocomplete() {
+  const input = $('#inviteUser');
+  const dropdown = $('#inviteAutocomplete');
+  const query = input.value.trim().toLowerCase();
+
+  if (query.length === 0) {
+    dropdown.style.display = 'none';
+    return;
+  }
+
+  const usersDb = JSON.parse(localStorage.getItem(STORAGE_KEYS.users) || '{}');
+  const matches = Object.keys(usersDb).filter(u => u.startsWith(query));
+
+  if (matches.length === 0) {
+    dropdown.style.display = 'none';
+    return;
+  }
+
+  dropdown.style.display = 'block';
+  dropdown.innerHTML = matches.map(m => `
+    <div class="ac-suggestion" onclick="selectInviteUser('${m}')">
+      <span class="avatar-mini">👨‍🍳</span>
+      <span>${capitalizeFirstLetter(m)}</span>
+    </div>
+  `).join('');
+}
+
+function selectInviteUser(user) {
+  $('#inviteUser').value = user;
+  $('#inviteAutocomplete').style.display = 'none';
+  inviteUserToPlanning();
+}
+
+function renderSharedList() {
+  const container = $('#sharedWithList');
+  if (!container) return;
+  const currentUser = localStorage.getItem(STORAGE_KEYS.currentUser);
+  const shared = JSON.parse(localStorage.getItem(STORAGE_KEYS.sharedPlannings) || '{}');
+  const list = shared[currentUser?.toLowerCase()] || [];
+
+  if (list.length === 0) {
+    container.innerHTML = '';
+    return;
+  }
+
+  container.innerHTML = '<div style="font-size:0.7rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; margin-bottom:0.5rem;">Cofondateur(s)</div>' +
+    list.map(u => `
+      <div style="display:flex; justify-content:space-between; align-items:center; background:var(--bg-alt); padding:0.5rem; border-radius:var(--radius-sm); margin-bottom:0.3rem;">
+        <span style="font-size:0.85rem; font-weight:600;">@${capitalizeFirstLetter(u)}</span>
+        <button onclick="removeShare('${u}')" style="color:var(--danger); font-size:0.8rem;">✕</button>
+      </div>
+    `).join('');
+}
+
+function removeShare(user) {
+  const currentUser = localStorage.getItem(STORAGE_KEYS.currentUser);
+  const shared = JSON.parse(localStorage.getItem(STORAGE_KEYS.sharedPlannings) || '{}');
+  const ownerKey = currentUser.toLowerCase();
+
+  // 1. Remove from share list
+  shared[ownerKey] = shared[ownerKey].filter(u => u !== user.toLowerCase());
+  localStorage.setItem(STORAGE_KEYS.sharedPlannings, JSON.stringify(shared));
+
+  // 2. Remove from team members too
+  const teamKey = `${STORAGE_KEYS.teamMembers}_${ownerKey}`;
+  let team = JSON.parse(localStorage.getItem(teamKey) || '[]');
+  team = team.filter(m => m.name.toLowerCase() !== user.toLowerCase());
+  localStorage.setItem(teamKey, JSON.stringify(team));
+
+  renderSharedList();
+  loadTeamMembers();
+  renderTeam();
+  showToast(t('plan.shared.access_removed', { name: user }), 'info');
+}
+
+function renderInvitations() {
+  const currentUser = localStorage.getItem(STORAGE_KEYS.currentUser);
+  const allShared = JSON.parse(localStorage.getItem(STORAGE_KEYS.sharedPlannings) || '{}');
+  const invitedTo = [];
+
+  for (const owner in allShared) {
+    if (allShared[owner].includes(currentUser?.toLowerCase())) {
+      invitedTo.push(owner);
+    }
+  }
+
+  const navArea = $('#mainNav');
+  $$('.shared-nav-btn').forEach(btn => btn.remove());
+
+  invitedTo.forEach(owner => {
+    const teamName = localStorage.getItem(`gourmet_team_name_${owner.toLowerCase()}`) || owner;
+    const btn = document.createElement('button');
+    btn.className = 'nav-link shared-nav-btn';
+    btn.style.color = 'var(--accent)';
+    btn.textContent = `📅 ${teamName}`;
+    btn.onclick = () => {
+      APP.viewOwner = owner;
+      document.getElementById('navPlanning').click();
+      showToast(t('plan.shared.viewing', { name: teamName }), 'info');
+    };
+    navArea.appendChild(btn);
+  });
+}
+
+function addTeamMember() {
+  const nameInput = $('#memberName');
+  const roleInput = $('#memberRole');
+  const name = nameInput.value.trim();
+  const role = roleInput.value;
+
+  if (!name) {
+    showToast(t('auth.error.empty'), 'error');
+    return;
+  }
+
+  const usersDb = JSON.parse(localStorage.getItem(STORAGE_KEYS.users) || '{}');
+  const targetUserData = usersDb[name.toLowerCase()];
+  if (!targetUserData) {
+    showToast(t('plan.team.not_found', { name }), 'error');
+    return;
+  }
+
+  // Check if already in team
+  if (APP.teamMembers.find(m => m.name.toLowerCase() === name.toLowerCase())) {
+    showToast(t('plan.team.already_in', { name }), 'info');
+    return;
+  }
+
+  // Define gender for the helper
+  const isFemale = targetUserData.gender === 'female';
+
+  // Use profile role if specified, otherwise use role input
+  let roleToProcess = targetUserData.role || role;
+
+  // Force 'Chef de Labo' if it's the very first member added to the team
+  if (APP.teamMembers.length === 0) {
+    roleToProcess = 'Chef de Labo';
+  }
+
+  // Use the new gender-sensitive role helper
+  const finalRole = getGenderedRole(roleToProcess, isFemale);
+
+  const nextColorIdx = APP.teamMembers.length > 0
+    ? (Math.max(...APP.teamMembers.map(m => m.colorIdx || 0)) + 1)
+    : 0;
+
+  APP.teamMembers.push({
+    id: Date.now().toString(),
+    name,
+    role: finalRole,
+    colorIdx: nextColorIdx
+  });
+
+  saveTeamMembers();
+  renderTeam();
+  nameInput.value = '';
+  $('#memberAutocomplete').style.display = 'none';
+  showToast(t('plan.team.added', { name }), 'success');
+}
+
+function handleMemberAutocomplete() {
+  const input = $('#memberName');
+  const dropdown = $('#memberAutocomplete');
+  const query = input.value.trim().toLowerCase();
+
+  if (query.length === 0) {
+    dropdown.style.display = 'none';
+    return;
+  }
+
+  const usersDb = JSON.parse(localStorage.getItem(STORAGE_KEYS.users) || '{}');
+  const matches = Object.keys(usersDb).filter(u => u.startsWith(query));
+
+  if (matches.length === 0) {
+    dropdown.style.display = 'none';
+    return;
+  }
+
+  dropdown.style.display = 'block';
+  dropdown.innerHTML = matches.map(m => `
+    <div class="ac-suggestion" onclick="selectMemberUser('${m}')">
+      <span class="avatar-mini">👨‍🍳</span>
+      <span>${capitalizeFirstLetter(m)}</span>
+    </div>
+  `).join('');
+}
+
+function selectMemberUser(user) {
+  $('#memberName').value = user;
+  $('#memberAutocomplete').style.display = 'none';
+  addTeamMember();
+}
+
+function removeTeamMember(id) {
+  if (!confirm(t('plan.team.confirm_remove'))) return;
+  APP.teamMembers = APP.teamMembers.filter(m => m.id !== id);
+  saveTeamMembers();
+  renderTeam();
+  showToast(t('plan.team.removed'), 'info');
+}
+
+function editMemberRole(id) {
+  const member = APP.teamMembers.find(m => m.id === id);
+  if (!member) return;
+
+  const modal = $('#roleModal');
+  const nameEl = $('#roleModalMemberName');
+  const select = $('#roleSelect');
+
+  nameEl.textContent = capitalizeFirstLetter(member.name);
+  select.value = member.role; // This will only work if current role matches one of the options
+
+  // Store the member ID in the save button for later retrieval
+  $('#btnSaveRole').onclick = () => confirmRoleUpdate(id);
+
+  modal.style.display = 'flex';
+}
+
+function confirmRoleUpdate(id) {
+  const member = APP.teamMembers.find(m => m.id === id);
+  if (!member) return;
+
+  const usersDb = JSON.parse(localStorage.getItem(STORAGE_KEYS.users) || '{}');
+  const targetUserData = usersDb[member.name.toLowerCase()];
+  const isFemale = targetUserData?.gender === 'female';
+
+  const select = $('#roleSelect');
+  member.role = getGenderedRole(select.value, isFemale);
+
+  saveTeamMembers();
+  renderTeam();
+  closeRoleModal();
+  showToast(t('plan.team.role_updated', { role: member.role }), 'success');
+}
+
+function closeRoleModal() {
+  $('#roleModal').style.display = 'none';
+}
+
+function renderAnnualCalendar() {
+  const container = $('#annualCalendarView');
+  if (!container) return;
+
+  const currentZone = localStorage.getItem(STORAGE_KEYS.vacationZone) || 'C';
+  const holidays = HOLIDAYS_2026[currentZone] || HOLIDAYS_2026.C;
+
+  const monthNames = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(m => t('month.' + m));
+  const dayNames = [1, 2, 3, 4, 5, 6, 7].map(d => t('day.' + d));
+
+  let html = '';
+  const currentYear = 2026;
+
+  for (let month = 0; month < 12; month++) {
+    const daysInMonth = new Date(currentYear, month + 1, 0).getDate();
+
+    html += `
+      <div class="month-view">
+        <h4 class="month-title">${monthNames[month]}</h4>
+        <div class="days-grid">
+    `;
+
+    // Always render 31 columns for alignment
+    for (let day = 1; day <= 31; day++) {
+      if (day > daysInMonth) {
+        html += `<div class="day-cell empty"></div>`;
+        continue;
+      }
+
+      const date = new Date(currentYear, month, day);
+      const mStr = (month + 1).toString().padStart(2, '0');
+      const dStr = day.toString().padStart(2, '0');
+      const dateStr = `${mStr}-${dStr}`;
+      const fullDateStr = `${currentYear}-${mStr}-${dStr}`;
+
+      const wdIdx = (date.getDay() + 6) % 7;
+      const weekday = dayNames[wdIdx];
+
+      let classes = ['day-cell'];
+      let toolTip = `${weekday} ${day} ${monthNames[month]}`;
+      let indicators = '';
+
+      // Weekends
+      if (date.getDay() === 0 || date.getDay() === 6) classes.push('sunday-day');
+
+      // Events
+      if (PASTRY_EVENTS_2026[dateStr]) {
+        classes.push('event-day');
+        toolTip += ` - 🔥 ${getTranslatedEvent(dateStr)}`;
+      }
+
+      // Holidays
+      const holiday = holidays.find(h => fullDateStr >= h.start && fullDateStr <= h.end);
+      if (holiday) {
+        classes.push('holiday-day');
+        toolTip += ` - 🏖️ ${getTranslatedHoliday(holiday.label)}`;
+      }
+
+      // Staff Leaves
+      const onLeave = (APP.staffLeaves || []).filter(l => fullDateStr >= l.start && fullDateStr <= l.end);
+      if (onLeave.length > 0) {
+        classes.push('leave-active-day');
+        const names = onLeave.map(l => l.memberName).join(', ');
+        toolTip += ` - 🌴 ${t('plan.leave.employee')}s: ${names}`;
+        indicators = `<span class="leave-dots">${onLeave.slice(0, 3).map(l => {
+          const c = getMemberColor(l.memberId);
+          return `<span style="color:${c.dot}">●</span>`;
+        }).join('')}</span>`;
+      }
+
+      html += `
+        <div class="${classes.join(' ')}" title="${toolTip}">
+          <span class="wd-mini">${weekday}</span>
+          <span class="d-num">${day}</span>
+          ${indicators}
+        </div>`;
+    }
+
+    html += `</div></div>`;
+  }
+
+  container.innerHTML = html;
+}
+
+function renderAdminUsers() {
+  const container = $('#adminUserList');
+  if (!container) return;
+
+  const usersDb = JSON.parse(localStorage.getItem(STORAGE_KEYS.users) || '{}');
+  const userKeys = Object.keys(usersDb);
+
+  if (userKeys.length === 0) {
+    container.innerHTML = `<tr><td colspan="5" style="padding:1rem; text-align:center;">${t('admin.col.user') === 'User' ? 'No registered users.' : (t('admin.col.user') === 'Usuario' ? 'No hay usuarios registrados.' : 'Aucun utilisateur enregistré.')}</td></tr>`;
+    return;
+  }
+
+  container.innerHTML = userKeys.map(key => {
+    const u = usersDb[key];
+    const isPinSet = u.pin && u.pin !== '0000';
+    const isAdmin = u.isAdmin || key.toLowerCase() === 'ju';
+    const isBanned = u.isBanned || false;
+
+    return `
+      <tr style="border-bottom:1px solid var(--surface-border); ${isBanned ? 'opacity:0.6; background:rgba(254,226,226,0.3);' : ''}">
+        <td style="padding:1rem; font-weight:600;">
+          ${escapeHtml(key)}
+          ${isAdmin ? '<span style="margin-left:5px; font-size:0.65rem; background:var(--primary); color:white; padding:1px 4px; border-radius:3px;">ADMIN</span>' : ''}
+          ${isBanned ? '<span style="margin-left:5px; font-size:0.65rem; background:var(--danger); color:white; padding:1px 4px; border-radius:3px;">BAN</span>' : ''}
+        </td>
+        <td style="padding:1rem;">${escapeHtml(u.email || '—')}</td>
+        <td style="padding:1rem;">${u.gender === 'female' ? t('auth.gender.female') : t('auth.gender.male')}</td>
+        <td style="padding:1rem;">
+          <span style="padding:0.25rem 0.5rem; border-radius:4px; font-size:0.75rem; background:${isPinSet ? '#dcfce7' : '#fee2e2'}; color:${isPinSet ? '#166534' : '#b91c1c'};">
+            ${isPinSet ? (t('admin.col.user') === 'User' ? 'PIN Set' : (t('admin.col.user') === 'Usuario' ? 'PIN Definido' : 'PIN Défini')) : (t('admin.col.user') === 'User' ? 'Default PIN' : (t('admin.col.user') === 'Usuario' ? 'PIN Por defecto' : 'PIN Par défaut'))}
+          </span>
+        </td>
+        <td style="padding:1rem; text-align:right; display:flex; gap:0.5rem; justify-content:flex-end;">
+          <button class="btn btn-sm btn-outline" onclick="openAdminModeration('${key}')">⚙️ ${t('nav.admin') === 'Admin' ? 'Moderate' : (t('nav.admin') === 'Admin' ? 'Moderar' : 'Modérer')}</button>
+          ${key.toLowerCase() !== 'ju' ?
+        `<button class="btn btn-sm btn-outline" style="color:var(--danger); border-color:var(--danger);" onclick="deleteUser('${key}')">🗑️</button>` :
+        '<small style="color:var(--text-muted); padding:0 0.5rem;">Admin</small>'}
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+let selectedModerationUser = null;
+
+function openAdminModeration(user) {
+  const usersDb = JSON.parse(localStorage.getItem(STORAGE_KEYS.users) || '{}');
+  const u = usersDb[user.toLowerCase()];
+  if (!u) return;
+
+  selectedModerationUser = user;
+  const isAdmin = u.isAdmin || user.toLowerCase() === 'ju';
+  const isBanned = u.isBanned || false;
+
+  $('#adminUserDetail').innerHTML = `
+    <div style="background:var(--bg-alt); padding:1rem; border-radius:var(--radius-md); border:1px solid var(--surface-border);">
+      <div style="font-weight:700; font-size:1.1rem; margin-bottom:0.5rem;">${escapeHtml(user)}</div>
+      <div style="display:grid; grid-template-columns:auto 1fr; gap:0.5rem 1rem; font-size:0.9rem;">
+        <span style="color:var(--text-muted);">Email:</span> <b>${escapeHtml(u.email || 'Non renseigné')}</b>
+        <span style="color:var(--text-muted);">Code PIN:</span> <b style="letter-spacing:2px; color:var(--accent);">${u.pin}</b>
+        <span style="color:var(--text-muted);">Genre:</span> <b>${u.gender === 'female' ? 'Femme' : 'Homme'}</b>
+      </div>
+    </div>
+  `;
+
+  const btnAdmin = $('#btnAdminToggle');
+  const btnBan = $('#btnBanToggle');
+
+  btnAdmin.textContent = isAdmin ? '🛡️ Retirer Admin' : '🛡️ Rendre Admin';
+  btnAdmin.style.background = isAdmin ? 'var(--primary-glow)' : 'transparent';
+  btnAdmin.disabled = user.toLowerCase() === 'ju'; // Cannot demote 'Ju'
+
+  btnBan.textContent = isBanned ? '✅ Débannir' : '🚫 Bannir';
+  btnBan.style.background = isBanned ? 'rgba(34,197,94,0.1)' : 'transparent';
+  btnBan.style.color = isBanned ? 'var(--success)' : 'var(--danger)';
+  btnBan.style.borderColor = isBanned ? 'var(--success)' : 'var(--danger)';
+  btnBan.disabled = user.toLowerCase() === 'ju'; // Cannot ban 'Ju'
+
+  $('#btnDeleteUserModal').style.display = user.toLowerCase() === 'ju' ? 'none' : 'block';
+
+  $('#adminUserModal').style.display = 'flex';
+}
+
+function toggleAdminStatus() {
+  if (!selectedModerationUser) return;
+  const userKey = selectedModerationUser.toLowerCase();
+  let usersDb = JSON.parse(localStorage.getItem(STORAGE_KEYS.users) || '{}');
+
+  usersDb[userKey].isAdmin = !usersDb[userKey].isAdmin;
+  localStorage.setItem(STORAGE_KEYS.users, JSON.stringify(usersDb));
+
+  openAdminModeration(selectedModerationUser);
+  renderAdminUsers();
+  showToast(t('admin.status.admin_updated', { name: selectedModerationUser }), 'info');
+}
+
+function toggleBanStatus() {
+  if (!selectedModerationUser) return;
+  const userKey = selectedModerationUser.toLowerCase();
+  let usersDb = JSON.parse(localStorage.getItem(STORAGE_KEYS.users) || '{}');
+
+  usersDb[userKey].isBanned = !usersDb[userKey].isBanned;
+  localStorage.setItem(STORAGE_KEYS.users, JSON.stringify(usersDb));
+
+  openAdminModeration(selectedModerationUser);
+  renderAdminUsers();
+  const statusMsg = usersDb[userKey].isBanned ? t('admin.status.banned', { name: selectedModerationUser }) : t('admin.status.unbanned', { name: selectedModerationUser });
+  showToast(statusMsg, 'info');
+}
+
+function deleteUser(user) {
+  const userKey = user.toLowerCase();
+
+  if (confirm(t('admin.confirm.delete_user', { name: user }))) {
+    // 1. Remove from database
+    let usersDb = JSON.parse(localStorage.getItem(STORAGE_KEYS.users) || '{}');
+    delete usersDb[userKey];
+    localStorage.setItem(STORAGE_KEYS.users, JSON.stringify(usersDb));
+
+    // 2. Remove user specific data
+    localStorage.removeItem(`gourmetrevient_recipes_${userKey}`);
+    localStorage.removeItem(`gourmet_team_members_${userKey}`);
+    localStorage.removeItem(`gourmet_staff_leaves_${userKey}`);
+    localStorage.removeItem(`gourmet_lab_plan_${userKey}`);
+    localStorage.removeItem(`labpatiss_config_${userKey}`);
+    localStorage.removeItem(`labpatiss_placements_${userKey}`);
+
+    // If deleting the current user (theoretically possible if admin deletes itself, but we blocked it)
+    if (localStorage.getItem(STORAGE_KEYS.currentUser)?.toLowerCase() === userKey) {
+      localStorage.removeItem('gourmet_auth');
+      localStorage.removeItem(STORAGE_KEYS.currentUser);
+      location.reload();
+    } else {
+      renderAdminUsers();
+      showToast(t('admin.user.deleted', { name: user }), 'info');
+    }
+  }
+}
+
+// ============================================================================
+// INITIALIZATION
+// ============================================================================
+
+function init() {
+  checkAuth();
+  loadSavedRecipes();
+  loadIngredientDb();
+  loadTeamMembers();
+  loadNotifications();
+  bindEvents();
+  renderSavedRecipes();
+  renderInvitations();
+
+  // Start at hero screen
+  goToStep(0);
+  renderLibraryRecipes();
+  updateRandomTip();
+  if (typeof showHub === 'function') showHub();
+
+  // Listen for language changes to refresh dynamic content
+  document.addEventListener('languageChanged', (e) => {
+    // 1. SAVE current state so changes aren't lost
+    if (APP.currentStep >= 1 && APP.currentStep <= 3) {
+      collectCurrentStepData();
+    }
+
+    // 2. Global UI updates
+    updateDashboard();
+    updateRandomTip();
+
+    // 3. Current active step content
+    if (APP.currentStep === 2) renderIngredients();
+    if (APP.currentStep === 3) renderProcedure();
+    if (APP.currentStep === 4) renderCostAnalysis();
+    if (APP.currentStep === 5) renderSummary();
+
+    // 4. Refresh other active/visible apps
+    if (typeof renderLibraryRecipes === 'function') renderLibraryRecipes();
+    if (typeof renderSavedRecipes === 'function') renderSavedRecipes();
+
+    const isVisible = (id) => {
+      const el = document.querySelector(id);
+      return el && el.style.display !== 'none';
+    };
+
+    if (isVisible('#appPortfolio')) { if (typeof renderPortfolio === 'function') renderPortfolio(); }
+    if (isVisible('#appPlanning')) {
+      if (typeof renderTeam === 'function') renderTeam();
+      if (typeof renderLeaves === 'function') renderLeaves();
+      if (typeof renderAnnualCalendar === 'function') renderAnnualCalendar();
+    }
+    if (isVisible('#appLaboratoire')) {
+      if (typeof renderDevis === 'function') renderDevis();
+    }
+  });
+}
+
+document.addEventListener('DOMContentLoaded', init);
+
+// Capitalization helper
+function capitalizeFirstLetter(str) {
+  if (!str) return '';
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+function escapeHtml(text) {
+  if (!text) return '';
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}

@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://julianperesson.github.io/Gourmetrevient/sitemap.xml
