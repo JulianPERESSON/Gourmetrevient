@@ -3922,19 +3922,23 @@ function loadHaccpLogs() {
       { id: 'tr_demo2', lot: 'L260302', product: 'Tarte Citron Meringuée', date: new Date(now - 1000 * 60 * 60 * 12).toISOString(), exp: '2026-03-07', qty: '12' },
       { id: 'tr_demo3', lot: 'L260303', product: 'Paris-Brest', date: new Date(now - 1000 * 60 * 60 * 48).toISOString(), exp: '2026-03-05', qty: '24' }
     ];
-    if (!APP.haccpLogs.clean || APP.haccpLogs.clean.length === 0) {
-      APP.haccpLogs.clean = [
-        { id: 'c1', areaKey: 'haccp.clean.c1', done: true, icon: '🧼' },
-        { id: 'c2', areaKey: 'haccp.clean.c2', done: true, icon: '🧹' },
-        { id: 'c3', areaKey: 'haccp.clean.c3', done: false, icon: '🔥' },
-        { id: 'c4', areaKey: 'haccp.clean.c4', done: false, icon: '📦' },
-        { id: 'c5', areaKey: 'haccp.clean.c5', done: true, icon: '❄️' },
-        { id: 'c6', areaKey: 'haccp.clean.c6', done: false, icon: '🍴' },
-        { id: 'c7', areaKey: 'haccp.clean.c7', done: false, icon: '🗑️' }
-      ];
-    }
     saveHaccpLogs();
   }
+
+  // Toujours initialiser le plan de nettoyage par défaut s'il est vide
+  if (!APP.haccpLogs.clean || APP.haccpLogs.clean.length === 0) {
+    APP.haccpLogs.clean = [
+      { id: 'c1', areaKey: 'haccp.clean.c1', done: false, icon: '🧼' },
+      { id: 'c2', areaKey: 'haccp.clean.c2', done: false, icon: '🧹' },
+      { id: 'c3', areaKey: 'haccp.clean.c3', done: false, icon: '🔥' },
+      { id: 'c4', areaKey: 'haccp.clean.c4', done: false, icon: '📦' },
+      { id: 'c5', areaKey: 'haccp.clean.c5', done: false, icon: '❄️' },
+      { id: 'c6', areaKey: 'haccp.clean.c6', done: false, icon: '🍴' },
+      { id: 'c7', areaKey: 'haccp.clean.c7', done: false, icon: '🗑️' }
+    ];
+    saveHaccpLogs();
+  }
+
 
   // Migrate: ensure cleaning items have areaKey for translation
   if (APP.haccpLogs.clean) {
