@@ -1,4 +1,4 @@
-/*
+﻿/*
   =====================================================================
   APP.JS — GourmetRevient Professional Recipe Cost Calculator
   Modular Vanilla JavaScript
@@ -27,6 +27,8 @@ const APP = {
   ingredientDb: [],
   teamMembers: [],
   staffLeaves: [],
+  inventory: [],
+  haccpLogs: { temp: [], trace: [], clean: [] },
   viewOwner: null, // User cuya data estamos viendo
   notifications: []
 };
@@ -39,36 +41,38 @@ const STORAGE_KEYS = {
   staffLeaves: 'gourmet_staff_leaves',
   sharedPlannings: 'gourmet_shared_plannings',
   notifications: 'gourmet_notifications',
-  vacationZone: 'gourmet_vacation_zone'
+  vacationZone: 'gourmet_vacation_zone',
+  inventory: 'gourmet_inventory',
+  haccpLogs: 'gourmet_haccp_logs'
 };
 
 // Default ingredient database (pre-loaded)
 const DEFAULT_INGREDIENT_DB = [
-  { name: 'Farine T55', unit: 'g', pricePerUnit: 0.65, priceRef: 'kg' },
-  { name: 'Farine T45', unit: 'g', pricePerUnit: 0.80, priceRef: 'kg' },
-  { name: 'Beurre AOP', unit: 'g', pricePerUnit: 7.50, priceRef: 'kg' },
-  { name: 'Beurre doux', unit: 'g', pricePerUnit: 6.80, priceRef: 'kg' },
-  { name: 'Sucre semoule', unit: 'g', pricePerUnit: 0.85, priceRef: 'kg' },
-  { name: 'Sucre glace', unit: 'g', pricePerUnit: 2.10, priceRef: 'kg' },
-  { name: 'Lait entier', unit: 'ml', pricePerUnit: 0.85, priceRef: 'L' },
-  { name: 'Crème 35% MG', unit: 'ml', pricePerUnit: 4.20, priceRef: 'L' },
-  { name: 'Œufs entiers', unit: 'pièce', pricePerUnit: 0.15, priceRef: 'pièce' },
-  { name: 'Jaunes d\'œufs', unit: 'pièce', pricePerUnit: 0.15, priceRef: 'pièce' },
-  { name: 'Blancs d\'œufs', unit: 'pièce', pricePerUnit: 0.10, priceRef: 'pièce' },
-  { name: 'Chocolat noir 64%', unit: 'g', pricePerUnit: 11.50, priceRef: 'kg' },
-  { name: 'Poudre d\'amandes', unit: 'g', pricePerUnit: 9.50, priceRef: 'kg' },
-  { name: 'Vanille (gousse)', unit: 'pièce', pricePerUnit: 1.80, priceRef: 'pièce' },
-  { name: 'Sel', unit: 'g', pricePerUnit: 0.50, priceRef: 'kg' },
-  { name: 'Maïzena', unit: 'g', pricePerUnit: 2.80, priceRef: 'kg' },
-  { name: 'Praliné noisette', unit: 'g', pricePerUnit: 14.50, priceRef: 'kg' },
-  { name: 'Cacao poudre', unit: 'g', pricePerUnit: 12.00, priceRef: 'kg' },
-  { name: 'Gélatine', unit: 'g', pricePerUnit: 22.00, priceRef: 'kg' },
-  { name: 'Levure fraîche', unit: 'g', pricePerUnit: 6.50, priceRef: 'kg' },
-  { name: 'Fraises fraîches', unit: 'g', pricePerUnit: 4.50, priceRef: 'kg' },
-  { name: 'Noisettes torréfiées', unit: 'g', pricePerUnit: 12.50, priceRef: 'kg' },
-  { name: 'Amandes effilées', unit: 'g', pricePerUnit: 9.50, priceRef: 'kg' },
-  { name: 'Rhum ambré', unit: 'ml', pricePerUnit: 18.00, priceRef: 'L' },
-  { name: 'Kirsch', unit: 'ml', pricePerUnit: 22.00, priceRef: 'L' },
+  { name: 'Farine T55', unit: 'g', pricePerUnit: 0.65, priceRef: 'kg', allergens: ['Gluten'] },
+  { name: 'Farine T45', unit: 'g', pricePerUnit: 0.80, priceRef: 'kg', allergens: ['Gluten'] },
+  { name: 'Beurre AOP', unit: 'g', pricePerUnit: 7.50, priceRef: 'kg', allergens: ['Lactose', 'Lait'] },
+  { name: 'Beurre doux', unit: 'g', pricePerUnit: 6.80, priceRef: 'kg', allergens: ['Lactose', 'Lait'] },
+  { name: 'Sucre semoule', unit: 'g', pricePerUnit: 0.85, priceRef: 'kg', allergens: [] },
+  { name: 'Sucre glace', unit: 'g', pricePerUnit: 2.10, priceRef: 'kg', allergens: [] },
+  { name: 'Lait entier', unit: 'ml', pricePerUnit: 0.85, priceRef: 'L', allergens: ['Lactose', 'Lait'] },
+  { name: 'Crème 35% MG', unit: 'ml', pricePerUnit: 4.20, priceRef: 'L', allergens: ['Lactose', 'Lait'] },
+  { name: 'Œufs entiers', unit: 'pièce', pricePerUnit: 0.15, priceRef: 'pièce', allergens: ['Œufs'] },
+  { name: 'Jaunes d\'œufs', unit: 'pièce', pricePerUnit: 0.15, priceRef: 'pièce', allergens: ['Œufs'] },
+  { name: 'Blancs d\'œufs', unit: 'pièce', pricePerUnit: 0.10, priceRef: 'pièce', allergens: ['Œufs'] },
+  { name: 'Chocolat noir 64%', unit: 'g', pricePerUnit: 11.50, priceRef: 'kg', allergens: ['Lait', 'Soja'] },
+  { name: 'Poudre d\'amandes', unit: 'g', pricePerUnit: 9.50, priceRef: 'kg', allergens: ['Fruits à coque'] },
+  { name: 'Vanille (gousse)', unit: 'pièce', pricePerUnit: 1.80, priceRef: 'pièce', allergens: [] },
+  { name: 'Sel', unit: 'g', pricePerUnit: 0.50, priceRef: 'kg', allergens: [] },
+  { name: 'Maïzena', unit: 'g', pricePerUnit: 2.80, priceRef: 'kg', allergens: [] },
+  { name: 'Praliné noisette', unit: 'g', pricePerUnit: 14.50, priceRef: 'kg', allergens: ['Fruits à coque'] },
+  { name: 'Cacao poudre', unit: 'g', pricePerUnit: 12.00, priceRef: 'kg', allergens: [] },
+  { name: 'Gélatine', unit: 'g', pricePerUnit: 22.00, priceRef: 'kg', allergens: [] },
+  { name: 'Levure fraîche', unit: 'g', pricePerUnit: 6.50, priceRef: 'kg', allergens: [] },
+  { name: 'Fraises fraîches', unit: 'g', pricePerUnit: 4.50, priceRef: 'kg', allergens: [] },
+  { name: 'Noisettes torréfiées', unit: 'g', pricePerUnit: 12.50, priceRef: 'kg', allergens: ['Fruits à coque'] },
+  { name: 'Amandes effilées', unit: 'g', pricePerUnit: 9.50, priceRef: 'kg', allergens: ['Fruits à coque'] },
+  { name: 'Rhum ambré', unit: 'ml', pricePerUnit: 18.00, priceRef: 'L', allergens: [] },
+  { name: 'Kirsch', unit: 'ml', pricePerUnit: 22.00, priceRef: 'L', allergens: [] },
 ];
 
 // Planning Constants - 2026 (Zone C - Toulouse)
@@ -318,6 +322,11 @@ function getUserPlacementsKey() {
   return `labpatiss_placements_${owner.toLowerCase()}`;
 }
 
+function getUserInventoryKey() {
+  const owner = getViewOwner();
+  return `gourmet_inventory_${owner.toLowerCase()}`;
+}
+
 function loadSavedRecipes() {
   try {
     const key = getUserRecipesKey();
@@ -339,8 +348,41 @@ function loadIngredientDb() {
   } catch { APP.ingredientDb = [...DEFAULT_INGREDIENT_DB]; }
 }
 
-function saveIngredientDb() {
-  localStorage.setItem(STORAGE_KEYS.ingredientDb, JSON.stringify(APP.ingredientDb));
+function saveIngredientDb() { localStorage.setItem(STORAGE_KEYS.ingredientDb, JSON.stringify(APP.ingredientDb)); }
+
+function loadInventory() {
+  const data = localStorage.getItem(getUserInventoryKey());
+  if (data) {
+    APP.inventory = JSON.parse(data);
+  } else {
+    initInventoryFromDb();
+  }
+}
+
+function saveInventory() {
+  localStorage.setItem(getUserInventoryKey(), JSON.stringify(APP.inventory));
+}
+
+function initInventoryFromDb() {
+  // Merge items from DEFAULT_INGREDIENT_DB into existing APP.inventory if not present
+  DEFAULT_INGREDIENT_DB.forEach(ing => {
+    const exists = APP.inventory.find(inv => inv.name === ing.name);
+    if (!exists) {
+      APP.inventory.push({
+        id: 'inv_' + Math.random().toString(36).substr(2, 9),
+        name: ing.name,
+        stock: 0,
+        unit: ing.unit,
+        price: ing.pricePerUnit,
+        alertThreshold: ing.unit === 'g' || ing.unit === 'ml' ? 1000 : 5,
+        lastUpdate: new Date().toISOString()
+      });
+    }
+  });
+  saveInventory();
+  if (typeof showToast === 'function') showToast('Inventaire synchronisé avec la base', 'success');
+  renderInventory();
+  updateDashboard();
 }
 
 function addToIngredientDb(ing) {
@@ -963,6 +1005,25 @@ function renderSummary() {
                 <div style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; font-weight:700;">${t('ui.batch.count_plural').replace('{n}', 100)}</div>
                 <div style="font-size:1.1rem; font-weight:800; color:var(--primary); margin-top:0.2rem;">${(costs.totalMaterial * 100).toFixed(2)} €</div>
              </div>
+          </div>
+        </div>
+
+        <div class="summary-section" style="margin-top:2.5rem; background: var(--success-light); border: 2px solid var(--success); padding: 2.5rem; border-radius: var(--radius-lg); animation: fadeUp 0.8s ease-out; position: relative; overflow: hidden;">
+          <div style="position: absolute; top: -10px; right: -10px; font-size: 5rem; opacity: 0.1; transform: rotate(15deg);">🏭</div>
+          <h3 style="color: var(--success); margin-bottom: 1.2rem; font-size: 1.5rem; display: flex; align-items: center; gap: 0.8rem;">
+            <span>🚀 ${t('ui.label.launch_prod') || 'Produire cette recette'}</span>
+          </h3>
+          <p style="font-size: 1rem; margin-bottom: 2rem; color: var(--text); font-weight: 500; line-height: 1.5; max-width: 600px;">
+            ${t('ui.label.prod_desc') || 'En lançant la production, les ingrédients seront déduits de votre inventaire et un numéro de lot sera généré.'}
+          </p>
+          <div style="display: flex; gap: 1.5rem; align-items: flex-end; flex-wrap: wrap;">
+            <div style="min-width: 180px;">
+              <label style="font-size: 0.75rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 0.6rem; display: block;">${t('ui.prod.portions') || 'Portions à réaliser'}</label>
+              <input type="number" id="prodPortions" class="form-input" value="${r.portions}" style="height: 50px; font-size: 1.2rem; font-weight: 800; text-align: center; border-radius: var(--radius-sm);">
+            </div>
+            <button class="btn btn-primary" onclick="confirmProduction()" style="height: 50px; padding: 0 2.5rem; background: var(--success); border-color: var(--success); font-weight: 800; font-size: 1.1rem; box-shadow: 0 10px 20px rgba(39, 174, 96, 0.2);">
+              ${t('ui.btn.produce') || 'Confirmer la Production'}
+            </button>
           </div>
         </div>
       </div>
@@ -1797,7 +1858,12 @@ function checkAuth() {
 
       // Special case for pre-existing admin or developers
       if (userKey === 'ju' && !usersDb[userKey]) {
-        usersDb[userKey] = { pin: '2503', gender: 'male', email: 'admin@gourmetrevient.fr' };
+        usersDb[userKey] = {
+          pin: '2503',
+          gender: 'male',
+          email: 'admin@gourmetrevient.fr',
+          role: 'Apprenti(e)'
+        };
         localStorage.setItem(STORAGE_KEYS.users, JSON.stringify(usersDb));
       }
 
@@ -1871,7 +1937,8 @@ function updateDashboard() {
   const name = localStorage.getItem(STORAGE_KEYS.currentUser) || 'Artisan';
   let usersDb = JSON.parse(localStorage.getItem(STORAGE_KEYS.users) || '{}');
   const userKey = name.toLowerCase();
-  const gender = usersDb[userKey]?.gender || 'male';
+  const userData = usersDb[userKey] || {};
+  const gender = userData.gender || 'male';
 
   const welcome = $('#welcomeUserName');
   if (welcome) welcome.textContent = name;
@@ -1881,9 +1948,8 @@ function updateDashboard() {
   const greeting = $('.dash-greeting');
   if (greeting) {
     const greetingText = t('dash.greeting');
-    if (greeting.firstChild && greeting.firstChild.nodeType === 3) {
-      greeting.firstChild.textContent = greetingText + (greetingText.endsWith(' ') ? '' : ' ');
-    }
+    // For the new structure we might have multiple greeting elements or different structure
+    // We target specifically the one with the id or class if needed.
   }
 
   const emoji = $('#welcomeGenderEmoji');
@@ -1891,24 +1957,20 @@ function updateDashboard() {
   const avatar = $('#dashUserAvatar');
   const hAvatar = $('#headerAvatar');
 
-  const g = t('dash.greeting').toLowerCase();
-  const prefix = g.includes('hola') ? 'Tu' : (g.includes('hello') ? 'Your' : 'Votre');
-
   if (gender === 'female') {
     if (emoji) emoji.textContent = '👩‍🍳';
-    if (label) label.textContent = prefix;
-    if (avatar) { avatar.innerHTML = ''; avatar.textContent = '👩‍🍳'; }
-    if (hAvatar) { hAvatar.innerHTML = ''; hAvatar.textContent = '👩‍🍳'; }
+    if (avatar) avatar.textContent = '👩‍🍳';
+    if (hAvatar) hAvatar.textContent = '👩‍🍳';
   } else {
     if (emoji) emoji.textContent = '👨‍🍳';
-    if (label) label.textContent = prefix;
-    if (avatar) { avatar.innerHTML = ''; avatar.textContent = '👨‍🍳'; }
-    if (hAvatar) { hAvatar.innerHTML = ''; hAvatar.textContent = '👨‍🍳'; }
+    if (avatar) avatar.textContent = '👨‍🍳';
+    if (hAvatar) hAvatar.textContent = '👨‍🍳';
   }
-  // 0. Update Admin Tab Visibility
+
+  // Update Admin Tab Visibility
   const navAdmin = $('#navAdmin');
   if (navAdmin) {
-    if (userKey === 'ju' && usersDb[userKey]?.pin === '2503') {
+    if (userKey === 'ju' && userData?.pin === '2503') {
       navAdmin.style.display = 'block';
     } else {
       navAdmin.style.display = 'none';
@@ -1927,39 +1989,301 @@ function updateDashboard() {
   const recipeCount = APP.savedRecipes.length;
   if ($('#statRecipeCount')) $('#statRecipeCount').textContent = recipeCount;
 
-  const statLab = $('#statLaboStatus');
-  const labKey = getUserLabPlanKey();
-  const isLabDone = localStorage.getItem(labKey) !== null;
-  if (statLab) statLab.textContent = isLabDone ? t('dash.lab_done') : t('dash.lab_progress');
+  const teamCount = APP.teamMembers.length;
+  if ($('#statTeamCount')) $('#statTeamCount').textContent = teamCount;
 
-  // 4. Populate Recent Recipes
+  const ingInDb = typeof DEFAULT_INGREDIENT_DB !== 'undefined' ? DEFAULT_INGREDIENT_DB.length : 0;
+  if ($('#statIngCount')) $('#statIngCount').textContent = ingInDb;
+
+  // Inventory Stats for App Hub
+  const lowStockCount = APP.inventory.filter(item => item.stock <= item.alertThreshold).length;
+  const invTotalItems = $('#invTotalItems');
+  const invLowStock = $('#invLowStock');
+  const invPriceAlerts = $('#invPriceAlerts');
+
+  if (invTotalItems) invTotalItems.textContent = APP.inventory.length;
+  if (invLowStock) invLowStock.textContent = lowStockCount;
+  if (invPriceAlerts) invPriceAlerts.textContent = 0; // Placeholder for now
+
+  // 4. Populate Recent Recipes (Modern Style)
   const recentList = $('#dashRecentRecipes');
   if (recentList) {
-    const recent = [...APP.savedRecipes].sort((a, b) => new Date(b.savedAt) - new Date(a.savedAt)).slice(0, 3);
+    const recent = [...APP.savedRecipes].sort((a, b) => new Date(b.savedAt) - new Date(a.savedAt)).slice(0, 4);
 
     if (recent.length === 0) {
       recentList.innerHTML = `
-        <div class="empty-state" style="text-align:center; padding:1.5rem; color:var(--text-muted);">
+        <div class="empty-state" style="padding:1rem; color:var(--text-muted); text-align:center;">
           <p>${t('dash.no_recent')}</p>
         </div>`;
     } else {
       recentList.innerHTML = recent.map(r => {
         const totalCost = r.ingredients.reduce((s, i) => s + (i.pricePerUnit * (i.unit === 'g' || i.unit === 'ml' ? i.quantity / 1000 : i.quantity)), 0);
         return `
-          <div class="recent-recipe-item" onclick="loadRecipe('${r.id}'); document.getElementById('navRecettes').click();">
-            <div class="rr-info">
-              <h4>${escapeHtml(r.name)}</h4>
-              <span>${escapeHtml(r.category || 'Pâtisserie')} · ${new Date(r.savedAt).toLocaleDateString(locale)}</span>
+          <div class="recent-item-premium" onclick="loadRecipe('${r.id}'); document.getElementById('navRecettes').click();">
+            <div class="ri-info">
+              <strong style="display:block; font-size:0.95rem;">${escapeHtml(r.name)}</strong>
+              <span style="font-size:0.75rem; color:var(--text-muted);">${escapeHtml(r.category || 'Pâtisserie')}</span>
             </div>
-            <div class="rr-cost">${totalCost.toFixed(2)} €</div>
+            <div class="ri-price" style="font-weight:700; color:var(--accent);">${totalCost.toFixed(2)} €</div>
           </div>
         `;
       }).join('');
     }
   }
 
-  // 5. Update Chef Notifications
+  // 5. New Premium Widgets
+  renderFeaturedRecipe();
+  renderTodayTeam();
   renderPendingLeavesDashboard();
+}
+
+let currentFeaturedRecipe = null;
+function renderFeaturedRecipe() {
+  const container = $('#featuredRecipeContent');
+  if (!container) return;
+
+  if (!currentFeaturedRecipe && typeof RECIPES !== 'undefined' && RECIPES.length > 0) {
+    const idx = Math.floor(Math.random() * RECIPES.length);
+    currentFeaturedRecipe = { ...RECIPES[idx], libIdx: idx };
+  }
+
+  if (!currentFeaturedRecipe) {
+    container.innerHTML = '<p>Aucune suggestion disponible.</p>';
+    return;
+  }
+
+  const r = currentFeaturedRecipe;
+  container.innerHTML = `
+    <img src="${r.image}" class="featured-img" alt="${r.name}" onerror="this.src='https://placehold.co/200x200?text=${escapeHtml(r.name).replace(/ /g, '+')}'; this.classList.add('error');">
+    <div class="featured-info">
+      <h4>${escapeHtml(r.name)}</h4>
+      <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:1rem; line-height:1.4;">${escapeHtml(r.description)}</p>
+      <div class="featured-meta">
+        <span style="display:flex; align-items:center; gap:4px;">
+           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+           ${r.prepTime + r.cookTime} min
+        </span>
+        <span style="display:flex; align-items:center; gap:4px;">
+           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+           ${r.portions} portions
+        </span>
+      </div>
+      <button class="btn btn-sm btn-outline" style="margin-top:1rem;" onclick="loadExampleRecipe(${r.libIdx}); document.getElementById('navRecettes').click();">Voir la fiche</button>
+    </div>
+  `;
+}
+
+function renderTodayTeam() {
+  const container = $('#todayTeamList');
+  if (!container) return;
+
+  if (APP.teamMembers.length === 0) {
+    container.innerHTML = `<p style="font-size:0.85rem; color:var(--text-muted);">${t('plan.team.no_members')}</p>`;
+    return;
+  }
+
+  const today = new Date().toISOString().split('T')[0];
+  const presentMembers = APP.teamMembers.filter(m => {
+    const isOnLeave = APP.staffLeaves.some(l =>
+      l.memberId === m.id &&
+      l.status === 'approved' &&
+      today >= l.start && today <= l.end
+    );
+    return !isOnLeave;
+  });
+
+  if (presentMembers.length === 0) {
+    container.innerHTML = `<p style="font-size:0.85rem; color:var(--danger); font-weight:700;">Aucun membre présent (Congés)</p>`;
+    return;
+  }
+
+  container.innerHTML = presentMembers.map(m => {
+    const c = getMemberColor(m.id);
+    return `
+      <div class="today-member" style="border-left: 3px solid ${c.dot}; background:rgba(255,255,255,0.5); border-radius:8px; margin-bottom:4px;">
+        <span class="member-dot" style="background:${c.dot}; margin-left:8px;"></span>
+        <div class="member-info">
+          <strong style="font-size:0.95rem;">${capitalizeFirstLetter(m.name)}</strong>
+          <span style="font-size:0.75rem; color:var(--text-muted);">${escapeHtml(m.role)}</span>
+        </div>
+        <div class="presence-indicator" style="margin-left:auto; width:8px; height:8px; background:var(--success); border-radius:50%; margin-right:12px;"></div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ============================================================================
+// INVENTORY SYSTEM
+// ============================================================================
+
+function getIngredientEmoji(name) {
+  const n = name.toLowerCase();
+  if (n.includes('farine')) return '🌾';
+  if (n.includes('beurre')) return '🧈';
+  if (n.includes('sucre')) return '🍬';
+  if (n.includes('lait') || n.includes('crème')) return '🥛';
+  if (n.includes('œuf')) return '🥚';
+  if (n.includes('chocolat')) return '🍫';
+  if (n.includes('amande') || n.includes('noisette')) return '🥜';
+  if (n.includes('sel')) return '🧂';
+  if (n.includes('vanille')) return '🍦';
+  if (n.includes('fraise') || n.includes('fruit')) return '🍓';
+  if (n.includes('levure')) return '🍞';
+  return '📦';
+}
+
+function renderInventory() {
+  const container = $('#inventoryListBody');
+  if (!container) return;
+
+  if (APP.inventory.length === 0) {
+    container.innerHTML = `
+      <tr>
+        <td colspan="6" style="text-align:center; padding:3rem; color:var(--text-muted);">
+          ${t('inv.table.empty') || 'Module d\'inventaire vide.'} <button class="btn btn-sm btn-outline" onclick="initInventoryFromDb(); renderInventory();">✨ ${t('inv.btn.sync') || 'Initialiser la Réserve'}</button>
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  container.innerHTML = APP.inventory.map(item => {
+    const isCritical = item.stock <= item.alertThreshold;
+    const isLow = item.stock <= (item.alertThreshold * 2);
+
+    // Health Bar logic
+    const healthPercent = Math.min(100, (item.stock / (item.alertThreshold * 4)) * 100);
+    const healthClass = isCritical ? 'health-critical' : (isLow ? 'health-low' : 'health-ok');
+    const statusClass = isCritical ? 'status-critical' : 'status-ok';
+    const statusLabel = isCritical ? '⚠️ ' + t('inv.health.critical') : '✅ ' + t('inv.health.ok');
+
+    const emoji = getIngredientEmoji(item.name);
+
+    return `
+      <tr class="${isCritical ? 'row-alert' : ''}">
+        <td>
+          <div style="display:flex; align-items:center; gap:12px;">
+            <div style="font-size:1.8rem; background:var(--bg-body); width:50px; height:50px; display:flex; align-items:center; justify-content:center; border-radius:12px;">${emoji}</div>
+            <div style="flex:1;">
+              <strong style="display:block; font-size:1rem;">${escapeHtml(t(item.name))}</strong>
+              <div class="stock-health-container">
+                <div class="stock-health-bar ${healthClass}" style="width: ${healthPercent}%"></div>
+              </div>
+              <small style="color:var(--text-muted); font-size:0.7rem;">${t('inv.last_restock') || 'Dernier arrivage'}: ${new Date(item.lastUpdate).toLocaleDateString()}</small>
+            </div>
+          </div>
+        </td>
+        <td style="text-align:center;">
+          <div class="stock-control">
+            <button class="btn-stock minus" onclick="updateStock('${item.id}', -100)">-</button>
+            <span class="stock-val ${isCritical ? 'text-danger' : ''}">${item.stock}</span>
+            <button class="btn-stock plus" onclick="updateStock('${item.id}', 100)">+</button>
+          </div>
+        </td>
+        <td style="font-weight:700; color:var(--text-secondary); text-align:center; font-size:0.85rem;">${item.unit}</td>
+        <td style="font-weight:900; color:var(--text-main); text-align:right; font-size:1rem;">
+          ${(item.stock * (item.price || 0) / (item.unit === 'g' || item.unit === 'ml' ? 1000 : 1)).toFixed(2)} €
+        </td>
+        <td style="text-align:center;"><span class="badge ${statusClass}">${statusLabel}</span></td>
+        <td style="text-align:center;">
+          <button class="btn btn-sm btn-outline btn-round" onclick="editInventoryItem('${item.id}')" title="Seuil d'alerte">⚙️</button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function filterInventory() {
+  const query = $('#invSearchInput').value.toLowerCase();
+  const rows = $$('#inventoryListBody tr');
+  rows.forEach(row => {
+    const text = row.querySelector('strong')?.textContent.toLowerCase() || '';
+    row.style.display = text.includes(query) ? '' : 'none';
+  });
+}
+
+function showRestockModal() {
+  const modal = $('#restockModal');
+  const selector = $('#restockItemSelector');
+  if (!modal || !selector) return;
+
+  // Fill selector with all ingredients from DB
+  selector.innerHTML = APP.inventory.map(item => `<option value="${item.id}">${getIngredientEmoji(item.name)} ${item.name}</option>`).join('');
+
+  selector.onchange = () => {
+    const item = APP.inventory.find(i => i.id === selector.value);
+    if (item) $('#restockUnit').value = item.unit;
+  };
+
+  // Trigger initial value
+  if (APP.inventory.length > 0) {
+    $('#restockUnit').value = APP.inventory[0].unit;
+  }
+
+  modal.style.display = 'flex';
+}
+
+function hideRestockModal() {
+  $('#restockModal').style.display = 'none';
+}
+
+function confirmRestock() {
+  const itemId = $('#restockItemSelector').value;
+  const qty = parseFloat($('#restockQty').value) || 0;
+  const totalLotPrice = parseFloat($('#restockTotalPrice').value);
+
+  const item = APP.inventory.find(i => i.id === itemId);
+  if (item && qty > 0) {
+    item.stock += qty;
+    item.lastUpdate = new Date().toISOString();
+
+    // Logic: if totalLotPrice is provided, update the reference price in the DB
+    if (!isNaN(totalLotPrice) && totalLotPrice > 0) {
+      // Calculate new unit price (pricePerKg or pricePerL)
+      let unitPrice;
+      if (item.unit === 'g' || item.unit === 'ml') {
+        unitPrice = (totalLotPrice / qty) * 1000;
+      } else {
+        unitPrice = totalLotPrice / qty;
+      }
+      item.price = unitPrice;
+
+      // Also update the global ingredient DB for future recipes
+      const dbIng = APP.ingredientDb.find(i => i.name === item.name);
+      if (dbIng) dbIng.pricePerUnit = unitPrice;
+      saveIngredientDb();
+    }
+
+    saveInventory();
+    hideRestockModal();
+    renderInventory();
+    updateDashboard();
+    if (typeof showToast === 'function') showToast(`Arrivage de ${item.name} enregistré`, 'success');
+  }
+}
+
+function updateStock(id, delta) {
+  const item = APP.inventory.find(i => i.id === id);
+  if (item) {
+    item.stock = Math.max(0, item.stock + delta);
+    item.lastUpdate = new Date().toISOString();
+    saveInventory();
+    renderInventory();
+    updateDashboard();
+  }
+}
+
+function editInventoryItem(id) {
+  const item = APP.inventory.find(i => i.id === id);
+  if (!item) return;
+
+  const newVal = prompt(`Modifier le seuil d'alerte pour ${item.name} (${item.unit}):`, item.alertThreshold);
+  if (newVal !== null) {
+    item.alertThreshold = parseFloat(newVal) || 0;
+    saveInventory();
+    renderInventory();
+    updateDashboard();
+  }
 }
 
 // ============================================================================
@@ -2190,7 +2514,7 @@ function checkPermissions() {
 
   const leaveBtn = $('#btnAddLeave');
   if (leaveBtn) {
-    leaveBtn.textContent = isChef ? t('plan.leave.btn') : t('plan.leave.request_btn');
+    leaveBtn.textContent = (isChef || isJuAdmin) ? t('plan.leave.btn') : t('plan.leave.request_btn');
   }
 
   // Dashboard Workflow visibility
@@ -2269,7 +2593,7 @@ function addLeave() {
   const currentUser = localStorage.getItem(STORAGE_KEYS.currentUser);
   const owner = getViewOwner();
 
-  if (isChef && isOwner) {
+  if (canModify || (isChef && isOwner)) {
     // Direct add
     APP.staffLeaves.push({
       id: Date.now().toString(),
@@ -2443,7 +2767,7 @@ function renderLeaves() {
       const eStr = e.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
       const days = Math.round((e - s) / (1000 * 60 * 60 * 24)) + 1;
       const c = getMemberColor(l.memberId);
-      const canRemove = isOwner && isChef;
+      const canRemove = (isOwner && isChef) || isJuAdmin;
       return `
       <div class="leave-card" style="border-left-color:${c.dot}; background:${c.bg}">
         <span class="member-dot" style="background:${c.dot}"></span>
@@ -3164,6 +3488,7 @@ function init() {
   loadSavedRecipes();
   loadIngredientDb();
   loadTeamMembers();
+  loadInventory();
   loadNotifications();
   bindEvents();
   renderSavedRecipes();
@@ -3211,7 +3536,13 @@ function init() {
     if (isVisible('#appLaboratoire')) {
       if (typeof renderDevis === 'function') renderDevis();
     }
+    if (isVisible('#appInventaire')) {
+      if (typeof renderInventory === 'function') renderInventory();
+    }
   });
+
+  loadHaccpLogs();
+  renderHygiene();
 }
 
 document.addEventListener('DOMContentLoaded', init);
@@ -3222,9 +3553,589 @@ function capitalizeFirstLetter(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
+/* ============================================================================ */
+/* LABELING & ALLERGEN TRACKING                                                */
+/* ============================================================================ */
+
+let selectedLabelRecipe = null;
+
+function showLabelingDropdown() {
+  const userRecipes = (APP.savedRecipes || []).map(r => ({ ...r, origin: 'user' }));
+  const defaultRecipes = (typeof RECIPES !== 'undefined' ? RECIPES : []).map(r => ({ ...r, origin: 'default' }));
+  const recipes = [...userRecipes, ...defaultRecipes];
+
+  const dropdown = $('#labelingRecipeDropdown');
+  if (!dropdown) return;
+
+  if (recipes.length === 0) {
+    dropdown.innerHTML = `<div class="autocomplete-item disabled">${t('recipe.lib.empty')}</div>`;
+  } else {
+    dropdown.innerHTML = recipes.map(r => `
+      <div class="autocomplete-item" onclick="selectLabelingRecipe('${r.id}', '${r.origin}')">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%;">
+          <div>
+            <strong>${escapeHtml(r.name)}</strong>
+            <small style="display: block;">${r.category || ''}</small>
+          </div>
+          <span class="badge" style="font-size: 0.65rem; padding: 2px 6px; background: ${r.origin === 'user' ? 'var(--primary-light)' : 'var(--bg-alt)'}; color: ${r.origin === 'user' ? 'var(--primary)' : 'var(--text-muted)'};">
+            ${r.origin === 'user' ? 'Mien' : 'Site'}
+          </span>
+        </div>
+      </div>
+    `).join('');
+  }
+  dropdown.style.display = 'block';
+
+  // Close dropdown when clicking outside
+  const closeHandler = (e) => {
+    if (!e.target.closest('#labelingSearchInput') && !e.target.closest('#labelingRecipeDropdown')) {
+      dropdown.style.display = 'none';
+      document.removeEventListener('click', closeHandler);
+    }
+  };
+  document.addEventListener('click', closeHandler);
+}
+
+function filterLabelingRecipes() {
+  const val = $('#labelingSearchInput').value.toLowerCase();
+  const dropdown = $('#labelingRecipeDropdown');
+  const items = dropdown.querySelectorAll('.autocomplete-item');
+
+  items.forEach(item => {
+    const text = item.textContent.toLowerCase();
+    item.style.display = text.includes(val) ? 'flex' : 'none';
+  });
+}
+
+function selectLabelingRecipe(id, origin) {
+  if (origin === 'user') {
+    selectedLabelRecipe = APP.savedRecipes.find(r => r.id === id);
+  } else {
+    const list = typeof RECIPES !== 'undefined' ? RECIPES : [];
+    selectedLabelRecipe = list.find(r => r.id === id);
+  }
+
+  if (!selectedLabelRecipe) return;
+
+  $('#labelingSearchInput').value = selectedLabelRecipe.name;
+  $('#labelingRecipeDropdown').style.display = 'none';
+
+  // Enable form fields
+  $('#labelingFields').style.opacity = '1';
+  $('#labelingFields').style.pointerEvents = 'auto';
+
+  // Auto-fill some data
+  const costs = calcFullCost(APP.margin, selectedLabelRecipe);
+  $('#labelPrice').value = costs.sellingPrice;
+  $('#labelWeight').value = selectedLabelRecipe.advanced?.weight || 0;
+
+  // Dates
+  const today = new Date().toISOString().split('T')[0];
+  $('#labelFabDate').value = today;
+
+  // Exp info: default 3 days for fresh pastries
+  const expDate = new Date();
+  expDate.setDate(expDate.getDate() + 3);
+  $('#labelExpDate').value = expDate.toISOString().split('T')[0];
+
+  $('#labelStorage').value = t('labeling.form.storage_ph') || 'À conserver entre 0°C et +4°C';
+
+  updateLabelPreview();
+}
+
+function updateLabelPreview() {
+  if (!selectedLabelRecipe) return;
+
+  $('#prevRecipeName').textContent = selectedLabelRecipe.name.toUpperCase();
+  $('#prevProducer').textContent = t('labeling.producer') || 'ARTISAN PÂTISSIER';
+
+  // Ingredients list (comma separated)
+  const ings = selectedLabelRecipe.ingredients.map(ing => {
+    const translatedName = t(ing.name);
+    return translatedName;
+  }).join(', ');
+  $('#prevIngredients').textContent = ings + '.';
+
+  // Allergen tracking
+  const allergenSet = new Set();
+  selectedLabelRecipe.ingredients.forEach(ing => {
+    // Look up in database by name or reverse lookup
+    const dbItem = APP.ingredientDb.find(db => db.name.toLowerCase() === ing.name.toLowerCase());
+    if (dbItem && dbItem.allergens) {
+      dbItem.allergens.forEach(a => allergenSet.add(a));
+    } else {
+      // Try reverse lookup if it's a French name
+      const key = REVERSE_LOOKUP[ing.name];
+      if (key) {
+        const item = APP.ingredientDb.find(db => db.name === t(key));
+        if (item && item.allergens) {
+          item.allergens.forEach(a => allergenSet.add(a));
+        }
+      }
+    }
+  });
+
+  const allergenList = Array.from(allergenSet);
+  const prevAllergens = $('#prevAllergens');
+  if (allergenList.length > 0) {
+    prevAllergens.textContent = allergenList.join(', ');
+  } else {
+    prevAllergens.textContent = t('labeling.preview.no_allergens') || 'Aucun';
+  }
+
+  // Form fields
+  $('#prevWeight').textContent = $('#labelWeight').value || '0';
+  $('#prevPrice').textContent = (parseFloat($('#labelPrice').value) || 0).toFixed(2) + ' €';
+
+  const fabDate = $('#labelFabDate').value;
+  $('#prevFabDate').textContent = fabDate ? new Date(fabDate).toLocaleDateString() : '--/--/----';
+
+  const expDate = $('#labelExpDate').value;
+  $('#prevExpDate').textContent = expDate ? new Date(expDate).toLocaleDateString() : '--/--/----';
+
+  $('#prevStorage').textContent = $('#labelStorage').value;
+
+  if (typeof renderLabelingStats === 'function') renderLabelingStats();
+}
+
+function printLabel() {
+  if (!selectedLabelRecipe) {
+    showToast(t('labeling.toast.no_recipe'), 'warning');
+    return;
+  }
+
+  // Add class to body for print styles
+  document.body.classList.add('printing-label');
+  window.print();
+
+  // Clean up
+  setTimeout(() => {
+    document.body.classList.remove('printing-label');
+  }, 100);
+}
+
+function downloadLabelImage() {
+  if (!selectedLabelRecipe) {
+    showToast(t('labeling.toast.no_recipe'), 'warning');
+    return;
+  }
+
+  if (typeof html2pdf === 'undefined') {
+    showToast('Bibliothèque html2pdf non chargée', 'error');
+    return;
+  }
+
+  const element = document.getElementById('labelCaptureArea');
+  const opt = {
+    margin: [0, 0],
+    filename: `Etiquette_${selectedLabelRecipe.name.replace(/\s+/g, '_')}.pdf`,
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2, logging: false },
+    jsPDF: { unit: 'mm', format: [100, 100], orientation: 'portrait' }
+  };
+
+  html2pdf().set(opt).from(element).save();
+  showToast(t('labeling.toast.print_success'), 'success');
+}
+
+function renderLabelingStats() {
+  const total = APP.savedRecipes.length;
+  $('#labTotalRecipes').textContent = total;
+
+  if (selectedLabelRecipe) {
+    const allergenSet = new Set();
+    selectedLabelRecipe.ingredients.forEach(ing => {
+      const dbItem = APP.ingredientDb.find(db => db.name.toLowerCase() === ing.name.toLowerCase());
+      if (dbItem && dbItem.allergens) {
+        dbItem.allergens.forEach(a => allergenSet.add(a));
+      } else {
+        const key = REVERSE_LOOKUP[ing.name];
+        if (key) {
+          const item = APP.ingredientDb.find(db => db.name === t(key));
+          if (item && item.allergens) {
+            item.allergens.forEach(a => allergenSet.add(a));
+          }
+        }
+      }
+    });
+    $('#labAllergenCount').textContent = allergenSet.size;
+
+    const box = $('#labAllergenStatusBox');
+    if (allergenSet.size > 0) {
+      box.classList.add('warning');
+      box.classList.remove('success');
+    } else {
+      box.classList.remove('warning');
+      box.classList.add('success');
+    }
+  } else {
+    $('#labAllergenCount').textContent = '0';
+    $('#labAllergenStatusBox').classList.remove('warning', 'success');
+  }
+}
+
 function escapeHtml(text) {
   if (!text) return '';
   const div = document.createElement('div');
   div.textContent = text;
   return div.innerHTML;
+}
+
+// ============================================================================
+// MODULAR EXTENSIONS — ROADMAP ENHANCEMENTS
+// ============================================================================
+
+// 1. PRODUCTION & STOCK SYNC
+function confirmProduction() {
+  const portionsInput = document.getElementById('prodPortions');
+  const portions = portionsInput ? (parseInt(portionsInput.value) || 0) : 0;
+  if (portions <= 0) {
+    if (typeof showToast === 'function') showToast('Quantité invalide', 'error');
+    return;
+  }
+
+  const recipe = APP.recipe;
+  const originalPortions = recipe.portions || 10;
+  const ratio = portions / originalPortions;
+
+  const deductions = [];
+  const unknown = [];
+
+  recipe.ingredients.forEach(ing => {
+    if (!ing.name || ing.quantity <= 0) return;
+    const needed = ing.quantity * ratio;
+
+    // Find in inventory (exact match)
+    let invItem = APP.inventory.find(i => i.name.toLowerCase() === ing.name.toLowerCase());
+
+    if (invItem) {
+      deductions.push({ item: invItem, needed });
+    } else {
+      unknown.push(ing.name);
+    }
+  });
+
+  if (unknown.length > 0) {
+    const proceed = confirm(`Certains ingrédients (${unknown.join(', ')}) ne sont pas dans votre inventaire. Continuer quand même ?`);
+    if (!proceed) return;
+  }
+
+  // Apply deductions
+  let lowStockList = [];
+  deductions.forEach(d => {
+    d.item.stock = Math.round((Math.max(0, d.item.stock - d.needed)) * 100) / 100;
+    if (d.item.stock <= d.item.alertThreshold) {
+      lowStockList.push(d.item.name);
+    }
+  });
+
+  // Save changes
+  saveInventory();
+  renderInventory();
+  updateDashboard();
+
+  // Record Traceability Entry (Module 3)
+  const lotNumber = 'L' + new Date().getFullYear().toString().slice(-2) +
+    (Math.floor(Date.now() / 1000) % 100000).toString().padStart(5, '0');
+
+  const traceEntry = {
+    id: 'tr_' + Date.now(),
+    lot: lotNumber,
+    product: recipe.name || 'Produit Inconnu',
+    date: new Date().toISOString(),
+    exp: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // Default +3 days
+    qty: portions + ' ' + (typeof t === 'function' ? t('unit.portions') : 'portions')
+  };
+
+  if (!APP.haccpLogs.trace) APP.haccpLogs.trace = [];
+  APP.haccpLogs.trace.unshift(traceEntry);
+  saveHaccpLogs();
+
+  if (typeof showToast === 'function') {
+    showToast(typeof t === 'function' ? t('ui.prod.success') : 'Production validée et stocks mis à jour.', 'success');
+  }
+}
+
+// 2. SCAN FACTURE (Simulated IA)
+function simulateInvoiceScan() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'image/*';
+  input.onchange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (typeof showToast === 'function') showToast('Scan de la facture en cours (IA)...', 'info');
+      // Simulated AI Processing Delay
+      setTimeout(() => {
+        // We find a few ingredients to update "randomly" to simulate reading prices
+        const toUpdate = APP.inventory.slice(0, 3);
+        if (toUpdate.length === 0) return showToast('Inventaire vide, rien à mettre à jour.', 'warning');
+
+        toUpdate.forEach(item => {
+          const oldPrice = item.price || 1;
+          const fluctuation = (Math.random() * 0.2) - 0.05; // -5% to +15%
+          item.price = Math.round((oldPrice * (1 + fluctuation)) * 100) / 100;
+        });
+
+        saveInventory();
+        renderInventory();
+        showToast(`Scan terminé ! ${toUpdate.length} prix mis à jour automatiquement via IA.`, 'success');
+      }, 3000);
+    }
+  };
+  input.click();
+}
+
+// 3. HYGIÈNE & HACCP LOGIC
+function saveHaccpLogs() {
+  localStorage.setItem(STORAGE_KEYS.haccpLogs, JSON.stringify(APP.haccpLogs));
+}
+
+function loadHaccpLogs() {
+  const saved = localStorage.getItem(STORAGE_KEYS.haccpLogs);
+  if (saved) {
+    try {
+      APP.haccpLogs = JSON.parse(saved);
+      if (!APP.haccpLogs.reception) APP.haccpLogs.reception = [];
+      if (!APP.haccpLogs.trace) APP.haccpLogs.trace = [];
+      if (!APP.haccpLogs.temp) APP.haccpLogs.temp = [];
+      if (!APP.haccpLogs.clean) APP.haccpLogs.clean = [];
+    } catch (e) { console.error("Error loading HACCP logs", e); }
+  }
+
+  const needsDemo = !APP.haccpLogs.temp.length && !APP.haccpLogs.trace.length && !APP.haccpLogs.reception.length;
+  if (needsDemo) {
+    const now = new Date();
+    APP.haccpLogs.temp = [
+      { id: 't_demo1', date: new Date(now - 1000 * 60 * 60 * 2).toISOString(), equipKey: 'haccp.equip.frigo1', val: 3.2, user: 'Julian', action: null },
+      { id: 't_demo2', date: new Date(now - 1000 * 60 * 60 * 14).toISOString(), equipKey: 'haccp.equip.frigo2', val: 4.5, user: 'Julian', action: null },
+      { id: 't_demo3', date: new Date(now - 1000 * 60 * 60 * 26).toISOString(), equipKey: 'haccp.equip.congelateur', val: -18.5, user: 'Julian', action: null },
+      { id: 't_demo4', date: new Date(now - 1000 * 60 * 60 * 38).toISOString(), equipKey: 'haccp.equip.cellule', val: -25.0, user: 'Julian', action: 'haccp.action.verified' }
+    ];
+    APP.haccpLogs.reception = [
+      { id: 'r_demo1', date: new Date(now - 1000 * 60 * 60 * 3).toISOString(), supplier: 'Métro', temp: 2.5, hygiene: 'ok' },
+      { id: 'r_demo2', date: new Date(now - 1000 * 60 * 60 * 24 * 2).toISOString(), supplier: 'Pomona Passion Froid', temp: 3.1, hygiene: 'ok' },
+      { id: 'r_demo3', date: new Date(now - 1000 * 60 * 60 * 24 * 5).toISOString(), supplier: 'Transgourmet', temp: 6.8, hygiene: 'ko' }
+    ];
+    APP.haccpLogs.trace = [
+      { id: 'tr_demo1', lot: 'L260301', product: 'Éclair Chocolat', date: new Date(now - 1000 * 60 * 60 * 24).toISOString(), exp: '2026-03-06', qty: '50' },
+      { id: 'tr_demo2', lot: 'L260302', product: 'Tarte Citron Meringuée', date: new Date(now - 1000 * 60 * 60 * 12).toISOString(), exp: '2026-03-07', qty: '12' },
+      { id: 'tr_demo3', lot: 'L260303', product: 'Paris-Brest', date: new Date(now - 1000 * 60 * 60 * 48).toISOString(), exp: '2026-03-05', qty: '24' }
+    ];
+    if (!APP.haccpLogs.clean || APP.haccpLogs.clean.length === 0) {
+      APP.haccpLogs.clean = [
+        { id: 'c1', areaKey: 'haccp.clean.c1', done: true, icon: '🧼' },
+        { id: 'c2', areaKey: 'haccp.clean.c2', done: true, icon: '🧹' },
+        { id: 'c3', areaKey: 'haccp.clean.c3', done: false, icon: '🔥' },
+        { id: 'c4', areaKey: 'haccp.clean.c4', done: false, icon: '📦' },
+        { id: 'c5', areaKey: 'haccp.clean.c5', done: true, icon: '❄️' },
+        { id: 'c6', areaKey: 'haccp.clean.c6', done: false, icon: '🍴' },
+        { id: 'c7', areaKey: 'haccp.clean.c7', done: false, icon: '🗑️' }
+      ];
+    }
+    saveHaccpLogs();
+  }
+
+  // Migrate: ensure cleaning items have areaKey for translation
+  if (APP.haccpLogs.clean) {
+    const keyMap = { c1: 'haccp.clean.c1', c2: 'haccp.clean.c2', c3: 'haccp.clean.c3', c4: 'haccp.clean.c4', c5: 'haccp.clean.c5', c6: 'haccp.clean.c6', c7: 'haccp.clean.c7' };
+    APP.haccpLogs.clean.forEach(c => {
+      if (!c.areaKey && keyMap[c.id]) c.areaKey = keyMap[c.id];
+    });
+  }
+}
+
+const EQUIP_KEY_MAP = {
+  'Frigo 1 (Vitrine)': 'haccp.equip.frigo1',
+  'Frigo 2 (Réserve)': 'haccp.equip.frigo2',
+  'Congélateur 1': 'haccp.equip.congelateur',
+  'Cellule': 'haccp.equip.cellule'
+};
+
+function switchHaccpTab(tab) {
+  const views = ['Temp', 'Clean', 'Trace', 'Reception'];
+  views.forEach(v => {
+    const el = document.getElementById('haccpView' + v);
+    const btn = document.getElementById('tabHaccp' + v);
+    if (el) el.style.display = v.toLowerCase() === tab ? 'block' : 'none';
+    if (btn) btn.classList.toggle('active', v.toLowerCase() === tab);
+  });
+  renderHygiene();
+}
+
+function renderHygiene() {
+  renderTempLogs();
+  renderCleaningChecklist();
+  renderTraceability();
+  renderReceptionLogs();
+}
+
+function renderTempLogs() {
+  const container = document.getElementById('tempLogsBody');
+  if (!container) return;
+  if (!APP.haccpLogs.temp || APP.haccpLogs.temp.length === 0) {
+    container.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:2rem; color:var(--text-muted);">' + t('haccp.temp.empty') + '</td></tr>';
+    return;
+  }
+  container.innerHTML = APP.haccpLogs.temp.map(function (log) {
+    var isWarn = log.val > 5;
+    var equipLabel = log.equipKey ? t(log.equipKey) : (EQUIP_KEY_MAP[log.equip] ? t(EQUIP_KEY_MAP[log.equip]) : (log.equip || ''));
+    var actionBadge = '';
+    if (log.action) {
+      var actionText = (log.action.indexOf('haccp.') === 0) ? t(log.action) : log.action;
+      actionBadge = '<div style="font-size:0.75rem; color:var(--text-muted); font-style:italic; margin-top:4px;">💬 ' + actionText + '</div>';
+    }
+    return '<tr>' +
+      '<td>' + new Date(log.date).toLocaleString() + '</td>' +
+      '<td style="font-weight:700;">' + equipLabel + '</td>' +
+      '<td style="font-size:1.1rem; font-weight:800; color:' + (isWarn ? 'var(--danger)' : 'var(--success)') + '">' + log.val + '°C</td>' +
+      '<td>' + (log.user || t('haccp.chef')) + '</td>' +
+      '<td><span class="badge ' + (isWarn ? 'status-critical' : 'status-ok') + '">' + (isWarn ? '⚠️ ' + t('haccp.status.warn') : '✅ ' + t('haccp.status.ok')) + '</span>' + actionBadge + '</td>' +
+      '<td><button class="btn btn-sm btn-outline btn-round" onclick="deleteTempLog(\'' + log.id + '\')">🗑️</button></td>' +
+      '</tr>';
+  }).join('');
+}
+
+function showAddTempModal() {
+  var modal = document.getElementById('modalHaccpTemp');
+  if (modal) modal.style.display = 'flex';
+  var sel = document.getElementById('haccpTempEquip');
+  if (sel) {
+    sel.innerHTML = '<option value="haccp.equip.frigo1">' + t('haccp.equip.frigo1') + '</option>' +
+      '<option value="haccp.equip.frigo2">' + t('haccp.equip.frigo2') + '</option>' +
+      '<option value="haccp.equip.congelateur">' + t('haccp.equip.congelateur') + '</option>' +
+      '<option value="haccp.equip.cellule">' + t('haccp.equip.cellule') + '</option>';
+  }
+}
+
+function hideAddTempModal() {
+  var modal = document.getElementById('modalHaccpTemp');
+  if (modal) modal.style.display = 'none';
+}
+
+function addTempLog() {
+  var equipSelector = document.getElementById('haccpTempEquip');
+  var valInput = document.getElementById('haccpTempVal');
+  var actionField = document.getElementById('haccpTempAction');
+  if (!equipSelector || !valInput) return;
+  var equipKey = equipSelector.value;
+  var val = parseFloat(valInput.value);
+  var action = actionField ? actionField.value.trim() : '';
+  if (isNaN(val)) {
+    if (typeof showToast === 'function') showToast(t('haccp.temp.empty'), 'error');
+    return;
+  }
+  var log = {
+    id: 't_log_' + Date.now(),
+    date: new Date().toISOString(),
+    equipKey: equipKey,
+    val: val,
+    action: action || null,
+    user: APP.viewOwner || localStorage.getItem(STORAGE_KEYS.currentUser) || t('haccp.chef')
+  };
+  if (!APP.haccpLogs.temp) APP.haccpLogs.temp = [];
+  APP.haccpLogs.temp.unshift(log);
+  if (APP.haccpLogs.temp.length > 50) APP.haccpLogs.temp.pop();
+  saveHaccpLogs();
+  hideAddTempModal();
+  valInput.value = '';
+  if (actionField) actionField.value = '';
+  renderTempLogs();
+  if (typeof showToast === 'function') showToast(t('haccp.status.ok'), 'success');
+}
+
+function deleteTempLog(id) {
+  APP.haccpLogs.temp = APP.haccpLogs.temp.filter(function (l) { return l.id !== id; });
+  saveHaccpLogs();
+  renderTempLogs();
+}
+
+function showAddReceptionModal() {
+  var modal = document.getElementById('modalHaccpReception');
+  if (modal) modal.style.display = 'flex';
+}
+function hideAddReceptionModal() {
+  var modal = document.getElementById('modalHaccpReception');
+  if (modal) modal.style.display = 'none';
+}
+function addReceptionLog() {
+  var supplier = document.getElementById('haccpReceptSupplier').value;
+  var temp = parseFloat(document.getElementById('haccpReceptTemp').value);
+  var hygiene = document.getElementById('haccpReceptHygiene').value;
+  if (!supplier) return;
+  var log = { id: 'recept_' + Date.now(), date: new Date().toISOString(), supplier: supplier, temp: temp, hygiene: hygiene };
+  if (!APP.haccpLogs.reception) APP.haccpLogs.reception = [];
+  APP.haccpLogs.reception.unshift(log);
+  saveHaccpLogs();
+  hideAddReceptionModal();
+  renderReceptionLogs();
+  if (typeof showToast === 'function') showToast(t('haccp.status.ok'), 'success');
+}
+function renderReceptionLogs() {
+  var container = document.getElementById('receptionLogsBody');
+  if (!container) return;
+  if (!APP.haccpLogs.reception || APP.haccpLogs.reception.length === 0) {
+    container.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:2rem; color:var(--text-muted);">' + t('haccp.reception.empty') + '</td></tr>';
+    return;
+  }
+  container.innerHTML = APP.haccpLogs.reception.map(function (log) {
+    return '<tr>' +
+      '<td>' + new Date(log.date).toLocaleDateString() + '</td>' +
+      '<td style="font-weight:700;">' + log.supplier + '</td>' +
+      '<td style="font-weight:800;">' + log.temp + '°C</td>' +
+      '<td>' + (log.hygiene === 'ok' ? '✅ ' + t('haccp.reception.ok') : '❌ ' + t('haccp.reception.ko')) + '</td>' +
+      '<td><span class="badge ' + (log.hygiene === 'ok' ? 'status-ok' : 'status-critical') + '">' + (log.hygiene === 'ok' ? t('haccp.status.ok') : t('haccp.status.warn')) + '</span></td>' +
+      '<td><button class="btn btn-sm btn-outline btn-round" onclick="deleteReceptionLog(\'' + log.id + '\')">🗑️</button></td>' +
+      '</tr>';
+  }).join('');
+}
+function deleteReceptionLog(id) {
+  APP.haccpLogs.reception = APP.haccpLogs.reception.filter(function (l) { return l.id !== id; });
+  saveHaccpLogs();
+  renderReceptionLogs();
+}
+
+function renderCleaningChecklist() {
+  var container = document.getElementById('cleaningChecklistArea');
+  if (!container) return;
+  if (!APP.haccpLogs.clean) return;
+  container.innerHTML = APP.haccpLogs.clean.map(function (task) {
+    var areaName = task.areaKey ? t(task.areaKey) : (task.area || '');
+    return '<div class="card glass-widget ' + (task.done ? 'cleaned' : '') + '" onclick="toggleCleaning(\'' + task.id + '\')">' +
+      '<div style="font-size:2rem;">' + task.icon + '</div>' +
+      '<div style="flex:1;">' +
+      '<h4 style="margin:0; font-size:1.1rem; color:var(--primary);">' + areaName + '</h4>' +
+      '<small style="color:var(--text-muted);">' + (task.done ? t('haccp.clean.stat_done') : t('haccp.clean.stat_todo')) + '</small>' +
+      '</div>' +
+      '<div style="font-size:1.5rem;">' + (task.done ? '✅' : '⭕') + '</div>' +
+      '</div>';
+  }).join('');
+}
+
+function toggleCleaning(id) {
+  var task = APP.haccpLogs.clean.find(function (c) { return c.id === id; });
+  if (task) {
+    task.done = !task.done;
+    saveHaccpLogs();
+    renderCleaningChecklist();
+  }
+}
+
+function renderTraceability() {
+  var container = document.getElementById('traceLogsBody');
+  if (!container) return;
+  if (!APP.haccpLogs.trace || APP.haccpLogs.trace.length === 0) {
+    container.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:2rem; color:var(--text-muted);">' + t('haccp.trace.empty') + '</td></tr>';
+    return;
+  }
+  container.innerHTML = APP.haccpLogs.trace.map(function (d) {
+    return '<tr>' +
+      '<td style="font-family:monospace; font-weight:800; color:var(--accent);">' + d.lot + '</td>' +
+      '<td style="font-weight:700;">' + d.product + '</td>' +
+      '<td>' + new Date(d.date).toLocaleDateString() + '</td>' +
+      '<td style="color:var(--danger); font-weight:700;">' + d.exp + '</td>' +
+      '<td>' + d.qty + ' ' + t('haccp.portions') + '</td>' +
+      '<td><button class="btn btn-sm btn-outline btn-round" onclick="window.print()">🖨️</button></td>' +
+      '</tr>';
+  }).join('');
 }
