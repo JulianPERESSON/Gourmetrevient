@@ -556,7 +556,8 @@ function drawPlanPreviewCustom() {
 // --- BIND EVENTS ---
 function initLabConfigurator() {
     const slider = document.getElementById('budgetSlider');
-    if (slider) slider.addEventListener('input', updateLab);
+    const throttledUpdateLab = (typeof throttle === 'function') ? throttle(updateLab, 50) : updateLab;
+    if (slider) slider.addEventListener('input', throttledUpdateLab);
 
     const modeGrid = document.getElementById('modeGrid');
     if (modeGrid) {

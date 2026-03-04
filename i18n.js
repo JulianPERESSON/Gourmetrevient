@@ -62,6 +62,8 @@ const TRANSLATIONS = {
         'nav.logout': 'Déconnexion',
         'nav.notifications': 'Notifications',
         'nav.no_notif': 'Aucune nouvelle notification',
+        'nav.suppliers': 'Fournisseurs',
+        'nav.stats': 'Statistiques',
 
         // Dashboard
         'dash.greeting': 'Bonjour, ',
@@ -643,6 +645,7 @@ const TRANSLATIONS = {
         'admin.user.deleted': "Utilisateur \"{name}\" et ses données ont été supprimés.",
         'admin.confirm.delete_user': "Êtes-vous sûr de vouloir supprimer définitivement l'utilisateur \"{name}\" ?",
 
+        'about.chef_oeuvre.desc': 'Réalisé au titre du "Chef d\'Œuvre" dans le cursus de la Chambre de Métiers et de l\'Artisanat. L\'accent principal a été mis sur la viabilité commerciale qui sous-tend les métiers de bouche.',
         'about.thanks.detail': "✨ <strong>Remerciements :</strong> Un grand merci à l'encadrement génial du CFA, et tout particulièrement à <strong>M. Pelletier</strong> et <strong>M. BOUVIER-GAZ</strong> pour leur accompagnement et leur bienveillance.",
         'about.project': "Le Projet",
         'about.desc1': "<strong>GourmetRevient</strong> est à la fois un simulateur avancé de rentabilité de recettes et un configurateur intelligent de laboratoire de pâtisserie professionnel.",
@@ -727,6 +730,19 @@ const TRANSLATIONS = {
         'labeling.toast.print_success': 'Impression lancée !',
         'labeling.preview.no_allergens': 'Aucun',
         'labeling.producer': 'Artisan Pâtissier',
+        'labeling.preview.fab_date': 'Fabriqué le',
+        'labeling.preview.exp_date': 'À consommer avant',
+        'labeling.preview.tax_included': 'TVA 5.5% Incluse',
+
+        // Suppliers
+        'suppliers.badge': '🚚 Logistique & Partenaires',
+        'suppliers.title': 'Gestion des <span class="accent">Fournisseurs</span>',
+        'suppliers.desc_long': 'Centralisez vos contacts logistiques, suivez vos stocks critiques et optimisez vos commandes.',
+        'suppliers.filter_title': 'Filtres Rapides',
+        'suppliers.btn.add': 'Nouveau Fournisseur',
+        'suppliers.stats.total': 'Total Fournisseurs',
+        'suppliers.stats.pending': 'Besoin Critique',
+        'suppliers.need_order': 'ARTICLES À RECOMMANDER',
 
         // Data Categories
         'data.cat.feuilletage': 'Feuilletage',
@@ -1044,6 +1060,8 @@ const TRANSLATIONS = {
         'nav.logout': '🚪 Log out',
         'nav.notifications': 'Notifications',
         'nav.no_notif': 'No new notifications',
+        'nav.suppliers': 'Suppliers',
+        'nav.stats': 'Statistics',
 
         // Inventory
         'inv.badge': '📦 Stock Management',
@@ -1097,7 +1115,19 @@ const TRANSLATIONS = {
         'labeling.toast.print_success': 'Print job started!',
         'labeling.preview.no_allergens': 'None',
         'labeling.producer': 'Artisan Pastry Chef',
+        'labeling.preview.fab_date': 'Manufactured on',
+        'labeling.preview.exp_date': 'Best before',
+        'labeling.preview.tax_included': 'VAT 5.5% Included',
 
+        // Suppliers
+        'suppliers.badge': '🚚 Logistics & Partners',
+        'suppliers.title': 'Supplier <span class="accent">Management</span>',
+        'suppliers.desc_long': 'Centralize your logistics contacts, track your critical stock and optimize your orders.',
+        'suppliers.filter_title': 'Quick Filters',
+        'suppliers.btn.add': 'New Supplier',
+        'suppliers.stats.total': 'Total Suppliers',
+        'suppliers.stats.pending': 'Critical Need',
+        'suppliers.need_order': 'ITEMS TO REORDER',
         'dash.greeting': 'Hello, ',
         'dash.greeting_prefix': 'Your',
         'dash.subtitle': 'GourmetRevient professional workspace',
@@ -1714,6 +1744,7 @@ const TRANSLATIONS = {
         'admin.user.deleted': "User \"{name}\" and their data have been deleted.",
         'admin.confirm.delete_user': "Are you sure you want to permanently delete user \"{name}\"?",
 
+        'about.chef_oeuvre.desc': 'Created as a "Chef d\'Œuvre" project within the Chamber of Trades and Crafts curriculum. The primary focus was on the commercial viability that underpins the food trades.',
         'about.thanks.detail': "✨ <strong>Acknowledgements:</strong> A big thank thank you to the brilliant CFA management, and especially to <strong>Mr. Pelletier</strong> and <strong>Mr. BOUVIER-GAZ</strong> for their support and kindness.",
         'about.project': "The Project",
         'about.desc1': "<strong>GourmetRevient</strong> is both an advanced recipe profitability simulator and an intelligent professional pastry lab configurator.",
@@ -2065,6 +2096,8 @@ const TRANSLATIONS = {
         'nav.logout': '🚪 Cerrar sesión',
         'nav.notifications': 'Notificaciones',
         'nav.no_notif': 'No hay nuevas notificaciones',
+        'nav.suppliers': 'Proveedores',
+        'nav.stats': 'Estadísticas',
 
         // Inventory
         'inv.badge': '📦 Gestión de Inventario',
@@ -2117,8 +2150,20 @@ const TRANSLATIONS = {
         'labeling.toast.no_recipe': 'Por favor, seleccione una receta.',
         'labeling.toast.print_success': '¡Impresión iniciada!',
         'labeling.preview.no_allergens': 'Ninguno',
-        'labeling.producer': 'Artesano Pastelero',
+        'labeling.producer': 'Pastelero Artesano',
+        'labeling.preview.fab_date': 'Fabricado el',
+        'labeling.preview.exp_date': 'Consumir preferentemente antes de',
+        'labeling.preview.tax_included': 'IVA 5.5% Incluido',
 
+        // Suppliers
+        'suppliers.badge': '🚚 Logística y Socios',
+        'suppliers.title': 'Gestión de <span class="accent">Proveedores</span>',
+        'suppliers.desc_long': 'Centralice sus contactos logísticos, realice un seguimiento de sus existencias críticas y optimice sus pedidos.',
+        'suppliers.filter_title': 'Filtros rápidos',
+        'suppliers.btn.add': 'Nuevo proveedor',
+        'suppliers.stats.total': 'Total Proveedores',
+        'suppliers.stats.pending': 'Necesidad Crítica',
+        'suppliers.need_order': 'ARTÍCULOS A PEDIR',
         'dash.greeting': 'Hola, ',
         'dash.greeting_prefix': 'Tu',
         'dash.subtitle': 'espacio profesional GourmetRevient',

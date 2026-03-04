@@ -5074,3 +5074,586 @@ select.form-input {
     grid-template-columns: 1fr !important;
   }
 }
+
+/* ============================================================================ */
+/* PRODUCTION MODE MODAL                                                       */
+/* ============================================================================ */
+.production-header {
+  background: var(--bg-alt);
+  padding: 1.5rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid var(--surface-border);
+}
+
+.production-body {
+  display: flex;
+  height: calc(85vh - 80px);
+}
+
+.production-sidebar {
+  width: 320px;
+  background: #f8fafc;
+  border-right: 1px solid var(--surface-border);
+  padding: 1.5rem;
+  overflow-y: auto;
+}
+
+.production-main {
+  flex: 1;
+  padding: 2.5rem;
+  background: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.prod-checklist {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 1rem;
+}
+
+.prod-check-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  background: white;
+  border: 1px solid var(--surface-border);
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.prod-check-item input:checked+label {
+  text-decoration: line-through;
+  opacity: 0.6;
+}
+
+.prod-step-slide {
+  animation: fadeIn 0.4s ease-out;
+}
+
+.prod-step-number {
+  color: var(--primary);
+  font-weight: 800;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.prod-step-content {
+  font-size: 1.8rem;
+  font-weight: 600;
+  line-height: 1.4;
+  color: #1e293b;
+}
+
+.production-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 2rem;
+  border-top: 1px solid var(--surface-border);
+}
+
+#prodStepIndicator {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--text-muted);
+}
+
+/* SUPPLIER MANAGEMENT REDESIGN - BOLD & PREMIUM                                */
+/* ============================================================================ */
+
+.suppliers-layout {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 2.5rem;
+  margin-top: 1rem;
+}
+
+@media (max-width: 1024px) {
+  .suppliers-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.supplier-filters {
+  position: sticky;
+  top: 100px;
+  height: fit-content;
+}
+
+.supplier-search-wrap {
+  position: relative;
+  margin-bottom: 1.8rem;
+}
+
+.supplier-search-wrap i {
+  position: absolute;
+  left: 1.2rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--primary);
+  font-size: 1.1rem;
+}
+
+.supplier-search-input {
+  width: 100%;
+  padding: 1.1rem 1rem 1.1rem 3.2rem;
+  border-radius: 16px;
+  border: 2px solid var(--surface-border);
+  background: white;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: all 0.3s;
+  color: var(--primary);
+}
+
+.supplier-search-input::placeholder {
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+.supplier-search-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 10px 25px rgba(230, 126, 34, 0.15);
+  background: white;
+}
+
+.suppliers-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 2rem;
+}
+
+.supplier-card {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+  display: flex;
+  flex-direction: column;
+  padding: 0 !important;
+  border-radius: 20px;
+  background: white;
+  border: 2px solid var(--surface-border);
+  box-shadow: var(--shadow-sm);
+}
+
+.supplier-card:hover {
+  transform: translateY(-10px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--accent);
+}
+
+.supplier-card-header {
+  padding: 1.8rem;
+  background: linear-gradient(135deg, #ffffff, #f8fafc);
+  border-bottom: 2px solid var(--surface-border);
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+}
+
+.supplier-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 18px;
+  background: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: white;
+  box-shadow: 0 8px 20px rgba(44, 62, 80, 0.2);
+}
+
+.supplier-info-main h3 {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  color: var(--primary);
+  line-height: 1.1;
+}
+
+.supplier-info-main span {
+  font-size: 0.8rem;
+  color: var(--accent);
+  text-transform: uppercase;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+.supplier-card-body {
+  padding: 1.8rem;
+  flex-grow: 1;
+}
+
+.supplier-contact-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 1rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.supplier-contact-row i {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-alt);
+  border-radius: 6px;
+  color: var(--primary);
+  font-size: 0.9rem;
+}
+
+.supplier-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 1.2rem;
+}
+
+.tag-supplier {
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  background: var(--accent-glow);
+  color: var(--accent-dark);
+  border: 1px solid rgba(230, 126, 34, 0.2);
+}
+
+.supplier-card-footer {
+  padding: 1.2rem 1.8rem;
+  background: #f8fafc;
+  border-top: 2px solid var(--surface-border);
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+/* Suggested Orders Premium Table - BOLDER */
+.order-premium-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.order-premium-table th {
+  text-align: left;
+  padding: 1.2rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--primary);
+  border-bottom: 2px solid var(--primary);
+}
+
+.order-row {
+  transition: all 0.2s;
+}
+
+.order-row:hover {
+  background: rgba(230, 126, 34, 0.04);
+}
+
+.order-row td {
+  padding: 1.5rem 1rem;
+  border-bottom: 1px solid var(--surface-border);
+  vertical-align: middle;
+}
+
+.order-item-name {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--primary);
+  text-transform: capitalize;
+}
+
+.order-qty-pill {
+  padding: 6px 16px;
+  background: var(--primary);
+  color: white;
+  border-radius: 30px;
+  font-weight: 800;
+  font-size: 0.95rem;
+  box-shadow: 0 4px 12px rgba(44, 62, 80, 0.2);
+}
+
+.order-status-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 10px;
+}
+
+.order-status-dot.critical {
+  background: var(--danger);
+  box-shadow: 0 0 15px rgba(231, 76, 60, 0.6);
+  animation: pulse-danger 2s infinite;
+}
+
+@keyframes pulse-danger {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  50% {
+    transform: scale(1.3);
+    opacity: 0.7;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.order-status-dot.warning {
+  background: var(--warning);
+  box-shadow: 0 0 10px rgba(243, 156, 18, 0.4);
+}
+
+.btn-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--surface-border);
+  background: white;
+  font-size: 1.2rem;
+  transition: all 0.3s;
+}
+
+.btn-icon:hover {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+  transform: translateY(-4px) rotate(5deg);
+}
+
+.btn-full-bold {
+  padding: 1.2rem !important;
+  font-size: 1.1rem !important;
+  font-weight: 800 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 1px !important;
+}
+
+/* ==========================================================================
+   SUPPLIERS PREMIUM STYLES
+   ========================================================================== */
+.suppliers-hero {
+  background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d) !important;
+  /* Premium sunset gradient */
+  background-size: 200% 200% !important;
+  animation: gradientMove 15s ease infinite !important;
+  color: white !important;
+  border-radius: 0 0 60px 60px;
+  padding: 6rem 2rem 10rem !important;
+  margin-bottom: 0;
+  position: relative;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+@keyframes gradientMove {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.suppliers-hero h2 {
+  color: white !important;
+  font-size: 3.5rem !important;
+  margin: 1.5rem 0 1rem !important;
+  text-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.suppliers-hero .accent {
+  color: #fff !important;
+  text-decoration: underline wavy var(--accent);
+  text-underline-offset: 8px;
+}
+
+.suppliers-hero .hero-badge {
+  background: rgba(255, 255, 255, 0.2) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  color: white !important;
+  backdrop-filter: blur(10px);
+  padding: 0.6rem 1.4rem !important;
+  font-size: 0.9rem !important;
+  letter-spacing: 2px !important;
+}
+
+.supplier-search-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.supplier-search-wrap i {
+  position: absolute;
+  left: 1.2rem;
+  font-style: normal;
+  font-size: 1.2rem;
+  opacity: 0.6;
+}
+
+.supplier-search-input {
+  width: 100%;
+  padding: 1rem 1rem 1rem 3.5rem !important;
+  border-radius: 14px !important;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
+  transition: all 0.3s;
+}
+
+.supplier-search-input:focus {
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 4px rgba(230, 126, 34, 0.1) !important;
+}
+
+@media (max-width: 1100px) {
+  .suppliers-main-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .supplier-filters aside {
+    position: static !important;
+  }
+}
+
+/* ==========================================================================
+   SUPPLIERS REFINED STYLES
+   ========================================================================== */
+.suppliers-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr) !important;
+  gap: 2rem;
+}
+
+@media (max-width: 1400px) {
+  .suppliers-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+@media (max-width: 900px) {
+  .suppliers-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+.supplier-card {
+  background: white;
+  border-radius: 16px;
+  border: 1px solid var(--surface-border);
+  padding: 1.5rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.supplier-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--accent);
+}
+
+.supplier-card-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.supplier-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
+  background: var(--accent-glow);
+  color: var(--accent-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  font-weight: 800;
+}
+
+.supplier-info-main h3 {
+  font-size: 1.1rem;
+  font-weight: 800;
+  margin: 0;
+  color: var(--primary);
+}
+
+.supplier-info-main span {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.supplier-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.tag-supplier {
+  background: #f0f2f5;
+  color: #555;
+  padding: 0.2rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.supplier-contact-row {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.supplier-card-footer {
+  margin-top: auto;
+  padding-top: 1rem;
+  border-top: 1px solid #eee;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.8rem;
+}
+/* Supplier Alert Styles */
+.supplier-card.alert-active { border: 2px solid var(--warning) !important; background: linear-gradient(180deg, rgba(243, 156, 18, 0.03) 0%, #ffffff 100%) !important; position: relative; }
+.supplier-card.alert-active::before { content: '⚠️ ACTION REQUISE'; position: absolute; top: -12px; right: 20px; background: var(--warning); color: white; padding: 2px 10px; border-radius: 20px; font-size: 0.65rem; font-weight: 900; letter-spacing: 0.5px; box-shadow: 0 4px 8px rgba(243, 156, 18, 0.3); z-index: 10; }
+.supplier-crit-list { margin-top: 0.5rem; padding: 0.8rem; background: var(--warning-light); border-radius: 10px; border: 1px dashed var(--warning); }
+.supplier-crit-item { font-size: 0.8rem; color: #a05a00; font-weight: 700; display: flex; align-items: center; gap: 5px; }

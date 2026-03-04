@@ -10,43 +10,28 @@
 // ============================================================================
 
 const APP = {
-  currentStep: 0,
-  recipe: { id: null, name: '', category: '', portions: 10, prepTime: 60, cookTime: 30, description: '', ingredients: [], steps: [] },
-  margin: 70,
+  currentStep: 0, // 0 = hero, 1-5 = steps
+  recipe: {
+    id: null,
+    name: '',
+    category: '',
+    portions: 10,
+    prepTime: 60,
+    cookTime: 30,
+    description: '',
+    ingredients: [],
+    steps: []
+  },
+  margin: 70, // percentage
   savedRecipes: [],
   ingredientDb: [],
   teamMembers: [],
   staffLeaves: [],
   inventory: [],
-  suppliers: [
-    { id: 101, name: 'Laiterie des Alpes', contact: 'M. Durif', email: 'ventes@laiterialpes.fr', categories: ['Lait', 'Beurre', 'Crème'], rating: 4.8 },
-    { id: 102, name: 'Fruits d\'Exception', contact: 'Mme. Berry', email: 'contact@fruits-exception.com', categories: ['Fruits frais', 'Purées', 'Surgelés'], rating: 4.9 },
-    { id: 103, name: 'Épices du Monde', contact: 'Jean Vanille', email: 'pro@epicesmonde.net', categories: ['Vanille', 'Cannelle', 'Épices'], rating: 4.7 },
-    { id: 104, name: 'Emballages Design', contact: 'Lucas Box', email: 'orders@designbox.fr', categories: ['Boîtes', 'Rubans', 'Papier'], rating: 4.5 },
-    { id: 105, name: 'Meunier d\'Or', contact: 'Paul Farine', email: 'contact@meunierd-or.fr', categories: ['Farine', 'Céréales'], rating: 4.6 }
-  ],
-  history: [], // New for stats
   haccpLogs: { temp: [], trace: [], clean: [] },
-  viewOwner: null,
+  viewOwner: null, // User cuya data estamos viendo
   notifications: []
 };
-
-// ============================================================================
-// UTILS
-// ============================================================================
-
-function throttle(func, limit) {
-  let inThrottle;
-  return function () {
-    const args = arguments;
-    const context = this;
-    if (!inThrottle) {
-      func.apply(context, args);
-      inThrottle = true;
-      setTimeout(() => inThrottle = false, limit);
-    }
-  }
-}
 
 const STORAGE_KEYS = {
   users: 'gourmet_users_db',
@@ -63,149 +48,31 @@ const STORAGE_KEYS = {
 
 // Default ingredient database (pre-loaded)
 const DEFAULT_INGREDIENT_DB = [
-  // --- 1. FARINES, FÉCULES & CÉRÉALES ---
-  { name: 'Farine T45', unit: 'g', pricePerUnit: 0.80, priceRef: 'kg', allergens: ['Gluten'] },
   { name: 'Farine T55', unit: 'g', pricePerUnit: 0.65, priceRef: 'kg', allergens: ['Gluten'] },
-  { name: 'Farine de Gruau T45', unit: 'g', pricePerUnit: 1.50, priceRef: 'kg', allergens: ['Gluten'] },
-  { name: 'Farine T55 Label Rouge', unit: 'g', pricePerUnit: 1.20, priceRef: 'kg', allergens: ['Gluten'] },
-  { name: 'Farine de Seigle T130', unit: 'g', pricePerUnit: 2.10, priceRef: 'kg', allergens: ['Gluten'] },
-  { name: 'Farine de Sarrasin', unit: 'g', pricePerUnit: 3.20, priceRef: 'kg', allergens: [] },
-  { name: 'Farine de Riz (S.G)', unit: 'g', pricePerUnit: 4.50, priceRef: 'kg', allergens: [] },
-  { name: 'Farine de Châtaigne', unit: 'g', pricePerUnit: 12.50, priceRef: 'kg', allergens: [] },
-  { name: 'Fécule de Pomme de Terre', unit: 'g', pricePerUnit: 3.20, priceRef: 'kg', allergens: [] },
-  { name: 'Maïzena', unit: 'g', pricePerUnit: 2.80, priceRef: 'kg', allergens: [] },
-
-  // --- 2. BEURRES & MATIÈRES GRASSES ---
-  { name: 'Beurre AOP', unit: 'g', pricePerUnit: 7.50, priceRef: 'kg', allergens: ['Lait'] },
-  { name: 'Beurre doux', unit: 'g', pricePerUnit: 6.80, priceRef: 'kg', allergens: ['Lait'] },
-  { name: 'Beurre Tourage AOP 82%', unit: 'g', pricePerUnit: 14.50, priceRef: 'kg', allergens: ['Lait'] },
-  { name: 'Beurre de Cacao', unit: 'g', pricePerUnit: 15.50, priceRef: 'kg', allergens: [] },
-  { name: 'Beurre de Cacao Mycryo', unit: 'g', pricePerUnit: 38.00, priceRef: 'kg', allergens: [] },
-  { name: 'Huile de Coco Vierge', unit: 'ml', pricePerUnit: 16.00, priceRef: 'L', allergens: [] },
-
-  // --- 3. SUCRES & PRODUITS SUCRANTS ---
+  { name: 'Farine T45', unit: 'g', pricePerUnit: 0.80, priceRef: 'kg', allergens: ['Gluten'] },
+  { name: 'Beurre AOP', unit: 'g', pricePerUnit: 7.50, priceRef: 'kg', allergens: ['Lactose', 'Lait'] },
+  { name: 'Beurre doux', unit: 'g', pricePerUnit: 6.80, priceRef: 'kg', allergens: ['Lactose', 'Lait'] },
   { name: 'Sucre semoule', unit: 'g', pricePerUnit: 0.85, priceRef: 'kg', allergens: [] },
   { name: 'Sucre glace', unit: 'g', pricePerUnit: 2.10, priceRef: 'kg', allergens: [] },
-  { name: 'Sucre Muscovado', unit: 'g', pricePerUnit: 4.50, priceRef: 'kg', allergens: [] },
-  { name: 'Vergeoise Brune', unit: 'g', pricePerUnit: 3.80, priceRef: 'kg', allergens: [] },
-  { name: 'Sucre de Fleur de Coco', unit: 'g', pricePerUnit: 14.00, priceRef: 'kg', allergens: [] },
-  { name: 'Glucose', unit: 'g', pricePerUnit: 4.80, priceRef: 'kg', allergens: [] },
-  { name: 'Sirop de Glucose', unit: 'g', pricePerUnit: 3.50, priceRef: 'kg', allergens: [] },
-  { name: 'Trimoline (Sucre Inverti)', unit: 'g', pricePerUnit: 4.80, priceRef: 'kg', allergens: [] },
-  { name: 'Miel de Fleurs', unit: 'g', pricePerUnit: 8.50, priceRef: 'kg', allergens: [] },
-  { name: 'Sirop d\'Erable Grade A', unit: 'ml', pricePerUnit: 28.00, priceRef: 'L', allergens: [] },
-  { name: 'Isomalt', unit: 'g', pricePerUnit: 6.50, priceRef: 'kg', allergens: [] },
-  { name: 'Sorbitol Poudre', unit: 'g', pricePerUnit: 18.00, priceRef: 'kg', allergens: [] },
-
-  // --- 4. PRODUITS LAITIERS ---
-  { name: 'Lait entier', unit: 'ml', pricePerUnit: 0.85, priceRef: 'L', allergens: ['Lait'] },
-  { name: 'Lait d\'Amande Pro', unit: 'ml', pricePerUnit: 3.80, priceRef: 'L', allergens: ['Fruits à coque'] },
-  { name: 'Crème 35% MG Excellence', unit: 'ml', pricePerUnit: 5.80, priceRef: 'L', allergens: ['Lait'] },
-  { name: 'Crème 35% MG', unit: 'ml', pricePerUnit: 4.20, priceRef: 'L', allergens: ['Lait'] },
-  { name: 'Mascarpone', unit: 'g', pricePerUnit: 8.50, priceRef: 'kg', allergens: ['Lait'] },
-
-  // --- 5. ŒUFS & DÉRIVÉS ---
-  { name: 'Œufs Frais (L)', unit: 'pièce', pricePerUnit: 0.25, priceRef: 'pièce', allergens: ['Œufs'] },
+  { name: 'Lait entier', unit: 'ml', pricePerUnit: 0.85, priceRef: 'L', allergens: ['Lactose', 'Lait'] },
+  { name: 'Crème 35% MG', unit: 'ml', pricePerUnit: 4.20, priceRef: 'L', allergens: ['Lactose', 'Lait'] },
   { name: 'Œufs entiers', unit: 'pièce', pricePerUnit: 0.15, priceRef: 'pièce', allergens: ['Œufs'] },
   { name: 'Jaunes d\'œufs', unit: 'pièce', pricePerUnit: 0.15, priceRef: 'pièce', allergens: ['Œufs'] },
   { name: 'Blancs d\'œufs', unit: 'pièce', pricePerUnit: 0.10, priceRef: 'pièce', allergens: ['Œufs'] },
-  { name: 'Blanc d\'œuf Pasteurisé', unit: 'g', pricePerUnit: 6.50, priceRef: 'kg', allergens: ['Œufs'] },
-  { name: 'Jaune d\'œuf Pasteurisé', unit: 'g', pricePerUnit: 12.00, priceRef: 'kg', allergens: ['Œufs'] },
-  { name: 'Poudre de Blanc d\'Œuf', unit: 'g', pricePerUnit: 45.00, priceRef: 'kg', allergens: ['Œufs'] },
-
-  // --- 6. CHOCOLATERIE & CACAO ---
   { name: 'Chocolat noir 64%', unit: 'g', pricePerUnit: 11.50, priceRef: 'kg', allergens: ['Lait', 'Soja'] },
-  { name: 'Chocolat Guanaja 70%', unit: 'g', pricePerUnit: 18.50, priceRef: 'kg', allergens: ['Lait', 'Soja'] },
-  { name: 'Chocolat au Lait 35%', unit: 'g', pricePerUnit: 10.20, priceRef: 'kg', allergens: ['Lait', 'Soja'] },
-  { name: 'Chocolat Jivara 40%', unit: 'g', pricePerUnit: 17.20, priceRef: 'kg', allergens: ['Lait', 'Soja'] },
-  { name: 'Chocolat Blanc 33%', unit: 'g', pricePerUnit: 9.80, priceRef: 'kg', allergens: ['Lait', 'Soja'] },
-  { name: 'Chocolat Opalys 33%', unit: 'g', pricePerUnit: 18.90, priceRef: 'kg', allergens: ['Lait', 'Soja'] },
-  { name: 'Chocolat Dulcey 35%', unit: 'g', pricePerUnit: 19.80, priceRef: 'kg', allergens: ['Lait', 'Soja'] },
-  { name: 'Cacao poudre', unit: 'g', pricePerUnit: 12.00, priceRef: 'kg', allergens: [] },
-  { name: 'Poudre Cacao Barry', unit: 'g', pricePerUnit: 18.00, priceRef: 'kg', allergens: [] },
-  { name: 'Pâte à glacer Brune', unit: 'g', pricePerUnit: 8.50, priceRef: 'kg', allergens: ['Soja'] },
-
-  // --- 7. FRUITS FRAIS & SECS ---
-  { name: 'Fraises fraîches', unit: 'g', pricePerUnit: 4.50, priceRef: 'kg', allergens: [] },
-  { name: 'Pomme Golden', unit: 'kg', pricePerUnit: 2.20, priceRef: 'kg', allergens: [] },
-  { name: 'Poire Williams', unit: 'kg', pricePerUnit: 3.50, priceRef: 'kg', allergens: [] },
-  { name: 'Menthe Fraîche', unit: 'g', pricePerUnit: 25.00, priceRef: 'kg', allergens: [] },
-  { name: 'Citron Vert', unit: 'pièce', pricePerUnit: 0.45, priceRef: 'pièce', allergens: [] },
-  { name: 'Orange', unit: 'pièce', pricePerUnit: 0.35, priceRef: 'pièce', allergens: [] },
-  { name: 'Griottes au Sirop', unit: 'g', pricePerUnit: 12.50, priceRef: 'kg', allergens: [] },
-
-  // --- 8. PURÉES & COULIS DE FRUITS ---
-  { name: 'Purée de Fraise', unit: 'ml', pricePerUnit: 11.50, priceRef: 'L', allergens: [] },
-  { name: 'Purée de Framboise', unit: 'ml', pricePerUnit: 13.20, priceRef: 'L', allergens: [] },
-  { name: 'Purée de Mangue', unit: 'ml', pricePerUnit: 12.80, priceRef: 'L', allergens: [] },
-  { name: 'Purée de Passion', unit: 'ml', pricePerUnit: 14.80, priceRef: 'L', allergens: [] },
-  { name: 'Purée de Cassis', unit: 'ml', pricePerUnit: 11.20, priceRef: 'L', allergens: [] },
-  { name: 'Purée de Yuzu', unit: 'ml', pricePerUnit: 55.00, priceRef: 'L', allergens: [] },
-  { name: 'Purée de Litchi', unit: 'ml', pricePerUnit: 16.50, priceRef: 'L', allergens: [] },
-  { name: 'Purée de Noix de Coco', unit: 'ml', pricePerUnit: 14.20, priceRef: 'L', allergens: [] },
-  { name: 'Purée de Goyave Rose', unit: 'ml', pricePerUnit: 15.80, priceRef: 'L', allergens: [] },
-  { name: 'Purée de Bergamote', unit: 'ml', pricePerUnit: 24.00, priceRef: 'L', allergens: [] },
-  { name: 'Poudre de Fraise Lyophilisée', unit: 'g', pricePerUnit: 120.00, priceRef: 'kg', allergens: [] },
-
-  // --- 9. FRUITS À COQUE & PÂTES ---
   { name: 'Poudre d\'amandes', unit: 'g', pricePerUnit: 9.50, priceRef: 'kg', allergens: ['Fruits à coque'] },
-  { name: 'Amandes effilées', unit: 'g', pricePerUnit: 9.50, priceRef: 'kg', allergens: ['Fruits à coque'] },
-  { name: 'Amandes blanchies', unit: 'g', pricePerUnit: 11.20, priceRef: 'kg', allergens: ['Fruits à coque'] },
-  { name: 'Noisettes torréfiées', unit: 'g', pricePerUnit: 12.50, priceRef: 'kg', allergens: ['Fruits à coque'] },
-  { name: 'Poudre de Noisette', unit: 'g', pricePerUnit: 14.50, priceRef: 'kg', allergens: ['Fruits à coque'] },
-  { name: 'Pâte de Noisette 100%', unit: 'g', pricePerUnit: 24.00, priceRef: 'kg', allergens: ['Fruits à coque'] },
-  { name: 'Pâte Noisette Piémont I.G.P', unit: 'g', pricePerUnit: 42.00, priceRef: 'kg', allergens: ['Fruits à coque'] },
-  { name: 'Praliné noisette', unit: 'g', pricePerUnit: 14.50, priceRef: 'kg', allergens: ['Fruits à coque'] },
-  { name: 'Pistaches Entières', unit: 'g', pricePerUnit: 28.50, priceRef: 'kg', allergens: ['Fruits à coque'] },
-  { name: 'Pâte de pistache', unit: 'g', pricePerUnit: 38.00, priceRef: 'kg', allergens: ['Fruits à coque'] },
-  { name: 'Pistache de Bronte D.O.P', unit: 'g', pricePerUnit: 85.00, priceRef: 'kg', allergens: ['Fruits à coque'] },
-  { name: 'Noix de Coco Râpée', unit: 'g', pricePerUnit: 7.20, priceRef: 'kg', allergens: [] },
-
-  // --- 10. ÉPICES, VANILLES & ARÔMES ---
   { name: 'Vanille (gousse)', unit: 'pièce', pricePerUnit: 1.80, priceRef: 'pièce', allergens: [] },
-  { name: 'Gousse Vanille Bourbon', unit: 'pièce', pricePerUnit: 2.50, priceRef: 'pièce', allergens: [] },
-  { name: 'Gousses de Vanille Tahiti', unit: 'pièce', pricePerUnit: 4.50, priceRef: 'pièce', allergens: [] },
-  { name: 'Arôme Naturel Vanille', unit: 'ml', pricePerUnit: 45.00, priceRef: 'L', allergens: [] },
-  { name: 'Arôme Amande Amère', unit: 'ml', pricePerUnit: 35.00, priceRef: 'L', allergens: [] },
-  { name: 'Extrait Café Trablit', unit: 'ml', pricePerUnit: 52.00, priceRef: 'L', allergens: [] },
-  { name: 'Café soluble', unit: 'g', pricePerUnit: 18.00, priceRef: 'kg', allergens: [] },
-  { name: 'Matcha Cérémonial', unit: 'g', pricePerUnit: 250.00, priceRef: 'kg', allergens: [] },
-  { name: 'Thé Matcha', unit: 'g', pricePerUnit: 85.00, priceRef: 'kg', allergens: [] },
-  { name: 'Tonka (fèves entières)', unit: 'g', pricePerUnit: 110.00, priceRef: 'kg', allergens: [] },
-  { name: 'Poivre de Timut', unit: 'g', pricePerUnit: 95.00, priceRef: 'kg', allergens: [] },
-  { name: 'Eau de Fleur d\'Oranger', unit: 'ml', pricePerUnit: 18.00, priceRef: 'L', allergens: [] },
   { name: 'Sel', unit: 'g', pricePerUnit: 0.50, priceRef: 'kg', allergens: [] },
-  { name: 'Fleur de sel', unit: 'g', pricePerUnit: 18.00, priceRef: 'kg', allergens: [] },
-  { name: 'Fleur de Sel de Guérande', unit: 'g', pricePerUnit: 12.00, priceRef: 'kg', allergens: [] },
-  { name: 'Sel de Guérande Moulu', unit: 'g', pricePerUnit: 0.85, priceRef: 'kg', allergens: [] },
-
-  // --- 11. ALCOOLS & SPIRITUEUX ---
-  { name: 'Rhum Ambré 54%', unit: 'ml', pricePerUnit: 42.00, priceRef: 'L', allergens: [] },
-  { name: 'Grand Marnier 54%', unit: 'ml', pricePerUnit: 48.00, priceRef: 'L', allergens: [] },
-  { name: 'Amaretto Disaronno', unit: 'ml', pricePerUnit: 32.00, priceRef: 'L', allergens: [] },
-  { name: 'Kirsh Pâtissier', unit: 'ml', pricePerUnit: 35.00, priceRef: 'L', allergens: [] },
-
-  // --- 12. GÉLIFIANTS, ADDITIFS & AIDES ---
+  { name: 'Maïzena', unit: 'g', pricePerUnit: 2.80, priceRef: 'kg', allergens: [] },
+  { name: 'Praliné noisette', unit: 'g', pricePerUnit: 14.50, priceRef: 'kg', allergens: ['Fruits à coque'] },
+  { name: 'Cacao poudre', unit: 'g', pricePerUnit: 12.00, priceRef: 'kg', allergens: [] },
+  { name: 'Gélatine', unit: 'g', pricePerUnit: 22.00, priceRef: 'kg', allergens: [] },
   { name: 'Levure fraîche', unit: 'g', pricePerUnit: 6.50, priceRef: 'kg', allergens: [] },
-  { name: 'Levure chimique', unit: 'g', pricePerUnit: 8.50, priceRef: 'kg', allergens: [] },
-  { name: 'Poudre à lever', unit: 'g', pricePerUnit: 4.20, priceRef: 'kg', allergens: [] },
-  { name: 'Bicarbonate de soude', unit: 'g', pricePerUnit: 2.50, priceRef: 'kg', allergens: [] },
-  { name: 'Gélatine en feuilles (Or)', unit: 'g', pricePerUnit: 28.00, priceRef: 'kg', allergens: [] },
-  { name: 'Gélatine poudre 200 Bloom', unit: 'g', pricePerUnit: 22.00, priceRef: 'kg', allergens: [] },
-  { name: 'Agar-agar', unit: 'g', pricePerUnit: 65.00, priceRef: 'kg', allergens: [] },
-  { name: 'Pectine NH', unit: 'g', pricePerUnit: 45.00, priceRef: 'kg', allergens: [] },
-  { name: 'Pectine X58', unit: 'g', pricePerUnit: 75.00, priceRef: 'kg', allergens: [] },
-  { name: 'Pectine Jaune', unit: 'g', pricePerUnit: 68.00, priceRef: 'kg', allergens: [] },
-  { name: 'Pectine Rapide (Nappage)', unit: 'g', pricePerUnit: 52.00, priceRef: 'kg', allergens: [] },
-  { name: 'Acide Citrique', unit: 'g', pricePerUnit: 12.00, priceRef: 'kg', allergens: [] },
-  { name: 'Crème de Tartre', unit: 'g', pricePerUnit: 28.00, priceRef: 'kg', allergens: [] },
-
-  // --- 13. DIVERS & DÉCORS ---
-  { name: 'Feuillantine', unit: 'g', pricePerUnit: 18.50, priceRef: 'kg', allergens: ['Gluten'] },
-  { name: 'Speculoos', unit: 'g', pricePerUnit: 6.20, priceRef: 'kg', allergens: ['Gluten'] },
-  { name: 'Colorant Jaune Hydrosoluble', unit: 'g', pricePerUnit: 95.00, priceRef: 'kg', allergens: [] },
-  { name: 'Colorant Noir Carbone', unit: 'g', pricePerUnit: 150.00, priceRef: 'kg', allergens: [] },
-  { name: 'Feuille d\'Or 24 carats', unit: 'pièce', pricePerUnit: 2.50, priceRef: 'pièce', allergens: [] },
+  { name: 'Fraises fraîches', unit: 'g', pricePerUnit: 4.50, priceRef: 'kg', allergens: [] },
+  { name: 'Noisettes torréfiées', unit: 'g', pricePerUnit: 12.50, priceRef: 'kg', allergens: ['Fruits à coque'] },
+  { name: 'Amandes effilées', unit: 'g', pricePerUnit: 9.50, priceRef: 'kg', allergens: ['Fruits à coque'] },
+  { name: 'Rhum ambré', unit: 'ml', pricePerUnit: 18.00, priceRef: 'L', allergens: [] },
+  { name: 'Kirsch', unit: 'ml', pricePerUnit: 22.00, priceRef: 'L', allergens: [] },
 ];
 
 // Planning Constants - 2026 (Zone C - Toulouse)
@@ -337,28 +204,15 @@ function escapeHtml(str) {
 
 function calcIngredientCost(ing) {
   const qty = parseFloat(ing.quantity) || 0;
+  const price = parseFloat(ing.pricePerUnit) || 0;
   const unit = ing.unit || 'g';
 
-  // RECURSIVE COST CALCULATION: Check if ingredient is a sub-recipe
-  const savedRecipes = JSON.parse(localStorage.getItem('gourmet_saved_recipes') || '[]');
-  const subRecipe = savedRecipes.find(r => r.name.toLowerCase() === ing.name.toLowerCase());
-
-  if (subRecipe) {
-    let subCost = 0;
-    subRecipe.ingredients.forEach(subIng => {
-      subCost += calcIngredientCost(subIng);
-    });
-    return (subCost / subRecipe.portions) * qty;
-  }
-
-  let price = parseFloat(ing.pricePerUnit);
-  if (isNaN(price)) price = parseFloat(ing.pricePerKg);
-  if (isNaN(price)) price = parseFloat(ing.pricePerL);
-  if (isNaN(price)) price = parseFloat(ing.pricePerPc);
-  if (isNaN(price)) price = 0;
-
-  // price is per kg, per L, or per pièce
-  if (unit === 'g' || unit === 'ml') return (qty / 1000) * price;
+  // pricePerUnit is per kg, per L, or per pièce
+  if (unit === 'g') return (qty / 1000) * price;
+  if (unit === 'kg') return qty * price;
+  if (unit === 'ml') return (qty / 1000) * price;
+  if (unit === 'L') return qty * price;
+  if (unit === 'pièce') return qty * price;
   return qty * price;
 }
 
@@ -489,21 +343,9 @@ function saveSavedRecipes() {
 function loadIngredientDb() {
   try {
     const data = localStorage.getItem(STORAGE_KEYS.ingredientDb);
-    const saved = data ? JSON.parse(data) : [];
-
-    // Merge logic: keep saved values for existing names, add new missing names from DEFAULT
-    const merged = [...saved];
-    DEFAULT_INGREDIENT_DB.forEach(def => {
-      if (!merged.find(m => m.name.toLowerCase() === def.name.toLowerCase())) {
-        merged.push(def);
-      }
-    });
-
-    APP.ingredientDb = merged.length > 0 ? merged : [...DEFAULT_INGREDIENT_DB];
-    saveIngredientDb();
-  } catch {
-    APP.ingredientDb = [...DEFAULT_INGREDIENT_DB];
-  }
+    APP.ingredientDb = data ? JSON.parse(data) : [...DEFAULT_INGREDIENT_DB];
+    if (APP.ingredientDb.length === 0) APP.ingredientDb = [...DEFAULT_INGREDIENT_DB];
+  } catch { APP.ingredientDb = [...DEFAULT_INGREDIENT_DB]; }
 }
 
 function saveIngredientDb() { localStorage.setItem(STORAGE_KEYS.ingredientDb, JSON.stringify(APP.ingredientDb)); }
@@ -2416,7 +2258,6 @@ function confirmRestock() {
     hideRestockModal();
     renderInventory();
     updateDashboard();
-    renderSuppliers();
     if (typeof showToast === 'function') showToast(`Arrivage de ${item.name} enregistré`, 'success');
   }
 }
@@ -2429,7 +2270,6 @@ function updateStock(id, delta) {
     saveInventory();
     renderInventory();
     updateDashboard();
-    renderSuppliers();
   }
 }
 
@@ -2945,369 +2785,6 @@ function renderLeaves() {
 // SHARING & NOTIFICATIONS SYSTEM
 // ============================================================================
 
-// =====================================================================
-// SUPPLIER & ORDER MANAGEMENT
-// =====================================================================
-
-function loadSuppliers() {
-  const saved = localStorage.getItem('gourmet_suppliers');
-  APP.suppliers = saved ? JSON.parse(saved) : [
-    { id: 1, name: 'Metro Cash & Carry', contact: '01 02 03 04 05', email: 'contact@metro.fr', categories: ['Général', 'Frais'], leadTime: 2 },
-    { id: 2, name: 'Valrhona (Chocolat)', contact: '04 75 07 60 60', email: 'serviceclient@valrhona.fr', categories: ['Chocolat', 'Décoration'], leadTime: 5 },
-    { id: 3, name: 'Grands Moulins de Paris', contact: '01 49 59 75 00', email: 'commercial@gmp.fr', categories: ['Farine', 'Céréales'], leadTime: 3 },
-    { id: 4, name: 'Fruits Rouge Co.', contact: '03 23 28 49 49', email: 'pro@fruitsrouge.com', categories: ['Purées', 'Coulis', 'Surgelés'], leadTime: 4 },
-    { id: 5, name: 'Laiterie Echiré', contact: '05 49 25 70 03', email: 'contact@echire-aop.fr', categories: ['Beurre AOP', 'Crème'], leadTime: 3 },
-    { id: 6, name: 'Vanille & Co', contact: '02 40 12 34 56', email: 'vanille@pro-reunion.re', categories: ['Vanille', 'Epices'], leadTime: 7 },
-    { id: 7, name: 'PCB Création', contact: '03 88 58 75 75', email: 'orders@pcb-creation.fr', categories: ['Décoration', 'Colorants'], leadTime: 4 },
-    { id: 8, name: 'Matfer Bourgeat', contact: '01 43 62 60 40', email: 'info@matferbourgeat.com', categories: ['Matériel Ops'], leadTime: 5 }
-  ];
-  if (!saved) saveSuppliers();
-}
-
-function saveSuppliers() { localStorage.setItem('gourmet_suppliers', JSON.stringify(APP.suppliers)); }
-
-function renderSuppliers() {
-  const grid = document.getElementById('suppliersGrid');
-  if (!grid) return;
-
-  const lowStock = APP.inventory.filter(item => item.stock <= item.alertThreshold);
-  const searchInput = document.getElementById('supplierSearchInput');
-  const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
-
-  const filtered = APP.suppliers.filter(s =>
-    s.name.toLowerCase().includes(query) ||
-    s.categories.some(c => c.toLowerCase().includes(query))
-  );
-
-  if (filtered.length === 0) {
-    grid.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding:3rem; color:var(--text-muted);">
-      <div style="font-size:3rem; margin-bottom:1rem;">🏢</div>
-      <p>Aucun fournisseur trouvé.</p>
-    </div>`;
-  } else {
-    grid.innerHTML = filtered.map(s => {
-      // Find matching items in low stock
-      const matchingLowStock = lowStock.filter(item =>
-        s.categories.some(cat =>
-          item.name.toLowerCase().includes(cat.toLowerCase()) ||
-          cat.toLowerCase().includes(item.name.toLowerCase()) ||
-          (cat.toLowerCase() === 'farine' && item.name.toLowerCase().startsWith('farine')) ||
-          (cat.toLowerCase() === 'beurre' && item.name.toLowerCase().includes('beurre')) ||
-          (cat.toLowerCase() === 'chocolat' && item.name.toLowerCase().includes('chocolat')) ||
-          (cat.toLowerCase() === 'purées' && item.name.toLowerCase().includes('purée')) ||
-          (cat.toLowerCase() === 'épices' && (item.name.toLowerCase().includes('vanille') || item.name.toLowerCase().includes('poivre')))
-        )
-      );
-
-      const hasAlert = matchingLowStock.length > 0;
-
-      return `
-        <div class="supplier-card ${hasAlert ? 'alert-active' : ''}">
-          <div class="supplier-card-header">
-            <div class="supplier-avatar">${s.name.charAt(0).toUpperCase()}</div>
-            <div class="supplier-info-main">
-              <h3>${escapeHtml(s.name)}</h3>
-              <span>ID: #${s.id.toString().slice(-4)}</span>
-            </div>
-          </div>
-          <div class="supplier-card-body">
-            <div class="supplier-contact-row"><i>📞</i> ${escapeHtml(s.contact || 'Non renseigné')}</div>
-            <div class="supplier-contact-row" style="word-break: break-all;"><i>✉️</i> ${escapeHtml(s.email || 'Pas d\'email')}</div>
-            <div class="supplier-tags">
-              ${s.categories.map(c => `<span class="tag-supplier">${escapeHtml(c)}</span>`).join('')}
-            </div>
-            
-            ${hasAlert ? `
-              <div class="supplier-crit-list">
-                <div style="font-size:0.7rem; font-weight:800; margin-bottom:0.5rem; color:var(--warning); display:flex; align-items:center; gap:5px;">
-                  ⚠️ ${t('suppliers.need_order') || 'ARTICLES À RECOMMANDER'} :
-                </div>
-                ${matchingLowStock.map(item => `
-                  <div class="supplier-crit-item">
-                    • ${escapeHtml(item.name)} (${item.stock} ${item.unit} restants)
-                  </div>
-                `).join('')}
-              </div>
-            ` : ''}
-          </div>
-          <div class="supplier-card-footer">
-            <button class="btn-icon" title="Contacter" onclick="window.location.href='mailto:${s.email}'" style="${hasAlert ? 'background:var(--warning); color:white;' : ''}">📧</button>
-            <button class="btn-icon" title="Modifier" onclick="editSupplier(${s.id})">✏️</button>
-            <button class="btn-icon" title="Supprimer" onclick="deleteSupplier(${s.id})" style="color:var(--danger);">🗑️</button>
-          </div>
-        </div>
-      `;
-    }).join('');
-  }
-
-  // Update Stats
-  const totalEl = document.getElementById('statsTotalSuppliers');
-  if (totalEl) totalEl.textContent = APP.suppliers.length;
-
-  renderSuggestedOrders();
-}
-
-
-
-function renderSuggestedOrders() {
-  const container = document.getElementById('suggestedOrderList');
-  if (!container) return;
-
-  const lowStock = APP.inventory.filter(item => item.stock <= item.alertThreshold);
-
-  const pendingEl = document.getElementById('statsPendingOrders');
-  if (pendingEl) pendingEl.textContent = lowStock.length;
-
-  if (lowStock.length === 0) {
-    container.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:2rem; color:var(--text-muted);">✅ Tous les stocks sont conformes.</td></tr>`;
-    return;
-  }
-
-  container.innerHTML = lowStock.map(item => {
-    const ratio = item.stock / item.alertThreshold;
-    const isCritical = ratio <= 0.2;
-    const need = (item.alertThreshold * 4) - item.stock;
-
-    return `
-      <tr class="order-row">
-        <td>
-          <div style="display:flex; align-items:center; gap:10px;">
-            <span class="order-status-dot ${isCritical ? 'critical' : 'warning'}"></span>
-            <span class="order-item-name">${escapeHtml(item.name)}</span>
-          </div>
-        </td>
-        <td style="font-weight:700;">${item.stock} ${item.unit}</td>
-        <td style="color:var(--text-muted);">${item.alertThreshold} ${item.unit}</td>
-        <td><span class="order-qty-pill">+ ${need} ${item.unit}</span></td>
-        <td style="text-align: right;">
-          <span style="font-size:0.7rem; font-weight:800; text-transform:uppercase; color:${isCritical ? 'var(--danger)' : 'var(--warning)'};">
-            ${isCritical ? 'CRITIQUE' : 'URGENT'}
-          </span>
-        </td>
-      </tr>
-    `;
-  }).join('');
-}
-
-function exportShoppingList() {
-  const lowStock = APP.inventory.filter(item => item.stock <= item.alertThreshold);
-  if (lowStock.length === 0) { showToast("Aucun article en stock bas."); return; }
-  let text = "BON DE COMMANDE GOURMET'REVIENT - " + new Date().toLocaleDateString() + "\n\n";
-  lowStock.forEach(item => { text += `- ${item.name}: ${(item.alertThreshold * 4) - item.stock} ${item.unit}\n`; });
-  const blob = new Blob([text], { type: 'text/plain' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = `Commande_${new Date().toISOString().split('T')[0]}.txt`;
-  a.click();
-  showToast("Liste exportée !");
-}
-
-// =====================================================================
-// STATISTICS & CHARTS
-// =====================================================================
-
-let charts = { margin: null, profit: null, price: null };
-
-function renderStats() {
-  const savedRecipes = JSON.parse(localStorage.getItem('gourmet_saved_recipes') || '[]');
-  if (savedRecipes.length === 0 || !window.Chart) return;
-
-  const createChart = (id, config) => {
-    const ctx = document.getElementById(id);
-    if (!ctx) return null;
-    if (charts[id]) charts[id].destroy();
-    return new Chart(ctx, config);
-  };
-
-  charts.margin = createChart('marginChart', {
-    type: 'doughnut',
-    data: {
-      labels: savedRecipes.slice(0, 6).map(r => r.name),
-      datasets: [{ data: savedRecipes.slice(0, 6).map(r => r.margin || 3.5), backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'] }]
-    }
-  });
-
-  const sortedProfit = [...savedRecipes].sort((a, b) => (b.margin || 0) - (a.margin || 0)).slice(0, 5);
-  charts.profit = createChart('profitChart', {
-    type: 'bar',
-    data: { labels: sortedProfit.map(r => r.name), datasets: [{ label: 'Coefficient', data: sortedProfit.map(r => r.margin || 3.5), backgroundColor: '#10b981' }] },
-    options: { indexAxis: 'y' }
-  });
-
-  charts.price = createChart('priceEvolutionChart', {
-    type: 'line',
-    data: {
-      labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-      datasets: [{ label: 'Beurre AOP', data: [6.5, 6.8, 7.2, 7.5, 7.4, 7.8], borderColor: '#f59e0b' }, { label: 'Farine T55', data: [0.6, 0.62, 0.65, 0.65, 0.68, 0.70], borderColor: '#3b82f6' }]
-    }
-  });
-}
-
-// =====================================================================
-// PRODUCTION MODE
-// =====================================================================
-
-let prodState = { step: 0, recipe: null, timer: null, seconds: 0 };
-
-function showProductionMode(recipeId) {
-  const recipe = RECIPES.find(r => r.id === recipeId) || JSON.parse(localStorage.getItem('gourmet_saved_recipes') || '[]').find(r => r.id === recipeId);
-  if (!recipe) return;
-  prodState = { step: 0, recipe, timer: null, seconds: 0 };
-
-  document.getElementById('productionModal').style.display = 'flex';
-  document.getElementById('prodRecipeName').textContent = recipe.name;
-  document.getElementById('prodTimerDisplay').textContent = '00:00:00';
-
-  const ingList = document.getElementById('prodIngredientsList');
-  ingList.innerHTML = (recipe.ingredients || []).map((ing, idx) => `
-    <div class="prod-check-item">
-      <input type="checkbox" id="p-ing-${idx}">
-      <label for="p-ing-${idx}">${ing.quantity} ${ing.unit} ${ing.name}</label>
-    </div>
-  `).join('');
-
-  renderProdSteps();
-}
-
-function renderProdSteps() {
-  const container = document.getElementById('prodStepsContainer');
-  const steps = prodState.recipe.steps || [];
-  container.innerHTML = steps.map((s, idx) => `<div class="prod-step-slide" style="display: ${idx === prodState.step ? 'block' : 'none'}"><div class="prod-step-number">Etape ${idx + 1}</div><div class="prod-step-content">${s}</div></div>`).join('');
-  document.getElementById('prodStepIndicator').textContent = `Étape ${prodState.step + 1} / ${steps.length}`;
-  document.getElementById('btnPrevProdStep').disabled = prodState.step === 0;
-  document.getElementById('btnNextProdStep').textContent = prodState.step === steps.length - 1 ? t('ui.btn.finish') || 'Terminer' : 'Suivant →';
-}
-
-function nextProdStep() {
-  if (prodState.step < prodState.recipe.steps.length - 1) { prodState.step++; renderProdSteps(); } else { finishProduction(); }
-}
-
-function prevProdStep() { if (prodState.step > 0) { prodState.step--; renderProdSteps(); } }
-
-function toggleProdTimer() {
-  const btn = document.getElementById('btnProdTimer');
-  if (prodState.timer) {
-    clearInterval(prodState.timer); prodState.timer = null; btn.textContent = 'Démarrer';
-  } else {
-    prodState.timer = setInterval(() => {
-      prodState.seconds++;
-      const h = Math.floor(prodState.seconds / 3600).toString().padStart(2, '0');
-      const m = Math.floor((prodState.seconds % 3600) / 60).toString().padStart(2, '0');
-      const s = (prodState.seconds % 60).toString().padStart(2, '0');
-      document.getElementById('prodTimerDisplay').textContent = `${h}:${m}:${s}`;
-    }, 1000);
-    btn.textContent = 'Pause';
-  }
-}
-
-function finishProduction() {
-  prodState.recipe.ingredients.forEach(ing => {
-    const inv = APP.inventory.find(i => i.name.toLowerCase() === ing.name.toLowerCase());
-    if (inv) inv.stock = Math.max(0, inv.stock - ing.quantity);
-  });
-  saveInventory();
-  document.getElementById('productionModal').style.display = 'none';
-  if (prodState.timer) clearInterval(prodState.timer);
-  showToast("Production terminée, stocks mis à jour !");
-}
-
-function scanInvoiceReal(file) {
-  if (!window.Tesseract) { showToast("Bibliothèque OCR non chargée."); return; }
-  showToast("Scanning de la facture...", 3000);
-  Tesseract.recognize(file, 'fra').then(({ data: { text } }) => {
-    const keywords = ["Beurre", "Farine", "Sucre", "Chocolat", "Lait"];
-    let count = 0;
-    keywords.forEach(key => {
-      const match = text.match(new RegExp(`${key}.*?(\\d+[,.]\\d{2})`, "i"));
-      if (match) {
-        const ing = APP.ingredientDb.find(i => i.name.toLowerCase().includes(key.toLowerCase()));
-        if (ing) { ing.pricePerUnit = parseFloat(match[1].replace(',', '.')); count++; }
-      }
-    });
-    if (count > 0) { saveIngredientDb(); showToast(`${count} prix mis à jour !`); } else { showToast("Aucun prix détecté."); }
-  });
-}
-
-function hideProductionMode() {
-  document.getElementById('productionModal').style.display = 'none';
-  if (prodState.timer) { clearInterval(prodState.timer); prodState.timer = null; }
-}
-
-function showAddSupplierModal() {
-  $('#editSupplierId').value = '';
-  $('#supName').value = '';
-  $('#supContact').value = '';
-  $('#supEmail').value = '';
-  $('#supCategory').value = 'Général';
-  $('#supplierModalTitle').textContent = '📦 Ajouter un Fournisseur';
-  $('#supplierModal').style.display = 'flex';
-}
-
-function closeSupplierModal() {
-  $('#supplierModal').style.display = 'none';
-}
-
-function saveSupplier() {
-  const id = $('#editSupplierId').value;
-  const name = $('#supName').value.trim();
-  const contact = $('#supContact').value.trim();
-  const email = $('#supEmail').value.trim();
-  const category = $('#supCategory').value;
-
-  if (!name) {
-    showToast("Le nom est obligatoire", "error");
-    return;
-  }
-
-  if (id) {
-    // Edit mode
-    const s = APP.suppliers.find(sup => sup.id.toString() === id);
-    if (s) {
-      s.name = name;
-      s.contact = contact;
-      s.email = email;
-      s.categories = [category];
-    }
-  } else {
-    // Add mode
-    APP.suppliers.push({
-      id: Date.now(),
-      name,
-      contact,
-      email,
-      categories: [category],
-      leadTime: 3
-    });
-  }
-
-  saveSuppliers();
-  renderSuppliers();
-  closeSupplierModal();
-  showToast(id ? "Fournisseur mis à jour" : "Fournisseur ajouté", "success");
-}
-
-function editSupplier(id) {
-  const s = APP.suppliers.find(sup => sup.id === id);
-  if (!s) return;
-
-  $('#editSupplierId').value = s.id;
-  $('#supName').value = s.name;
-  $('#supContact').value = s.contact || '';
-  $('#supEmail').value = s.email || '';
-  $('#supCategory').value = s.categories[0] || 'Général';
-
-  $('#supplierModalTitle').textContent = '✏️ Modifier ' + s.name;
-  $('#supplierModal').style.display = 'flex';
-}
-
-function deleteSupplier(id) {
-  if (!confirm("Voulez-vous vraiment supprimer ce fournisseur ?")) return;
-  APP.suppliers = APP.suppliers.filter(s => s.id !== id);
-  saveSuppliers();
-  renderSuppliers();
-  showToast("Fournisseur supprimé", "info");
-}
-
 function loadNotifications() {
   const user = localStorage.getItem(STORAGE_KEYS.currentUser);
   if (!user) return;
@@ -3773,68 +3250,93 @@ function closeRoleModal() {
 
 function renderAnnualCalendar() {
   const container = $('#annualCalendarView');
-  if (!container || container.offsetParent === null) return; // Lazy render
+  if (!container) return;
 
   const currentZone = localStorage.getItem(STORAGE_KEYS.vacationZone) || 'C';
   const holidays = HOLIDAYS_2026[currentZone] || HOLIDAYS_2026.C;
 
-  // OPTIMIZATION: Maps for O(1) lookups
-  const leavesMap = new Map();
-  (APP.staffLeaves || []).forEach(l => {
-    if (l.status !== 'approved') return;
-    const start = new Date(l.start);
-    const end = new Date(l.end);
-    for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
-      leavesMap.set(d.toISOString().split('T')[0], l.memberName);
-    }
-  });
-
-  const hMap = new Map();
-  holidays.forEach(h => {
-    const start = new Date(h.start);
-    const end = new Date(h.end);
-    for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
-      hMap.set(d.toISOString().split('T')[0], h.label);
-    }
-  });
-
   const monthNames = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(m => t('month.' + m));
   const dayNames = [1, 2, 3, 4, 5, 6, 7].map(d => t('day.' + d));
-  const currentYear = 2026;
+
   let html = '';
+  const currentYear = 2026;
 
   for (let month = 0; month < 12; month++) {
     const daysInMonth = new Date(currentYear, month + 1, 0).getDate();
-    html += `<div class="month-view"><h4 class="month-title">${monthNames[month]}</h4><div class="days-grid">`;
 
+    html += `
+      <div class="month-view">
+        <h4 class="month-title">${monthNames[month]}</h4>
+        <div class="days-grid">
+    `;
+
+    // Always render 31 columns for alignment
     for (let day = 1; day <= 31; day++) {
-      if (day > daysInMonth) { html += `<div class="day-cell empty"></div>`; continue; }
+      if (day > daysInMonth) {
+        html += `<div class="day-cell empty"></div>`;
+        continue;
+      }
 
       const date = new Date(currentYear, month, day);
-      const dateStr = date.toISOString().split('T')[0];
-      const mmDd = dateStr.slice(5); // "MM-DD"
-      const dayNum = date.getDay();
-      const classes = ['day-cell'];
-      let toolTip = `${day} ${monthNames[month]}`;
+      const mStr = (month + 1).toString().padStart(2, '0');
+      const dStr = day.toString().padStart(2, '0');
+      const dateStr = `${mStr}-${dStr}`;
+      const fullDateStr = `${currentYear}-${mStr}-${dStr}`;
 
-      if (dayNum === 0 || dayNum === 6) classes.push('sunday-day');
-      if (PASTRY_EVENTS_2026[mmDd]) {
+      const wdIdx = (date.getDay() + 6) % 7;
+      const weekday = dayNames[wdIdx];
+
+      let classes = ['day-cell'];
+      let toolTip = `${weekday} ${day} ${monthNames[month]}`;
+      let indicators = '';
+      let cellStyle = '';
+
+      // Weekends
+      if (date.getDay() === 0 || date.getDay() === 6) classes.push('sunday-day');
+
+      // Events
+      if (PASTRY_EVENTS_2026[dateStr]) {
         classes.push('event-day');
-        toolTip += ` - 🔥 ${getTranslatedEvent(mmDd)}`;
-      }
-      if (hMap.has(dateStr)) {
-        classes.push('holiday-day');
-        toolTip += ` - 🏖️ ${getTranslatedHoliday(hMap.get(dateStr))}`;
-      }
-      if (leavesMap.has(dateStr)) {
-        classes.push('leave-active-day');
-        toolTip += ` - 🌴 ${t('plan.leave.employee')}: ${leavesMap.get(dateStr)}`;
+        toolTip += ` - 🔥 ${getTranslatedEvent(dateStr)}`;
       }
 
-      html += `<div class="${classes.join(' ')}" title="${toolTip}">${day}</div>`;
+      // Holidays
+      const holiday = holidays.find(h => fullDateStr >= h.start && fullDateStr <= h.end);
+      if (holiday) {
+        classes.push('holiday-day');
+        toolTip += ` - 🏖️ ${getTranslatedHoliday(holiday.label)}`;
+      }
+
+      // Staff Leaves
+      const onLeave = (APP.staffLeaves || []).filter(l => fullDateStr >= l.start && fullDateStr <= l.end && l.status === 'approved');
+      if (onLeave.length > 0) {
+        classes.push('leave-active-day');
+        const names = onLeave.map(l => l.memberName).join(', ');
+        toolTip += ` - 🌴 ${t('plan.leave.employee')}s: ${names}`;
+
+        const firstMemberColor = getMemberColor(onLeave[0].memberId);
+        if (onLeave.length === 1) {
+          cellStyle = `background-color: ${firstMemberColor.bg} !important; border-bottom: 3px solid ${firstMemberColor.dot} !important; color: ${firstMemberColor.text} !important;`;
+        } else {
+          indicators = `<div class="leave-indicators" style="background: ${firstMemberColor.dot}; position:absolute; bottom:0; left:0; right:0; height:4px; border-radius:0 0 4px 4px;"></div>`;
+          indicators += `<span class="leave-dots" style="bottom: 6px;">${onLeave.slice(0, 3).map(l => {
+            const c = getMemberColor(l.memberId);
+            return `<span style="color:${c.dot}">●</span>`;
+          }).join('')}</span>`;
+        }
+      }
+
+      html += `
+        <div class="${classes.join(' ')}" title="${toolTip}" style="${cellStyle}">
+          <span class="wd-mini">${weekday}</span>
+          <span class="d-num">${day}</span>
+          ${indicators}
+        </div>`;
     }
+
     html += `</div></div>`;
   }
+
   container.innerHTML = html;
 }
 
@@ -3983,12 +3485,11 @@ function deleteUser(user) {
 
 function init() {
   checkAuth();
-  loadIngredientDb();
   loadSavedRecipes();
+  loadIngredientDb();
   loadTeamMembers();
   loadInventory();
   loadNotifications();
-  loadSuppliers();
   bindEvents();
   renderSavedRecipes();
   renderInvitations();
@@ -3999,41 +3500,45 @@ function init() {
   updateRandomTip();
   if (typeof showHub === 'function') showHub();
 
-  // Optimized Dashboard Update
-  const throttledDashboard = throttle(updateDashboard, 500);
-  window.updateDashboardThrottled = throttledDashboard;
-
-  // Listen for language changes - optimized to only re-render visible components
+  // Listen for language changes to refresh dynamic content
   document.addEventListener('languageChanged', (e) => {
-    if (APP.currentStep >= 1 && APP.currentStep <= 3) collectCurrentStepData();
+    // 1. SAVE current state so changes aren't lost
+    if (APP.currentStep >= 1 && APP.currentStep <= 3) {
+      collectCurrentStepData();
+    }
 
-    const isVisible = (selector) => {
-      const el = document.querySelector(selector);
-      return el && el.offsetParent !== null;
-    };
-
-    updateRandomTip();
+    // 2. Global UI updates
     updateDashboard();
+    updateRandomTip();
 
+    // 3. Current active step content
     if (APP.currentStep === 2) renderIngredients();
     if (APP.currentStep === 3) renderProcedure();
     if (APP.currentStep === 4) renderCostAnalysis();
     if (APP.currentStep === 5) renderSummary();
 
+    // 4. Refresh other active/visible apps
     if (typeof renderLibraryRecipes === 'function') renderLibraryRecipes();
     if (typeof renderSavedRecipes === 'function') renderSavedRecipes();
 
+    const isVisible = (id) => {
+      const el = document.querySelector(id);
+      return el && el.style.display !== 'none';
+    };
+
+    if (isVisible('#appPortfolio')) { if (typeof renderPortfolio === 'function') renderPortfolio(); }
     if (isVisible('#appPlanning')) {
-      renderTeam();
-      renderLeaves();
-      renderAnnualCalendar();
-      if (typeof updateVacationZone === 'function') updateVacationZone();
+      if (typeof renderTeam === 'function') renderTeam();
+      if (typeof renderLeaves === 'function') renderLeaves();
+      if (typeof renderAnnualCalendar === 'function') renderAnnualCalendar();
+      updateVacationZone(); // Refresh labels
     }
-    if (isVisible('#appLaboratoire') && typeof renderDevis === 'function') renderDevis();
-    if (isVisible('#appInventaire')) renderInventory();
-    if (isVisible('#appHygiene') && typeof renderHygiene === 'function') renderHygiene();
-    if (isVisible('#appSuppliers')) renderSuppliers();
-    if (isVisible('#appStats')) renderStats();
+    if (isVisible('#appLaboratoire')) {
+      if (typeof renderDevis === 'function') renderDevis();
+    }
+    if (isVisible('#appInventaire')) {
+      if (typeof renderInventory === 'function') renderInventory();
+    }
   });
 
   loadHaccpLogs();
@@ -4122,16 +3627,7 @@ function selectLabelingRecipe(id, origin) {
   // Auto-fill some data
   const costs = calcFullCost(APP.margin, selectedLabelRecipe);
   $('#labelPrice').value = costs.sellingPrice;
-
-  let totalWeight = selectedLabelRecipe.advanced?.weight || 0;
-  if (!totalWeight) {
-    totalWeight = selectedLabelRecipe.ingredients.reduce((sum, ing) => {
-      return sum + (ing.unit === 'g' || ing.unit === 'ml' ? parseFloat(ing.quantity) || 0 : 0);
-    }, 0);
-    const portions = selectedLabelRecipe.portions || 10;
-    totalWeight = Math.round(totalWeight / portions);
-  }
-  $('#labelWeight').value = totalWeight;
+  $('#labelWeight').value = selectedLabelRecipe.advanced?.weight || 0;
 
   // Dates
   const today = new Date().toISOString().split('T')[0];
@@ -4163,25 +3659,17 @@ function updateLabelPreview() {
   // Allergen tracking
   const allergenSet = new Set();
   selectedLabelRecipe.ingredients.forEach(ing => {
-    let dbItem = APP.ingredientDb.find(db => db.name.toLowerCase() === ing.name.toLowerCase());
-    if (dbItem && dbItem.allergens && dbItem.allergens.length > 0) {
+    // Look up in database by name or reverse lookup
+    const dbItem = APP.ingredientDb.find(db => db.name.toLowerCase() === ing.name.toLowerCase());
+    if (dbItem && dbItem.allergens) {
       dbItem.allergens.forEach(a => allergenSet.add(a));
     } else {
-      // Let's try to find it in DEFAULT_INGREDIENT_DB directly just in case local db lacks allergens
-      let defItem = DEFAULT_INGREDIENT_DB.find(db => db.name.toLowerCase() === ing.name.toLowerCase());
-      if (defItem && defItem.allergens) {
-        defItem.allergens.forEach(a => allergenSet.add(a));
-      } else {
-        // Try reverse lookup if it's a French name
-        const key = REVERSE_LOOKUP[ing.name.toLowerCase()] || REVERSE_LOOKUP[ing.name];
-        if (key) {
-          let item = APP.ingredientDb.find(db => db.name === t(key));
-          if (item && item.allergens && item.allergens.length > 0) {
-            item.allergens.forEach(a => allergenSet.add(a));
-          } else {
-            let defItem2 = DEFAULT_INGREDIENT_DB.find(db => db.name === t(key) || db.name.toLowerCase() === ing.name.toLowerCase());
-            if (defItem2 && defItem2.allergens) defItem2.allergens.forEach(a => allergenSet.add(a));
-          }
+      // Try reverse lookup if it's a French name
+      const key = REVERSE_LOOKUP[ing.name];
+      if (key) {
+        const item = APP.ingredientDb.find(db => db.name === t(key));
+        if (item && item.allergens) {
+          item.allergens.forEach(a => allergenSet.add(a));
         }
       }
     }
@@ -4257,23 +3745,15 @@ function renderLabelingStats() {
   if (selectedLabelRecipe) {
     const allergenSet = new Set();
     selectedLabelRecipe.ingredients.forEach(ing => {
-      let dbItem = APP.ingredientDb.find(db => db.name.toLowerCase() === ing.name.toLowerCase());
-      if (dbItem && dbItem.allergens && dbItem.allergens.length > 0) {
+      const dbItem = APP.ingredientDb.find(db => db.name.toLowerCase() === ing.name.toLowerCase());
+      if (dbItem && dbItem.allergens) {
         dbItem.allergens.forEach(a => allergenSet.add(a));
       } else {
-        let defItem = DEFAULT_INGREDIENT_DB.find(db => db.name.toLowerCase() === ing.name.toLowerCase());
-        if (defItem && defItem.allergens) {
-          defItem.allergens.forEach(a => allergenSet.add(a));
-        } else {
-          const key = REVERSE_LOOKUP[ing.name.toLowerCase()] || REVERSE_LOOKUP[ing.name];
-          if (key) {
-            let item = APP.ingredientDb.find(db => db.name === t(key));
-            if (item && item.allergens && item.allergens.length > 0) {
-              item.allergens.forEach(a => allergenSet.add(a));
-            } else {
-              let defItem2 = DEFAULT_INGREDIENT_DB.find(db => db.name === t(key) || db.name.toLowerCase() === ing.name.toLowerCase());
-              if (defItem2 && defItem2.allergens) defItem2.allergens.forEach(a => allergenSet.add(a));
-            }
+        const key = REVERSE_LOOKUP[ing.name];
+        if (key) {
+          const item = APP.ingredientDb.find(db => db.name === t(key));
+          if (item && item.allergens) {
+            item.allergens.forEach(a => allergenSet.add(a));
           }
         }
       }
