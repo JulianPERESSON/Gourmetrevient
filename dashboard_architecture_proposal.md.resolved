@@ -1,0 +1,139 @@
+# 🧁 Refonte de la Page d'Accueil : Le Cockpit du Chef
+
+Cette proposition vise à transformer l'actuelle page d'accueil de **GourmetRevient** en un véritable espace de pilotage décisionnel ultra-moderne (SaaS premium, type Notion/Linear/Stripe). 
+
+L'objectif principal est de permettre au chef de comprendre en moins de 5 secondes l'état de son activité, ses urgences et sa rentabilité globale.
+
+---
+
+## 1 — Nouvelle Structure du Dashboard (Section par Section)
+
+Le dashboard sera divisé en zones de contenu hiérarchisées selon leur criticité. 
+
+1. **Header Intelligent (Global Overview)** : Accroche personnalisée et macro-indicateurs.
+2. **Cockpit du Laboratoire (Urgence & Opérationnel)** : Zone prioritaire (Rouge/Orange/Vert) pour l'action immédiate.
+3. **Performance Business (Analyse & Pilotage)** : Suivi de la rentabilité et marges.
+4. **Gestion Logistique & Stock (Prévention)** : Alertes fournisseurs et ruptures.
+5. **Intelligence Culinaire (IA Insights)** : Recommandations proactives.
+6. **Activité Récente & Traçabilité (Suivi)** : Ce qui s'est passé dans le labo.
+7. **Actions Rapides (Création)** : Boutons flottants ou barre d'actions rapides omniprésente.
+
+---
+
+## 2 — Liste Complète des Widgets & 3 — Description UX
+
+### 📍 Section 1 : Header Intelligent
+* **Salutation Personnalisée** : "Bonjour, Chef [Nom]" avec la date du jour et la météo/saisonnalité.
+* **Micro-KPI bar (Horizontal)** :
+  - **Recettes Actives** : Nombre total (ex: 45 recettes).
+  - **Marge Globale** : Moyenne du portfolio (ex: 72%).
+  - **Coût Matière Moyen** : /portion (ex: 1.20€).
+  - **Équipe Présente** : (ex: 3/4 présents aujourd'hui).
+
+### 📍 Section 2 : Cockpit du Laboratoire (Zone Prioritaire)
+* **Widget "Production du Jour" (Kanban mini)** : Liste décroissante de ce qui doit être produit aujourd'hui. UX : Cases à cocher interactives.
+* **Widget "Alertes HACCP" (Card Flash)** : Tâches d'hygiène critiques du jour (ex: "Nettoyage chambre froide"). UX : Icône de danger rouge/orange.
+* **Widget "Planning Équipe" (Timeline)** : Qui est là aujourd'hui, qui est en congé. UX : Avatars avec pastilles de statut (vert = présent, gris = absent).
+
+### 📍 Section 3 : Performance Business
+* **Widget "Top/Flop Rentabilité" (Liste Classée)** : 
+  - 3 recettes les plus rentables (Vert).
+  - 3 recettes à optimiser urgemment (Orange/Rouge).
+  UX : Mini-graphique sparkline à côté de chaque nom.
+* **Widget "Évolution Coûts" (Chart Line)** : Graphique de la variation du coût matière sur les 30 derniers jours. UX : Courbe lissée au style minimaliste.
+* **Widget "Valeur Portfolio" (Big Number)** : Le CA potentiel total des stocks + recettes prêtes. UX : Chiffre très grand, typo moderne.
+
+### 📍 Section 4 : Gestion Logistique & Stock
+* **Widget "Alertes Rupture" (Liste Critique)** : Ingrédients sous le seuil d'alerte, classés par urgence. UX : Ligne rouge, bouton direct "Ajouter au panier fournisseur".
+* **Widget "Variation Prix Fournisseurs" (Tableau Mini)** : Ingrédients dont le prix a le plus augmenté récemment. UX : Flèche ascendante rouge.
+
+### 📍 Section 5 : Intelligence Culinaire (IA)
+* **Widget "L'Assistant du Chef" (Bulle interactive)** :
+  - *"Le prix des amandes a baissé, c'est le moment de produire vos macarons."*
+  UX : Une carte avec un effet *Glassmorphism* scintillant subtilement (violet/bleu électrique pour l'IA).
+
+### 📍 Section 6 : Activité Récente
+* **Widget "Timeline Produit" (Feed vertical)** : 
+  - "Fiche 'Paris-Brest' modifiée par Alex il y a 2h."
+  UX : Ligne de temps (Notion-style), iconographie claire pour l'action.
+
+### 📍 Section 7 : Actions Rapides
+* **Widget "Quick Launchpad" (Tuiles Flottantes)** :
+  - ➕ Nouvelle Recette
+  - 🏷️ Générer Étiquette
+  - 📦 Rentrée de Stock
+  - 🧹 Valider Hygiène
+  UX : Grosses icônes claires, fond légèrement contrasté, hover prononcé.
+
+---
+
+## 4 — Logique Métier derrière chaque donnée
+
+Pour qu'un chef trouve le tableau de bord utile, la donnée doit être calculée :
+
+1. **Marge Globale** : Moyenne pondérée des marges de toutes les recettes.
+2. **Alertes Stocks** : Jointure entre `APP.inventory` et `alertThreshold`.
+3. **Top / Flop** : Tri algorithmique des recettes basé sur la marge.
+4. **Variations Fournisseurs** : Historisation des prix d'achats lors des "Restock". Comparaison du `price(n)` avec `price(n-1)`.
+5. **Production du Jour** : Extraction depuis le module *Planning/Laboratoire* (Date === Today).
+6. **Alertes HACCP** : Vérification des logs de nettoyage/température. Si (date actuelle - dernier log) > récurrence exigée => Alerte.
+
+---
+
+## 5 — Suggestions IA Intelligentes
+
+* **Optimisation de Prix** : *"Vos cookies sont 20% moins chers que la moyenne du marché. Augmenter le prix de 0.20€ n'impactera pas les ventes mais génèrera +150€/mois."*
+* **Saisonnalité** : *"C'est le début de la saison des framboises. Voici 3 recettes de votre bibliothèque à remettre en vitrine."*
+* **Anti-Gaspi (Stocks)** : *"Vous avez 4L de crème liquide qui arrivent à DLC dans 3 jours. Lancez une production de Ganache Montée."*
+* **Alerte Inflation** : *"Le coût de revient de votre Fraisier a augmenté de 8% ce mois-ci à cause du prix du sucre. Mettez à jour son prix."*
+
+---
+
+## 6 — Layout Desktop (Concept Spatial)
+
+Le dashboard adopte une architecture en grille (CSS Grid), de type Bento Box (Linear/Vercel).
+
+```text
++-----------------------------------------------------------------------------+
+|                                HEADER INTELLIGENT                           |
+|  [Avatar] "Bonjour Chef, belle journée !"           [KPI 1] [KPI 2] [KPI 3] |
++-----------------------------------------+-----------------------------------+
+|         COCKPIT DU LABO (Urgent)        |        PERFORMANCE BUSINESS       |
+|                                         |                                   |
+|  [x] Produire 40 tartes     [⚠️ HACCP]  |   [Marge globale : 72%] ▲ +2%    |
+|  [ ] Finir commandes        [📦 Sucre]  |   [Top 3 Recettes rentables]      |
+|                                         |   [Graphe Évolution Coûts]        |
++-----------------------------------------+-----------------------------------+
+|         LOGISTIQUE & ACHATS             |       INTELLIGENCE IA (Glow)      |
+|                                         |                                   |
+|  * Ruptures : Beurre doux               |  💡 "La marge du Paris-Brest     |
+|  * Prix en hausse : Chocolat noir ▲     |       peut gagner +4% avec..."    |
++-----------------------------------------+-----------------------------------+
+|           ACTIVITÉ RÉCENTE              |        ACTIONS RAPIDES            |
+|                                         |                                   |
+|  • Julien a créé la recette "Flan"      |    [+ Recette]   [+ Stock]        |
+|  • Thomas a nettoyé le frigo            |    [+ Étiquette] [+ Planning]     |
++-----------------------------------------+-----------------------------------+
+```
+
+## 7 — Layout Tablette / Mobile (Responsive)
+
+Mode "Stack" (1 colonne) respectant la hiérarchie d'urgence :
+
+1. **Header KPI** (scroll horizontal).
+2. **Intelligence IA** (remontée stratégique en haut).
+3. **Alertes Cockpit** (HACCP + Ruptures fusionnés).
+4. **Actions Rapides** (grille 2x2).
+5. **Production du jour** (Liste scrollable).
+6. **Performance Business** (Graphiques).
+7. **Activité récente** (En fin de page).
+
+---
+
+## 🎨 Système de Couleurs Métier & UI (CSS)
+
+* **Verts (Santé/Succès)** : `#10B981` (Marge saine, tâche accomplie)
+* **Oranges (Attention/Warning)** : `#F59E0B` (Stock bas, date limite proche)
+* **Rouges (Problème / Bloquant)** : `#EF4444` (Rupture, Alerte HACCP temp)
+* **Bleu/Violet (IA / Premium)** : `#6366F1` à `#8B5CF6` (dégradés pour les insights)
+* **Personnalisation** : Un bouton "Modifier le Dashboard" révèlerait des poignées de *drag-and-drop* sur chaque carte pour l'organisation.

@@ -65,6 +65,44 @@ const TRANSLATIONS = {
         'nav.suppliers': 'Fournisseurs',
         'nav.stats': 'Statistiques',
 
+        // Statistiques
+        'stats.badge': '📊 Analyse Commerciale',
+        'stats.title': 'Performance & Rentabilité',
+        'stats.desc': 'Décryptez vos marges, identifiez vos produits stars et optimisez votre rentabilité pour un laboratoire plus performant.',
+        'stats.insight.title': 'Analyse Stratégique Automatique',
+        'stats.insight.loading': 'Calcul en cours...',
+        'stats.kpi.avg_margin': 'Marge moyenne',
+        'stats.kpi.hero': 'Recette Star',
+        'stats.kpi.worst': 'À surveiller',
+        'stats.kpi.avg_cost': 'Coût moyen/Portion',
+        'stats.kpi.avg_price': 'Prix moyen conseillé',
+        'stats.margin_dist': 'Répartition des Marges',
+        'stats.top_profitable': 'Performance des Recettes',
+        'stats.toggle.top': 'Top 5 Rentables',
+        'stats.toggle.worst': 'Top 5 à améliorer',
+        'stats.strategic_map': 'Matrice Stratégique (Coût vs Marge)',
+        'stats.alerts.title': 'Alertes & Optimisations',
+        'stats.detailed_report': 'Liste Détaillée des Recettes',
+        'stats.insight.template': 'Votre marge moyenne est de **{avg}%**. La recette la plus performante est **{best}** ({bestMargin}%).',
+        'stats.insight.attention': "Attention au **{worst}** qui présente une marge faible de {worstMargin}%.",
+        'stats.insight.balanced': "Votre catalogue est globalement très équilibré.",
+        'stats.analysis.excellent_pct': "<strong>{pct}%</strong> de vos recettes ont une marge > 70%. Votre catalogue est {status}.",
+        'stats.analysis.profitable': "globalement très rentable.",
+        'stats.analysis.to_optimize': "à optimiser.",
+        'stats.chart.margin_label': 'Marge %',
+        'stats.chart.cost_axis': 'Coût Matière (€)',
+        'stats.chart.margin_axis': 'Marge %',
+        'stats.chart.recipes_label': 'Recettes',
+        'stats.chart.tooltip_margin': 'Marge',
+        'stats.chart.tooltip_price': 'Prix',
+        'stats.chart.tooltip_cost': 'Coût',
+        'stats.alerts.none': '✅ Aucune alerte détectée. Vos marges sont saines.',
+        'stats.alerts.critical_suggestion': 'Augmenter le prix de {amount}€ ou réduire coût matière.',
+        'stats.alerts.standard_suggestion': 'Optimiser coût de revient de ~10%.',
+        'stats.alerts.margin_at': 'Marge de <strong>{margin}%</strong>.',
+        'stats.alerts.material_cost': 'Coût matière de {cost}€.',
+        'stats.table.search_ph': 'Rechercher une recette...',
+
         // Dashboard
         'dash.greeting': 'Bonjour, ',
         'dash.greeting_prefix': 'Votre',
@@ -92,8 +130,54 @@ const TRANSLATIONS = {
         'dash.roadmap.item2': 'Partage & Workflow Planning',
         'dash.roadmap.item3': 'Module Boulangerie & Viennoiserie',
         'dash.pending': 'Demandes',
-        'dash.tip_prefix': 'Conseil de Pro :',
+        'dash.tip_prefix': 'Astuce du Chef :',
+        'dash.lab_active': 'Labo: Actif',
+        'dash.stock_alert': 'Stock: Alerte',
+        'dash.kpi.recipes': 'Recettes Labo',
+        'dash.kpi.margin': 'Marge du Labo',
+        'dash.kpi.cost': 'Coût/Port. (Prod)',
+        'dash.kpi.team': 'Équipe',
+        'dash.kpi.school': '1 À L\'ÉCOLE',
+        'dash.kpi.alerts': 'Alertes',
+        'dash.kpi.todo': 'À VOIR',
+        'dash.col.prod': 'Pilotage Production',
+        'dash.col.biz': 'Performance Business',
+        'dash.col.ai': 'Assistant du Chef',
+        'dash.col.logistics': 'Goulots Logistiques',
+        'dash.col.alerts': '⚠️ Alertes',
+        'dash.prod.ongoing': 'En cours',
+        'dash.prod.todo': 'À produire',
+        'dash.prod.done': 'Terminé',
+        'dash.biz.top': 'Top',
+        'dash.biz.worst': 'À Surveiller',
+        'dash.ai.alert': 'Alerte Rentabilité :',
+        'dash.ai.stock': 'Optimisation Stock :',
+        'dash.ai.adjust': 'Ajuster Prix... ',
+        'dash.lab_active': 'Labo: Actif',
+        'dash.stock_alert': 'Stock: Alerte',
+        'dash.kpi.recipes': 'Recettes Labo',
+        'dash.kpi.margin': 'Marge du Labo',
+        'dash.kpi.cost': 'Coût/Port. (Prod)',
+        'dash.kpi.team': 'Équipe',
+        'dash.kpi.school': '1 À L\'ÉCOLE',
+        'dash.kpi.alerts': 'Alertes',
+        'dash.kpi.todo': 'À VOIR',
+        'dash.col.prod': 'Pilotage Production',
+        'dash.col.biz': 'Performance Business',
+        'dash.col.ai': 'Assistant du Chef',
+        'dash.col.logistics': 'Goulots Logistiques',
+        'dash.col.alerts': '⚠️ Alertes',
+        'dash.prod.ongoing': 'En cours',
+        'dash.prod.todo': 'À produire',
+        'dash.prod.done': 'Terminé',
+        'dash.biz.top': 'Top',
+        'dash.biz.worst': 'À Surveiller',
+        'dash.ai.alert': 'Alerte Rentabilité :',
+        'dash.ai.stock': 'Optimisation Stock :',
+        'dash.ai.adjust': 'Ajuster Prix... ',
         'dash.active_status': 'En ligne',
+        'dash.btn.order': 'Commander',
+        'dash.btn.inventory': 'Inventaire',
 
         // Recipe Hero
         'hero.badge': '✨ Coût de revient',
@@ -343,6 +427,7 @@ const TRANSLATIONS = {
         'plan.calendar.desc': 'Organisation annuelle du laboratoire et des équipes.',
 
         // Portfolio
+        'portfolio.badge': '🖼️ Mon Portfolio',
         'portfolio.title': 'Mon Portfolio',
         'portfolio.desc': 'Découvrez mes créations, fiches techniques et réalisations professionnelles.',
         'portfolio.creations': 'Créations ⭐',
@@ -350,7 +435,9 @@ const TRANSLATIONS = {
         'portfolio.thanks.team': 'À la super équipe de choc chez <strong>Christian Larroque et ses fils</strong> 🫶🏻',
 
         // About
+        'about.badge': 'ℹ️ À propos du projet',
         'about.title': 'À propos du projet',
+        'about.desc': "GourmetRevient — Projet Chef d'Œuvre réalisé par Julian Peresson, étudiant en CAP Pâtisserie au CMA de Muret",
         'about.subtitle': "GourmetRevient — Projet réalisé par Julian Peresson, étudiant en CAP Pâtisserie au CMA de Muret",
         'about.project': 'Le Projet',
         'about.objectives': 'Objectifs pédagogiques',
@@ -742,7 +829,21 @@ const TRANSLATIONS = {
         'suppliers.btn.add': 'Nouveau Fournisseur',
         'suppliers.stats.total': 'Total Fournisseurs',
         'suppliers.stats.pending': 'Besoin Critique',
+        'suppliers.stats.active': 'Actif',
+        'suppliers.stats.network': 'Réseau Partenaires',
+        'suppliers.search_label': 'Rechercher un partenaire',
+        'suppliers.search_ph': 'Ex: Laiterie, Farine...',
+        'suppliers.tip_title': '💡 Astuce :',
+        'suppliers.tip_text': 'Saisissez le nom d\'un ingrédient pour voir quels fournisseurs le proposent.',
         'suppliers.need_order': 'ARTICLES À RECOMMANDER',
+        'orders.title': 'Approvisionnement',
+        'orders.desc': 'Articles sous le seuil d\'alerte critique.',
+        'orders.btn.export': 'Exporter',
+        'orders.col_item': 'Article',
+        'orders.col_stock': 'Stock Actuel',
+        'orders.col_threshold': 'Seuil',
+        'orders.col_need': 'Besoin Estimé',
+        'orders.col_urgency': 'Urgence',
 
         // Data Categories
         'data.cat.feuilletage': 'Feuilletage',
@@ -929,7 +1030,7 @@ const TRANSLATIONS = {
         'data.recipe.croissant.step.4': 'Laisser pousser 2h à 25°C.',
         'data.recipe.croissant.step.5': 'Dorer et cuire à 190°C pendant 18 min.',
 
-        'data.recipe.pain-au-chocolat.name': 'Pain au chocolat',
+        'data.recipe.pain-au-chocolat.name': 'Chocolatine',
         'data.recipe.pain-au-chocolat.desc': 'Pâte feuilletée levée pur beurre avec deux barres de chocolat noir.',
         'data.recipe.pain-au-chocolat.step.0': 'Réaliser la pâte feuilletée levée (PFL).',
         'data.recipe.pain-au-chocolat.step.1': 'Abaisser la pâte en un long rectangle.',
@@ -1007,6 +1108,25 @@ const TRANSLATIONS = {
         'data.recipe.tarte-framboise-pistache-fleur.step.2': "Préparer deux pochages : l'un à la vanille, l'autre à la pistache.",
         'data.recipe.tarte-framboise-pistache-fleur.step.3': "Réaliser le pochage fleur bicolore (blanc et vert pastel).",
         'data.recipe.tarte-framboise-pistache-fleur.step.4': "Décorer avec quelques framboises entières et des pistaches.",
+
+        // Recipe Data: La Negresco
+        'data.recipe.negresco.name': 'La Negresco',
+        'data.recipe.negresco.desc': 'Une création signature fleurie : biscuit chocolat intense, ganache fondante, mousse légère et décor framboises fraîches.',
+        'data.recipe.negresco.step.0': 'Préparer le biscuit chocolat de base.',
+        'data.recipe.negresco.step.1': 'Réaliser la ganache et la mousse au chocolat.',
+        'data.recipe.negresco.step.2': 'Effectuer le montage en cercle.',
+        'data.recipe.negresco.step.3': 'Réaliser le pochage artistique en pétales.',
+        'data.recipe.negresco.step.4': 'Déposer les framboises et les décors en chocolat noir.',
+
+        // Recipe Data: La Frangipane
+        'data.recipe.frangipane.name': 'La Frangipane',
+        'data.recipe.frangipane.desc': 'La classique galette des rois : feuilletage inversé pur beurre et crème frangipane onctueuse aux amandes.',
+        'data.recipe.frangipane.step.0': 'Réaliser le feuilletage (ou utiliser un pâton frais).',
+        'data.recipe.frangipane.step.1': "Préparer la crème d'amandes et la mélanger à la pâtissière pour la frangipane.",
+        'data.recipe.frangipane.step.2': 'Détailler deux disques de pâte.',
+        'data.recipe.frangipane.step.3': 'Garnir le premier disque, dorer les bords et refermer.',
+        'data.recipe.frangipane.step.4': 'Chiqueter les bords et rayer le dessus.',
+        'data.recipe.frangipane.step.5': 'Cuire à 180°C jusqu\'à coloration dorée.',
     },
 
     // ========== ENGLISH ==========
@@ -1062,6 +1182,44 @@ const TRANSLATIONS = {
         'nav.no_notif': 'No new notifications',
         'nav.suppliers': 'Suppliers',
         'nav.stats': 'Statistics',
+
+        // Statistics
+        'stats.badge': '📊 Business Analysis',
+        'stats.title': 'Performance & Profitability',
+        'stats.desc': 'Understand your margins, identify star products, and optimize your profitability for a more efficient lab.',
+        'stats.insight.title': 'Automatic Strategic Analysis',
+        'stats.insight.loading': 'Calculating...',
+        'stats.kpi.avg_margin': 'Average Margin',
+        'stats.kpi.hero': 'Star Recipe',
+        'stats.kpi.worst': 'To Monitor',
+        'stats.kpi.avg_cost': 'Avg Cost/Portion',
+        'stats.kpi.avg_price': 'Avg Recommended Price',
+        'stats.margin_dist': 'Margin Distribution',
+        'stats.top_profitable': 'Recipe Performance',
+        'stats.toggle.top': 'Top 5 Profitable',
+        'stats.toggle.worst': 'Top 5 to Improve',
+        'stats.strategic_map': 'Strategic Matrix (Cost vs Margin)',
+        'stats.alerts.title': 'Alerts & Optimizations',
+        'stats.detailed_report': 'Detailed Recipe List',
+        'stats.insight.template': 'Your average margin is **{avg}%**. The best performing recipe is **{best}** ({bestMargin}%).',
+        'stats.insight.attention': "Watch out for **{worst}** which has a low margin of {worstMargin}%.",
+        'stats.insight.balanced': "Your catalog is overall very balanced.",
+        'stats.analysis.excellent_pct': "<strong>{pct}%</strong> of your recipes have a margin > 70%. Your catalog is {status}.",
+        'stats.analysis.profitable': "overall very profitable.",
+        'stats.analysis.to_optimize': "needs optimization.",
+        'stats.chart.margin_label': 'Margin %',
+        'stats.chart.cost_axis': 'Material Cost (€)',
+        'stats.chart.margin_axis': 'Margin %',
+        'stats.chart.recipes_label': 'Recipes',
+        'stats.chart.tooltip_margin': 'Margin',
+        'stats.chart.tooltip_price': 'Price',
+        'stats.chart.tooltip_cost': 'Cost',
+        'stats.alerts.none': '✅ No alerts detected. Your margins are healthy.',
+        'stats.alerts.critical_suggestion': 'Increase price by {amount}€ or reduce material cost.',
+        'stats.alerts.standard_suggestion': 'Optimize cost of goods by ~10%.',
+        'stats.alerts.margin_at': 'Margin at <strong>{margin}%</strong>.',
+        'stats.alerts.material_cost': 'Material cost of {cost}€.',
+        'stats.table.search_ph': 'Search recipe...',
 
         // Inventory
         'inv.badge': '📦 Stock Management',
@@ -1127,7 +1285,21 @@ const TRANSLATIONS = {
         'suppliers.btn.add': 'New Supplier',
         'suppliers.stats.total': 'Total Suppliers',
         'suppliers.stats.pending': 'Critical Need',
+        'suppliers.stats.active': 'Active',
+        'suppliers.stats.network': 'Partner Network',
+        'suppliers.search_label': 'Search a partner',
+        'suppliers.search_ph': 'Ex: Dairy, Flour...',
+        'suppliers.tip_title': '💡 Tip:',
+        'suppliers.tip_text': 'Enter an ingredient name to see which suppliers offer it.',
         'suppliers.need_order': 'ITEMS TO REORDER',
+        'orders.title': 'Supply Management',
+        'orders.desc': 'Items below the critical alert threshold.',
+        'orders.btn.export': 'Export',
+        'orders.col_item': 'Item',
+        'orders.col_stock': 'Current Stock',
+        'orders.col_threshold': 'Threshold',
+        'orders.col_need': 'Estimated Need',
+        'orders.col_urgency': 'Urgency',
         'dash.greeting': 'Hello, ',
         'dash.greeting_prefix': 'Your',
         'dash.subtitle': 'GourmetRevient professional workspace',
@@ -1153,8 +1325,33 @@ const TRANSLATIONS = {
         'dash.roadmap.item1': 'Profile & Security System',
         'dash.roadmap.item2': 'Sharing & Planning Workflow',
         'dash.roadmap.item3': 'Bakery & Pastry Module',
-        'dash.pending': '📢 Pending Requests',
-        'dash.tip_prefix': "Chef's Tip:",
+        'dash.pending': '⏳ Pending Requests',
+        'dash.tip_prefix': '💡 Pro Tip:',
+        'dash.lab_active': 'Lab: Active',
+        'dash.stock_alert': 'Stock: Alert',
+        'dash.kpi.recipes': 'Lab Recipes',
+        'dash.kpi.margin': 'Lab Margin',
+        'dash.kpi.cost': 'Cost/Port. (Prod)',
+        'dash.kpi.team': 'Team',
+        'dash.kpi.school': '1 AT SCHOOL',
+        'dash.kpi.alerts': 'Alerts',
+        'dash.kpi.todo': 'TO REVIEW',
+        'dash.col.prod': 'Production Control',
+        'dash.col.biz': 'Business Performance',
+        'dash.col.ai': 'Chef Assistant',
+        'dash.col.logistics': 'Logistics Bottlenecks',
+        'dash.col.alerts': '⚠️ Alerts',
+        'dash.prod.ongoing': 'Ongoing',
+        'dash.prod.todo': 'To Produce',
+        'dash.prod.done': 'Done',
+        'dash.biz.top': 'Top',
+        'dash.biz.worst': 'To Monitor',
+        'dash.ai.alert': 'Profitability Alert:',
+        'dash.ai.stock': 'Stock Optimization:',
+        'dash.ai.adjust': 'Adjust Price... ',
+        'dash.active_status': 'Online',
+        'dash.btn.order': 'Order',
+        'dash.btn.inventory': 'Inventory',
 
         'hero.badge': '✨ Cost analysis',
         'hero.title': '<span class="accent">Recipe</span> Calculator<br>for pastry making',
@@ -1447,13 +1644,17 @@ const TRANSLATIONS = {
         'plan.leave.from_short': 'From',
         'plan.leave.to_short': 'To',
 
+        'portfolio.badge': '🖼️ Professional Portfolio',
         'portfolio.title': 'My Portfolio',
         'portfolio.desc': 'Discover my creations, technical sheets and professional achievements.',
         'portfolio.creations': 'Creations ⭐',
         'portfolio.thanks': '🙏 A huge thank you...',
-        'portfolio.thanks.team': 'To the amazing team at <strong>Christian Larroque et ses fils</strong> 🫶🏻',
+        'portfolio.thanks.team': 'To the great team at <strong>Christian Larroque et ses fils</strong> 🫶🏻',
 
-        'about.title': 'About the project',
+        // About
+        'about.badge': 'ℹ️ About the Project',
+        'about.title': 'About the Project',
+        'about.desc': "GourmetRevient — Masterpiece Project created by Julian Peresson, CAP Pastry student at CMA Muret",
         'about.subtitle': "GourmetRevient — Project by Julian Peresson, CAP Pastry student at CMA Muret",
         'about.project': 'The Project',
         'about.objectives': 'Educational Objectives',
@@ -2015,7 +2216,7 @@ const TRANSLATIONS = {
         'data.recipe.tarte-chocolat-poire-fleur.step.4': "Create the flower-shaped piping with the chocolate diplomate on the entire surface.",
         'data.recipe.tarte-chocolat-poire-fleur.step.5': "Add a touch of glaze in the center.",
 
-        // Recipe Data: Tarte Fleur Fruits Rouges
+        // Recipe Data: Tarte Fleur Fruits Red
         'data.recipe.tarte-fruits-rouges-fleur.name': 'Red Fruit Flower Tart',
         'data.recipe.tarte-fruits-rouges-fleur.desc': "A burst of freshness with a red fruit confit and artistic vanilla flower piping.",
         'data.recipe.tarte-fruits-rouges-fleur.step.0': "Make a crispy shortcrust tart base.",
@@ -2099,6 +2300,44 @@ const TRANSLATIONS = {
         'nav.suppliers': 'Proveedores',
         'nav.stats': 'Estadísticas',
 
+        // Estadísticas
+        'stats.badge': '📊 Análisis Comercial',
+        'stats.title': 'Rendimiento y Rentabilidad',
+        'stats.desc': 'Descifre sus márgenes, identifique sus productos estrella y optimice su rentabilidad para un laboratorio más eficiente.',
+        'stats.insight.title': 'Análisis Estratégico Automático',
+        'stats.insight.loading': 'Calculando...',
+        'stats.kpi.avg_margin': 'Margen Promedio',
+        'stats.kpi.hero': 'Receta Estrella',
+        'stats.kpi.worst': 'A Monitorear',
+        'stats.kpi.avg_cost': 'Costo Promedio/Porción',
+        'stats.kpi.avg_price': 'Precio Promedio Recomendado',
+        'stats.margin_dist': 'Distribución de Márgenes',
+        'stats.top_profitable': 'Rendimiento de Recetas',
+        'stats.toggle.top': 'Top 5 Rentables',
+        'stats.toggle.worst': 'Top 5 a Mejorar',
+        'stats.strategic_map': 'Matriz Estratégica (Costo vs Margen)',
+        'stats.alerts.title': 'Alertas y Optimizaciones',
+        'stats.detailed_report': 'Lista Detallada de Recetas',
+        'stats.insight.template': 'Su margen promedio es de **{avg}%**. La receta con mejor rendimiento es **{best}** ({bestMargin}%).',
+        'stats.insight.attention': "Atención con **{worst}** que tiene un margen bajo de {worstMargin}%.",
+        'stats.insight.balanced': "Su catálogo está globalmente muy equilibrado.",
+        'stats.analysis.excellent_pct': "El <strong>{pct}%</strong> de sus recetas tienen un margen > 70%. Su catálogo {status}.",
+        'stats.analysis.profitable': "es globalmente muy rentable.",
+        'stats.analysis.to_optimize': "debería optimizarse.",
+        'stats.chart.margin_label': 'Margen %',
+        'stats.chart.cost_axis': 'Costo de Material (€)',
+        'stats.chart.margin_axis': 'Margen %',
+        'stats.chart.recipes_label': 'Recetas',
+        'stats.chart.tooltip_margin': 'Margen',
+        'stats.chart.tooltip_price': 'Precio',
+        'stats.chart.tooltip_cost': 'Costo',
+        'stats.alerts.none': '✅ No se detectaron alertas. Sus márgenes son saludables.',
+        'stats.alerts.critical_suggestion': 'Aumentar el precio en {amount}€ o reducir el costo del material.',
+        'stats.alerts.standard_suggestion': 'Optimizar el costo de ventas en ~10%.',
+        'stats.alerts.margin_at': 'Margen del <strong>{margin}%</strong>.',
+        'stats.alerts.material_cost': 'Costo de material de {cost}€.',
+        'stats.table.search_ph': 'Buscar receta...',
+
         // Inventory
         'inv.badge': '📦 Gestión de Inventario',
         'inv.title': 'Inventario y <span class="accent">Alertas de Stock</span>',
@@ -2163,7 +2402,21 @@ const TRANSLATIONS = {
         'suppliers.btn.add': 'Nuevo proveedor',
         'suppliers.stats.total': 'Total Proveedores',
         'suppliers.stats.pending': 'Necesidad Crítica',
+        'suppliers.stats.active': 'Activo',
+        'suppliers.stats.network': 'Red de Socios',
+        'suppliers.search_label': 'Buscar un socio',
+        'suppliers.search_ph': 'Ej: Lácteos, Harina...',
+        'suppliers.tip_title': '💡 Consejo:',
+        'suppliers.tip_text': 'Ingrese el nombre de un ingrediente para ver qué proveedores lo ofrecen.',
         'suppliers.need_order': 'ARTÍCULOS A PEDIR',
+        'orders.title': 'Abastecimiento',
+        'orders.desc': 'Artículos por debajo del umbral de alerta crítica.',
+        'orders.btn.export': 'Exportar',
+        'orders.col_item': 'Artículo',
+        'orders.col_stock': 'Stock Actual',
+        'orders.col_threshold': 'Umbral',
+        'orders.col_need': 'Necesidad Estimada',
+        'orders.col_urgency': 'Urgencia',
         'dash.greeting': 'Hola, ',
         'dash.greeting_prefix': 'Tu',
         'dash.subtitle': 'espacio profesional GourmetRevient',
@@ -2189,8 +2442,33 @@ const TRANSLATIONS = {
         'dash.roadmap.item1': 'Sistema de Perfil y Seguridad',
         'dash.roadmap.item2': 'Compartir y Flujo de Planificación',
         'dash.roadmap.item3': 'Módulo Panadería y Bollería',
-        'dash.pending': '📢 Solicitudes pendientes',
-        'dash.tip_prefix': 'Consejo del Chef:',
+        'dash.pending': '⏳ Solicitudes pendientes',
+        'dash.tip_prefix': '💡 Consejo Pro:',
+        'dash.lab_active': 'Lab: Activo',
+        'dash.stock_alert': 'Stock: Alerta',
+        'dash.kpi.recipes': 'Recetas Lab',
+        'dash.kpi.margin': 'Margen Lab',
+        'dash.kpi.cost': 'Costo/Porc. (Prod)',
+        'dash.kpi.team': 'Equipo',
+        'dash.kpi.school': '1 EN ESCUELA',
+        'dash.kpi.alerts': 'Alertas',
+        'dash.kpi.todo': 'REVISAR',
+        'dash.col.prod': 'Control Producción',
+        'dash.col.biz': 'Rendimiento Negocio',
+        'dash.col.ai': 'Asistente Chef',
+        'dash.col.logistics': 'Cuellos Logísticos',
+        'dash.col.alerts': '⚠️ Alertas',
+        'dash.prod.ongoing': 'En curso',
+        'dash.prod.todo': 'Por producir',
+        'dash.prod.done': 'Terminado',
+        'dash.biz.top': 'Mejores',
+        'dash.biz.worst': 'A Vigilar',
+        'dash.ai.alert': 'Alerta Rentabilidad:',
+        'dash.ai.stock': 'Optimiz. Stock:',
+        'dash.ai.adjust': 'Ajustar Precio... ',
+        'dash.active_status': 'En línea',
+        'dash.btn.order': 'Pedir',
+        'dash.btn.inventory': 'Inventario',
 
         'hero.badge': '✨ Análisis de costos',
         'hero.title': 'Calculadora de <span class="accent">recetas</span><br>para pastelería',
@@ -2483,13 +2761,17 @@ const TRANSLATIONS = {
         'plan.leave.from_short': 'Desde',
         'plan.leave.to_short': 'A',
 
+        'portfolio.badge': '🖼️ Portafolio Profesional',
         'portfolio.title': 'Mi Portafolio',
         'portfolio.desc': 'Descubra mis creaciones, fichas técnicas y logros profesionales.',
         'portfolio.creations': 'Creaciones ⭐',
         'portfolio.thanks': '🙏 Un inmenso agradecimiento...',
         'portfolio.thanks.team': 'Al increíble equipo de <strong>Christian Larroque et ses fils</strong> 🫶🏻',
 
+        // About
+        'about.badge': 'ℹ️ Acerca del Proyecto',
         'about.title': 'Acerca del proyecto',
+        'about.desc': "GourmetRevient — Proyecto Obra Maestra creado por Julian Peresson, estudiante de CAP Pastelería en CMA Muret",
         'about.subtitle': "GourmetRevient — Proyecto realizado por Julian Peresson, estudiante de CAP Pastelería en CMA de Muret",
         'about.project': 'El Proyecto',
         'about.objectives': 'Objetivos pedagógicos',
@@ -3171,6 +3453,7 @@ function buildReverseLookup() {
         'Tarte Citron Meringuée': 'data.recipe.tarte-citron-meringuee.name',
         'Croissant': 'data.recipe.croissant.name',
         'Pain au chocolat': 'data.recipe.pain-au-chocolat.name',
+        'Chocolatine': 'data.recipe.pain-au-chocolat.name',
         'Tarte Bourdaloue': 'data.recipe.tarte-bourdaloue.name',
         'Éclair au café': 'data.recipe.eclair-cafe.name',
         'Verrine Baba Cointreau Poires Spéculoos': 'data.recipe.baba-cointreau-poire.name',
@@ -3178,6 +3461,8 @@ function buildReverseLookup() {
         'Tarte Fleur Fruits Rouges': 'data.recipe.tarte-fruits-rouges-fleur.name',
         'Tarte Praliné Fleur': 'data.recipe.tarte-praline-fleur.name',
         'Tarte Framboise Pistache Fleur': 'data.recipe.tarte-framboise-pistache-fleur.name',
+        'La Negresco': 'data.recipe.negresco.name',
+        'La Frangipane': 'data.recipe.frangipane.name',
     };
     for (const name in frLookup) {
         REVERSE_LOOKUP[name.toLowerCase()] = frLookup[name];
@@ -3248,13 +3533,8 @@ function applyLanguage(lang) {
         if (val) el.title = val;
     });
 
-    // Update language switcher active state
-    document.querySelectorAll('.lang-switcher-btn').forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.lang === lang);
-    });
-
     // Dispatch event for dynamic content
-    document.dispatchEvent(new CustomEvent('languageChanged', { detail: { lang } }));
+    document.dispatchEvent(new CustomEvent('languageChanged', { detail: { lang: currentLang } }));
 }
 
 function initI18n() {
@@ -3263,62 +3543,19 @@ function initI18n() {
 
     buildReverseLookup();
 
-    // Create language switcher in auth overlay
-    createAuthLangSwitcher();
-    // Create language switcher in header
-    createHeaderLangSwitcher();
-
     applyLanguage(currentLang);
 }
 
-// ============================================================================
-// LANGUAGE SWITCHER UI
-// ============================================================================
+// Global i18n object for dynamic translations in app.js
+window.i18n = {
+    t: t,
+    setLanguage: applyLanguage
+};
 
-const LANG_DATA = [
-    { code: 'fr', flag: 'https://flagcdn.com/w160/fr.png', label: 'Français' },
-    { code: 'en', flag: 'https://flagcdn.com/w160/gb.png', label: 'GB' },
-    { code: 'es', flag: 'https://flagcdn.com/w160/es.png', label: 'Español' }
-];
-
-function createLangSwitcherHTML(containerId) {
-    return `
-    <div class="lang-switcher" id="${containerId}">
-      ${LANG_DATA.map(l => `
-        <button class="lang-switcher-btn ${l.code === currentLang ? 'active' : ''}"
-                data-lang="${l.code}" title="${l.label}"
-                onclick="applyLanguage('${l.code}')">
-          <img src="${l.flag}" alt="${l.label}" class="lang-flag-img">
-        </button>
-      `).join('')}
-    </div>
-  `;
-}
-
-function createAuthLangSwitcher() {
-    const authCard = document.querySelector('.auth-card');
-    if (!authCard || document.getElementById('authLangSwitcher')) return;
-
-    const wrapper = document.createElement('div');
-    wrapper.innerHTML = createLangSwitcherHTML('authLangSwitcher');
-    authCard.insertBefore(wrapper.firstElementChild, authCard.firstChild);
-}
-
-function createHeaderLangSwitcher() {
-    const header = document.querySelector('.app-header');
-    if (!header || document.getElementById('headerLangSwitcher')) return;
-
-    const wrapper = document.createElement('div');
-    wrapper.innerHTML = createLangSwitcherHTML('headerLangSwitcher');
-
-    // Insert AFTER the brand logo to swap positions
-    const brand = header.querySelector('.header-brand');
-    if (brand) {
-        brand.after(wrapper.firstElementChild);
-    } else {
-        header.prepend(wrapper.firstElementChild);
-    }
-}
+// Global alias for compatibility with HTML onclick attributes
+window.setLanguage = function (lang) {
+    applyLanguage(lang);
+};
 
 // Initialize on DOM ready
 document.addEventListener('DOMContentLoaded', initI18n);

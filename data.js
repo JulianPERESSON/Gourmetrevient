@@ -563,6 +563,57 @@ const RECIPES = [
       'Réaliser le pochage fleur bicolore (blanc et vert pastel).',
       'Décorer avec quelques framboises entières et des pistaches torréfiées.'
     ]
+  },
+  {
+    id: 'negresco',
+    name: 'La Negresco',
+    category: 'Entremets',
+    portions: 8,
+    prepTime: 120,
+    cookTime: 20,
+    image: './img/negresco.jpg',
+    description: 'Une création signature fleurie : biscuit chocolat intense, ganache fondante, mousse légère et décor framboises fraîches.',
+    ingredients: [
+      { name: 'Chocolat noir 64%', quantity: 200, unit: 'g', pricePerKg: 11.50 },
+      { name: 'Crème 35% MG', quantity: 400, unit: 'ml', pricePerL: 4.20 },
+      { name: 'Œufs entiers', quantity: 4, unit: 'pcs', pricePerPc: 0.15 },
+      { name: 'Farine T45', quantity: 50, unit: 'g', pricePerKg: 1.30 },
+      { name: 'Sucre semoule', quantity: 100, unit: 'g', pricePerKg: 0.85 },
+      { name: 'Fraises/Framboises', quantity: 150, unit: 'g', pricePerKg: 6.50 }
+    ],
+    steps: [
+      'Préparer le biscuit chocolat de base.',
+      'Réaliser la ganache et la mousse au chocolat.',
+      'Effectuer le montage en cercle.',
+      'Réaliser le pochage artistique en pétales.',
+      'Déposer les framboises et les décors en chocolat noir.'
+    ]
+  },
+  {
+    id: 'frangipane',
+    name: 'La Frangipane',
+    category: 'Feuilletage',
+    portions: 8,
+    prepTime: 60,
+    cookTime: 40,
+    image: './img/frangine.jpg',
+    description: 'La classique galette des rois : feuilletage inversé pur beurre et crème frangipane onctueuse aux amandes.',
+    ingredients: [
+      { name: 'Beurre AOP (tourage)', quantity: 300, unit: 'g', pricePerKg: 7.50 },
+      { name: 'Farine T55', quantity: 400, unit: 'g', pricePerKg: 0.65 },
+      { name: 'Poudre d\'amandes', quantity: 200, unit: 'g', pricePerKg: 9.50 },
+      { name: 'Sucre semoule', quantity: 150, unit: 'g', pricePerKg: 0.85 },
+      { name: 'Œufs entiers', quantity: 3, unit: 'pcs', pricePerPc: 0.15 },
+      { name: 'Rhum ambré', quantity: 10, unit: 'ml', pricePerL: 18.00 }
+    ],
+    steps: [
+      'Réaliser le feuilletage (ou utiliser un pâton frais).',
+      'Préparer la crème d\'amandes et la mélanger à la pâtissière pour la frangipane.',
+      'Détailler deux disques de pâte.',
+      'Garnir le premier disque, dorer les bords et refermer.',
+      'Chiqueter les bords et rayer le dessus.',
+      'Cuire à 180°C jusqu\'à coloration dorée.'
+    ]
   }
 ];
 
@@ -600,7 +651,7 @@ const VIENNOISERIES = [
   },
   {
     id: 'pain-au-chocolat',
-    name: 'Pain au chocolat',
+    name: 'Chocolatine',
     category: 'Viennoiserie',
     portions: 10,
     prepTime: 180,

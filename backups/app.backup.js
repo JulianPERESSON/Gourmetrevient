@@ -48,6 +48,12 @@ function throttle(func, limit) {
   }
 }
 
+function escapeHtml(text) {
+  if (typeof text !== 'string') return text;
+  const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+  return text.replace(/[&<>"']/g, m => map[m]);
+}
+
 const STORAGE_KEYS = {
   users: 'gourmet_users_db',
   currentUser: 'gourmet_current_user',
@@ -61,27 +67,79 @@ const STORAGE_KEYS = {
   haccpLogs: 'gourmet_haccp_logs'
 };
 
+// --- Helper: Format Unit with Plural Support ---
+function formatUnit(qty, unit) {
+  const q = parseFloat(qty) || 0;
+  let key = unit;
+  if (unit === 'pièce' || unit === 'pcs') key = 'piece';
+  if (unit === 'portion') key = 'portion';
+
+  const tKey = 'unit.' + key;
+  const tKeyPlural = tKey + 's';
+
+  if (q > 1) {
+    const translatedPlural = t(tKeyPlural);
+    if (translatedPlural && translatedPlural !== tKeyPlural) return translatedPlural;
+    if (key === 'piece') return 'pièces';
+    if (key === 'portion') return 'portions';
+  }
+
+  const translated = t(tKey);
+  if (translated && translated !== tKey) return translated;
+  return unit;
+}
+
+function prepareOrder(itemName) {
+  const item = APP.inventory.find(i => i.name === itemName);
+  if (!item) return;
+
+  let bestSupplier = null;
+  for (const s of APP.suppliers) {
+    const isMatch = s.categories.some(cat =>
+      item.name.toLowerCase().includes(cat.toLowerCase()) ||
+      cat.toLowerCase().includes(item.name.toLowerCase()) ||
+      (cat.toLowerCase() === 'frais' && (item.name.toLowerCase().includes('lait') || item.name.toLowerCase().includes('beurre') || item.name.toLowerCase().includes('crème'))) ||
+      (cat.toLowerCase() === 'chocolat' && item.name.toLowerCase().includes('choc')) ||
+      (cat.toLowerCase() === 'farine' && item.name.toLowerCase().includes('farine'))
+    );
+    if (isMatch) { bestSupplier = s; break; }
+  }
+
+  const need = (item.alertThreshold * 4) - item.stock;
+  const u = formatUnit(need, item.unit);
+
+  if (bestSupplier && bestSupplier.email) {
+    const body = `Bonjour ${bestSupplier.name},\n\nJe souhaiterais commander :\n- ${itemName} : ${need} ${u}\n\nMerci d'avance,\nCordialement.`;
+    window.location.href = `mailto:${bestSupplier.email}?subject=Commande ${itemName}&body=${encodeURIComponent(body)}`;
+    showToast(t('toast.order.email_sent'), 'success');
+  } else {
+    navigator.clipboard.writeText(`Commande : ${itemName} — ${need} ${u}`).then(() => {
+      showToast(t('toast.order.copied'), 'info');
+    });
+  }
+}
+
 // Default ingredient database (pre-loaded)
 const DEFAULT_INGREDIENT_DB = [
   // --- 1. FARINES, FÉCULES & CÉRÉALES ---
-  { name: 'Farine T45', unit: 'g', pricePerUnit: 0.80, priceRef: 'kg', allergens: ['Gluten'] },
-  { name: 'Farine T55', unit: 'g', pricePerUnit: 0.65, priceRef: 'kg', allergens: ['Gluten'] },
-  { name: 'Farine de Gruau T45', unit: 'g', pricePerUnit: 1.50, priceRef: 'kg', allergens: ['Gluten'] },
-  { name: 'Farine T55 Label Rouge', unit: 'g', pricePerUnit: 1.20, priceRef: 'kg', allergens: ['Gluten'] },
-  { name: 'Farine de Seigle T130', unit: 'g', pricePerUnit: 2.10, priceRef: 'kg', allergens: ['Gluten'] },
-  { name: 'Farine de Sarrasin', unit: 'g', pricePerUnit: 3.20, priceRef: 'kg', allergens: [] },
-  { name: 'Farine de Riz (S.G)', unit: 'g', pricePerUnit: 4.50, priceRef: 'kg', allergens: [] },
-  { name: 'Farine de Châtaigne', unit: 'g', pricePerUnit: 12.50, priceRef: 'kg', allergens: [] },
-  { name: 'Fécule de Pomme de Terre', unit: 'g', pricePerUnit: 3.20, priceRef: 'kg', allergens: [] },
-  { name: 'Maïzena', unit: 'g', pricePerUnit: 2.80, priceRef: 'kg', allergens: [] },
+  { name: 'Farine T45', unit: 'g', pricePerUnit: 0.80, priceRef: 'kg', allergens: ['Gluten'], nutri: { kcal: 364, prot: 10, fat: 1, carbs: 76 } },
+  { name: 'Farine T55', unit: 'g', pricePerUnit: 0.65, priceRef: 'kg', allergens: ['Gluten'], nutri: { kcal: 364, prot: 10.5, fat: 1.2, carbs: 75 } },
+  { name: 'Farine de Gruau T45', unit: 'g', pricePerUnit: 1.50, priceRef: 'kg', allergens: ['Gluten'], nutri: { kcal: 360, prot: 13, fat: 1.5, carbs: 72 } },
+  { name: 'Farine T55 Label Rouge', unit: 'g', pricePerUnit: 1.20, priceRef: 'kg', allergens: ['Gluten'], nutri: { kcal: 364, prot: 11, fat: 1.2, carbs: 75 } },
+  { name: 'Farine de Seigle T130', unit: 'g', pricePerUnit: 2.10, priceRef: 'kg', allergens: ['Gluten'], nutri: { kcal: 338, prot: 9, fat: 1.8, carbs: 65 } },
+  { name: 'Farine de Sarrasin', unit: 'g', pricePerUnit: 3.20, priceRef: 'kg', allergens: [], nutri: { kcal: 343, prot: 13, fat: 3, carbs: 71 } },
+  { name: 'Farine de Riz (S.G)', unit: 'g', pricePerUnit: 4.50, priceRef: 'kg', allergens: [], nutri: { kcal: 366, prot: 6, fat: 1.4, carbs: 80 } },
+  { name: 'Farine de Châtaigne', unit: 'g', pricePerUnit: 12.50, priceRef: 'kg', allergens: [], nutri: { kcal: 370, prot: 6, fat: 3.7, carbs: 74 } },
+  { name: 'Fécule de Pomme de Terre', unit: 'g', pricePerUnit: 3.20, priceRef: 'kg', allergens: [], nutri: { kcal: 333, prot: 0, fat: 0.1, carbs: 83 } },
+  { name: 'Maïzena', unit: 'g', pricePerUnit: 2.80, priceRef: 'kg', allergens: [], nutri: { kcal: 355, prot: 0.3, fat: 0.1, carbs: 86 } },
 
   // --- 2. BEURRES & MATIÈRES GRASSES ---
-  { name: 'Beurre AOP', unit: 'g', pricePerUnit: 7.50, priceRef: 'kg', allergens: ['Lait'] },
-  { name: 'Beurre doux', unit: 'g', pricePerUnit: 6.80, priceRef: 'kg', allergens: ['Lait'] },
-  { name: 'Beurre Tourage AOP 82%', unit: 'g', pricePerUnit: 14.50, priceRef: 'kg', allergens: ['Lait'] },
-  { name: 'Beurre de Cacao', unit: 'g', pricePerUnit: 15.50, priceRef: 'kg', allergens: [] },
-  { name: 'Beurre de Cacao Mycryo', unit: 'g', pricePerUnit: 38.00, priceRef: 'kg', allergens: [] },
-  { name: 'Huile de Coco Vierge', unit: 'ml', pricePerUnit: 16.00, priceRef: 'L', allergens: [] },
+  { name: 'Beurre AOP', unit: 'g', pricePerUnit: 7.50, priceRef: 'kg', allergens: ['Lait'], nutri: { kcal: 717, prot: 0.9, fat: 81, carbs: 0.1 } },
+  { name: 'Beurre doux', unit: 'g', pricePerUnit: 6.80, priceRef: 'kg', allergens: ['Lait'], nutri: { kcal: 717, prot: 0.9, fat: 81, carbs: 0.1 } },
+  { name: 'Beurre Tourage AOP 82%', unit: 'g', pricePerUnit: 14.50, priceRef: 'kg', allergens: ['Lait'], nutri: { kcal: 740, prot: 0.5, fat: 82, carbs: 0.5 } },
+  { name: 'Beurre de Cacao', unit: 'g', pricePerUnit: 15.50, priceRef: 'kg', allergens: [], nutri: { kcal: 884, prot: 0, fat: 100, carbs: 0 } },
+  { name: 'Beurre de Cacao Mycryo', unit: 'g', pricePerUnit: 38.00, priceRef: 'kg', allergens: [], nutri: { kcal: 884, prot: 0, fat: 100, carbs: 0 } },
+  { name: 'Huile de Coco Vierge', unit: 'ml', pricePerUnit: 16.00, priceRef: 'L', allergens: [], nutri: { kcal: 862, prot: 0, fat: 92, carbs: 0 } },
 
   // --- 3. SUCRES & PRODUITS SUCRANTS ---
   { name: 'Sucre semoule', unit: 'g', pricePerUnit: 0.85, priceRef: 'kg', allergens: [] },
@@ -362,6 +420,34 @@ function calcIngredientCost(ing) {
   return qty * price;
 }
 
+function calcIngredientNutri(ing) {
+  const qty = parseFloat(ing.quantity) || 0;
+  const unit = (ing.unit || 'g').toLowerCase();
+
+  // Find in DB for nutri info
+  const dbItem = APP.ingredientDb.find(db => db.name.toLowerCase() === ing.name.toLowerCase());
+  if (!dbItem || !dbItem.nutri) return { kcal: 0, prot: 0, fat: 0, carbs: 0 };
+
+  const n = dbItem.nutri;
+  let factor = 0;
+
+  if (unit === 'g' || unit === 'ml') {
+    factor = qty / 100; // Database is per 100g/ml
+  } else if (unit === 'pièce' || unit === 'pc') {
+    // Assume standard 50g for piece if no weight provided
+    factor = (qty * 50) / 100;
+  } else if (unit === 'kg' || unit === 'l') {
+    factor = (qty * 1000) / 100;
+  }
+
+  return {
+    kcal: n.kcal * factor,
+    prot: n.prot * factor,
+    fat: n.fat * factor,
+    carbs: n.carbs * factor
+  };
+}
+
 function calcTotalMaterialCost() {
   return APP.recipe.ingredients.reduce((sum, ing) => sum + calcIngredientCost(ing), 0);
 }
@@ -412,6 +498,28 @@ function calcFullCost(margin, customRecipe = null) {
   const marginPerPortion = sellingPrice - costPerPortion;
   const marginPct = sellingPrice > 0 ? (marginPerPortion / sellingPrice) * 100 : 0;
 
+  // Nutritional Calculation
+  const nutriTotal = r.ingredients.reduce((acc, ing) => {
+    const n = calcIngredientNutri(ing);
+    acc.kcal += n.kcal;
+    acc.prot += n.prot;
+    acc.fat += n.fat;
+    acc.carbs += n.carbs;
+    return acc;
+  }, { kcal: 0, prot: 0, fat: 0, carbs: 0 });
+
+  // Total weight for 100g calculation
+  const totalWeightStr = r.ingredients.reduce((sum, ing) => {
+    const q = parseFloat(ing.quantity) || 0;
+    const u = (ing.unit || 'g').toLowerCase();
+    if (u === 'g' || u === 'ml') return sum + q;
+    if (u === 'kg' || u === 'l') return sum + (q * 1000);
+    if (u === 'pièce' || u === 'pc') return sum + (q * 50);
+    return sum;
+  }, 0);
+
+  const per100Factor = totalWeightStr > 100 ? 100 / totalWeightStr : 1;
+
   return {
     totalMaterial: round2(totalMaterial),
     additionalCosts: round2(additionalCosts),
@@ -424,6 +532,12 @@ function calcFullCost(margin, customRecipe = null) {
     sellingPrice: round2(sellingPrice),
     marginPerPortion: round2(marginPerPortion),
     marginPct: round2(marginPct),
+    nutri: {
+      kcal100: Math.round(nutriTotal.kcal * per100Factor),
+      prot100: (nutriTotal.prot * per100Factor).toFixed(1),
+      fat100: (nutriTotal.fat * per100Factor).toFixed(1),
+      carbs100: (nutriTotal.carbs * per100Factor).toFixed(1)
+    },
     portions,
     prepTime,
     cookTime,
@@ -478,7 +592,43 @@ function loadSavedRecipes() {
     const key = getUserRecipesKey();
     const data = localStorage.getItem(key);
     APP.savedRecipes = data ? JSON.parse(data) : [];
+
+    // Seed examples if totally empty or very low to show off the stats/portfolio
+    if (APP.savedRecipes.length < 6) {
+      seedDemoData();
+    }
   } catch { APP.savedRecipes = []; }
+}
+
+function seedDemoData() {
+  // Classic recipes to showcase stats
+  const demoPool = (typeof RECIPES !== 'undefined') ? RECIPES.slice(0, 15) : [];
+
+  demoPool.forEach(r => {
+    // Check if a recipe with the same ID already exists in savedRecipes to avoid infinite duplicates
+    const exists = APP.savedRecipes.some(saved => saved.id === r.id || saved.name === r.name);
+    if (!exists) {
+      const copy = JSON.parse(JSON.stringify(r));
+      copy.savedAt = new Date().toISOString();
+      copy.margin = 62 + (Math.random() * 18); // Realistic variety in margins
+      APP.savedRecipes.push(copy);
+    }
+  });
+
+  // Fill some inventory to show stock value
+  if (APP.inventory.length === 0) {
+    initInventoryFromDb();
+  }
+
+  APP.inventory.forEach(item => {
+    if (!item.stock || item.stock < 100) {
+      item.stock = Math.floor(Math.random() * 3000) + 500;
+      item.lastUpdate = new Date().toISOString();
+    }
+  });
+
+  saveSavedRecipes();
+  saveInventory();
 }
 
 function saveSavedRecipes() {
@@ -882,7 +1032,7 @@ function renderCostAnalysis() {
     <div class="kpi-card">
       <div class="kpi-label">${t('ui.kpi.total_material')}</div>
       <div class="kpi-value">${costs.totalMaterial.toFixed(2)} €</div>
-      <div class="kpi-sub">${t('label.per_portion')} ${costs.portions} ${costs.portions > 1 ? t('unit.portions') : t('unit.portion')}</div>
+      <div class="kpi-sub">${t('label.per_portion')} ${costs.portions} ${formatUnit(costs.portions, 'portion')}</div>
     </div>
     <div class="kpi-card accent">
       <div class="kpi-label">${t('ui.kpi.per_portion')}</div>
@@ -951,7 +1101,7 @@ function renderAdvancedCostKPI(costs) {
     <div class="kpi-card success">
       <div class="kpi-label">${t('s4.adv.kpi.full_portion')}</div>
       <div class="kpi-value" style="font-size:1.3rem">${costs.costPerPortion.toFixed(2)} €</div>
-      <div class="kpi-sub">${costs.totalFullCost.toFixed(2)} € / ${costs.portions} ${costs.portions > 1 ? t('unit.portions') : t('unit.portion')}</div>
+      <div class="kpi-sub">${costs.totalFullCost.toFixed(2)} € / ${costs.portions} ${formatUnit(costs.portions, 'portion')}</div>
     </div>
   `;
 }
@@ -1052,14 +1202,14 @@ function renderSummary() {
   const r = APP.recipe;
 
   $('#summarySubtitle').textContent = r.name
-    ? `${r.name} — ${r.portions} ${r.portions > 1 ? t('unit.portions') : t('unit.portion')} · ${r.category || t('label.unclassified')}`
+    ? `${r.name} — ${r.portions} ${formatUnit(r.portions, 'portion')} · ${r.category || t('label.unclassified')}`
     : t('s5.subtitle.empty');
 
   // Ingredients table
   let ingRows = r.ingredients.filter(i => i.name).map(ing => {
     const cost = calcIngredientCost(ing);
     const priceRef = getPriceRef(ing.unit);
-    const unitLabel = ing.unit === 'pièce' ? t('unit.portion') : ing.unit;
+    const unitLabel = formatUnit(ing.quantity, ing.unit);
     return `<tr>
       <td>${escapeHtml(t(ing.name))}</td>
       <td>${ing.quantity} ${unitLabel}</td>
@@ -1082,7 +1232,7 @@ function renderSummary() {
   $('#summaryContent').innerHTML = `
     ${r.description ? `<p style="color:var(--text-secondary); margin-bottom:1.2rem; font-style:italic;">${escapeHtml(r.description)}</p>` : ''}
     <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:1.5rem;">
-      ⏱ ${t('ui.label.prep')}: ${prepStr} · ${t('ui.label.cook')}: ${cookStr} · ${r.portions} ${r.portions > 1 ? t('unit.portions') : t('unit.portion')}
+      ⏱ ${t('ui.label.prep')}: ${prepStr} · ${t('ui.label.cook')}: ${cookStr} · ${r.portions} ${formatUnit(r.portions, 'portion')}
     </p>
 
     <div class="summary-sections-grid">
@@ -1190,6 +1340,20 @@ function renderSummary() {
       ${t('s5.footer.credits')}
     </div>
   `;
+
+  // Update Nutritional display
+  const nutriCont = $('#summaryNutritional');
+  if (nutriCont && costs.nutri) {
+    if (costs.nutri.kcal100 > 0) {
+      nutriCont.style.display = 'block';
+      const k = $('#nutriKcal'); if (k) k.textContent = costs.nutri.kcal100 + ' kcal';
+      const p = $('#nutriProt'); if (p) p.textContent = costs.nutri.prot100 + ' g';
+      const f = $('#nutriFat'); if (f) f.textContent = costs.nutri.fat100 + ' g';
+      const c = $('#nutriCarbs'); if (c) c.textContent = costs.nutri.carbs100 + ' g';
+    } else {
+      nutriCont.style.display = 'none';
+    }
+  }
 }
 
 // ============================================================================
@@ -1315,16 +1479,14 @@ function toggleSavedRecipes() {
 // HELPERS
 // ============================================================================
 
-function loadExampleRecipe(idOrIdx) {
+function loadExampleRecipe(idxOrId) {
   const allRecipes = typeof RECIPES !== 'undefined' ? RECIPES : [];
-  if (allRecipes.length === 0) {
-    showToast(t('recipe.toast.not_found'), 'error');
-    return;
+  let example;
+  if (typeof idxOrId === 'string') {
+    example = allRecipes.find(r => r.id === idxOrId);
+  } else {
+    example = allRecipes[idxOrId];
   }
-
-  const example = typeof idOrIdx === 'string'
-    ? allRecipes.find(r => r.id === idOrIdx)
-    : allRecipes[idOrIdx];
 
   if (!example) {
     showToast(t('recipe.toast.not_found'), 'error');
@@ -1421,10 +1583,10 @@ function renderLibraryRecipes() {
     return;
   }
 
-  // Slice to only take the first 10 as requested
-  const top10 = allRecipes.slice(0, 10);
+  // Slice to only take the first 20 (showing all available for now)
+  const topList = allRecipes.slice(0, 20);
 
-  container.innerHTML = top10.map((r, idx) => {
+  container.innerHTML = topList.map((r, idx) => {
     // Determine an emoji based on category
     let emoji = '🍰';
     const cat = r.category.toLowerCase();
@@ -1437,14 +1599,10 @@ function renderLibraryRecipes() {
     const tNameRaw = t(`data.recipe.${r.id}.name`);
     const displayName = tNameRaw !== `data.recipe.${r.id}.name` ? tNameRaw : r.name;
 
-    const hasImage = false;
-    const imgHtml = '';
-
     return `
       <div class="carousel-card" onclick="loadExampleRecipe(${idx})">
         <div class="carousel-card-img-wrapper">
-          ${imgHtml}
-          <div class="carousel-card-img-placeholder" style="${hasImage ? 'display:none;' : ''}">${emoji}</div>
+          <div class="carousel-card-img-placeholder" style="display:flex;">${emoji}</div>
         </div>
         <span class="carousel-badge">${escapeHtml(tCat)}</span>
         <h4 class="carousel-card-title">${escapeHtml(displayName)}</h4>
@@ -1560,26 +1718,13 @@ function renderPortfolio() {
   // We reuse the beautifully crafted recipes from data.js
   let allRecipes = typeof RECIPES !== 'undefined' ? RECIPES : [];
 
-  // Filter to show only specific portfolio items requested by user
-  const portfolioFilter = [
-    'saint-honore',
-    'negresco',
-    'frangipane',
-    'mille-feuille',
-    'paris-brest',
-    'tarte-citron-meringuee',
-    'tarte-chocolat-poire-fleur',
-    'tarte-fruits-rouges-fleur',
-    'tarte-praline-fleur',
-    'tarte-framboise-pistache-fleur',
-    'croissant',
-    'pain-au-chocolat'
+  // Filter out specific recipes as requested by the user for the portfolio view
+  const excludeIds = [
+    'opera', 'fraisier', 'tarte-tatin', 'eclair', 'macaron',
+    'eclair-cafe', 'baba-au-rhum', 'baba-cointreau-poire', 'foret-noire', 'tarte-bourdaloue',
+    'chouquettes', 'tarte-pomme-normande', 'flan-patissier', 'religieuse-chocolat'
   ];
-
-  allRecipes = allRecipes.filter(r => portfolioFilter.includes(r.id));
-
-  // Re-order to match user's requested sequence if possible
-  allRecipes.sort((a, b) => portfolioFilter.indexOf(a.id) - portfolioFilter.indexOf(b.id));
+  allRecipes = allRecipes.filter(r => !excludeIds.includes(r.id));
 
   if (allRecipes.length === 0) {
     container.innerHTML = `<p style="text-align:center; color:var(--text-muted); width:100%;">${t('portfolio.empty')}</p>`;
@@ -1593,11 +1738,10 @@ function renderPortfolio() {
     const fallBackColor = `hsl(${hue}, 70%, 85%)`;
 
     // Specific styling for certain images (dezoom or position)
-    const dezoomIds = ['negresco', 'tarte-fruits-rouges-fleur'];
+    const dezoomIds = ['fraisier', 'baba-au-rhum', 'tarte-bourdaloue'];
     const extraClass = dezoomIds.includes(r.id) ? ' dezoom' : '';
-    const extraStyle = ''; // Removed tarte-bourdaloue as it's not in the filtered list
-
-    // Translation logic
+    const topIds = ['saint-honore', 'tarte-bourdaloue'];
+    const extraStyle = topIds.includes(r.id) ? ' style="object-position: top !important;"' : '';
     const tCatRaw = t(r.category);
     const tCat = tCatRaw !== r.category ? tCatRaw : r.category;
     const tNameRaw = t(`data.recipe.${r.id}.name`);
@@ -1613,7 +1757,7 @@ function renderPortfolio() {
         ${imgOrFallback}
         <div class="portfolio-overlay">
           <h3 class="portfolio-title">${escapeHtml(displayName)}</h3>
-          <span class="portfolio-category">${escapeHtml(tCat)}</span>
+          <span style="font-size: 0.85rem; opacity: 0.9;">${escapeHtml(tCat)}</span>
         </div>
       </div>
     `;
@@ -1655,15 +1799,14 @@ function exportPdf() {
 
   // Setup the clone to be visible but off-stage
   pdfClone.id = "pdf-export-temp-node";
-  pdfClone.style.position = 'fixed';
+  pdfClone.style.position = 'absolute';
+  pdfClone.style.left = '-9999px';
   pdfClone.style.top = '0';
-  pdfClone.style.left = '0';
-  pdfClone.style.zIndex = '-9999'; // Behind everything
-  pdfClone.style.display = 'block'; // Force block
-  pdfClone.style.visibility = 'visible'; // Force visibility
+  pdfClone.style.display = 'block';
+  pdfClone.style.visibility = 'visible';
   pdfClone.style.opacity = '1';
-  pdfClone.style.width = '780px';
-  pdfClone.style.height = 'auto';
+  pdfClone.style.width = '210mm'; // Standard A4 width
+  pdfClone.style.padding = '20mm';
   pdfClone.style.backgroundColor = 'white';
 
   pdfClone.classList.add('pdf-export-mode');
@@ -1683,15 +1826,25 @@ function exportPdf() {
 
   document.body.appendChild(pdfClone);
 
+  // Apply Prestige Styles to Clone before export
+  const headers = pdfClone.querySelectorAll('h3');
+  headers.forEach(h => {
+    h.style.color = '#1a252f';
+    h.style.borderBottom = '1.5px solid #1a252f';
+    h.style.paddingBottom = '8px';
+    h.style.marginBottom = '20px';
+  });
+
   const opt = {
-    margin: 8,
-    filename: `${safeFilename}_fiche.pdf`,
+    margin: [0, 0, 0, 0],
+    filename: `${recipeName}.pdf`,
     image: { type: 'jpeg', quality: 0.98 },
     html2canvas: {
-      scale: 2,
+      scale: 2, // 3 is sometimes too much for memory
       useCORS: true,
       backgroundColor: '#ffffff',
-      logging: false
+      logging: false,
+      letterRendering: true
     },
     jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
   };
@@ -2222,7 +2375,100 @@ function updateDashboard() {
   renderFeaturedRecipe();
   renderTodayTeam();
   renderPendingLeavesDashboard();
+  renderCommandCenter();
 }
+
+function renderCommandCenter() {
+  const row = $('#commandCenterRow');
+  if (!row) return;
+  row.style.display = 'grid';
+
+  // 1. Stock Alerts
+  const lowStock = APP.inventory.filter(item => item.stock <= item.alertThreshold);
+  const stockList = $('#dashStockAlertList');
+  const stockSub = $('#dashStockSubtitle');
+  if (stockList && stockSub) {
+    stockSub.textContent = `${lowStock.length} ${t('dash.alert.items_low') || 'articles sous le seuil'}`;
+    if (lowStock.length === 0) {
+      stockList.innerHTML = `<div class="alert-item-mini" style="background:var(--success-light); color:var(--success); border:none;">✅ ${t('dash.alert.all_good') || 'Tous les stocks sont OK'}</div>`;
+    } else {
+      stockList.innerHTML = lowStock.slice(0, 3).map(item => `
+        <div class="alert-item-mini">
+          <span>${escapeHtml(item.name)}</span>
+          <strong style="color:var(--danger)">${item.stock} ${item.unit}</strong>
+        </div>
+      `).join('');
+    }
+  }
+
+  // 2. Finance Health
+  const avgMarginEl = $('#dashAvgMargin');
+  const totalValEl = $('#dashTotalValue');
+  if (avgMarginEl && totalValEl) {
+    if (APP.savedRecipes.length > 0) {
+      const avg = APP.savedRecipes.reduce((s, r) => s + (r.margin || 70), 0) / APP.savedRecipes.length;
+      avgMarginEl.textContent = avg.toFixed(1) + '%';
+
+      const totalVal = APP.savedRecipes.reduce((s, r) => {
+        const costs = calcFullCost(r.margin || 70, r);
+        return s + costs.sellingPrice;
+      }, 0);
+      totalValEl.textContent = totalVal.toLocaleString() + ' €';
+    }
+  }
+
+  // 3. AI Advice
+  const aiAdvice = $('#dashAIAdvice');
+  if (aiAdvice) {
+    let pick = "";
+    if (APP.savedRecipes.length > 0) {
+      const topRecipe = [...APP.savedRecipes].sort((a, b) => (b.margin || 0) - (a.margin || 0))[0];
+      pick = `Votre recette la plus rentable est <strong>${topRecipe.name}</strong> (${topRecipe.margin.toFixed(0)}%).`;
+    } else {
+      pick = "Commencez par créer une recette pour recevoir des analyses !";
+    }
+
+    const extraAdvices = [
+      "Optimisez le coût du beurre : +12% de hausse prévue.",
+      "Vos marges sur les viennoiseries sont au-dessus de la moyenne.",
+      "Réduisez le gaspillage sur les fruits frais ce week-end."
+    ];
+
+    aiAdvice.innerHTML = `
+      <div class="alert-item-mini" style="background:var(--accent-glow); color:var(--accent-dark); border:none; flex-direction:column; align-items:flex-start; gap:4px;">
+        <div style="font-weight:700;">✨ Insight:</div>
+        <div>${pick}</div>
+        <div style="font-size:0.75rem; border-top:1px solid rgba(0,0,0,0.05); padding-top:4px; margin-top:4px; opacity:0.8;">💡 ${extraAdvices[Math.floor(Math.random() * extraAdvices.length)]}</div>
+      </div>`;
+  }
+}
+
+function toggleDarkMode() {
+  document.body.classList.toggle('dark-theme');
+  const isDark = document.body.classList.contains('dark-theme');
+  localStorage.setItem('theme', isDark ? 'dark' : 'light');
+
+  const sun = $('.theme-icon-sun');
+  const moon = $('.theme-icon-moon');
+  if (sun && moon) {
+    sun.style.display = isDark ? 'none' : 'block';
+    moon.style.display = isDark ? 'block' : 'none';
+  }
+}
+
+// Initialize theme
+document.addEventListener('DOMContentLoaded', () => {
+  const savedTheme = localStorage.getItem('theme');
+  if (savedTheme === 'dark') {
+    document.body.classList.add('dark-theme');
+    const sun = $('.theme-icon-sun');
+    const moon = $('.theme-icon-moon');
+    if (sun && moon) { sun.style.display = 'none'; moon.style.display = 'block'; }
+  }
+
+  const themeBtn = $('#themeToggleBtn');
+  if (themeBtn) themeBtn.addEventListener('click', toggleDarkMode);
+});
 
 let currentFeaturedRecipe = null;
 function renderFeaturedRecipe() {
@@ -2241,7 +2487,6 @@ function renderFeaturedRecipe() {
 
   const r = currentFeaturedRecipe;
   container.innerHTML = `
-    <img src="${r.image}" class="featured-img" alt="${r.name}" onerror="this.src='https://placehold.co/200x200?text=${escapeHtml(r.name).replace(/ /g, '+')}'; this.classList.add('error');">
     <div class="featured-info">
       <h4>${escapeHtml(r.name)}</h4>
       <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:1rem; line-height:1.4;">${escapeHtml(r.description)}</p>
@@ -2988,12 +3233,40 @@ function loadSuppliers() {
     { id: 5, name: 'Laiterie Echiré', contact: '05 49 25 70 03', email: 'contact@echire-aop.fr', categories: ['Beurre AOP', 'Crème'], leadTime: 3 },
     { id: 6, name: 'Vanille & Co', contact: '02 40 12 34 56', email: 'vanille@pro-reunion.re', categories: ['Vanille', 'Epices'], leadTime: 7 },
     { id: 7, name: 'PCB Création', contact: '03 88 58 75 75', email: 'orders@pcb-creation.fr', categories: ['Décoration', 'Colorants'], leadTime: 4 },
-    { id: 8, name: 'Matfer Bourgeat', contact: '01 43 62 60 40', email: 'info@matferbourgeat.com', categories: ['Matériel Ops'], leadTime: 5 }
+    { id: 8, name: 'Matfer Bourgeat', contact: '01 43 62 60 40', email: 'info@matferbourgeat.com', categories: ['Matériel Ops'], leadTime: 5 },
+    { id: 9, name: 'DGF Gastronomie', contact: '01 39 22 22 00', email: 'info@dgf.fr', categories: ['Pâtisserie', 'Général'], leadTime: 3 },
+    { id: 10, name: 'Bridor France', contact: '02 99 00 11 67', email: 'contact@bridor.com', categories: ['Viennoiserie', 'Boulangerie'], leadTime: 4 },
+    { id: 11, name: 'Barry Callebaut', contact: '01 30 22 84 00', email: 'customer_service@barry-callebaut.com', categories: ['Chocolat', 'Décoration'], leadTime: 5 }
   ];
   if (!saved) saveSuppliers();
 }
 
 function saveSuppliers() { localStorage.setItem('gourmet_suppliers', JSON.stringify(APP.suppliers)); }
+
+let currentSupplierCategory = 'all';
+
+function filterSuppliers(cat, btn) {
+  const isAlreadyActive = currentSupplierCategory === cat;
+
+  // Toggle: If clicked same active cat (and it's not 'all'), go back to 'all'
+  if (isAlreadyActive && cat !== 'all') {
+    currentSupplierCategory = 'all';
+    // Switch active state back to 'All' button
+    const allBtn = document.querySelector('[onclick*="all"]');
+    if (allBtn) {
+      document.querySelectorAll('.filter-side-item').forEach(c => c.classList.remove('active'));
+      allBtn.classList.add('active');
+    }
+  } else {
+    currentSupplierCategory = cat;
+    // Update UI chips
+    const chips = document.querySelectorAll('.filter-side-item');
+    chips.forEach(c => c.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+  }
+
+  renderSuppliers();
+}
 
 function renderSuppliers() {
   const grid = document.getElementById('suppliersGrid');
@@ -3003,19 +3276,30 @@ function renderSuppliers() {
   const searchInput = document.getElementById('supplierSearchInput');
   const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
 
-  const filtered = APP.suppliers.filter(s =>
-    s.name.toLowerCase().includes(query) ||
-    s.categories.some(c => c.toLowerCase().includes(query))
-  );
+  let filtered = APP.suppliers;
+
+  // Category Filter
+  if (currentSupplierCategory !== 'all') {
+    filtered = filtered.filter(s =>
+      s.categories.some(c => c.toLowerCase().includes(currentSupplierCategory.toLowerCase()))
+    );
+  }
+
+  // Search Query Filter
+  if (query) {
+    filtered = filtered.filter(s =>
+      s.name.toLowerCase().includes(query) ||
+      s.categories.some(c => c.toLowerCase().includes(query))
+    );
+  }
 
   if (filtered.length === 0) {
     grid.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding:3rem; color:var(--text-muted);">
       <div style="font-size:3rem; margin-bottom:1rem;">🏢</div>
-      <p>Aucun fournisseur trouvé.</p>
+      <p>${t('orders.empty.suppliers')}</p>
     </div>`;
   } else {
     grid.innerHTML = filtered.map(s => {
-      // Find matching items in low stock
       const matchingLowStock = lowStock.filter(item =>
         s.categories.some(cat =>
           item.name.toLowerCase().includes(cat.toLowerCase()) ||
@@ -3031,38 +3315,46 @@ function renderSuppliers() {
       const hasAlert = matchingLowStock.length > 0;
 
       return `
-        <div class="supplier-card ${hasAlert ? 'alert-active' : ''}">
+        <div class="supplier-card">
           <div class="supplier-card-header">
-            <div class="supplier-avatar">${s.name.charAt(0).toUpperCase()}</div>
-            <div class="supplier-info-main">
+            <div class="supplier-title-group">
               <h3>${escapeHtml(s.name)}</h3>
-              <span>ID: #${s.id.toString().slice(-4)}</span>
+              <span class="supplier-categories-sub">${s.categories.map(cat => t(cat)).join(' · ')}</span>
+            </div>
+            <div class="supplier-status-badge ${hasAlert ? 'need-order' : 'ok'}">
+              ${hasAlert ? t('orders.status.action') : t('orders.status.ok')}
             </div>
           </div>
+
           <div class="supplier-card-body">
-            <div class="supplier-contact-row"><i>📞</i> ${escapeHtml(s.contact || 'Non renseigné')}</div>
-            <div class="supplier-contact-row" style="word-break: break-all;"><i>✉️</i> ${escapeHtml(s.email || 'Pas d\'email')}</div>
-            <div class="supplier-tags">
-              ${s.categories.map(c => `<span class="tag-supplier">${escapeHtml(c)}</span>`).join('')}
-            </div>
-            
             ${hasAlert ? `
-              <div class="supplier-crit-list">
-                <div style="font-size:0.7rem; font-weight:800; margin-bottom:0.5rem; color:var(--warning); display:flex; align-items:center; gap:5px;">
-                  ⚠️ ${t('suppliers.need_order') || 'ARTICLES À RECOMMANDER'} :
-                </div>
-                ${matchingLowStock.map(item => `
-                  <div class="supplier-crit-item">
-                    • ${escapeHtml(item.name)} (${item.stock} ${item.unit} restants)
-                  </div>
-                `).join('')}
+              <div class="supplier-alert-strip">
+                ${matchingLowStock.map(item => {
+        const need = (item.alertThreshold * 4) - item.stock;
+        return `
+                    <div class="alert-strip-item">
+                      <span class="alert-item-name">${escapeHtml(t(item.name))}</span>
+                      <span class="alert-item-qty">+${need} ${formatUnit(need, item.unit)}</span>
+                    </div>
+                  `;
+      }).join('')}
               </div>
             ` : ''}
+
+            <div class="supplier-contact-info">
+              <div class="contact-item"><span>📞</span> ${escapeHtml(s.contact || '—')}</div>
+              <div class="contact-item"><span>✉️</span> ${escapeHtml(s.email || '—')}</div>
+            </div>
           </div>
+
           <div class="supplier-card-footer">
-            <button class="btn-icon" title="Contacter" onclick="window.location.href='mailto:${s.email}'" style="${hasAlert ? 'background:var(--warning); color:white;' : ''}">📧</button>
-            <button class="btn-icon" title="Modifier" onclick="editSupplier(${s.id})">✏️</button>
-            <button class="btn-icon" title="Supprimer" onclick="deleteSupplier(${s.id})" style="color:var(--danger);">🗑️</button>
+            <button class="btn-order-now" onclick="prepareOrder('${escapeHtml(matchingLowStock[0]?.name || '')}')" ${!hasAlert ? 'disabled style="opacity:0.3; cursor:not-allowed;"' : ''}>
+              ${t('orders.btn.order')}
+            </button>
+            <div class="supplier-util-actions">
+              <button class="btn-util" title="${t('ui.btn.edit')}" onclick="editSupplier(${s.id})">✏️</button>
+              <button class="btn-util" title="${t('ui.btn.delete')}" onclick="deleteSupplier(${s.id})">🗑️</button>
+            </div>
           </div>
         </div>
       `;
@@ -3088,7 +3380,7 @@ function renderSuggestedOrders() {
   if (pendingEl) pendingEl.textContent = lowStock.length;
 
   if (lowStock.length === 0) {
-    container.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:2rem; color:var(--text-muted);">✅ Tous les stocks sont conformes.</td></tr>`;
+    container.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:2rem; color:var(--text-muted);">✅ ${t('orders.empty.stocks')}</td></tr>`;
     return;
   }
 
@@ -3100,45 +3392,43 @@ function renderSuggestedOrders() {
     return `
       <tr class="order-row">
         <td>
-          <div style="display:flex; align-items:center; gap:10px;">
-            <span class="order-status-dot ${isCritical ? 'critical' : 'warning'}"></span>
-            <span class="order-item-name">${escapeHtml(item.name)}</span>
+          <div class="order-item-badge">
+            <span class="order-status-dot ${isCritical ? 'critical' : 'warning'}" title="${isCritical ? t('orders.status.critical') : t('orders.status.urgent')}"></span>
+            <span class="order-item-name">${escapeHtml(t(item.name))}</span>
           </div>
         </td>
-        <td style="font-weight:700;">${item.stock} ${item.unit}</td>
-        <td style="color:var(--text-muted);">${item.alertThreshold} ${item.unit}</td>
-        <td><span class="order-qty-pill">+ ${need} ${item.unit}</span></td>
-        <td style="text-align: right;">
-          <span style="font-size:0.7rem; font-weight:800; text-transform:uppercase; color:${isCritical ? 'var(--danger)' : 'var(--warning)'};">
-            ${isCritical ? 'CRITIQUE' : 'URGENT'}
+        <td style="font-weight:700;">
+          <span style="color:${isCritical ? 'var(--danger)' : 'var(--text)'}">${item.stock} ${formatUnit(item.stock, item.unit)}</span>
+        </td>
+        <td style="color:var(--text-muted); font-size:0.85rem;">${item.alertThreshold} ${item.unit}</td>
+        <td>
+          <span class="order-qty-pill">+ ${need} ${formatUnit(need, item.unit)}</span>
+        </td>
+        <td>
+          <span style="font-size:0.7rem; font-weight:900; text-transform:uppercase; color:${isCritical ? 'var(--danger)' : 'var(--warning)'}; background:${isCritical ? 'rgba(231, 76, 60, 0.1)' : 'rgba(243, 156, 18, 0.1)'}; padding:4px 10px; border-radius:12px;">
+            ${isCritical ? t('orders.status.critical') : t('orders.status.urgent')}
           </span>
+        </td>
+        <td style="text-align: right;">
+          <button class="btn-prepare-order" onclick="prepareOrder('${escapeHtml(item.name)}')">
+            ${t('orders.btn.order')}
+          </button>
         </td>
       </tr>
     `;
   }).join('');
 }
 
-function exportShoppingList() {
-  const lowStock = APP.inventory.filter(item => item.stock <= item.alertThreshold);
-  if (lowStock.length === 0) { showToast("Aucun article en stock bas."); return; }
-  let text = "BON DE COMMANDE GOURMET'REVIENT - " + new Date().toLocaleDateString() + "\n\n";
-  lowStock.forEach(item => { text += `- ${item.name}: ${(item.alertThreshold * 4) - item.stock} ${item.unit}\n`; });
-  const blob = new Blob([text], { type: 'text/plain' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = `Commande_${new Date().toISOString().split('T')[0]}.txt`;
-  a.click();
-  showToast("Liste exportée !");
-}
 
-// =====================================================================
-// STATISTICS & CHARTS (V2)
-// =====================================================================
+// ============================================================================
+// STATISTICS SYSTEM
+// ============================================================================
 
 let v2Charts = { margin: null, performance: null, scatter: null };
-let perfMode = 'top';
+let perfMode = 'top'; // 'top' or 'worst'
 
 function renderStats() {
+  // If no recipes, seed some examples to show user how it looks
   if (APP.savedRecipes.length === 0) {
     seedDemoData();
   }
@@ -3159,35 +3449,33 @@ function renderStats() {
   const avgCost = results.reduce((sum, r) => sum + r.data.costPerPortion, 0) / results.length;
   const avgPrice = results.reduce((sum, r) => sum + r.data.sellingPrice, 0) / results.length;
 
-  if ($('#v2KpiAvgMargin')) $('#v2KpiAvgMargin').textContent = avgMargin.toFixed(1) + '%';
-  if ($('#v2KpiBestRecipe')) $('#v2KpiBestRecipe').textContent = bestRecipe.name;
-  if ($('#v2KpiWorstRecipe')) $('#v2KpiWorstRecipe').textContent = worstRecipe.name;
-  if ($('#v2KpiAvgCost')) $('#v2KpiAvgCost').textContent = avgCost.toFixed(2) + '€';
-  if ($('#v2KpiAvgPrice')) $('#v2KpiAvgPrice').textContent = avgPrice.toFixed(2) + '€';
+  $('#v2KpiAvgMargin').textContent = avgMargin.toFixed(1) + '%';
+  $('#v2KpiBestRecipe').textContent = bestRecipe.name;
+  $('#v2KpiWorstRecipe').textContent = worstRecipe.name;
+  $('#v2KpiAvgCost').textContent = avgCost.toFixed(2) + '€';
+  $('#v2KpiAvgPrice').textContent = avgPrice.toFixed(2) + '€';
 
   // --- 10. INSIGHTS ---
-  let insightText = i18n.t('stats.insight.template', {
-    avg: avgMargin.toFixed(1),
-    best: bestRecipe.name,
-    bestMargin: bestRecipe.data.marginPct.toFixed(1)
-  });
+  const insightText = `Votre marge moyenne est de **${avgMargin.toFixed(1)}%**. La recette la plus performante est **${bestRecipe.name}** (${bestRecipe.data.marginPct.toFixed(1)}%). ` +
+    (worstRecipe.data.marginPct < 50 ? `Attention au **${worstRecipe.name}** qui présente une marge faible de ${worstRecipe.data.marginPct.toFixed(1)}%.` : "Votre catalogue est globalement très équilibré.");
+  $('#statsInsightText').innerHTML = insightText;
 
-  if (worstRecipe.data.marginPct < 50) {
-    insightText += " " + i18n.t('stats.insight.attention', {
-      worst: worstRecipe.name,
-      worstMargin: worstRecipe.data.marginPct.toFixed(1)
-    });
-  } else {
-    insightText += " " + i18n.t('stats.insight.balanced');
-  }
-
-  if ($('#statsInsightText')) $('#statsInsightText').innerHTML = insightText;
-
+  // --- 2. MARGIN DISTRIBUTION (Donut) ---
   renderV2MarginDonut(results);
+
+  // --- 3. PERFORMANCE CHART (Bars) ---
   renderV2PerformanceBars(results);
+
+  // --- 6. STRATEGIC SCATTER PLOT ---
   renderV2ScatterPlot(results);
+
+  // --- 4. ALERT CARDS ---
   renderV2Alerts(results);
+
+  // --- 5. DETAILED TABLE ---
   renderV2Table(results);
+
+  // Setup event listeners for stats UI
   setupStatsListeners(results);
 }
 
@@ -3228,13 +3516,7 @@ function renderV2MarginDonut(results) {
   });
 
   const excellentPct = (buckets.excellent / results.length * 100).toFixed(0);
-  const analysisEl = $('#v2MarginAnalysis');
-  if (analysisEl) {
-    analysisEl.innerHTML = i18n.t('stats.analysis.excellent_pct', {
-      pct: excellentPct,
-      status: Number(excellentPct) > 50 ? i18n.t('stats.analysis.profitable') : i18n.t('stats.analysis.to_optimize')
-    });
-  }
+  $('#v2MarginAnalysis').innerHTML = `<strong>${excellentPct}%</strong> de vos recettes ont une marge > 70%. Votre catalogue est ${excellentPct > 50 ? 'globalement très rentable.' : 'à optimiser.'}`;
 }
 
 function renderV2PerformanceBars(results) {
@@ -3251,7 +3533,7 @@ function renderV2PerformanceBars(results) {
     data: {
       labels: sorted.map(r => r.name),
       datasets: [{
-        label: i18n.t('stats.chart.margin_label'),
+        label: 'Marge %',
         data: sorted.map(r => r.data.marginPct),
         backgroundColor: perfMode === 'top' ? 'rgba(34, 197, 94, 0.8)' : 'rgba(239, 68, 68, 0.8)',
         borderRadius: 6,
@@ -3270,7 +3552,7 @@ function renderV2PerformanceBars(results) {
         legend: { display: false },
         tooltip: {
           callbacks: {
-            label: (ctx) => ` ${i18n.t('stats.chart.tooltip_margin')}: ${ctx.raw.toFixed(1)}% | ${i18n.t('stats.chart.tooltip_price')}: ${sorted[ctx.dataIndex].data.sellingPrice.toFixed(2)}€`
+            label: (ctx) => ` Marge: ${ctx.raw.toFixed(1)}% | Prix: ${sorted[ctx.dataIndex].data.sellingPrice.toFixed(2)}€`
           }
         }
       }
@@ -3293,7 +3575,7 @@ function renderV2ScatterPlot(results) {
     type: 'scatter',
     data: {
       datasets: [{
-        label: i18n.t('stats.chart.recipes_label'),
+        label: 'Recettes',
         data: data,
         backgroundColor: '#6366F1',
         pointRadius: 6,
@@ -3304,13 +3586,13 @@ function renderV2ScatterPlot(results) {
       responsive: true,
       maintainAspectRatio: false,
       scales: {
-        x: { title: { display: true, text: i18n.t('stats.chart.cost_axis'), font: { weight: '700' } }, grid: { color: '#F1F5F9' } },
-        y: { title: { display: true, text: i18n.t('stats.chart.margin_axis'), font: { weight: '700' } }, min: 0, max: 100, grid: { color: '#F1F5F9' } }
+        x: { title: { display: true, text: 'Coût Matière (€)', font: { weight: '700' } }, grid: { color: '#F1F5F9' } },
+        y: { title: { display: true, text: 'Marge %', font: { weight: '700' } }, min: 0, max: 100, grid: { color: '#F1F5F9' } }
       },
       plugins: {
         tooltip: {
           callbacks: {
-            label: (ctx) => ` ${data[ctx.dataIndex].name}: ${i18n.t('stats.chart.tooltip_cost')} ${ctx.parsed.x.toFixed(2)}€ | ${i18n.t('stats.chart.tooltip_margin')} ${ctx.parsed.y.toFixed(1)}%`
+            label: (ctx) => ` ${data[ctx.dataIndex].name}: Coût ${ctx.parsed.x.toFixed(2)}€ | Marge ${ctx.parsed.y.toFixed(1)}%`
           }
         }
       }
@@ -3325,22 +3607,17 @@ function renderV2Alerts(results) {
   const problematic = results.filter(r => r.data.marginPct < 55).sort((a, b) => a.data.marginPct - b.data.marginPct).slice(0, 3);
 
   if (problematic.length === 0) {
-    container.innerHTML = `<div style="text-align:center; padding:2rem; color:var(--text-secondary);">${i18n.t('stats.alerts.none')}</div>`;
+    container.innerHTML = `<div style="text-align:center; padding:2rem; color:var(--dash-text-muted);">✅ Aucune alerte détectée. Vos marges sont saines.</div>`;
     return;
   }
 
   container.innerHTML = problematic.map(r => {
     const isCritical = r.data.marginPct < 35;
-    const suggestion = isCritical
-      ? i18n.t('stats.alerts.critical_suggestion', { amount: (r.data.sellingPrice * 0.15).toFixed(2) })
-      : i18n.t('stats.alerts.standard_suggestion');
+    const suggestion = isCritical ? `Augmenter le prix de ${(r.data.sellingPrice * 0.15).toFixed(2)}€ ou réduire coût matière.` : `Optimiser coût de revient de ~10%.`;
     return `
       <div class="alert-recipe-card ${isCritical ? 'danger' : ''}">
         <div class="alert-title">⚠️ ${escapeHtml(r.name)}</div>
-        <div class="alert-desc">
-          ${i18n.t('stats.alerts.margin_at', { margin: r.data.marginPct.toFixed(1) })} 
-          ${i18n.t('stats.alerts.material_cost', { cost: r.data.totalMaterial.toFixed(2) })}
-        </div>
+        <div class="alert-desc">Marge de <strong>${r.data.marginPct.toFixed(1)}%</strong>. Coût matière de ${r.data.totalMaterial.toFixed(2)}€.</div>
         <div class="alert-suggestion">${suggestion}</div>
       </div>
     `;
@@ -3351,12 +3628,7 @@ function renderV2Table(results) {
   const body = $('#v2DetailedTableBody');
   if (!body) return;
 
-  const searchInput = $('#statsSearch');
-  if (searchInput) {
-    searchInput.placeholder = i18n.t('stats.table.search_ph');
-  }
-
-  const searchTerm = (searchInput?.value || '').toLowerCase();
+  const searchTerm = ($('#statsSearch')?.value || '').toLowerCase();
   const filtered = results.filter(r => r.name.toLowerCase().includes(searchTerm));
 
   body.innerHTML = filtered.map(r => {
@@ -3367,7 +3639,7 @@ function renderV2Table(results) {
         <td style="font-weight:700;">${escapeHtml(r.name)}</td>
         <td>${r.data.totalMaterial.toFixed(2)} €</td>
         <td>${r.data.costPerPortion.toFixed(2)} €</td>
-        <td style="font-weight:800; color:var(--primary);">${r.data.sellingPrice.toFixed(2)} €</td>
+        <td style="font-weight:800; color:var(--dash-primary);">${r.data.sellingPrice.toFixed(2)} €</td>
         <td>
           <div style="display:flex; align-items:center; gap:0.75rem;">
             <span style="font-weight:700; min-width:35px;">${m.toFixed(0)}%</span>
@@ -3408,6 +3680,23 @@ function setupStatsListeners(results) {
     searchInput.oninput = () => renderV2Table(results);
   }
 }
+
+function exportShoppingList() {
+  const lowStock = APP.inventory.filter(item => item.stock <= item.alertThreshold);
+  if (lowStock.length === 0) { showToast("Aucun article en stock bas."); return; }
+  let text = "BON DE COMMANDE GOURMET'REVIENT - " + new Date().toLocaleDateString() + "\n\n";
+  lowStock.forEach(item => { text += `- ${item.name}: ${(item.alertThreshold * 4) - item.stock} ${item.unit}\n`; });
+  const blob = new Blob([text], { type: 'text/plain' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `Commande_${new Date().toISOString().split('T')[0]}.txt`;
+  a.click();
+  showToast("Liste exportée !");
+}
+
+// =====================================================================
+// PRODUCTION MODE
+// =====================================================================
 
 // =====================================================================
 // PRODUCTION MODE
