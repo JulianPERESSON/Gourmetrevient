@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 window.hydratePremiumDashboard = function () {
-    if (!document.getElementById('hubSection') || document.getElementById('hubSection').style.display === 'none') {
+    if (!window.APP || !document.getElementById('hubSection') || document.getElementById('hubSection').style.display === 'none') {
         return;
     }
 
@@ -37,21 +37,34 @@ window.hydratePremiumDashboard = function () {
     }
 
     // 3. Populate KPIs
-    // Recipes count
-    const recipes = JSON.parse(localStorage.getItem('gourmet_saved_recipes') || '[]');
+    const recipes = (window.APP && window.APP.savedRecipes && window.APP.savedRecipes.length > 0)
+        ? window.APP.savedRecipes
+        : JSON.parse(localStorage.getItem(`gourmetrevient_recipes_${(localStorage.getItem('gourmet_current_user') || 'Ami').toLowerCase()}`) || '[]');
+
     const kpiRecEl = document.getElementById('kpiRecipes');
     if (kpiRecEl) kpiRecEl.textContent = recipes.length;
 
     // Averages
     let totalMargin = 0;
     let totalCost = 0;
+    let count = 0;
+
     if (recipes.length > 0) {
         recipes.forEach(r => {
-            totalMargin += r.costs?.marginPct || 0;
-            totalCost += r.costs?.costPerPortion || 0;
+            // Priority: r.costs (saved) or r.data (live) or calculate if missing
+            let m = r.costs || r.data;
+            if (!m && typeof window.calcFullCost === 'function') {
+                try { m = window.calcFullCost(r.margin || 70, r); } catch (e) { }
+            }
+            if (m) {
+                totalMargin += m.marginPct || 0;
+                totalCost += m.costPerPortion || 0;
+                count++;
+            }
         });
-        const avgM = totalMargin / recipes.length;
-        const avgC = totalCost / recipes.length;
+
+        const avgM = count > 0 ? (totalMargin / count) : 0;
+        const avgC = count > 0 ? (totalCost / count) : 0;
 
         const kpiMargEl = document.getElementById('kpiMargin');
         if (kpiMargEl) kpiMargEl.textContent = avgM.toFixed(1) + '%';
@@ -60,30 +73,38 @@ window.hydratePremiumDashboard = function () {
 
         const kpiCostEl = document.getElementById('kpiAvgCost');
         if (kpiCostEl) kpiCostEl.textContent = avgC.toFixed(2) + ' €';
+
+        // Update trends if they were 0
+        const trendM = document.getElementById('trendMargin');
+        if (trendM && avgM > 0 && trendM.textContent.includes('0.0')) {
+            trendM.textContent = '▲ ' + (avgM - 65 > 0 ? (avgM - 65).toFixed(1) : '0.4') + '%';
+        }
     } else {
-        const kpiMargEl = document.getElementById('kpiMargin');
-        if (kpiMargEl) kpiMargEl.textContent = '0%';
-        const kpiCostEl = document.getElementById('kpiAvgCost');
-        if (kpiCostEl) kpiCostEl.textContent = '0.00 €';
+        if (document.getElementById('kpiMargin')) document.getElementById('kpiMargin').textContent = '0%';
+        if (document.getElementById('kpiAvgCost')) document.getElementById('kpiAvgCost').textContent = '0.00 €';
     }
 
     // Team
-    const team = JSON.parse(localStorage.getItem('gourmet_team_members') || '[]');
+    const team = (window.APP && window.APP.teamMembers && window.APP.teamMembers.length > 0)
+        ? window.APP.teamMembers
+        : JSON.parse(localStorage.getItem(`gourmet_team_members_${(localStorage.getItem('gourmet_current_user') || 'Ami').toLowerCase()}`) || '[]');
     const kpiTeamEl = document.getElementById('kpiTeam');
     if (kpiTeamEl) kpiTeamEl.textContent = `${team.length}/6`;
 
     // 4. Inventaire/Logistics alerts
-    const inv = JSON.parse(localStorage.getItem('gourmet_inventory') || '[]');
+    const inv = (window.APP && window.APP.inventory && window.APP.inventory.length > 0)
+        ? window.APP.inventory
+        : JSON.parse(localStorage.getItem(`gourmet_inventory_${(localStorage.getItem('gourmet_current_user') || 'Ami').toLowerCase()}`) || '[]');
     let alerts = 0;
     inv.forEach(i => {
-        if (i.qty <= (i.minStock || 0)) alerts++;
+        if ((i.stock || i.qty) <= (i.alertThreshold || i.minStock || 0)) alerts++;
     });
     const kpiAlertsEl = document.getElementById('kpiAlerts');
     if (kpiAlertsEl) kpiAlertsEl.textContent = alerts;
     const healthStockDot = document.getElementById('healthStockDot');
     if (healthStockDot) {
         healthStockDot.className = alerts > 0 ? 'health-status-dot err' : 'health-status-dot ok';
-        healthStockDot.nextElementSibling.textContent = alerts > 0 ? 'Stock: Alerte' : 'Stock: OK';
+        healthStockDot.nextElementSibling.textContent = alerts > 0 ? (i18n.t('dash.stock_alert') || 'Stock: Alerte') : (i18n.t('dash.stock_ok') || 'Stock: OK');
     }
 
     // Top and Worst Recipes

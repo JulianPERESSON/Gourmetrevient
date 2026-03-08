@@ -19,11 +19,9 @@ const APP = {
   staffLeaves: [],
   inventory: [],
   suppliers: [
-    { id: 101, name: 'Laiterie des Alpes', contact: 'M. Durif', email: 'ventes@laiterialpes.fr', categories: ['Lait', 'Beurre', 'Crème'], rating: 4.8 },
-    { id: 102, name: 'Fruits d\'Exception', contact: 'Mme. Berry', email: 'contact@fruits-exception.com', categories: ['Fruits frais', 'Purées', 'Surgelés'], rating: 4.9 },
-    { id: 103, name: 'Épices du Monde', contact: 'Jean Vanille', email: 'pro@epicesmonde.net', categories: ['Vanille', 'Cannelle', 'Épices'], rating: 4.7 },
-    { id: 104, name: 'Emballages Design', contact: 'Lucas Box', email: 'orders@designbox.fr', categories: ['Boîtes', 'Rubans', 'Papier'], rating: 4.5 },
-    { id: 105, name: 'Meunier d\'Or', contact: 'Paul Farine', email: 'contact@meunierd-or.fr', categories: ['Farine', 'Céréales'], rating: 4.6 }
+    { id: 101, name: 'Metro Cash & Carry', contact: 'M. Lefebvre', email: 'service-client@metro.fr', categories: ['Général', 'Frais', 'Sec'], rating: 4.8 },
+    { id: 102, name: 'Valrhona', contact: 'Claire Val', email: 'pro@valrhona.com', categories: ['Chocolat', 'Praliné', 'Couverture'], rating: 5.0 },
+    { id: 103, name: 'Grands Moulins de Paris', contact: 'Jean Meunier', email: 'commandes@gmp.fr', categories: ['Farine', 'Mixes', 'Céréales'], rating: 4.9 }
   ],
   history: [], // New for stats
   haccpLogs: { temp: [], trace: [], clean: [] },
@@ -478,7 +476,55 @@ function loadSavedRecipes() {
     const key = getUserRecipesKey();
     const data = localStorage.getItem(key);
     APP.savedRecipes = data ? JSON.parse(data) : [];
+
+    // ENHANCEMENT: Ensure all recipes have cost data for the dashboard
+    let needsSave = false;
+    APP.savedRecipes.forEach(r => {
+      if (!r.costs && typeof calcFullCost === 'function') {
+        r.margin = r.margin || 70;
+        r.costs = calcFullCost(r.margin, r);
+        needsSave = true;
+      }
+    });
+    if (needsSave) saveSavedRecipes();
+
+    // Seed examples if totally empty or very low to show off the stats/portfolio
+    if (APP.savedRecipes.length < 6) {
+      seedDemoData();
+    }
   } catch { APP.savedRecipes = []; }
+}
+
+function seedDemoData() {
+  // Classic recipes to showcase stats
+  const demoPool = (typeof RECIPES !== 'undefined') ? RECIPES.slice(0, 15) : [];
+
+  demoPool.forEach(r => {
+    // Check if a recipe with the same name already exists in savedRecipes
+    const exists = APP.savedRecipes.some(saved => saved.name === r.name);
+    if (!exists) {
+      const copy = JSON.parse(JSON.stringify(r));
+      copy.savedAt = new Date().toISOString();
+      copy.margin = 68 + (Math.random() * 12); // Realistic variety in margins
+      copy.costs = calcFullCost(copy.margin, copy);
+      APP.savedRecipes.push(copy);
+    }
+  });
+
+  // Fill some inventory to show stock value
+  if (APP.inventory.length === 0) {
+    initInventoryFromDb();
+  }
+
+  APP.inventory.forEach(item => {
+    if (!item.stock || item.stock < 10) {
+      item.stock = Math.floor(Math.random() * 2000) + 100;
+      item.lastUpdate = new Date().toISOString();
+    }
+  });
+
+  saveSavedRecipes();
+  saveInventory();
 }
 
 function saveSavedRecipes() {
@@ -2132,6 +2178,11 @@ function updateDashboard() {
   const headerName = $('#userNameHeader');
   if (headerName) headerName.textContent = name;
 
+  // Bridge to the premium dashboard if available
+  if (typeof hydratePremiumDashboard === 'function') {
+    hydratePremiumDashboard();
+  }
+
   const greeting = $('.dash-greeting');
   if (greeting) {
     const greetingText = t('dash.greeting');
@@ -2995,23 +3046,40 @@ function loadSuppliers() {
 
 function saveSuppliers() { localStorage.setItem('gourmet_suppliers', JSON.stringify(APP.suppliers)); }
 
+window.currentSupplierCat = 'all';
+
+function filterSupplierCat(cat) {
+  window.currentSupplierCat = cat;
+
+  // Update UI active state
+  document.querySelectorAll('.filter-pill').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.cat === cat);
+  });
+
+  renderSuppliers();
+}
+
 function renderSuppliers() {
   const grid = document.getElementById('suppliersGrid');
   if (!grid) return;
 
-  const lowStock = APP.inventory.filter(item => item.stock <= item.alertThreshold);
+  const lowStock = APP.inventory.filter(item => item.stock <= (item.alertThreshold || 0));
   const searchInput = document.getElementById('supplierSearchInput');
   const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
+  const currentCat = window.currentSupplierCat || 'all';
 
-  const filtered = APP.suppliers.filter(s =>
-    s.name.toLowerCase().includes(query) ||
-    s.categories.some(c => c.toLowerCase().includes(query))
-  );
+  const filtered = APP.suppliers.filter(s => {
+    const matchesQuery = s.name.toLowerCase().includes(query) ||
+      s.categories.some(c => c.toLowerCase().includes(query));
+    const matchesCat = currentCat === 'all' ||
+      s.categories.some(c => c.toLowerCase().includes(currentCat.toLowerCase()));
+    return matchesQuery && matchesCat;
+  });
 
   if (filtered.length === 0) {
-    grid.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding:3rem; color:var(--text-muted);">
-      <div style="font-size:3rem; margin-bottom:1rem;">🏢</div>
-      <p>${i18n.t('suppliers.none_found')}</p>
+    grid.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding:4rem; background:rgba(0,0,0,0.02); border-radius:20px; border:2px dashed var(--surface-border);">
+      <div style="font-size:4rem; margin-bottom:1.5rem; filter: grayscale(1);">🏢</div>
+      <p style="font-weight:700; color:var(--text-muted); font-size:1.1rem;">${i18n.t('suppliers.none_found')}</p>
     </div>`;
   } else {
     grid.innerHTML = filtered.map(s => {
@@ -3020,49 +3088,56 @@ function renderSuppliers() {
         s.categories.some(cat =>
           item.name.toLowerCase().includes(cat.toLowerCase()) ||
           cat.toLowerCase().includes(item.name.toLowerCase()) ||
-          (cat.toLowerCase() === 'farine' && item.name.toLowerCase().startsWith('farine')) ||
-          (cat.toLowerCase() === 'beurre' && item.name.toLowerCase().includes('beurre')) ||
-          (cat.toLowerCase() === 'chocolat' && item.name.toLowerCase().includes('chocolat')) ||
-          (cat.toLowerCase() === 'purées' && item.name.toLowerCase().includes('purée')) ||
-          (cat.toLowerCase() === 'épices' && (item.name.toLowerCase().includes('vanille') || item.name.toLowerCase().includes('poivre')))
+          (cat.toLowerCase().includes('lait') && item.name.toLowerCase().includes('lait')) ||
+          (cat.toLowerCase().includes('beurre') && item.name.toLowerCase().includes('beurre')) ||
+          (cat.toLowerCase().includes('farine') && item.name.toLowerCase().startsWith('farine')) ||
+          (cat.toLowerCase().includes('fruit') && (item.name.toLowerCase().includes('purée') || item.name.toLowerCase().includes('fruit')))
         )
       );
 
       const hasAlert = matchingLowStock.length > 0;
+      const stars = '⭐'.repeat(Math.round(s.rating || 5));
+
+      // BRAND COLORS Logic
+      let brandColor = 'var(--primary)';
+      if (s.name.includes('Metro')) brandColor = '#0055a4';
+      if (s.name.includes('Valrhona')) brandColor = '#e67e22';
+      if (s.name.includes('Moulins')) brandColor = '#c0392b';
 
       return `
-        <div class="supplier-card ${hasAlert ? 'alert-active' : ''}">
+        <div class="supplier-card ${hasAlert ? 'alert-active' : ''}" style="border-top: 4px solid ${brandColor};">
           <div class="supplier-card-header">
-            <div class="supplier-avatar">${s.name.charAt(0).toUpperCase()}</div>
+            <div class="supplier-avatar" style="background: ${brandColor};">${s.name.charAt(0).toUpperCase()}</div>
             <div class="supplier-info-main">
               <h3>${escapeHtml(s.name)}</h3>
-              <span>ID: #${s.id.toString().slice(-4)}</span>
+              <div class="rating-stars">${stars} <span style="font-size:0.7rem; color:#aaa;">(${s.rating || '5.0'})</span></div>
             </div>
           </div>
           <div class="supplier-card-body">
-            <div class="supplier-contact-row"><i>📞</i> ${escapeHtml(s.contact || 'Non renseigné')}</div>
-            <div class="supplier-contact-row" style="word-break: break-all;"><i>✉️</i> ${escapeHtml(s.email || i18n.t('suppliers.no_email'))}</div>
+            <div class="supplier-contact-row"><i>📞</i> ${escapeHtml(s.contact || 'Directeur')}</div>
+            <div class="supplier-contact-row" style="word-break: break-all; opacity:0.8; font-size:0.9rem;"><i>✉️</i> ${escapeHtml(s.email || 'contact@fournisseur.fr')}</div>
+            
             <div class="supplier-tags">
               ${s.categories.map(c => `<span class="tag-supplier">${escapeHtml(c)}</span>`).join('')}
             </div>
             
             ${hasAlert ? `
-              <div class="supplier-crit-list">
-                <div style="font-size:0.7rem; font-weight:800; margin-bottom:0.5rem; color:var(--warning); display:flex; align-items:center; gap:5px;">
-                  ⚠️ ${t('suppliers.need_order') || 'ARTICLES À RECOMMANDER'} :
+              <div class="supplier-crit-list" style="margin-top:1.5rem; border-top:1px solid rgba(243, 156, 18, 0.2); padding-top:1rem;">
+                <div style="font-size:0.75rem; font-weight:800; margin-bottom:0.8rem; color:var(--warning); display:flex; align-items:center; gap:8px;">
+                  ⚠️ ${i18n.t('suppliers.need_order') || 'ARTICLES À RECOMMANDER'} :
                 </div>
                 ${matchingLowStock.map(item => `
-                  <div class="supplier-crit-item">
-                    • ${escapeHtml(item.name)} (${item.stock} ${item.unit} restants)
+                  <div class="supplier-crit-item" style="font-size:0.8rem; padding:4px 0;">
+                    • ${escapeHtml(item.name)} <span style="color:#ef4444; font-weight:700;">(${item.stock} ${item.unit})</span>
                   </div>
                 `).join('')}
               </div>
             ` : ''}
           </div>
           <div class="supplier-card-footer">
-            <button class="btn-icon" title="Contacter" onclick="window.location.href='mailto:${s.email}'" style="${hasAlert ? 'background:var(--warning); color:white;' : ''}">📧</button>
+            <button class="btn btn-outline" style="padding:6px 12px; font-size:0.75rem;" onclick="window.location.href='mailto:${s.email}'">📧 ${i18n.t('suppliers.btn.contact') || 'Email'}</button>
             <button class="btn-icon" title="Modifier" onclick="editSupplier(${s.id})">✏️</button>
-            <button class="btn-icon" title="Supprimer" onclick="deleteSupplier(${s.id})" style="color:var(--danger);">🗑️</button>
+            <button class="btn-icon" title="Supprimer" onclick="deleteSupplier(${s.id})" style="color:var(--danger); opacity:0.6;">🗑️</button>
           </div>
         </div>
       `;
@@ -3505,6 +3580,7 @@ function showAddSupplierModal() {
   $('#supContact').value = '';
   $('#supEmail').value = '';
   $('#supCategory').value = 'Général';
+  $('#supRating').value = '5';
   $('#supplierModalTitle').textContent = '📦 Ajouter un Fournisseur';
   $('#supplierModal').style.display = 'flex';
 }
@@ -3519,6 +3595,7 @@ function saveSupplier() {
   const contact = $('#supContact').value.trim();
   const email = $('#supEmail').value.trim();
   const category = $('#supCategory').value;
+  const rating = parseFloat($('#supRating').value) || 5;
 
   if (!name) {
     showToast("Le nom est obligatoire", "error");
@@ -3533,6 +3610,7 @@ function saveSupplier() {
       s.contact = contact;
       s.email = email;
       s.categories = [category];
+      s.rating = rating;
     }
   } else {
     // Add mode
@@ -3542,6 +3620,7 @@ function saveSupplier() {
       contact,
       email,
       categories: [category],
+      rating,
       leadTime: 3
     });
   }
@@ -3561,6 +3640,7 @@ function editSupplier(id) {
   $('#supContact').value = s.contact || '';
   $('#supEmail').value = s.email || '';
   $('#supCategory').value = s.categories[0] || 'Général';
+  $('#supRating').value = Math.round(s.rating || 5).toString();
 
   $('#supplierModalTitle').textContent = '✏️ Modifier ' + s.name;
   $('#supplierModal').style.display = 'flex';

@@ -341,7 +341,7 @@
               </div>
               <div class="prod-item">
                 <div class="prod-header">
-                  <span class="prod-name">Tarte Citron (X24)</span>
+                  <span class="prod-name">Tartelette Chocolat (X24)</span>
                   <span class="prod-status-badge" style="background:#10b981; color:white;"
                     data-i18n="dash.prod.done">Terminé</span>
                 </div>
@@ -396,11 +396,11 @@
                 <span class="premium-stat-val" id="dashPerfMargin">72.9%</span>
                 <span class="kpi-mini-trend up" id="dashPerfTrend">▲ +0.6%</span>
               </div>
-              <canvas id="businessTrendSpark" style="width:100%; height:40px; margin: 0 0 10px 0;"></canvas>
+              <canvas id="businessTrendSpark" style="width:100%; height:25px; margin: 0 0 5px 0;"></canvas>
 
               <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; flex:1;">
                 <div>
-                  <h4 style="font-size:0.75rem; text-transform:uppercase; color:var(--text-muted); margin:0 0 5px 0;">
+                  <h4 style="font-size:0.75rem; text-transform:uppercase; color:var(--text-muted); margin:0;">
                     <span data-i18n="dash.biz.top">💎 Top</span>
                   </h4>
                   <div id="dashTopRecipes">
@@ -411,7 +411,7 @@
                   </div>
                 </div>
                 <div>
-                  <h4 style="font-size:0.75rem; text-transform:uppercase; color:var(--text-muted); margin:0 0 5px 0;">
+                  <h4 style="font-size:0.75rem; text-transform:uppercase; color:var(--text-muted); margin:0;">
                     <span data-i18n="dash.biz.worst">⚠️ À Surveiller</span>
                   </h4>
                   <div id="dashWorstRecipes">
@@ -1972,6 +1972,24 @@
                 </p>
               </div>
 
+              <div class="form-group" style="margin-bottom: 2rem;">
+                <label
+                  style="font-size: 0.75rem; text-transform: uppercase; font-weight: 800; color: #777; margin-bottom: 1rem; display: block;"
+                  data-i18n="suppliers.category_filter">Catégories</label>
+                <div id="supplierCategoryFilters" style="display: flex; flex-wrap: wrap; gap: 8px;">
+                  <!-- Dynamically populated -->
+                  <button class="filter-pill active" onclick="filterSupplierCat('all')" data-cat="all">Tout
+                    voir</button>
+                  <button class="filter-pill" onclick="filterSupplierCat('Laiterie')"
+                    data-cat="Laiterie">Laiterie</button>
+                  <button class="filter-pill" onclick="filterSupplierCat('Épicerie')"
+                    data-cat="Épicerie">Épicerie</button>
+                  <button class="filter-pill" onclick="filterSupplierCat('Fruits')" data-cat="Fruits">Fruits</button>
+                  <button class="filter-pill" onclick="filterSupplierCat('Emballages')"
+                    data-cat="Emballages">Emballages</button>
+                </div>
+              </div>
+
               <button class="btn btn-primary btn-full"
                 style="height: 60px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;"
                 onclick="showAddSupplierModal()">
@@ -2373,6 +2391,16 @@
             <label>Email</label>
             <input type="email" id="supEmail" class="form-input" placeholder="contact@fournisseur.com"
               style="width:100%;">
+          </div>
+          <div>
+            <label>Qualité / Note</label>
+            <select id="supRating" class="form-input" style="width:100%;">
+              <option value="5">⭐⭐⭐⭐⭐ (Excellent)</option>
+              <option value="4">⭐⭐⭐⭐ (Très bon)</option>
+              <option value="3">⭐⭐⭐ (Correct)</option>
+              <option value="2">⭐⭐ (Moyen)</option>
+              <option value="1">⭐ (À éviter)</option>
+            </select>
           </div>
           <button class="btn btn-primary btn-full" onclick="saveSupplier()">✅ Enregistrer le Fournisseur</button>
         </div>
