@@ -293,7 +293,8 @@
                   <span class="prod-status-badge" style="background:rgba(99,102,241,0.1); color:#6366f1;"
                     data-i18n="dash.prod.ongoing">En cours</span>
                 </div>
-                <div style="font-size:0.75rem; color:var(--text-muted); margin-bottom:6px;">Plateaux G1 • Progression
+                <div style="font-size:0.75rem; color:var(--text-muted); margin-bottom:6px;"
+                  data-i18n="dash.demo.plateaux" data-i18n-data='{"pct":65}'>Plateaux G1 • Progression
                   65%</div>
                 <div class="prod-progress-bar">
                   <div class="prod-progress-fill" style="width:65%; background:#6366f1;"></div>
@@ -305,7 +306,8 @@
                   <span class="prod-status-badge" style="background:var(--surface-border);" data-i18n="dash.prod.todo">À
                     produire</span>
                 </div>
-                <div style="font-size:0.75rem; color:var(--text-muted); margin-bottom:6px;">Individuels • Progression 0%
+                <div style="font-size:0.75rem; color:var(--text-muted); margin-bottom:6px;"
+                  data-i18n="dash.demo.individuels" data-i18n-data='{"pct":0}'>Individuels • Progression 0%
                 </div>
                 <div class="prod-progress-bar">
                   <div class="prod-progress-fill" style="width:0%;"></div>
@@ -317,7 +319,8 @@
                   <span class="prod-status-badge" style="background:var(--surface-border);" data-i18n="dash.prod.todo">À
                     produire</span>
                 </div>
-                <div style="font-size:0.75rem; color:var(--text-muted); margin-bottom:6px;">Bocaux • Progression 0%
+                <div style="font-size:0.75rem; color:var(--text-muted); margin-bottom:6px;" data-i18n="dash.demo.bocaux"
+                  data-i18n-data='{"pct":0}'>Bocaux • Progression 0%
                 </div>
                 <div class="prod-progress-bar">
                   <div class="prod-progress-fill" style="width:0%;"></div>
@@ -329,7 +332,8 @@
                   <span class="prod-status-badge" style="background:var(--surface-border);" data-i18n="dash.prod.todo">À
                     produire</span>
                 </div>
-                <div style="font-size:0.75rem; color:var(--text-muted); margin-bottom:6px;">Grand format • Progression
+                <div style="font-size:0.75rem; color:var(--text-muted); margin-bottom:6px;"
+                  data-i18n="dash.demo.grand_format" data-i18n-data='{"pct":0}'>Grand format • Progression
                   0%</div>
                 <div class="prod-progress-bar">
                   <div class="prod-progress-fill" style="width:0%;"></div>
@@ -341,7 +345,8 @@
                   <span class="prod-status-badge" style="background:#10b981; color:white;"
                     data-i18n="dash.prod.done">Terminé</span>
                 </div>
-                <div style="font-size:0.75rem; color:var(--text-muted); margin-bottom:6px;">Fonds cuits, ganache dressée
+                <div style="font-size:0.75rem; color:var(--text-muted); margin-bottom:6px;"
+                  data-i18n="dash.demo.fonds_cuits" data-i18n-data='{"pct":100}'>Fonds cuits, ganache dressée
                   • Progression 100%</div>
                 <div class="prod-progress-bar">
                   <div class="prod-progress-fill" style="width:100%; background:#10b981;"></div>
@@ -362,8 +367,9 @@
             <div class="premium-card-body" style="background: rgba(139, 92, 246, 0.05); padding: 1.2rem;">
               <div id="dashAIOptim">
                 <p style="font-size:0.85rem; margin:0 0 0.5rem 0; line-height:1.4;">
-                  <strong data-i18n="dash.ai.alert">Alerte Rentabilité :</strong> Votre <strong>Paris-Brest</strong>
-                  chute à 65% de marge suite à l'augmentation du prix de la noisette.
+                  <strong data-i18n="dash.ai.alert">Alerte Rentabilité :</strong> <span
+                    data-i18n="dash.demo.ai_alert_text">Votre <strong>Paris-Brest</strong>
+                    chute à 65% de marge suite à l'augmentation du prix de la noisette.</span>
                 </p>
                 <div class="suggestion-actions" style="margin: 0.5rem 0;">
                   <button class="sugg-btn primary" style="font-size:0.7rem; padding:4px 8px;"><span
@@ -371,8 +377,9 @@
                 </div>
                 <hr style="opacity:0.05; margin:0.5rem 0;">
                 <p style="font-size:0.85rem; margin:0; line-height:1.4;">
-                  <strong data-i18n="dash.ai.stock">Optimisation Stock :</strong> Commande de beurre nécessaire d'ici
-                  demain.
+                  <strong data-i18n="dash.ai.stock">Optimisation Stock :</strong> <span
+                    data-i18n="dash.demo.ai_stock_text">Commande de beurre nécessaire d'ici
+                    demain.</span>
                 </p>
               </div>
             </div>
@@ -427,14 +434,18 @@
             <div class="premium-card-body" id="bentoRecentList">
               <div class="recipe-row" style="border:none; padding:2px 0;">
                 <div style="display:flex; flex-direction:column;">
-                  <span style="font-size:0.75rem; font-weight:700;">Stock Beurre modifié</span>
-                  <span style="font-size:0.65rem; color:var(--text-muted);">par Chef Julien • 14:05</span>
+                  <span style="font-size:0.75rem; font-weight:700;" data-i18n="dash.demo.stock_beurre">Stock Beurre
+                    modifié</span>
+                  <span style="font-size:0.65rem; color:var(--text-muted);" data-i18n="dash.demo.stock_beurre_by">par
+                    Chef Julian à 14:05</span>
                 </div>
               </div>
               <div class="recipe-row" style="border:none; padding:2px 0;">
                 <div style="display:flex; flex-direction:column;">
-                  <span style="font-size:0.75rem; font-weight:700;">HACCP: Frigo A contrôlé</span>
-                  <span style="font-size:0.65rem; color:var(--text-muted);">Conforme (+3.2°C) • 13:45</span>
+                  <span style="font-size:0.75rem; font-weight:700;" data-i18n="dash.demo.haccp_frigo">HACCP: Frigo A
+                    contrôlé</span>
+                  <span style="font-size:0.65rem; color:var(--text-muted);"
+                    data-i18n="dash.demo.haccp_frigo_status">Conforme (+3.2°C) à 13:45</span>
                 </div>
               </div>
             </div>
@@ -453,15 +464,18 @@
                   data-i18n="dash.col.alerts">⚠️ Alertes</span></h4>
               <div id="dashRuptureList" style="margin-bottom:1rem;">
                 <div class="alert-item warning">
-                  <div style="flex:1; font-size:0.8rem; font-weight:700;">Sucre glace AOP</div>
+                  <div style="flex:1; font-size:0.8rem; font-weight:700;" data-i18n="dash.demo.sucre_glace">Sucre glace
+                    AOP</div>
                   <div style="font-size:0.75rem; font-weight:800; color:#ef4444;">2.5 kg</div>
                 </div>
                 <div class="alert-item warning">
-                  <div style="flex:1; font-size:0.8rem; font-weight:700;">Framboises</div>
+                  <div style="flex:1; font-size:0.8rem; font-weight:700;" data-i18n="dash.demo.framboises">Framboises
+                  </div>
                   <div style="font-size:0.75rem; font-weight:800; color:#ef4444;">0.8 kg</div>
                 </div>
                 <div class="alert-item warning">
-                  <div style="flex:1; font-size:0.8rem; font-weight:700;">Beurre Tourage</div>
+                  <div style="flex:1; font-size:0.8rem; font-weight:700;" data-i18n="dash.demo.beurre_tourage">Beurre
+                    Tourage</div>
                   <div style="font-size:0.75rem; font-weight:800; color:#ef4444;">5 plq</div>
                 </div>
               </div>

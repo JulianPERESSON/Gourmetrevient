@@ -108,7 +108,7 @@ window.hydratePremiumDashboard = function () {
             <div class="recipe-row" style="margin-bottom:2px; font-size:0.75rem;">
                 <span>${r.name}</span><span class="recipe-label-badge badge-danger" style="font-size:0.65rem;">${r.costs?.marginPct ? Math.round(r.costs.marginPct) : 0}%</span>
             </div>
-        `).join('') || '<div class="recipe-row"><span style="color:#aaa;">Aucune recette</span></div>';
+        `).join('') || `<div class="recipe-row"><span style="color:#aaa;">${i18n.t('dash.no_recipes')}</span></div>`;
     }
 
     if (!window.tipInitialized) {

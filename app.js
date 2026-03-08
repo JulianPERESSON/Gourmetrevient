@@ -3011,7 +3011,7 @@ function renderSuppliers() {
   if (filtered.length === 0) {
     grid.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding:3rem; color:var(--text-muted);">
       <div style="font-size:3rem; margin-bottom:1rem;">🏢</div>
-      <p>Aucun fournisseur trouvé.</p>
+      <p>${i18n.t('suppliers.none_found')}</p>
     </div>`;
   } else {
     grid.innerHTML = filtered.map(s => {
@@ -3041,7 +3041,7 @@ function renderSuppliers() {
           </div>
           <div class="supplier-card-body">
             <div class="supplier-contact-row"><i>📞</i> ${escapeHtml(s.contact || 'Non renseigné')}</div>
-            <div class="supplier-contact-row" style="word-break: break-all;"><i>✉️</i> ${escapeHtml(s.email || 'Pas d\'email')}</div>
+            <div class="supplier-contact-row" style="word-break: break-all;"><i>✉️</i> ${escapeHtml(s.email || i18n.t('suppliers.no_email'))}</div>
             <div class="supplier-tags">
               ${s.categories.map(c => `<span class="tag-supplier">${escapeHtml(c)}</span>`).join('')}
             </div>
@@ -3088,7 +3088,7 @@ function renderSuggestedOrders() {
   if (pendingEl) pendingEl.textContent = lowStock.length;
 
   if (lowStock.length === 0) {
-    container.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:2rem; color:var(--text-muted);">✅ Tous les stocks sont conformes.</td></tr>`;
+    container.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:2rem; color:var(--text-muted);">${i18n.t('orders.all_safe')}</td></tr>`;
     return;
   }
 
@@ -3110,7 +3110,7 @@ function renderSuggestedOrders() {
         <td><span class="order-qty-pill">+ ${need} ${item.unit}</span></td>
         <td style="text-align: right;">
           <span style="font-size:0.7rem; font-weight:800; text-transform:uppercase; color:${isCritical ? 'var(--danger)' : 'var(--warning)'};">
-            ${isCritical ? 'CRITIQUE' : 'URGENT'}
+            ${isCritical ? i18n.t('orders.critical') : i18n.t('orders.urgent')}
           </span>
         </td>
       </tr>
@@ -3120,15 +3120,15 @@ function renderSuggestedOrders() {
 
 function exportShoppingList() {
   const lowStock = APP.inventory.filter(item => item.stock <= item.alertThreshold);
-  if (lowStock.length === 0) { showToast("Aucun article en stock bas."); return; }
-  let text = "BON DE COMMANDE GOURMET'REVIENT - " + new Date().toLocaleDateString() + "\n\n";
+  if (lowStock.length === 0) { showToast(i18n.t('orders.no_low_stock')); return; }
+  let text = i18n.t('orders.export_title') + new Date().toLocaleDateString() + "\n\n";
   lowStock.forEach(item => { text += `- ${item.name}: ${(item.alertThreshold * 4) - item.stock} ${item.unit}\n`; });
   const blob = new Blob([text], { type: 'text/plain' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = `Commande_${new Date().toISOString().split('T')[0]}.txt`;
   a.click();
-  showToast("Liste exportée !");
+  showToast(i18n.t('orders.export_success'));
 }
 
 // =====================================================================
