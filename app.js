@@ -1794,6 +1794,117 @@ function renderDbIngredients() {
 }
 
 // ============================================================================
+// OPEN FOOD FACTS (OFF) API INTEGRATION
+// ============================================================================
+
+function showOffModal() {
+  $('#offModal').style.display = 'flex';
+  $('#offSearchInput').value = '';
+  $('#offResultsList').innerHTML = '';
+}
+
+function hideOffModal() {
+  $('#offModal').style.display = 'none';
+}
+
+async function searchOffProduct() {
+  const query = $('#offSearchInput').value.trim();
+  if (!query) return;
+
+  const resultsList = $('#offResultsList');
+  const loader = $('#offLoader');
+
+  resultsList.innerHTML = '';
+  loader.style.display = 'block';
+
+  try {
+    const isEAN = /^\d+$/.test(query);
+    let url = '';
+
+    if (isEAN) {
+      url = `https://world.openfoodfacts.org/api/v2/product/${query}.json`;
+    } else {
+      url = `https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(query)}&search_simple=1&action=process&json=1`;
+    }
+
+    const res = await fetch(url);
+    const data = await res.json();
+    loader.style.display = 'none';
+
+    let products = [];
+    if (isEAN) {
+      if (data.status === 1) products = [data.product];
+    } else {
+      products = data.products || [];
+    }
+
+    if (products.length === 0) {
+      resultsList.innerHTML = '<div style="padding:1rem; text-align:center; color:var(--text-muted);">Aucun produit trouvé. Vérifiez le code-barres ou le nom.</div>';
+      return;
+    }
+
+    window._offTempResults = products.slice(0, 10);
+
+    resultsList.innerHTML = products.slice(0, 10).map((p, i) => {
+      const name = p.product_name || p.product_name_fr || 'Produit inconnu';
+      const brands = p.brands ? `(${p.brands})` : '';
+      const kcal = p.nutriments && p.nutriments['energy-kcal_100g'] !== undefined ? p.nutriments['energy-kcal_100g'] : '?';
+      return `
+        <div class="autocomplete-item" style="padding:0.65rem 0.75rem; cursor:pointer; border-bottom:1px solid var(--surface-border); display:flex; justify-content:space-between; align-items:center;"
+             onclick="selectOffProduct(${i})">
+          <div>
+            <div style="font-weight:bold;">${escapeHtml(name)} <span style="font-weight:normal; font-size:0.8rem; color:var(--text-muted);">${escapeHtml(brands)}</span></div>
+            <div style="font-size:0.75rem; color:var(--primary); font-weight:600; margin-top:2px;">${kcal} kcal / 100g</div>
+          </div>
+          <span style="font-size:1.2rem; background:var(--surface-border); padding:4px 8px; border-radius:4px;">➕</span>
+        </div>
+      `;
+    }).join('');
+
+  } catch (e) {
+    loader.style.display = 'none';
+    resultsList.innerHTML = '<div style="padding:1rem; text-align:center; color:var(--danger);">Erreur réseau lors de la connexion à Open Food Facts.</div>';
+    console.error(e);
+  }
+}
+
+function selectOffProduct(index) {
+  const p = window._offTempResults[index];
+  if (!p) return;
+
+  const name = p.product_name || p.product_name_fr || 'Produit inconnu';
+
+  // Extract nutritions
+  const n = p.nutriments || {};
+  const kcal = n['energy-kcal_100g'] || 0;
+
+  // Ensure ingredient DB is initialized
+  if (!APP.ingredientDb) loadIngredientDb(); // Handle just in case
+
+  let existing = APP.ingredientDb.find(db => db.name.toLowerCase() === name.toLowerCase());
+  let price = existing ? existing.pricePerUnit : 0;
+
+  // Create ingredient with basic nutrition data
+  const offIngredient = {
+    name: name,
+    quantity: 0,
+    unit: existing ? existing.unit : 'g',
+    pricePerUnit: price,
+    kcal: kcal,
+    isOffData: true
+  };
+
+  addIngredient(offIngredient);
+
+  if (!existing) {
+    addToIngredientDb({ name: name, unit: 'g', pricePerUnit: 0 });
+  }
+
+  hideOffModal();
+  showToast(`Ingrédient associé avec Open Food Facts (${kcal} kcal/100g)`, 'success');
+}
+
+// ============================================================================
 // TOAST NOTIFICATIONS
 // ============================================================================
 
@@ -1886,11 +1997,23 @@ function bindEvents() {
   // Ingredients
   $('#btnAddIngredient').addEventListener('click', () => addIngredient());
   $('#btnAddFromDb').addEventListener('click', showIngredientDbModal);
+  $('#btnSearchOff').addEventListener('click', showOffModal);
+
   $('#dbModalClose').addEventListener('click', hideIngredientDbModal);
+  $('#offModalClose').addEventListener('click', hideOffModal);
+  $('#btnOffSearch').addEventListener('click', searchOffProduct);
+
+  $('#offSearchInput').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') searchOffProduct();
+  });
 
   // Close DB modal on backdrop click
   $('#dbModal').addEventListener('click', (e) => {
     if (e.target.id === 'dbModal') hideIngredientDbModal();
+  });
+
+  $('#offModal').addEventListener('click', (e) => {
+    if (e.target.id === 'offModal') hideOffModal();
   });
 
   // Procedure
