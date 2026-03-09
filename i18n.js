@@ -268,8 +268,8 @@ const TRANSLATIONS = {
         's4.btn.next': 'Récapitulatif →',
 
         // Step 5
-        's5.title': '📋 Récapitulatif de la recette',
         's5.btn.pdf': '📄 Exporter en PDF',
+        's5.btn.quote': '🤝 Devis Client (B2B)',
         's5.btn.json': '💾 Exporter en JSON',
         's5.btn.save': '✅ Sauvegarder la recette',
         's5.btn.prev': '← Analyse',
@@ -428,7 +428,7 @@ const TRANSLATIONS = {
         'haccp.portions': 'portions',
 
         // Production Sync
-        'ui.label.launch_prod': '🚀 Produire cette recette',
+        'ui.label.launch_prod': 'Produire cette recette',
         'ui.label.prod_desc': 'En lançant la production, les ingrédients seront déduits de votre inventaire et un numéro de lot sera généré.',
         'ui.btn.produce': 'Confirmer la Production',
         'ui.prod.portions': 'Portions à réaliser',
@@ -1557,8 +1557,8 @@ const TRANSLATIONS = {
         's4.btn.prev': '← Procedure',
         's4.btn.next': 'Summary →',
 
-        's5.title': '📋 Recipe Summary',
         's5.btn.pdf': '📄 Export as PDF',
+        's5.btn.quote': '🤝 Client Quote (B2B)',
         's5.btn.json': '💾 Export as JSON',
         's5.btn.save': '✅ Save recipe',
         's5.btn.prev': '← Analysis',
@@ -1754,7 +1754,7 @@ const TRANSLATIONS = {
         'haccp.portions': 'portions',
 
         // Production Sync
-        'ui.label.launch_prod': '🚀 Produce this recipe',
+        'ui.label.launch_prod': 'Produce this recipe',
         'ui.label.prod_desc': 'By launching production, ingredients will be deducted from your inventory and a batch number will be generated.',
         'ui.btn.produce': 'Confirm Production',
         'ui.prod.portions': 'Portions to make',
@@ -2796,8 +2796,8 @@ const TRANSLATIONS = {
         's4.btn.prev': '← Procedimiento',
         's4.btn.next': 'Resumen →',
 
-        's5.title': '📋 Resumen de la receta',
         's5.btn.pdf': '📄 Exportar como PDF',
+        's5.btn.quote': '🤝 Presupuesto Cliente (B2B)',
         's5.btn.json': '💾 Exportar como JSON',
         's5.btn.save': '✅ Guardar receta',
         's5.btn.prev': '← Análisis',
@@ -2994,7 +2994,7 @@ const TRANSLATIONS = {
         'haccp.portions': 'porciones',
 
         // Production Sync
-        'ui.label.launch_prod': '🚀 Producir esta receta',
+        'ui.label.launch_prod': 'Producir esta receta',
         'ui.label.prod_desc': 'Al iniciar la producción, los ingredientes se deducirán de su inventario y se generará un número de lote.',
         'ui.btn.produce': 'Confirmar Producción',
         'ui.prod.portions': 'Porciones a realizar',

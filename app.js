@@ -2053,6 +2053,21 @@ function renderNutritionAnalysis() {
   let weightInGrams = 0;
   const foundAllergens = new Set();
 
+  // Fonction locale pour simuler la nutrition des ingrédients par défaut
+  const getMockNutrition = (name) => {
+    const n = name.toLowerCase();
+    if (n.includes('beurre') || n.includes('huile') || n.includes('graisse')) return { kcal: 717, proteins: 1, carbs: 1, fats: 81 };
+    if (n.includes('sucre') || n.includes('sirop') || n.includes('miel') || n.includes('glucose')) return { kcal: 387, proteins: 0, carbs: 100, fats: 0 };
+    if (n.includes('farine') || n.includes('fécule') || n.includes('maïzena') || n.includes('fecule')) return { kcal: 364, proteins: 10, carbs: 76, fats: 1 };
+    if (n.includes('crème') || n.includes('creme') || n.includes('mascarpone')) return { kcal: 345, proteins: 2, carbs: 3, fats: 35 };
+    if (n.includes('lait')) return { kcal: 42, proteins: 3.4, carbs: 4.8, fats: 1 };
+    if (n.includes('chocolat') || n.includes('cacao') || n.includes('praliné')) return { kcal: 546, proteins: 5, carbs: 31, fats: 36 };
+    if (n.includes('œuf') || n.includes('oeuf') || n.includes('jaune') || n.includes('blanc')) return { kcal: 143, proteins: 13, carbs: 1, fats: 10 };
+    if (n.includes('fraise') || n.includes('framboise') || n.includes('pomme') || n.includes('citron') || n.includes('purée') || n.includes('fruit')) return { kcal: 50, proteins: 1, carbs: 12, fats: 0 };
+    if (n.includes('amande') || n.includes('noisette') || n.includes('noix') || n.includes('pistache')) return { kcal: 600, proteins: 20, carbs: 10, fats: 50 };
+    return { kcal: 250, proteins: 5, carbs: 30, fats: 10 }; // Default
+  };
+
   APP.recipe.ingredients.forEach(ing => {
     if (!ing.name || ing.quantity <= 0) return;
 
@@ -2064,12 +2079,16 @@ function renderNutritionAnalysis() {
     weightInGrams += qtyGrams;
 
     const dbItem = APP.ingredientDb.find(db => db.name.toLowerCase() === ing.name.toLowerCase());
-    if (dbItem && dbItem.nutrition && qtyGrams > 0) {
+
+    // Fallback nutrition if exact API data is not present
+    const nutrition = (dbItem && dbItem.nutrition) ? dbItem.nutrition : getMockNutrition(ing.name);
+
+    if (qtyGrams > 0) {
       const ratio = qtyGrams / 100; // Database nutrition is for 100g
-      totalKcal += dbItem.nutrition.kcal * ratio;
-      totalPro += dbItem.nutrition.proteins * ratio;
-      totalGlu += dbItem.nutrition.carbs * ratio;
-      totalLip += dbItem.nutrition.fats * ratio;
+      totalKcal += nutrition.kcal * ratio;
+      totalPro += nutrition.proteins * ratio;
+      totalGlu += nutrition.carbs * ratio;
+      totalLip += nutrition.fats * ratio;
     }
     if (dbItem && dbItem.allergens) {
       dbItem.allergens.forEach(a => foundAllergens.add(a));
