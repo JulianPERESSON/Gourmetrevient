@@ -1063,6 +1063,31 @@ select.form-input {
   background: var(--surface-hover);
 }
 
+.ing-row-icon {
+  font-size: 1.25rem;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-alt);
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.ing-row:hover .ing-row-icon {
+  transform: scale(1.1);
+  background: var(--surface);
+}
+
+.ing-row .ing-name {
+  display: flex !important;
+  align-items: center;
+  gap: 10px;
+  position: relative;
+}
+
 .ing-row .form-input {
   padding: 0.45rem 0.6rem;
   font-size: 0.85rem;

@@ -26,7 +26,8 @@ const APP = {
   history: [], // New for stats
   haccpLogs: { temp: [], trace: [], clean: [], reception: [] },
   viewOwner: null,
-  notifications: []
+  notifications: [],
+  baselineCosts: null
 };
 
 // ============================================================================
@@ -327,6 +328,24 @@ function escapeHtml(str) {
   const div = document.createElement('div');
   div.textContent = str;
   return div.innerHTML;
+}
+
+function getIngredientIcon(name) {
+  const n = (name || '').toLowerCase();
+  if (n.includes('beurre')) return '🧈';
+  if (n.includes('lait') || n.includes('crème') || n.includes('creme')) return '🥛';
+  if (n.includes('œuf') || n.includes('oeuf') || n.includes('oufs')) return '🥚';
+  if (n.includes('farine')) return '🌾';
+  if (n.includes('sucre')) return '🍬';
+  if (n.includes('chocolat') || n.includes('cacao')) return '🍫';
+  if (n.includes('fraise') || n.includes('framboise') || n.includes('fruit')) return '🍓';
+  if (n.includes('vanille')) return '🍦';
+  if (n.includes('sel')) return '🧂';
+  if (n.includes('huile')) return '🫗';
+  if (n.includes('amande') || n.includes('noisette') || n.includes('noix')) return '🥜';
+  if (n.includes('levure')) return '🍞';
+  if (n.includes('citron')) return '🍋';
+  return '📦';
 }
 
 // ============================================================================
@@ -736,6 +755,7 @@ function createIngredientRow(ing, idx) {
 
   row.innerHTML = `
     <div class="ing-name autocomplete-wrap">
+      <div class="ing-row-icon">${getIngredientIcon(ing.name)}</div>
       <input type="text" class="form-input ing-input" data-field="name" value="${escapeHtml(t(ing.name))}" placeholder="${t('ui.ph.name')}" />
       <div class="autocomplete-list" id="ac-${idx}"></div>
     </div>
@@ -859,9 +879,12 @@ function showAutocomplete(input, listEl, idx) {
   if (matches.length === 0) { listEl.classList.remove('show'); return; }
 
   listEl.innerHTML = matches.map(m => `
-    <div class="autocomplete-item" data-name="${escapeHtml(m.name)}" data-unit="${m.unit}" data-price="${m.pricePerUnit}">
-      <span>${escapeHtml(m.name)}</span>
-      <span class="ac-price">${m.pricePerUnit.toFixed(2)} €/${m.priceRef}</span>
+    <div class="autocomplete-item" data-name="${escapeHtml(m.name)}" data-unit="${m.unit}" data-price="${m.pricePerUnit}" style="display:flex; align-items:center; gap:8px;">
+      <span style="font-size:1.1rem; width:24px; text-align:center;">${getIngredientIcon(m.name)}</span>
+      <div style="flex:1;">
+        <div style="font-weight:600;">${escapeHtml(m.name)}</div>
+        <small style="color:var(--text-muted)">${m.pricePerUnit.toFixed(2)} €/${m.priceRef}</small>
+      </div>
     </div>
   `).join('');
 
@@ -1052,7 +1075,66 @@ function renderCostAnalysis() {
       });
       renderNutritionAnalysis();
     }
+
+    // Update comparator if open
+    if ($('#comparatorModal').style.display === 'flex') {
+      updateComparator();
+    }
   }, 150);
+}
+
+function updateComparator() {
+  const container = $('#comparatorBody');
+  const verdict = $('#comparatorVerdict');
+  if (!container) return;
+
+  const current = calcFullCost(APP.margin);
+  const base = APP.baselineCosts || current;
+
+  const rows = [
+    { label: t('ui.kpi.total_material'), key: 'totalMaterial', unit: '€' },
+    { label: t('ui.kpi.per_portion'), key: 'costPerPortion', unit: '€' },
+    { label: t('ui.kpi.suggested_price'), key: 'sellingPrice', unit: '€' },
+    { label: t('ui.kpi.margin_portion'), key: 'marginPerPortion', unit: '€' }
+  ];
+
+  container.innerHTML = rows.map(row => {
+    const valA = base[row.key] || 0;
+    const valB = current[row.key] || 0;
+    const diff = valB - valA;
+    const diffColor = (row.key === 'marginPerPortion' || row.key === 'sellingPrice')
+      ? (diff >= 0 ? 'var(--success)' : 'var(--danger)')
+      : (diff <= 0 ? 'var(--success)' : 'var(--danger)');
+
+    return `
+      <tr style="border-bottom:1px solid var(--surface-border);">
+        <td style="padding:0.8rem 0.5rem; font-weight:600;">${row.label}</td>
+        <td style="padding:0.8rem 0.5rem; color:var(--text-muted);">${valA.toFixed(2)} ${row.unit}</td>
+        <td style="padding:0.8rem 0.5rem; font-weight:700;">
+          ${valB.toFixed(2)} ${row.unit}
+          <div style="font-size:0.75rem; color:${diffColor};">${diff > 0 ? '+' : ''}${diff.toFixed(2)} ${row.unit}</div>
+        </td>
+      </tr>
+    `;
+  }).join('');
+
+  const diffTotal = current.totalMaterial - base.totalMaterial;
+  if (Math.abs(diffTotal) < 0.01) {
+    verdict.textContent = "Versions identiques. Modifiez les ingrédients pour comparer !";
+    verdict.style.color = "var(--text-muted)";
+  } else if (diffTotal < 0) {
+    verdict.textContent = `✅ Économie de ${Math.abs(diffTotal).toFixed(2)}€ sur le coût matière total !`;
+    verdict.style.color = "var(--success)";
+  } else {
+    verdict.textContent = `⚠️ Surcoût de ${diffTotal.toFixed(2)}€ par rapport à la référence.`;
+    verdict.style.color = "var(--danger)";
+  }
+}
+
+function snapBaseline() {
+  APP.baselineCosts = JSON.parse(JSON.stringify(calcFullCost(APP.margin)));
+  updateComparator();
+  showToast("Référence (A) mise à jour !", "success");
 }
 
 function renderAdvancedCostKPI(costs) {
@@ -1114,10 +1196,10 @@ function renderDonutChart() {
   ];
 
   // Build segments
-  const segments = ingredients.map((ing, i) => ({
+  const segments = ingredients.map(ing => ({
     name: t(ing.name),
     cost: calcIngredientCost(ing),
-    color: colors[i % colors.length]
+    color: colors[Math.floor(Math.random() * colors.length)] // Random color for now
   })).sort((a, b) => b.cost - a.cost);
 
   // SVG donut
@@ -1960,10 +2042,13 @@ function hideIngredientDbModal() {
 function renderDbIngredients() {
   const container = $('#dbIngredientsList');
   container.innerHTML = APP.ingredientDb.map((ing, i) => `
-    <div class="autocomplete-item" style="padding:0.65rem 0.75rem; cursor:pointer; border-bottom:1px solid var(--surface-border);"
+    <div class="autocomplete-item" style="padding:0.65rem 0.75rem; cursor:pointer; border-bottom:1px solid var(--surface-border); display:flex; align-items:center; gap:12px;"
          data-db-idx="${i}">
-      <span>${escapeHtml(ing.name)} · <small style="color:var(--text-muted)">${ing.unit}</small></span>
-      <span class="ac-price">${ing.pricePerUnit.toFixed(2)} €/${ing.priceRef}</span>
+      <span style="font-size:1.4rem; width:30px; text-align:center;">${getIngredientIcon(ing.name)}</span>
+      <div style="flex:1;">
+        <div style="font-weight:600; font-size:0.95rem;">${escapeHtml(ing.name)}</div>
+        <small style="color:var(--text-muted)">${ing.unit} · ${ing.pricePerUnit.toFixed(2)} €/${ing.priceRef}</small>
+      </div>
     </div>
   `).join('');
 
@@ -2042,9 +2127,9 @@ async function searchOffProduct() {
              onclick="selectOffProduct(${i})">
           <div>
             <div style="font-weight:bold;">${escapeHtml(name)} <span style="font-weight:normal; font-size:0.8rem; color:var(--text-muted);">${escapeHtml(brands)}</span></div>
-            <div style="font-size:0.75rem; color:var(--primary); font-weight:600; margin-top:2px;">${kcal} kcal / 100g</div>
+            <div style="font-size:1.2rem; background:var(--surface-border); padding:4px 8px; border-radius:4px;">➕</div>
           </div>
-          <span style="font-size:1.2rem; background:var(--surface-border); padding:4px 8px; border-radius:4px;">➕</span>
+          <span style="font-size:0.75rem; color:var(--primary); font-weight:600; margin-top:2px;">${kcal} kcal / 100g</span>
         </div>
       `;
     }).join('');
@@ -2293,6 +2378,19 @@ function bindEvents() {
   $('#btnSearchOff').addEventListener('click', showOffModal);
 
   $('#dbModalClose').addEventListener('click', hideIngredientDbModal);
+
+  // Comparator
+  const btnComp = $('#btnOpenComparator');
+  if (btnComp) btnComp.addEventListener('click', () => {
+    if (!APP.baselineCosts) APP.baselineCosts = JSON.parse(JSON.stringify(calcFullCost(APP.margin)));
+    $('#comparatorModal').style.display = 'flex';
+    updateComparator();
+  });
+  const btnCompClose = $('#comparatorClose');
+  if (btnCompClose) btnCompClose.addEventListener('click', () => $('#comparatorModal').style.display = 'none');
+  const btnSnap = $('#btnSnapBaseline');
+  if (btnSnap) btnSnap.addEventListener('click', snapBaseline);
+
   $('#offModalClose').addEventListener('click', hideOffModal);
   $('#btnOffSearch').addEventListener('click', searchOffProduct);
 
@@ -5581,9 +5679,17 @@ document.addEventListener('keydown', (e) => {
     e.preventDefault();
     toggleOmniSearch();
   }
-  // Handle Escape to close
+
+  // Handle mobile bottom bar logic
   if (e.key === 'Escape' && $('#omniModal').style.display === 'flex') {
     toggleOmniSearch();
+  }
+});
+
+// PWA Registration move to window load
+window.addEventListener('load', () => {
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW register error', err));
   }
 });
 
