@@ -739,7 +739,7 @@
             l'amortissement pour un coût complet.</div>
 
           <div
-            style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 1rem; margin-top: 1.5rem; width: 100%; align-items: end;">
+            style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1rem; margin-top: 1.5rem; width: 100%; align-items: end;">
             <div class="form-group">
               <label class="label-with-icon" style="white-space: nowrap; font-size: 0.72rem;"
                 data-i18n="s4.adv.labor_rate">💰 Taux horaire MO (€/h)</label>
@@ -1106,7 +1106,8 @@
           </div>
         </div>
 
-        <div class="labeling-dashboard-grid" style="display: grid; grid-template-columns: 1fr 520px; gap: 2rem;">
+        <div class="labeling-dashboard-grid"
+          style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 2rem;">
           <!-- Left Column: Form -->
           <div class="card glass-widget labeling-form-card">
             <div class="widget-header" style="margin-bottom: 2rem;">
@@ -1942,7 +1943,7 @@
         </div>
 
         <div class="suppliers-main-grid"
-          style="display: grid; grid-template-columns: 320px 1fr; gap: 4rem; max-width: 100%; margin: 0 auto; padding: 0 40px;">
+          style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2.5rem; max-width: 100%; margin: 0 auto; padding: 0 40px;">
           <!-- Sidebar: Search & Actions -->
           <aside class="supplier-filters">
             <div class="card" style="padding: 2rem; position: sticky; top: 120px; border-top: 5px solid var(--accent);">
