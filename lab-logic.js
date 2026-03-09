@@ -91,21 +91,40 @@ function createLabEquipmentCard(eq) {
 function renderLabGrid(results, category) {
     const gridEl = document.getElementById('equipmentGrid');
     if (!gridEl) return;
-    gridEl.innerHTML = '';
-    const filtered = category === 'all' ? results : results.filter(r => r.category === category);
-    if (!filtered.length) {
-        gridEl.innerHTML = `<p style="text-align:center;color:var(--text-muted);padding:3rem;grid-column:1/-1;">${t('lab.empty_cat')}</p>`;
-        return;
-    }
-    const sorted = [...filtered].sort((a, b) => {
-        if (a.boosted !== b.boosted) return b.boosted ? 1 : -1;
-        if (a.essential !== b.essential) return a.essential ? -1 : 1;
-        return a.category.localeCompare(b.category);
-    });
-    sorted.forEach((eq, i) => {
-        const card = createLabEquipmentCard(eq);
-        gridEl.appendChild(card);
-    });
+
+    // Show a quick skeleton state if switching categories
+    gridEl.innerHTML = Array(6).fill(0).map(() => `
+        <div class="card skeleton" style="height:180px; margin-top:0.5rem;"></div>
+    `).join('');
+
+    setTimeout(() => {
+        gridEl.innerHTML = '';
+        const filtered = category === 'all' ? results : results.filter(r => r.category === category);
+        if (!filtered.length) {
+            gridEl.innerHTML = `<p style="text-align:center;color:var(--text-muted);padding:3rem;grid-column:1/-1;">${t('lab.empty_cat')}</p>`;
+            return;
+        }
+        const sorted = [...filtered].sort((a, b) => {
+            if (a.boosted !== b.boosted) return b.boosted ? 1 : -1;
+            if (a.essential !== b.essential) return a.essential ? -1 : 1;
+            return a.category.localeCompare(b.category);
+        });
+
+        sorted.forEach((eq, i) => {
+            const card = createLabEquipmentCard(eq);
+            gridEl.appendChild(card);
+        });
+
+        if (window.gsap && filtered.length > 0) {
+            gsap.from('#equipmentGrid .lab-card', {
+                opacity: 0,
+                y: 20,
+                duration: 0.4,
+                stagger: 0.05,
+                ease: 'power2.out'
+            });
+        }
+    }, 150);
 }
 
 function updateLabCounts(results) {

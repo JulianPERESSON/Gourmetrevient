@@ -701,11 +701,27 @@ function populateStep1() {
 
 function renderIngredients() {
   const container = $('#ingredientsList');
+  if (!container) return;
+
+  // Clear container
   container.innerHTML = '';
 
+  // Add rows
   APP.recipe.ingredients.forEach((ing, idx) => {
-    container.appendChild(createIngredientRow(ing, idx));
+    const row = createIngredientRow(ing, idx);
+    container.appendChild(row);
   });
+
+  // GSAP Stagger Animation (Using gsap.from for safety)
+  if (window.gsap && APP.recipe.ingredients.length > 0) {
+    gsap.from('#ingredientsList .ing-row', {
+      opacity: 0,
+      y: 15,
+      duration: 0.4,
+      stagger: 0.05,
+      ease: 'power2.out'
+    });
+  }
 
   updateIngredientsTotal();
 }
@@ -932,68 +948,111 @@ function collectProcedure() {
 // ============================================================================
 
 function renderCostAnalysis() {
-  collectIngredients();
+  const kpiGrid = $('#kpiGrid');
+  const nutritionGrid = document.getElementById('nutritionGrid');
 
-  // Populate advanced inputs from saved data if available
-  if (APP.recipe.advanced) {
-    const adv = APP.recipe.advanced;
-    const setVal = (id, val) => {
-      const el = document.getElementById(id);
-      if (el && !el.dataset.initialized) {
-        el.value = val;
-        el.dataset.initialized = 'true';
+  // Show skeletons for perceived smoothness
+  if (kpiGrid) {
+    kpiGrid.innerHTML = Array(4).fill(0).map(() => `
+      <div class="kpi-card skeleton" style="height: 120px;"></div>
+    `).join('');
+  }
+
+  if (nutritionGrid) {
+    // Instead of wiping the whole grid (which deletes IDs), 
+    // we just empty the values or add skeleton class to specific elements
+    const valueEls = nutritionGrid.querySelectorAll('[id^="nutri"]');
+    valueEls.forEach(el => {
+      el.classList.add('skeleton-text');
+      el.style.minWidth = '40px';
+      el.style.display = 'inline-block';
+      el.textContent = ' '; // Empty while loading
+    });
+  }
+
+  // Small timeout to allow skeleton to be visible (150ms is perfect for perceived speed)
+  setTimeout(() => {
+    // Populate advanced inputs from saved data if available
+    if (APP.recipe.advanced) {
+      const adv = APP.recipe.advanced;
+      const setVal = (id, val) => {
+        const el = document.getElementById(id);
+        if (el && !el.dataset.initialized) {
+          el.value = val;
+          el.dataset.initialized = 'true';
+        }
+      };
+      setVal('advLaborRate', adv.laborRate);
+      setVal('advFixedCharges', adv.fixedCharges);
+      setVal('advProductions', adv.productions);
+      setVal('advEnergy', adv.energyRate);
+      setVal('advAmortization', adv.amortization);
+    }
+
+    const costs = calcFullCost(APP.margin);
+
+    // KPI Cards
+    if (kpiGrid) {
+      kpiGrid.innerHTML = `
+        <div class="kpi-card">
+          <div class="kpi-label">${t('ui.kpi.total_material')}</div>
+          <div class="kpi-value">${costs.totalMaterial.toFixed(2)} €</div>
+          <div class="kpi-sub">${t('label.per_portion')} ${costs.portions} ${costs.portions > 1 ? t('unit.portions') : t('unit.portion')}</div>
+        </div>
+        <div class="kpi-card accent">
+          <div class="kpi-label">${t('ui.kpi.per_portion')}</div>
+          <div class="kpi-value">${costs.costPerPortion.toFixed(2)} €</div>
+          <div class="kpi-sub">${t('label.cost')} / ${t('unit.portion')}</div>
+        </div>
+        <div class="kpi-card success">
+          <div class="kpi-label">${t('ui.kpi.suggested_price')}</div>
+          <div class="kpi-value">${costs.sellingPrice.toFixed(2)} €</div>
+          <div class="kpi-sub">${t('s4.margin')} ${APP.margin}%</div>
+        </div>
+        <div class="kpi-card warning">
+          <div class="kpi-label">${t('ui.kpi.margin_portion')}</div>
+          <div class="kpi-value">${costs.marginPerPortion.toFixed(2)} €</div>
+          <div class="kpi-sub">${costs.marginPct.toFixed(1)}% ${t('s4.margin')}</div>
+        </div>
+      `;
+
+      // Animate KPI Cards
+      if (window.gsap) {
+        gsap.from('#kpiGrid .kpi-card', {
+          opacity: 0,
+          scale: 0.95,
+          duration: 0.4,
+          stagger: 0.08,
+          ease: 'back.out(1.7)'
+        });
       }
-    };
-    setVal('advLaborRate', adv.laborRate);
-    setVal('advFixedCharges', adv.fixedCharges);
-    setVal('advProductions', adv.productions);
-    setVal('advEnergy', adv.energyRate);
-    setVal('advAmortization', adv.amortization);
-  }
+    }
 
-  const costs = calcFullCost(APP.margin);
+    // Donut chart
+    renderDonutChart();
 
-  // KPI Cards
-  $('#kpiGrid').innerHTML = `
-    <div class="kpi-card">
-      <div class="kpi-label">${t('ui.kpi.total_material')}</div>
-      <div class="kpi-value">${costs.totalMaterial.toFixed(2)} €</div>
-      <div class="kpi-sub">${t('label.per_portion')} ${costs.portions} ${costs.portions > 1 ? t('unit.portions') : t('unit.portion')}</div>
-    </div>
-    <div class="kpi-card accent">
-      <div class="kpi-label">${t('ui.kpi.per_portion')}</div>
-      <div class="kpi-value">${costs.costPerPortion.toFixed(2)} €</div>
-      <div class="kpi-sub">${t('label.cost')} / ${t('unit.portion')}</div>
-    </div>
-    <div class="kpi-card success">
-      <div class="kpi-label">${t('ui.kpi.suggested_price')}</div>
-      <div class="kpi-value">${costs.sellingPrice.toFixed(2)} €</div>
-      <div class="kpi-sub">${t('s4.margin')} ${APP.margin}%</div>
-    </div>
-    <div class="kpi-card warning">
-      <div class="kpi-label">${t('ui.kpi.margin_portion')}</div>
-      <div class="kpi-value">${costs.marginPerPortion.toFixed(2)} €</div>
-      <div class="kpi-sub">${costs.marginPct.toFixed(1)}% ${t('s4.margin')}</div>
-    </div>
-  `;
+    // Batch scaling
+    renderBatchScaling(costs);
 
-  // Donut chart
-  renderDonutChart();
+    // Margin slider value
+    const marginValEl = $('#marginValue');
+    const marginSliderEl = $('#marginSlider');
+    if (marginValEl) marginValEl.textContent = APP.margin + '%';
+    if (marginSliderEl) marginSliderEl.value = APP.margin;
 
-  // Batch scaling
-  renderBatchScaling(costs);
+    // Advanced cost KPI
+    renderAdvancedCostKPI(costs);
 
-  // Margin slider value
-  $('#marginValue').textContent = APP.margin + '%';
-  $('#marginSlider').value = APP.margin;
-
-  // Advanced cost KPI
-  renderAdvancedCostKPI(costs);
-
-  // Nutrition & Allergens calculation
-  if (document.getElementById('nutritionGrid')) {
-    renderNutritionAnalysis();
-  }
+    // Nutrition & Allergens calculation
+    if (nutritionGrid) {
+      // Remove skeleton classes before updating values
+      nutritionGrid.querySelectorAll('[id^="nutri"]').forEach(el => {
+        el.classList.remove('skeleton-text');
+        el.style.minWidth = '';
+      });
+      renderNutritionAnalysis();
+    }
+  }, 150);
 }
 
 function renderAdvancedCostKPI(costs) {
@@ -1128,168 +1187,158 @@ function renderBatchScaling(costs) {
 // ============================================================================
 
 function renderSummary() {
-  collectCurrentStepData();
-  const costs = calcFullCost(APP.margin);
-  const r = APP.recipe;
+  const container = document.getElementById('summaryContent');
+  if (!container) return;
 
-  $('#summarySubtitle').textContent = r.name
-    ? `${r.name} — ${r.portions} ${r.portions > 1 ? t('unit.portions') : t('unit.portion')} · ${r.category || t('label.unclassified')}`
-    : t('s5.subtitle.empty');
-
-  // Ingredients table
-  let ingRows = r.ingredients.filter(i => i.name).map(ing => {
-    const cost = calcIngredientCost(ing);
-    const priceRef = getPriceRef(ing.unit);
-    const unitLabel = ing.unit === 'pièce' ? t('unit.portion') : ing.unit;
-    return `<tr>
-      <td>${escapeHtml(t(ing.name))}</td>
-      <td>${ing.quantity} ${unitLabel}</td>
-      <td>${ing.pricePerUnit.toFixed(2)} €/${priceRef}</td>
-      <td style="font-weight:700; color:var(--accent)">${cost.toFixed(2)} €</td>
-    </tr>`;
-  }).join('');
-
-  // Procedure list (Handling new object format)
-  let procHtml = '';
-  if (r.steps && r.steps.length > 0) {
-    let currentDay = '';
-    r.steps.filter(s => s).forEach((s, i) => {
-      const isObj = typeof s === 'object';
-      const text = isObj ? s.text : s;
-      const day = isObj ? s.day : 'Jour J';
-
-      if (day !== currentDay) {
-        currentDay = day;
-        procHtml += `<div style="font-weight:800; color:var(--accent); margin-top:0.8rem; margin-bottom:0.2rem; font-size:0.85rem;">📅 ${currentDay}</div>`;
-      }
-      procHtml += `<li>${escapeHtml(t(text))}</li>`;
-    });
-  }
-
-  // Time display
-  const prepH = Math.floor(r.prepTime / 60);
-  const prepM = r.prepTime % 60;
-  const prepStr = prepH > 0 ? `${prepH}h${prepM > 0 ? (prepM < 10 ? '0' + prepM : prepM) : ''}` : `${prepM} min`;
-  const cookH = Math.floor(r.cookTime / 60);
-  const cookM = r.cookTime % 60;
-  const cookStr = cookH > 0 ? `${cookH}h${cookM > 0 ? (cookM < 10 ? '0' + cookM : cookM) : ''}` : `${cookM} min`;
-
-  $('#summaryContent').innerHTML = `
-    ${r.description ? `<p style="color:var(--text-secondary); margin-bottom:1.2rem; font-style:italic;">${escapeHtml(r.description)}</p>` : ''}
-    <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:1.5rem;">
-      ⏱ ${t('ui.label.prep')}: ${prepStr} · ${t('ui.label.cook')}: ${cookStr} · ${r.portions} ${r.portions > 1 ? t('unit.portions') : t('unit.portion')}
-    </p>
-
+  // Show skeleton
+  container.innerHTML = `
+    <div class="skeleton" style="height: 20px; width: 60%; margin-bottom: 1.5rem;"></div>
+    <div class="skeleton" style="height: 15px; width: 40%; margin-bottom: 2rem;"></div>
     <div class="summary-sections-grid">
-      <div class="summary-section">
-        <h3>🥄 ${t('step.ingredients')}</h3>
-        <table class="summary-table">
-          <thead>
-            <tr><th>${t('s5.table.ingredient')}</th><th>${t('s5.table.quantity')}</th><th>${t('s5.table.price')}</th><th>${t('s5.table.cost')}</th></tr>
-          </thead>
-          <tbody>${ingRows || `<tr><td colspan="4" style="color:var(--text-muted)">${t('label.no_ingredient')}</td></tr>`}</tbody>
-          <tfoot>
-            <tr><td colspan="3"><strong>${t('ui.label.total_material')}</strong></td><td><strong>${costs.totalMaterial.toFixed(2)} €</strong></td></tr>
-          </tfoot>
-        </table>
-      </div>
-
-      <div class="summary-right-col">
-        ${r.steps.length > 0 ? `
-        <div class="summary-section">
-          <h3>👨‍🍳 ${t('step.procedure')}</h3>
-          <div class="summary-procedures">
-            <ol>${procHtml}</ol>
-          </div>
-        </div>` : ''}
-
-        <div class="summary-section">
-          <h3>📊 ${t('ui.label.financial_analysis')}</h3>
-          <div class="summary-financials">
-            <div class="fin-row">
-              <span class="fin-label">${t('ui.kpi.total_material')}</span>
-              <span class="fin-value">${costs.totalMaterial.toFixed(2)} €</span>
-            </div>
-            ${costs.additionalCosts > 0 ? `
-            <div class="fin-row" style="font-size: 0.8rem; color: var(--text-muted); padding-left: 0.5rem; border-left: 2px solid var(--surface-border);">
-              <span>${t('s4.adv.kpi.labor')} + ${t('s4.adv.kpi.energy')} + ...</span>
-              <span>+ ${costs.additionalCosts.toFixed(2)} €</span>
-            </div>
-            <div class="fin-row" style="font-weight: 700; border-top: 1px dashed var(--surface-border); margin-top: 0.2rem; padding-top: 0.2rem;">
-              <span>${t('s4.adv.kpi.full_cost')}</span>
-              <span>${costs.totalFullCost.toFixed(2)} €</span>
-            </div>
-            ` : ''}
-            <div class="fin-row">
-              <span class="fin-label">${t('s1.portions')}</span>
-              <span class="fin-value">${costs.portions}</span>
-            </div>
-            <div class="fin-row highlight">
-              <span class="fin-label">${costs.additionalCosts > 0 ? t('s4.adv.kpi.full_portion') : t('ui.kpi.per_portion')}</span>
-              <span class="fin-value">${costs.costPerPortion.toFixed(2)} €</span>
-            </div>
-            <div class="fin-row highlight">
-              <span class="fin-label">${t('ui.kpi.suggested_price')}</span>
-              <span class="fin-value">${costs.sellingPrice.toFixed(2)} €</span>
-            </div>
-            <div class="fin-row">
-              <span class="fin-label">${t('ui.kpi.margin_portion')}</span>
-              <span class="fin-value">${costs.marginPerPortion.toFixed(2)} €</span>
-            </div>
-            <div class="fin-row">
-              <span class="fin-label">${t('dash.avg_margin')}</span>
-              <span class="fin-value">${costs.marginPct.toFixed(1)}%</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="summary-section" style="margin-top:1.5rem;">
-          <h3>📦 ${t('ui.label.scaling')}</h3>
-          <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:0.8rem; text-align:center;">
-             <div style="background:var(--bg-alt); padding:0.8rem; border-radius:var(--radius-sm); border:1px solid var(--surface-border);">
-                <div style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; font-weight:700;">${t('ui.batch.count').replace('{n}', 1)}</div>
-                <div style="font-size:1.1rem; font-weight:800; color:var(--primary); margin-top:0.2rem;">${costs.totalMaterial.toFixed(2)} €</div>
-             </div>
-             <div style="background:var(--bg-alt); padding:0.8rem; border-radius:var(--radius-sm); border:1px solid var(--surface-border);">
-                <div style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; font-weight:700;">${t('ui.batch.count_plural').replace('{n}', 10)}</div>
-                <div style="font-size:1.1rem; font-weight:800; color:var(--primary); margin-top:0.2rem;">${(costs.totalMaterial * 10).toFixed(2)} €</div>
-             </div>
-             <div style="background:var(--bg-alt); padding:0.8rem; border-radius:var(--radius-sm); border:1px solid var(--surface-border);">
-                <div style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; font-weight:700;">${t('ui.batch.count_plural').replace('{n}', 100)}</div>
-                <div style="font-size:1.1rem; font-weight:800; color:var(--primary); margin-top:0.2rem;">${(costs.totalMaterial * 100).toFixed(2)} €</div>
-             </div>
-          </div>
-        </div>
-
-        <div class="summary-section" style="margin-top:2.5rem; background: var(--success-light); border: 2px solid var(--success); padding: 2.5rem; border-radius: var(--radius-lg); animation: fadeUp 0.8s ease-out; position: relative; overflow: hidden;">
-          <div style="position: absolute; top: -10px; right: -10px; font-size: 5rem; opacity: 0.1; transform: rotate(15deg);">🏭</div>
-          <h3 style="color: var(--success); margin-bottom: 1.2rem; font-size: 1.5rem; display: flex; align-items: center; gap: 0.8rem;">
-            <span>🚀 ${t('ui.label.launch_prod') || 'Produire cette recette'}</span>
-          </h3>
-          <p style="font-size: 1rem; margin-bottom: 2rem; color: var(--text); font-weight: 500; line-height: 1.5; max-width: 600px;">
-            ${t('ui.label.prod_desc') || 'En lançant la production, les ingrédients seront déduits de votre inventaire et un numéro de lot sera généré.'}
-          </p>
-          <div style="display: flex; gap: 1.5rem; align-items: flex-end; flex-wrap: wrap;">
-            <div style="min-width: 180px;">
-              <label style="font-size: 0.75rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 0.6rem; display: block;">${t('ui.prod.portions') || 'Portions à réaliser'}</label>
-              <input type="number" id="prodPortions" class="form-input" value="${r.portions}" style="height: 50px; font-size: 1.2rem; font-weight: 800; text-align: center; border-radius: var(--radius-sm);">
-            </div>
-            <button class="btn btn-primary" onclick="confirmProduction()" style="height: 50px; padding: 0 2.5rem; background: var(--success); border-color: var(--success); font-weight: 800; font-size: 1.1rem; box-shadow: 0 10px 20px rgba(39, 174, 96, 0.2);">
-              ${t('ui.btn.produce') || 'Confirmer la Production'}
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="pdf-footer-credits" style="display:none;">
-      ${t('s5.footer.credits')}
+      <div class="summary-section skeleton" style="height: 300px;"></div>
+      <div class="summary-section skeleton" style="height: 300px;"></div>
     </div>
   `;
+
+  setTimeout(() => {
+    collectCurrentStepData();
+    const costs = calcFullCost(APP.margin);
+    const r = APP.recipe;
+
+    const subtitleEl = $('#summarySubtitle');
+    if (subtitleEl) {
+      subtitleEl.textContent = r.name
+        ? `${r.name} — ${r.portions} ${r.portions > 1 ? t('unit.portions') : t('unit.portion')} · ${r.category || t('label.unclassified')}`
+        : t('s5.subtitle.empty');
+    }
+
+    // Ingredients table
+    let ingRows = r.ingredients.filter(i => i.name).map(ing => {
+      const cost = calcIngredientCost(ing);
+      const priceRef = getPriceRef(ing.unit);
+      const unitLabel = ing.unit === 'pièce' ? t('unit.portion') : ing.unit;
+      return `<tr>
+        <td>${escapeHtml(t(ing.name))}</td>
+        <td>${ing.quantity} ${unitLabel}</td>
+        <td>${ing.pricePerUnit.toFixed(2)} €/${priceRef}</td>
+        <td style="font-weight:700; color:var(--accent)">${cost.toFixed(2)} €</td>
+      </tr>`;
+    }).join('');
+
+    // Procedure list
+    let procHtml = '';
+    if (r.steps && r.steps.length > 0) {
+      let currentDay = '';
+      r.steps.filter(s => s).forEach((s, i) => {
+        const isObj = typeof s === 'object';
+        const text = isObj ? s.text : s;
+        const day = isObj ? s.day : 'Jour J';
+
+        if (day !== currentDay) {
+          currentDay = day;
+          procHtml += `<div style="font-weight:800; color:var(--accent); margin-top:0.8rem; margin-bottom:0.2rem; font-size:0.85rem;">📅 ${currentDay}</div>`;
+        }
+        procHtml += `<li>${escapeHtml(t(text))}</li>`;
+      });
+    }
+
+    // Time display
+    const prepH = Math.floor(r.prepTime / 60);
+    const prepM = r.prepTime % 60;
+    const prepStr = prepH > 0 ? `${prepH}h${prepM > 0 ? (prepM < 10 ? '0' + prepM : prepM) : ''}` : `${prepM} min`;
+    const cookH = Math.floor(r.cookTime / 60);
+    const cookM = r.cookTime % 60;
+    const cookStr = cookH > 0 ? `${cookH}h${cookM > 0 ? (cookM < 10 ? '0' + cookM : cookM) : ''}` : `${cookM} min`;
+
+    container.innerHTML = `
+      ${r.description ? `<p style="color:var(--text-secondary); margin-bottom:1.2rem; font-style:italic;">${escapeHtml(r.description)}</p>` : ''}
+      <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:1.5rem;">
+        ⏱ ${t('ui.label.prep')}: ${prepStr} · ${t('ui.label.cook')}: ${cookStr} · ${r.portions} ${r.portions > 1 ? t('unit.portions') : t('unit.portion')}
+      </p>
+
+      <div class="summary-sections-grid">
+        <div class="summary-section">
+          <h3>🥄 ${t('step.ingredients')}</h3>
+          <table class="summary-table">
+            <thead>
+              <tr><th>${t('s5.table.ingredient')}</th><th>${t('s5.table.quantity')}</th><th>${t('s5.table.price')}</th><th>${t('s5.table.cost')}</th></tr>
+            </thead>
+            <tbody>${ingRows || `<tr><td colspan="4" style="color:var(--text-muted)">${t('label.no_ingredient')}</td></tr>`}</tbody>
+            <tfoot>
+              <tr><td colspan="3"><strong>${t('ui.label.total_material')}</strong></td><td><strong>${costs.totalMaterial.toFixed(2)} €</strong></td></tr>
+            </tfoot>
+          </table>
+        </div>
+
+        <div class="summary-right-col">
+          ${r.steps.length > 0 ? `
+          <div class="summary-section">
+            <h3>👨‍🍳 ${t('step.procedure')}</h3>
+            <div class="summary-procedures">
+              <ol>${procHtml}</ol>
+            </div>
+          </div>` : ''}
+
+          <div class="summary-section">
+            <h3>📊 ${t('ui.label.financial_analysis')}</h3>
+            <div class="summary-financials">
+              <div class="fin-row">
+                <span class="fin-label">${t('ui.kpi.total_material')}</span>
+                <span class="fin-value">${costs.totalMaterial.toFixed(2)} €</span>
+              </div>
+              ${costs.additionalCosts > 0 ? `
+              <div class="fin-row" style="font-size: 0.8rem; color: var(--text-muted); padding-left: 0.5rem; border-left: 2px solid var(--surface-border);">
+                <span>${t('s4.adv.kpi.labor')} + ${t('s4.adv.kpi.energy')} + ...</span>
+                <span>+ ${costs.additionalCosts.toFixed(2)} €</span>
+              </div>
+              <div class="fin-row" style="font-weight: 700; border-top: 1px dashed var(--surface-border); margin-top: 0.2rem; padding-top: 0.2rem;">
+                <span>${t('s4.adv.kpi.full_cost')}</span>
+                <span>${costs.totalFullCost.toFixed(2)} €</span>
+              </div>
+              ` : ''}
+              <div class="fin-row">
+                <span class="fin-label">${t('s1.portions')}</span>
+                <span class="fin-value">${costs.portions}</span>
+              </div>
+              <div class="fin-row highlight">
+                <span class="fin-label">${costs.additionalCosts > 0 ? t('s4.adv.kpi.full_portion') : t('ui.kpi.per_portion')}</span>
+                <span class="fin-value">${costs.costPerPortion.toFixed(2)} €</span>
+              </div>
+              <div class="fin-row highlight">
+                <span class="fin-label">${t('ui.kpi.suggested_price')}</span>
+                <span class="fin-value" style="color:var(--success)">${costs.sellingPrice.toFixed(2)} €</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    // Animations GSAP
+    if (window.gsap) {
+      gsap.from('.summary-section', {
+        opacity: 0,
+        y: 20,
+        duration: 0.5,
+        stagger: 0.1,
+        ease: 'power2.out'
+      });
+
+      gsap.from('.summary-table tbody tr', {
+        opacity: 0,
+        x: -10,
+        duration: 0.3,
+        stagger: 0.03,
+        delay: 0.3
+      });
+    }
+  }, 400);
 }
 
 // ============================================================================
 // SAVE / LOAD / DELETE RECIPES
 // ============================================================================
+
 
 function saveCurrentRecipe() {
   collectCurrentStepData();
@@ -1688,9 +1737,9 @@ function renderPortfolio() {
     const fallBackColor = `hsl(${hue}, 70%, 85%)`;
 
     // Specific styling for certain images (dezoom or position)
-    const dezoomIds = ['negresco', 'tarte-fruits-rouges-fleur'];
+    const dezoomIds = [];
     const extraClass = dezoomIds.includes(r.id) ? ' dezoom' : '';
-    const extraStyle = ''; // Removed tarte-bourdaloue as it's not in the filtered list
+    const extraStyle = r.id === 'saint-honore' ? ' style="object-position: top;"' : '';
 
     // Translation logic
     const tCatRaw = t(r.category);

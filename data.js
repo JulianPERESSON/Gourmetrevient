@@ -566,7 +566,7 @@ const RECIPES = [
   },
   {
     id: 'negresco',
-    name: 'La Negresco',
+    name: 'Negresco',
     category: 'Entremets',
     portions: 8,
     prepTime: 120,
@@ -591,7 +591,7 @@ const RECIPES = [
   },
   {
     id: 'frangipane',
-    name: 'La Frangipane',
+    name: 'Frangipane',
     category: 'Feuilletage',
     portions: 8,
     prepTime: 60,

@@ -1232,7 +1232,7 @@ const TRANSLATIONS = {
         'data.recipe.tarte-framboise-pistache-fleur.step.4': "Décorer avec quelques framboises entières et des pistaches.",
 
         // Recipe Data: La Negresco
-        'data.recipe.negresco.name': 'La Negresco',
+        'data.recipe.negresco.name': 'Negresco',
         'data.recipe.negresco.desc': 'Une création signature fleurie : biscuit chocolat intense, ganache fondante, mousse légère et décor framboises fraîches.',
         'data.recipe.negresco.step.0': 'Préparer le biscuit chocolat de base.',
         'data.recipe.negresco.step.1': 'Réaliser la ganache et la mousse au chocolat.',
@@ -1241,7 +1241,7 @@ const TRANSLATIONS = {
         'data.recipe.negresco.step.4': 'Déposer les framboises et les décors en chocolat noir.',
 
         // Recipe Data: La Frangipane
-        'data.recipe.frangipane.name': 'La Frangipane',
+        'data.recipe.frangipane.name': 'Frangipane',
         'data.recipe.frangipane.desc': 'La classique galette des rois : feuilletage inversé pur beurre et crème frangipane onctueuse aux amandes.',
         'data.recipe.frangipane.step.0': 'Réaliser le feuilletage (ou utiliser un pâton frais).',
         'data.recipe.frangipane.step.1': "Préparer la crème d'amandes et la mélanger à la pâtissière pour la frangipane.",
@@ -3913,8 +3913,8 @@ function buildReverseLookup() {
         'Tarte Fleur Fruits Rouges': 'data.recipe.tarte-fruits-rouges-fleur.name',
         'Tarte Praliné Fleur': 'data.recipe.tarte-praline-fleur.name',
         'Tarte Framboise Pistache Fleur': 'data.recipe.tarte-framboise-pistache-fleur.name',
-        'La Negresco': 'data.recipe.negresco.name',
-        'La Frangipane': 'data.recipe.frangipane.name',
+        'Negresco': 'data.recipe.negresco.name',
+        'Frangipane': 'data.recipe.frangipane.name',
     };
     for (const name in frLookup) {
         REVERSE_LOOKUP[name.toLowerCase()] = frLookup[name];

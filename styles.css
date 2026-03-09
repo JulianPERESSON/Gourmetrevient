@@ -65,8 +65,8 @@
   /* Composite Surfaces */
   --bg-card: #ffffff;
   --surface-shadow-inset: rgba(255, 255, 255, 0.5);
-  --surface-glass: rgba(255, 255, 255, 0.5);
-  --surface-border-glass: rgba(255, 255, 255, 0.6);
+  --surface-glass: rgba(255, 255, 255, 0.55);
+  --surface-border-glass: rgba(255, 255, 255, 0.4);
 }
 
 .dark-theme {
@@ -97,8 +97,8 @@
 
   --bg-card: #2c2c2c;
   --surface-shadow-inset: rgba(0, 0, 0, 0.1);
-  --surface-glass: rgba(255, 255, 255, 0.05);
-  --surface-border-glass: rgba(255, 255, 255, 0.1);
+  --surface-glass: rgba(0, 0, 0, 0.3);
+  --surface-border-glass: rgba(255, 255, 255, 0.08);
 
   /* Dash system dark mode */
   --dash-bg: #121212;
@@ -633,6 +633,80 @@ body.auth-pending .app-main {
   75% {
     transform: translateX(5px);
   }
+}
+
+/* ---------- Skeleton Screens (Shimmer) ---------- */
+.skeleton {
+  background: var(--bg-alt);
+  background: linear-gradient(90deg,
+      var(--bg-alt) 25%,
+      var(--surface-hover) 50%,
+      var(--bg-alt) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite linear;
+  border-radius: var(--radius-sm);
+  min-height: 1em;
+  border: none !important;
+  pointer-events: none;
+}
+
+.skeleton-card {
+  height: 180px;
+  width: 100%;
+  border-radius: var(--radius);
+}
+
+.skeleton-line {
+  height: 12px;
+  margin-bottom: 8px;
+  width: 100%;
+}
+
+.skeleton-text {
+  height: 20px;
+  width: 70%;
+  margin-bottom: 12px;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* ---------- Glassmorphism Enhancements ---------- */
+.glass-panel {
+  background: var(--surface-glass);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid var(--surface-border-glass);
+  box-shadow: var(--shadow-lg);
+}
+
+.modal-content,
+.card-premium {
+  background: var(--surface-glass) !important;
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid var(--surface-border-glass) !important;
+}
+
+.app-header {
+  background: var(--surface-glass);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 1px solid var(--surface-border-glass);
+}
+
+.navbar-bottom {
+  background: var(--surface-glass);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border-top: 1px solid var(--surface-border-glass);
 }
 
 /* ---------- Hero / Onboarding ---------- */

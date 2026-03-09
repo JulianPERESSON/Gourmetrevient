@@ -107,6 +107,30 @@ window.hydratePremiumDashboard = function () {
         healthStockDot.nextElementSibling.textContent = alerts > 0 ? (i18n.t('dash.stock_alert') || 'Stock: Alerte') : (i18n.t('dash.stock_ok') || 'Stock: OK');
     }
 
+    // Entrance animation for dashboard elements
+    const hubSection = document.getElementById('hubSection');
+    if (hubSection && !hubSection.dataset.animated && window.gsap) {
+        hubSection.dataset.animated = 'true';
+
+        // Initial state
+        gsap.set('.premium-kpi-bar > div, .premium-card, .dash-footer-tips', {
+            opacity: 0,
+            y: 30,
+            scale: 0.98
+        });
+
+        // Staggered arrival
+        gsap.to('.premium-kpi-bar > div, .premium-card, .dash-footer-tips', {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            duration: 0.6,
+            stagger: 0.1,
+            ease: 'expo.out',
+            clearProps: 'all'
+        });
+    }
+
     // Top and Worst Recipes
     const sortedByMargin = [...recipes].sort((a, b) => (b.costs?.marginPct || 0) - (a.costs?.marginPct || 0));
     const topDash = document.getElementById('dashTopRecipes');
