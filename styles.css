@@ -5318,6 +5318,12 @@ select.form-input {
   }
 }
 
+@media (max-width: 900px) {
+  .suppliers-main-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
 .supplier-filters {
   position: sticky;
   top: 100px;
