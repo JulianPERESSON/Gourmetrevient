@@ -814,6 +814,11 @@ function collectIngredients() {
   const container = $('#ingredientsList');
   if (!container) return;
   const rows = container.querySelectorAll('.ing-row');
+
+  // SÉCURITÉ : Si aucune ligne n'est présente dans le DOM (UI non initialisée), 
+  // on ne vide pas APP.recipe.ingredients pour éviter d'effacer les données chargées en mémoire.
+  if (rows.length === 0) return;
+
   APP.recipe.ingredients = [];
   rows.forEach(row => {
     const name = row.querySelector('[data-field="name"]').value.trim();
@@ -2056,15 +2061,18 @@ function renderNutritionAnalysis() {
   // Fonction locale pour simuler la nutrition des ingrédients par défaut
   const getMockNutrition = (name) => {
     const n = name.toLowerCase();
-    if (n.includes('beurre') || n.includes('huile') || n.includes('graisse')) return { kcal: 717, proteins: 1, carbs: 1, fats: 81 };
-    if (n.includes('sucre') || n.includes('sirop') || n.includes('miel') || n.includes('glucose')) return { kcal: 387, proteins: 0, carbs: 100, fats: 0 };
-    if (n.includes('farine') || n.includes('fécule') || n.includes('maïzena') || n.includes('fecule')) return { kcal: 364, proteins: 10, carbs: 76, fats: 1 };
-    if (n.includes('crème') || n.includes('creme') || n.includes('mascarpone')) return { kcal: 345, proteins: 2, carbs: 3, fats: 35 };
-    if (n.includes('lait')) return { kcal: 42, proteins: 3.4, carbs: 4.8, fats: 1 };
-    if (n.includes('chocolat') || n.includes('cacao') || n.includes('praliné')) return { kcal: 546, proteins: 5, carbs: 31, fats: 36 };
-    if (n.includes('œuf') || n.includes('oeuf') || n.includes('jaune') || n.includes('blanc')) return { kcal: 143, proteins: 13, carbs: 1, fats: 10 };
-    if (n.includes('fraise') || n.includes('framboise') || n.includes('pomme') || n.includes('citron') || n.includes('purée') || n.includes('fruit')) return { kcal: 50, proteins: 1, carbs: 12, fats: 0 };
-    if (n.includes('amande') || n.includes('noisette') || n.includes('noix') || n.includes('pistache')) return { kcal: 600, proteins: 20, carbs: 10, fats: 50 };
+    const matches = (keywords) => keywords.some(k => n.includes(k));
+
+    if (matches(['beurre', 'huile', 'graisse', 'gras'])) return { kcal: 717, proteins: 1, carbs: 1, fats: 81 };
+    if (matches(['sucre', 'sirop', 'miel', 'glucose', 'semoule', 'glace'])) return { kcal: 387, proteins: 0, carbs: 100, fats: 0 };
+    if (matches(['farine', 'fécule', 'fecule', 'amidon', 'maïzena'])) return { kcal: 364, proteins: 10, carbs: 76, fats: 1 };
+    if (matches(['crème', 'creme', 'mascarpone', 'chantilly'])) return { kcal: 345, proteins: 2, carbs: 3, fats: 35 };
+    if (matches(['lait'])) return { kcal: 42, proteins: 3.4, carbs: 4.8, fats: 1 };
+    if (matches(['chocolat', 'cacao', 'couverture', 'ganache', 'pralin', 'gianduja'])) return { kcal: 546, proteins: 5, carbs: 31, fats: 36 };
+    if (matches(['œuf', 'oeuf', 'jaune', 'blanc', 'oufs'])) return { kcal: 143, proteins: 13, carbs: 1, fats: 10 };
+    if (matches(['fraise', 'framboise', 'pomme', 'citron', 'fruit', 'purée', 'coulis', 'griotte'])) return { kcal: 50, proteins: 1, carbs: 12, fats: 0 };
+    if (matches(['amande', 'noisette', 'noix', 'pistache', 'pignon'])) return { kcal: 600, proteins: 20, carbs: 10, fats: 50 };
+    if (matches(['sel'])) return { kcal: 0, proteins: 0, carbs: 0, fats: 0 };
     return { kcal: 250, proteins: 5, carbs: 30, fats: 10 }; // Default
   };
 
@@ -2073,8 +2081,16 @@ function renderNutritionAnalysis() {
 
     // Convert to grams
     let qtyGrams = 0;
-    if (ing.unit === 'g' || ing.unit === 'ml') qtyGrams = parseFloat(ing.quantity);
-    else if (ing.unit === 'kg' || ing.unit === 'L') qtyGrams = parseFloat(ing.quantity) * 1000;
+    const unit = (ing.unit || '').toLowerCase();
+
+    if (unit === 'g' || unit === 'ml') {
+      qtyGrams = parseFloat(ing.quantity);
+    } else if (unit === 'kg' || unit === 'l') {
+      qtyGrams = parseFloat(ing.quantity) * 1000;
+    } else if (unit === 'pièce' || unit === 'piece' || unit === 'pcs' || unit === 'unité' || unit === 'u') {
+      // Conversion arbitraire mais nécessaire (50g par pièce/oeuf)
+      qtyGrams = parseFloat(ing.quantity) * 50;
+    }
 
     weightInGrams += qtyGrams;
 
@@ -2090,9 +2106,17 @@ function renderNutritionAnalysis() {
       totalGlu += nutrition.carbs * ratio;
       totalLip += nutrition.fats * ratio;
     }
+
+    // Allergens from DB if available
     if (dbItem && dbItem.allergens) {
       dbItem.allergens.forEach(a => foundAllergens.add(a));
     }
+    // Simple name-based allergen fallback if DB missing (safety)
+    const n = ing.name.toLowerCase();
+    if (n.includes('lait') || n.includes('crème') || n.includes('creme') || n.includes('beurre')) foundAllergens.add('Lait');
+    if (n.includes('farine') || n.includes('gluten')) foundAllergens.add('Gluten');
+    if (n.includes('œuf') || n.includes('oeuf') || n.includes('oufs')) foundAllergens.add('Œufs');
+    if (n.includes('noisette') || n.includes('amande') || n.includes('noix') || n.includes('pistache')) foundAllergens.add('Fruits à coque');
   });
 
   // Calculate per 100g
