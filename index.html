@@ -2845,6 +2845,136 @@
       </div>
     </div>
   </div>
+
+  <!-- Mobile Bottom Nav Bar -->
+  <nav class="mobile-nav-bar" id="mobileNavBar" style="display:none;">
+    <button class="mobile-nav-item active" id="mNavHub">
+      <span class="icon">🏠</span>
+      <span class="label" data-i18n="nav.home">Accueil</span>
+    </button>
+    <button class="mobile-nav-item" id="mNavRecettes">
+      <span class="icon">📖</span>
+      <span class="label" data-i18n="nav.recipes">Recettes</span>
+    </button>
+    <button class="mobile-nav-item" id="mNavLabo">
+      <span class="icon">📐</span>
+      <span class="label" data-i18n="nav.lab">Labo</span>
+    </button>
+    <button class="mobile-nav-item" id="mNavStats">
+      <span class="icon">📊</span>
+      <span class="label" data-i18n="nav.stats">Stats</span>
+    </button>
+    <button class="mobile-nav-item" id="mNavMore">
+      <span class="icon">➕</span>
+      <span class="label">Plus</span>
+    </button>
+  </nav>
+
+  <!-- Mobile "More" Menu Drawer -->
+  <div class="mobile-more-menu" id="mobileMoreMenu">
+    <div class="more-menu-content">
+      <div class="more-menu-header">
+        <h3 style="margin:0;">Menu</h3>
+        <button class="btn-icon" id="closeMoreMenu"
+          style="background:var(--bg-alt); width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center;">✕</button>
+      </div>
+      <div class="more-menu-grid">
+        <button class="menu-item" id="mNavSuppliers">
+          <span class="icon">🚚</span>
+          <span data-i18n="nav.suppliers">Fournisseurs</span>
+        </button>
+        <button class="menu-item" id="mNavInventaire">
+          <span class="icon">📦</span>
+          <span data-i18n="nav.inventory">Stock</span>
+        </button>
+        <button class="menu-item" id="mNavPlanning">
+          <span class="icon">🗓️</span>
+          <span data-i18n="nav.planning">Planning</span>
+        </button>
+        <button class="menu-item" id="mNavLabeling">
+          <span class="icon">🏷️</span>
+          <span data-i18n="nav.labeling">Étiquettes</span>
+        </button>
+        <button class="menu-item" id="mNavHygiene">
+          <span class="icon">🛡️</span>
+          <span data-i18n="nav.hygiene">HACCP</span>
+        </button>
+        <button class="menu-item" id="mNavPortfolio">
+          <span class="icon">🖼️</span>
+          <span data-i18n="nav.portfolio">Portfolio</span>
+        </button>
+        <button class="menu-item" id="mNavAPropos">
+          <span class="icon">ℹ️</span>
+          <span data-i18n="nav.about">À propos</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Mobile Navigation Logic
+    function updateMobileNavActive(id) {
+      document.querySelectorAll('.mobile-nav-item').forEach(el => el.classList.remove('active'));
+      const activeBtn = document.getElementById(id);
+      if (activeBtn) activeBtn.classList.add('active');
+    }
+
+    document.getElementById('mNavHub').addEventListener('click', () => { showHub(); updateMobileNavActive('mNavHub'); });
+    document.getElementById('mNavRecettes').addEventListener('click', () => { showRecettes(); updateMobileNavActive('mNavRecettes'); });
+    document.getElementById('mNavLabo').addEventListener('click', () => { showLabo(); updateMobileNavActive('mNavLabo'); });
+    document.getElementById('mNavStats').addEventListener('click', () => { showStats(); updateMobileNavActive('mNavStats'); });
+
+    // Drawer Logic
+    const drawer = document.getElementById('mobileMoreMenu');
+    document.getElementById('mNavMore').addEventListener('click', () => {
+      drawer.style.display = 'flex';
+      setTimeout(() => drawer.classList.add('show'), 10);
+    });
+
+    const closeDrawer = () => {
+      drawer.classList.remove('show');
+      setTimeout(() => drawer.style.display = 'none', 400);
+    };
+
+    document.getElementById('closeMoreMenu').addEventListener('click', closeDrawer);
+    drawer.addEventListener('click', (e) => { if (e.target === drawer) closeDrawer(); });
+
+    // Drawer Links
+    const drawerActions = {
+      'mNavSuppliers': showSuppliers,
+      'mNavInventaire': showInventaire,
+      'mNavPlanning': showPlanning,
+      'mNavLabeling': showLabeling,
+      'mNavHygiene': showHygiene,
+      'mNavPortfolio': showPortfolio,
+      'mNavAPropos': showAPropos
+    };
+
+    Object.keys(drawerActions).forEach(id => {
+      document.getElementById(id).addEventListener('click', () => {
+        drawerActions[id]();
+        closeDrawer();
+        updateMobileNavActive('mNavMore'); // Keep Plus active as a visual hint
+      });
+    });
+
+    // Handle initial show/hide based on auth
+    function updateMobileNavVisibility() {
+      const isAuth = localStorage.getItem('gourmet_auth') === 'true';
+      const bar = document.getElementById('mobileNavBar');
+      if (bar) bar.style.display = isAuth ? 'flex' : 'none';
+    }
+
+    // Patch existing funcs to update mobile nav
+    const originalHideAllApps = window.hideAllApps;
+    window.hideAllApps = function () {
+      if (originalHideAllApps) originalHideAllApps();
+      updateMobileNavVisibility();
+    };
+
+    // Initial call
+    updateMobileNavVisibility();
+  </script>
 </body>
 
 </html>

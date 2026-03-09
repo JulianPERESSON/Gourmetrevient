@@ -2551,6 +2551,7 @@ function checkAuth() {
     overlay.classList.add('hidden');
     document.body.classList.remove('auth-pending');
     $('#userProfileArea').style.display = 'flex';
+    if ($('#mobileNavBar')) $('#mobileNavBar').style.display = 'flex';
     updateDashboard();
     loadSavedRecipes();
     updateDashboard();
@@ -2558,6 +2559,7 @@ function checkAuth() {
     overlay.classList.remove('hidden');
     document.body.classList.add('auth-pending');
     $('#userProfileArea').style.display = 'none';
+    if ($('#mobileNavBar')) $('#mobileNavBar').style.display = 'none';
 
     let authMode = 'login'; // 'login' or 'register'
 
