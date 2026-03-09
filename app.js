@@ -3210,29 +3210,78 @@ function exportShoppingList() {
 // STATISTICS & CHARTS (V2)
 // =====================================================================
 
+// =====================================================================
+// STATISTICS & CHARTS (V2)
+// =====================================================================
+
 let v2Charts = { margin: null, performance: null, scatter: null };
 let perfMode = 'top';
+window.currentStatsCat = 'all';
+
+function filterStatsCat(cat) {
+  window.currentStatsCat = cat;
+  const btns = document.querySelectorAll('#statsCategoryFilters .stats-toggle-btn');
+  btns.forEach(b => {
+    if (b.getAttribute('data-cat') === cat) b.classList.add('active');
+    else b.classList.remove('active');
+  });
+  renderStats();
+}
 
 function renderStats() {
+  const container = document.getElementById('appStats');
+  if (!container || container.style.display === 'none') return;
+
   if (APP.savedRecipes.length === 0) {
-    seedDemoData();
+    // Optional: seed demo if empty, or show empty state
+    // seedDemoData(); 
   }
 
-  const recipes = APP.savedRecipes;
-  if (!recipes || recipes.length === 0) return;
+  let recipes = APP.savedRecipes;
+  if (!recipes || recipes.length === 0) {
+    // Show empty state if no recipes
+    const grid = document.querySelector('.stats-main-grid');
+    if (grid) grid.style.opacity = '0.5';
+    return;
+  }
 
-  const results = recipes.map(r => ({
+  // Calculate full data for all recipes
+  const allResults = recipes.map(r => ({
     ...r,
     data: calcFullCost(r.margin || 70, r)
   }));
 
+  // Filter based on selected category
+  const filteredResults = window.currentStatsCat === 'all'
+    ? allResults
+    : allResults.filter(r => r.category === window.currentStatsCat);
+
+  // --- 0. POPULATE CATEGORY FILTERS ---
+  const catFilterContainer = document.getElementById('statsCategoryFilters');
+  if (catFilterContainer) {
+    const categories = [...new Set(allResults.map(r => r.category).filter(Boolean))];
+    let html = `<button class="stats-toggle-btn ${window.currentStatsCat === 'all' ? 'active' : ''}" 
+                 onclick="filterStatsCat('all')" data-cat="all" data-i18n="ui.all">${i18n.t('ui.all') || 'Toutes'}</button>`;
+
+    categories.forEach(cat => {
+      html += `<button class="stats-toggle-btn ${window.currentStatsCat === cat ? 'active' : ''}" 
+                onclick="filterStatsCat('${cat}')" data-cat="${cat}">${cat}</button>`;
+    });
+    catFilterContainer.innerHTML = html;
+  }
+
+  if (filteredResults.length === 0) {
+    // Handle case where category has no recipes (unlikely but safe)
+    return;
+  }
+
   // --- 1. KPI UPDATES ---
-  const avgMargin = results.reduce((sum, r) => sum + r.data.marginPct, 0) / results.length;
-  const sortedByMargin = [...results].sort((a, b) => b.data.marginPct - a.data.marginPct);
+  const avgMargin = filteredResults.reduce((sum, r) => sum + r.data.marginPct, 0) / filteredResults.length;
+  const sortedByMargin = [...filteredResults].sort((a, b) => b.data.marginPct - a.data.marginPct);
   const bestRecipe = sortedByMargin[0];
   const worstRecipe = sortedByMargin[sortedByMargin.length - 1];
-  const avgCost = results.reduce((sum, r) => sum + r.data.costPerPortion, 0) / results.length;
-  const avgPrice = results.reduce((sum, r) => sum + r.data.sellingPrice, 0) / results.length;
+  const avgCost = filteredResults.reduce((sum, r) => sum + r.data.costPerPortion, 0) / filteredResults.length;
+  const avgPrice = filteredResults.reduce((sum, r) => sum + r.data.sellingPrice, 0) / filteredResults.length;
 
   if ($('#v2KpiAvgMargin')) $('#v2KpiAvgMargin').textContent = avgMargin.toFixed(1) + '%';
   if ($('#v2KpiBestRecipe')) $('#v2KpiBestRecipe').textContent = bestRecipe.name;
@@ -3240,30 +3289,64 @@ function renderStats() {
   if ($('#v2KpiAvgCost')) $('#v2KpiAvgCost').textContent = avgCost.toFixed(2) + '€';
   if ($('#v2KpiAvgPrice')) $('#v2KpiAvgPrice').textContent = avgPrice.toFixed(2) + '€';
 
-  // --- 10. INSIGHTS ---
+  // --- 2. INSIGHTS ---
   let insightText = i18n.t('stats.insight.template', {
     avg: avgMargin.toFixed(1),
     best: bestRecipe.name,
     bestMargin: bestRecipe.data.marginPct.toFixed(1)
-  });
+  }) || `Votre marge moyenne est de <strong>${avgMargin.toFixed(1)}%</strong>. Le produit le plus rentable est <strong>${bestRecipe.name}</strong> (${bestRecipe.data.marginPct.toFixed(1)}%).`;
 
   if (worstRecipe.data.marginPct < 50) {
-    insightText += " " + i18n.t('stats.insight.attention', {
+    insightText += " " + (i18n.t('stats.insight.attention', {
       worst: worstRecipe.name,
       worstMargin: worstRecipe.data.marginPct.toFixed(1)
-    });
+    }) || `Attention à <strong>${worstRecipe.name}</strong> dont la marge est faible (${worstRecipe.data.marginPct.toFixed(1)}%).`);
   } else {
-    insightText += " " + i18n.t('stats.insight.balanced');
+    insightText += " " + (i18n.t('stats.insight.balanced') || "Vos marges sont globalement saines et équilibrées.");
   }
 
   if ($('#statsInsightText')) $('#statsInsightText').innerHTML = insightText;
 
-  renderV2MarginDonut(results);
-  renderV2PerformanceBars(results);
-  renderV2ScatterPlot(results);
-  renderV2Alerts(results);
-  renderV2Table(results);
-  setupStatsListeners(results);
+  // --- 3. CHARTS ---
+  renderV2MarginDonut(filteredResults);
+  renderV2PerformanceBars(filteredResults);
+  renderV2ScatterPlot(filteredResults);
+  renderV2Alerts(filteredResults);
+  renderV2Table(filteredResults);
+  setupStatsListeners(filteredResults);
+}
+
+async function exportStatsPDF() {
+  const container = document.getElementById('appStats');
+  if (!container) return;
+
+  const opt = {
+    margin: 10,
+    filename: `Rapport_Performance_${new Date().toISOString().split('T')[0]}.pdf`,
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2, useCORS: true, logging: false },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+  };
+
+  showToast(i18n.t('ui.toast.exporting') || "Génération du PDF...");
+
+  // Clone element to avoid modifying live view
+  const clone = container.cloneNode(true);
+  clone.style.display = 'block';
+  clone.style.background = '#ffffff';
+  clone.classList.add('pdf-export-mode');
+
+  // Remove buttons and inputs from clone
+  clone.querySelectorAll('button, input').forEach(el => el.remove());
+  clone.querySelector('.stats-filter-bar')?.remove();
+
+  try {
+    await html2pdf().set(opt).from(clone).save();
+    showToast(i18n.t('ui.toast.exported') || "Rapport exporté avec succès", "success");
+  } catch (err) {
+    console.error("PDF Export Error:", err);
+    showToast("Erreur lors de l'export PDF", "error");
+  }
 }
 
 function renderV2MarginDonut(results) {
@@ -3364,28 +3447,73 @@ function renderV2ScatterPlot(results) {
     name: r.name
   }));
 
+  // Plugin for Quadrants Background
+  const quadrantPlugin = {
+    id: 'quadrants',
+    beforeDraw(chart) {
+      const { ctx, chartArea: { left, top, right, bottom }, scales: { x, y } } = chart;
+      const midX = x.getPixelForValue((x.max + x.min) / 2);
+      const midY = y.getPixelForValue(50); // 50% margin is mid-point strictly for quadrants
+
+      ctx.save();
+      // TL: Low Cost, High Margin (Stars)
+      ctx.fillStyle = 'rgba(34, 197, 94, 0.05)';
+      ctx.fillRect(left, top, midX - left, midY - top);
+      // TR: High Cost, High Margin (Premium)
+      ctx.fillStyle = 'rgba(99, 102, 241, 0.05)';
+      ctx.fillRect(midX, top, right - midX, midY - top);
+      // BL: Low Cost, Low Margin (Volume)
+      ctx.fillStyle = 'rgba(245, 158, 11, 0.05)';
+      ctx.fillRect(left, midY, midX - left, bottom - midY);
+      // BR: High Cost, Low Margin (Danger)
+      ctx.fillStyle = 'rgba(239, 68, 68, 0.05)';
+      ctx.fillRect(midX, midY, right - midX, bottom - midY);
+      ctx.restore();
+    }
+  };
+
   v2Charts.scatter = new Chart(ctx, {
     type: 'scatter',
+    plugins: [quadrantPlugin],
     data: {
       datasets: [{
-        label: i18n.t('stats.chart.recipes_label'),
+        label: i18n.t('stats.chart.recipes_label') || 'Recettes',
         data: data,
         backgroundColor: '#6366F1',
-        pointRadius: 6,
-        pointHoverRadius: 8
+        pointRadius: 8,
+        pointHoverRadius: 12,
+        borderColor: '#ffffff',
+        borderWidth: 2
       }]
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
       scales: {
-        x: { title: { display: true, text: i18n.t('stats.chart.cost_axis'), font: { weight: '700' } }, grid: { color: '#F1F5F9' } },
-        y: { title: { display: true, text: i18n.t('stats.chart.margin_axis'), font: { weight: '700' } }, min: 0, max: 100, grid: { color: '#F1F5F9' } }
+        x: {
+          title: { display: true, text: i18n.t('stats.chart.cost_axis') || 'Coût Matière (€)', font: { weight: '800', size: 12 } },
+          grid: { color: 'rgba(0,0,0,0.05)' }
+        },
+        y: {
+          title: { display: true, text: i18n.t('stats.chart.margin_axis') || 'Marge (%)', font: { weight: '800', size: 12 } },
+          min: 0, max: 100,
+          grid: { color: 'rgba(0,0,0,0.05)' }
+        }
       },
       plugins: {
         tooltip: {
+          padding: 15,
+          backgroundColor: 'rgba(30, 41, 59, 0.9)',
+          titleFont: { size: 14, weight: 'bold' },
           callbacks: {
-            label: (ctx) => ` ${data[ctx.dataIndex].name}: ${i18n.t('stats.chart.tooltip_cost')} ${ctx.parsed.x.toFixed(2)}€ | ${i18n.t('stats.chart.tooltip_margin')} ${ctx.parsed.y.toFixed(1)}%`
+            label: (ctx) => {
+              const r = data[ctx.dataIndex];
+              return [
+                ` ${r.name}`,
+                ` • ${i18n.t('stats.chart.tooltip_cost') || 'Coût'}: ${ctx.parsed.x.toFixed(2)}€`,
+                ` • ${i18n.t('stats.chart.tooltip_margin') || 'Marge'}: ${ctx.parsed.y.toFixed(1)}%`
+              ];
+            }
           }
         }
       }
