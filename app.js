@@ -24,7 +24,7 @@ const APP = {
     { id: 103, name: 'Grands Moulins de Paris', contact: 'Jean Meunier', email: 'commandes@gmp.fr', categories: ['Farine', 'Mixes', 'Céréales'], rating: 4.9 }
   ],
   history: [], // New for stats
-  haccpLogs: { temp: [], trace: [], clean: [] },
+  haccpLogs: { temp: [], trace: [], clean: [], reception: [] },
   viewOwner: null,
   notifications: []
 };
@@ -4897,14 +4897,18 @@ function loadHaccpLogs() {
     } catch (e) { console.error("Error loading HACCP logs", e); }
   }
 
-  const needsDemo = !APP.haccpLogs.temp.length && !APP.haccpLogs.trace.length && !APP.haccpLogs.reception.length;
+  if (!APP.haccpLogs.temp) APP.haccpLogs.temp = [];
+  if (!APP.haccpLogs.trace) APP.haccpLogs.trace = [];
+  if (!APP.haccpLogs.reception) APP.haccpLogs.reception = [];
+  if (!APP.haccpLogs.clean) APP.haccpLogs.clean = [];
+
+  const needsDemo = APP.haccpLogs.temp.length === 0 && APP.haccpLogs.trace.length === 0 && APP.haccpLogs.reception.length === 0;
   if (needsDemo) {
     const now = new Date();
     APP.haccpLogs.temp = [
       { id: 't_demo1', date: new Date(now - 1000 * 60 * 60 * 2).toISOString(), equipKey: 'haccp.equip.frigo1', val: 3.2, user: 'Julian', action: null },
       { id: 't_demo2', date: new Date(now - 1000 * 60 * 60 * 14).toISOString(), equipKey: 'haccp.equip.frigo2', val: 4.5, user: 'Julian', action: null },
-      { id: 't_demo3', date: new Date(now - 1000 * 60 * 60 * 26).toISOString(), equipKey: 'haccp.equip.congelateur', val: -18.5, user: 'Julian', action: null },
-      { id: 't_demo4', date: new Date(now - 1000 * 60 * 60 * 38).toISOString(), equipKey: 'haccp.equip.cellule', val: -25.0, user: 'Julian', action: 'haccp.action.verified' }
+      { id: 't_demo3', date: new Date(now - 1000 * 60 * 60 * 26).toISOString(), equipKey: 'haccp.equip.congelateur', val: -18.5, user: 'Julian', action: null }
     ];
     APP.haccpLogs.reception = [
       { id: 'r_demo1', date: new Date(now - 1000 * 60 * 60 * 3).toISOString(), supplier: 'Métro', temp: 2.5, hygiene: 'ok' },
@@ -4924,11 +4928,7 @@ function loadHaccpLogs() {
     APP.haccpLogs.clean = [
       { id: 'c1', areaKey: 'haccp.clean.c1', done: false, icon: '🧼' },
       { id: 'c2', areaKey: 'haccp.clean.c2', done: false, icon: '🧹' },
-      { id: 'c3', areaKey: 'haccp.clean.c3', done: false, icon: '🔥' },
-      { id: 'c4', areaKey: 'haccp.clean.c4', done: false, icon: '📦' },
-      { id: 'c5', areaKey: 'haccp.clean.c5', done: false, icon: '❄️' },
-      { id: 'c6', areaKey: 'haccp.clean.c6', done: false, icon: '🍴' },
-      { id: 'c7', areaKey: 'haccp.clean.c7', done: false, icon: '🗑️' }
+      { id: 'c3', areaKey: 'haccp.clean.c3', done: false, icon: '🔥' }
     ];
     saveHaccpLogs();
   }
