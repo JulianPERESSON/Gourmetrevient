@@ -258,6 +258,8 @@ const TRANSLATIONS = {
         // Step 4
         's4.title': '📊 Analyse des coûts',
         's4.subtitle': 'Indicateurs financiers calculés automatiquement à partir de vos données.',
+        's4.nutrition': '🍎 Profil Nutritionnel & Allergènes',
+        's4.nutrition.desc': 'Calculé automatiquement pour 100g selon vos ingrédients et données Open Food Facts.',
         's4.margin': 'Marge souhaitée',
         's4.chart': '🍰 Répartition du coût par ingrédient',
         's4.batch': '📦 Simulation par lot',
@@ -1546,6 +1548,8 @@ const TRANSLATIONS = {
 
         's4.title': '📊 Cost Analysis',
         's4.subtitle': 'Financial indicators automatically calculated from your data.',
+        's4.nutrition': '🍎 Nutritional Profile & Allergens',
+        's4.nutrition.desc': 'Automatically calculated per 100g based on ingredients and Open Food Facts.',
         's4.margin': 'Target margin',
         's4.chart': '🍰 Cost breakdown by ingredient',
         's4.batch': '📦 Batch simulation',
@@ -2783,6 +2787,8 @@ const TRANSLATIONS = {
 
         's4.title': '📊 Análisis de costos',
         's4.subtitle': 'Indicadores financieros calculados automáticamente a partir de sus datos.',
+        's4.nutrition': '🍎 Perfil Nutricional y Alérgenos',
+        's4.nutrition.desc': 'Calculado automáticamente por cada 100g usando ingredientes y Open Food Facts.',
         's4.margin': 'Margen deseado',
         's4.chart': '🍰 Distribución del costo por ingrediente',
         's4.batch': '📦 Simulación por lote',

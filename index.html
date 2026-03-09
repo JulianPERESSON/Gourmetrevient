@@ -707,6 +707,47 @@
       <!-- STEP 4: Cost Analysis -->
       <!-- ================================================ -->
       <div class="step-content" id="step4">
+        <!-- Nutrition & Allergens (calculated) -->
+        <div class="card" style="margin-bottom: 1.2rem; background: var(--bg-alt);">
+          <div class="card-title" data-i18n="s4.nutrition">🍎 Profil Nutritionnel & Allergènes</div>
+          <div class="card-subtitle" data-i18n="s4.nutrition.desc" style="margin-bottom:1rem;">Calculé automatiquement
+            pour 100g selon vos ingrédients et données Open Food Facts.</div>
+          <div id="nutritionGrid"
+            style="display:grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap:1rem; text-align:center;">
+            <div
+              style="background:var(--surface); padding:1rem; border-radius:var(--radius-md); border:1px solid var(--surface-border);">
+              <div style="font-size:1.5rem; font-weight:800; color:var(--text);" id="nutriKcal">0</div>
+              <div style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; font-weight:700;">Kcal /
+                100g</div>
+            </div>
+            <div
+              style="background:var(--surface); padding:1rem; border-radius:var(--radius-md); border:1px solid var(--surface-border);">
+              <div style="font-size:1.5rem; font-weight:800; color:#3b82f6;" id="nutriPro">0g</div>
+              <div style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; font-weight:700;">
+                Protéines</div>
+            </div>
+            <div
+              style="background:var(--surface); padding:1rem; border-radius:var(--radius-md); border:1px solid var(--surface-border);">
+              <div style="font-size:1.5rem; font-weight:800; color:#eab308;" id="nutriGlu">0g</div>
+              <div style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; font-weight:700;">
+                Glucides</div>
+            </div>
+            <div
+              style="background:var(--surface); padding:1rem; border-radius:var(--radius-md); border:1px solid var(--surface-border);">
+              <div style="font-size:1.5rem; font-weight:800; color:#ef4444;" id="nutriLip">0g</div>
+              <div style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; font-weight:700;">
+                Lipides</div>
+            </div>
+          </div>
+          <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px dashed var(--surface-border);">
+            <div style="font-weight:700; font-size:0.9rem; margin-bottom:0.5rem;">⚠️ Allergènes détectés :</div>
+            <div id="allergensList"
+              style="font-size: 0.9rem; color: var(--danger); font-weight:600; min-height:1.5rem;">
+              Aucun ingrédient saisi / Non renseigné
+            </div>
+          </div>
+        </div>
+
         <!-- Cost Breakdown Chart -->
         <div class="card" style="margin-bottom: 1.2rem;">
           <div class="card-title" data-i18n="s4.chart">🍰 Répartition du coût par ingrédient</div>
@@ -797,6 +838,8 @@
 
           <div class="export-actions">
             <button class="btn btn-primary" id="btnExportPdf" data-i18n="s5.btn.pdf">📄 Exporter en PDF</button>
+            <button class="btn btn-outline" id="btnExportDevis" data-i18n="s5.btn.quote"
+              style="border-color:var(--accent); color:var(--accent);">🤝 Devis Client (B2B)</button>
             <button class="btn btn-secondary" id="btnExportJson" data-i18n="s5.btn.json">💾 Exporter en JSON</button>
             <button class="btn btn-success" id="btnSaveRecipe" data-i18n="s5.btn.save">✅ Sauvegarder la
               recette</button>

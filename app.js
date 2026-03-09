@@ -598,8 +598,15 @@ function addToIngredientDb(ing) {
       name: ing.name,
       unit: ing.unit,
       pricePerUnit: ing.pricePerUnit,
-      priceRef: ing.priceRef || getPriceRef(ing.unit)
+      priceRef: ing.priceRef || getPriceRef(ing.unit),
+      nutrition: ing.nutrition || null,
+      allergens: ing.allergens || []
     });
+    saveIngredientDb();
+  } else if (exists && ing.nutrition) {
+    // Mettre à jour si de nouvelles données OFF arrivent
+    exists.nutrition = ing.nutrition;
+    if (ing.allergens && ing.allergens.length) exists.allergens = ing.allergens;
     saveIngredientDb();
   }
 }
@@ -864,12 +871,24 @@ function renderProcedure() {
   });
 }
 
-function createProcedureStep(text, idx) {
+function createProcedureStep(textObj, idx) {
   const div = document.createElement('div');
   div.className = 'procedure-step';
+
+  const isObj = typeof textObj === 'object' && textObj !== null;
+  const stepText = isObj ? textObj.text : textObj;
+  const stepDay = isObj ? textObj.day : 'Jour J';
+
   div.innerHTML = `
     <div class="step-num">${idx + 1}</div>
-    <input type="text" class="form-input proc-input" value="${escapeHtml(t(text))}" placeholder="${t('ui.ph.step')}" />
+    <select class="form-input proc-day" style="max-width:100px; padding:0.4rem; font-size:0.85rem; border-right:none; border-radius:var(--radius-sm) 0 0 var(--radius-sm); border-right: 1px solid var(--surface-border);">
+      <option value="J-3" ${stepDay === 'J-3' ? 'selected' : ''}>J-3</option>
+      <option value="J-2" ${stepDay === 'J-2' ? 'selected' : ''}>J-2</option>
+      <option value="J-1" ${stepDay === 'J-1' ? 'selected' : ''}>J-1</option>
+      <option value="Jour J" ${stepDay === 'Jour J' ? 'selected' : ''}>Jour J</option>
+      <option value="J+1" ${stepDay === 'J+1' ? 'selected' : ''}>J+1</option>
+    </select>
+    <input type="text" class="form-input proc-input" style="border-radius:0 var(--radius-sm) var(--radius-sm) 0;" value="${escapeHtml(t(stepText))}" placeholder="${t('ui.ph.step')}" />
     <button class="btn-remove" data-remove-step="${idx}" title="${t('ui.btn.delete')}">✕</button>
   `;
 
@@ -889,11 +908,17 @@ function addProcedureStep() {
 }
 
 function collectProcedure() {
-  const inputs = $$('.proc-input');
+  const steps = $$('.procedure-step');
   APP.recipe.steps = [];
-  inputs.forEach(input => {
-    const val = input.value.trim();
-    if (val) APP.recipe.steps.push(val);
+  steps.forEach(stepEl => {
+    const input = stepEl.querySelector('.proc-input');
+    const day = stepEl.querySelector('.proc-day');
+    const val = input ? input.value.trim() : '';
+    const dayVal = day ? day.value : 'Jour J';
+
+    if (val) {
+      APP.recipe.steps.push({ text: val, day: dayVal });
+    }
   });
 }
 
@@ -959,6 +984,11 @@ function renderCostAnalysis() {
 
   // Advanced cost KPI
   renderAdvancedCostKPI(costs);
+
+  // Nutrition & Allergens calculation
+  if (document.getElementById('nutritionGrid')) {
+    renderNutritionAnalysis();
+  }
 }
 
 function renderAdvancedCostKPI(costs) {
@@ -1114,8 +1144,22 @@ function renderSummary() {
     </tr>`;
   }).join('');
 
-  // Procedure list
-  let procHtml = r.steps.filter(s => s).map((s, i) => `<li>${escapeHtml(t(s))}</li>`).join('');
+  // Procedure list (Handling new object format)
+  let procHtml = '';
+  if (r.steps && r.steps.length > 0) {
+    let currentDay = '';
+    r.steps.filter(s => s).forEach((s, i) => {
+      const isObj = typeof s === 'object';
+      const text = isObj ? s.text : s;
+      const day = isObj ? s.day : 'Jour J';
+
+      if (day !== currentDay) {
+        currentDay = day;
+        procHtml += `<div style="font-weight:800; color:var(--accent); margin-top:0.8rem; margin-bottom:0.2rem; font-size:0.85rem;">📅 ${currentDay}</div>`;
+      }
+      procHtml += `<li>${escapeHtml(t(text))}</li>`;
+    });
+  }
 
   // Time display
   const prepH = Math.floor(r.prepTime / 60);
@@ -1755,6 +1799,96 @@ function exportPdf() {
   }, 300); // 300ms is safer
 }
 
+function exportDevisPdf() {
+  const recipeName = APP.recipe.name || 'Prestation';
+  const costs = calcFullCost(APP.margin);
+
+  // Create a stylized container for the Quote
+  const quoteDiv = document.createElement('div');
+  quoteDiv.style.padding = '40px';
+  quoteDiv.style.fontFamily = "'Inter', sans-serif";
+  quoteDiv.style.color = '#333';
+  quoteDiv.style.backgroundColor = '#fff';
+  quoteDiv.style.width = '780px';
+
+  quoteDiv.innerHTML = `
+    <div style="border-bottom:2px solid #333; padding-bottom:20px; margin-bottom:30px; display:flex; justify-content:space-between; align-items:flex-end;">
+      <div>
+        <h1 style="color:#6366f1; margin:0; font-size:2rem;">DEVIS CLIENT</h1>
+        <p style="margin:5px 0 0; color:#666;">Pour la réalisation sur mesure de vos besoins.</p>
+      </div>
+      <div style="text-align:right;">
+        <h2 style="margin:0;">L'Artisan / GourmetRevient</h2>
+        <p style="margin:5px 0 0; color:#666;">Date: ${new Date().toLocaleDateString()}</p>
+      </div>
+    </div>
+    
+    <div style="margin-bottom:30px;">
+      <h3 style="background:#f4f4f5; padding:10px; margin:0 0 10px;">Désignation de la prestation</h3>
+      <p style="font-size:1.1rem; font-weight:600;">${recipeName} (${APP.recipe.category || 'Pâtisserie'})</p>
+      <p style="color:#555;">${APP.recipe.description || 'Fabrication artisanale selon demande client.'}</p>
+      <p><strong>Quantité prévue :</strong> ${APP.recipe.portions} portions/pièces.</p>
+    </div>
+    
+    <table style="width:100%; border-collapse:collapse; margin-bottom:30px;">
+      <thead>
+        <tr style="background:#333; color:#fff; text-align:left;">
+          <th style="padding:10px;">Description</th>
+          <th style="padding:10px; text-align:right;">Quantité</th>
+          <th style="padding:10px; text-align:right;">Prix Unitaire HT</th>
+          <th style="padding:10px; text-align:right;">Montant HT</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="padding:10px; border-bottom:1px solid #ddd;">Prestation complète : ${recipeName}</td>
+          <td style="padding:10px; text-align:right; border-bottom:1px solid #ddd;">${APP.recipe.portions}</td>
+          <td style="padding:10px; text-align:right; border-bottom:1px solid #ddd;">${costs.sellingPrice.toFixed(2)} €</td>
+          <td style="padding:10px; text-align:right; border-bottom:1px solid #ddd;">${(costs.sellingPrice * APP.recipe.portions).toFixed(2)} €</td>
+        </tr>
+      </tbody>
+    </table>
+    
+    <div style="display:flex; justify-content:flex-end;">
+      <div style="width:300px; background:#f4f4f5; padding:20px; border-radius:8px;">
+        <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+          <span>Total HT</span>
+          <strong>${(costs.sellingPrice * APP.recipe.portions).toFixed(2)} €</strong>
+        </div>
+        <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+          <span>TVA (5.5%)</span>
+          <strong>${((costs.sellingPrice * APP.recipe.portions) * 0.055).toFixed(2)} €</strong>
+        </div>
+        <div style="display:flex; justify-content:space-between; font-size:1.2rem; font-weight:bold; border-top:2px solid #333; padding-top:10px;">
+          <span>TOTAL TTC</span>
+          <span style="color:#6366f1;">${((costs.sellingPrice * APP.recipe.portions) * 1.055).toFixed(2)} €</span>
+        </div>
+      </div>
+    </div>
+    
+    <div style="margin-top:50px; text-align:center; font-size:0.8rem; color:#888;">
+      <p>Devis valable 30 jours à compter de la date d'émission.</p>
+      <p>Ce document, une fois signé, vaut pour accord et bon de commande.</p>
+    </div>
+  `;
+
+  const opt = {
+    margin: [0.5, 0.5, 0.5, 0.5],
+    filename: `Devis_${recipeName.replace(/\s+/g, '_')}.pdf`,
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2, useCORS: true },
+    jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+  };
+
+  showToast('Génération du devis PDF en cours...', 'info');
+  html2pdf().set(opt).from(quoteDiv).save().then(() => {
+    showToast('Devis généré avec succès.', 'success');
+  }).catch(err => {
+    console.error('PDF Error:', err);
+    showToast('Erreur lors de la génération du devis.', 'error');
+  });
+}
+
 // ============================================================================
 // INGREDIENT DATABASE MODAL
 // ============================================================================
@@ -1876,7 +2010,13 @@ function selectOffProduct(index) {
 
   // Extract nutritions
   const n = p.nutriments || {};
-  const kcal = n['energy-kcal_100g'] || 0;
+  const nutriData = {
+    kcal: parseFloat(n['energy-kcal_100g']) || 0,
+    proteins: parseFloat(n['proteins_100g']) || 0,
+    carbs: parseFloat(n['carbohydrates_100g']) || 0,
+    fats: parseFloat(n['fat_100g']) || 0
+  };
+  const allergensData = p.allergens_tags ? p.allergens_tags.map(a => a.replace('en:', '').replace('fr:', '')) : [];
 
   // Ensure ingredient DB is initialized
   if (!APP.ingredientDb) loadIngredientDb(); // Handle just in case
@@ -1890,18 +2030,79 @@ function selectOffProduct(index) {
     quantity: 0,
     unit: existing ? existing.unit : 'g',
     pricePerUnit: price,
-    kcal: kcal,
+    kcal: nutriData.kcal,
     isOffData: true
   };
 
   addIngredient(offIngredient);
 
-  if (!existing) {
-    addToIngredientDb({ name: name, unit: 'g', pricePerUnit: 0 });
-  }
+  addToIngredientDb({
+    name: name, unit: 'g', pricePerUnit: price,
+    nutrition: nutriData, allergens: allergensData
+  });
 
   hideOffModal();
-  showToast(`Ingrédient associé avec Open Food Facts (${kcal} kcal/100g)`, 'success');
+  showToast(`Ingrédient associé avec Open Food Facts (${nutriData.kcal} kcal/100g)`, 'success');
+}
+
+function renderNutritionAnalysis() {
+  let totalKcal = 0;
+  let totalPro = 0;
+  let totalGlu = 0;
+  let totalLip = 0;
+  let weightInGrams = 0;
+  const foundAllergens = new Set();
+
+  APP.recipe.ingredients.forEach(ing => {
+    if (!ing.name || ing.quantity <= 0) return;
+
+    // Convert to grams
+    let qtyGrams = 0;
+    if (ing.unit === 'g' || ing.unit === 'ml') qtyGrams = parseFloat(ing.quantity);
+    else if (ing.unit === 'kg' || ing.unit === 'L') qtyGrams = parseFloat(ing.quantity) * 1000;
+
+    weightInGrams += qtyGrams;
+
+    const dbItem = APP.ingredientDb.find(db => db.name.toLowerCase() === ing.name.toLowerCase());
+    if (dbItem && dbItem.nutrition && qtyGrams > 0) {
+      const ratio = qtyGrams / 100; // Database nutrition is for 100g
+      totalKcal += dbItem.nutrition.kcal * ratio;
+      totalPro += dbItem.nutrition.proteins * ratio;
+      totalGlu += dbItem.nutrition.carbs * ratio;
+      totalLip += dbItem.nutrition.fats * ratio;
+    }
+    if (dbItem && dbItem.allergens) {
+      dbItem.allergens.forEach(a => foundAllergens.add(a));
+    }
+  });
+
+  // Calculate per 100g
+  if (weightInGrams > 0) {
+    const factor = 100 / weightInGrams;
+    totalKcal *= factor;
+    totalPro *= factor;
+    totalGlu *= factor;
+    totalLip *= factor;
+  }
+
+  const k = document.getElementById('nutriKcal');
+  const p = document.getElementById('nutriPro');
+  const g = document.getElementById('nutriGlu');
+  const l = document.getElementById('nutriLip');
+  const al = document.getElementById('allergensList');
+
+  if (k) k.textContent = Math.round(totalKcal);
+  if (p) p.textContent = totalPro.toFixed(1) + 'g';
+  if (g) g.textContent = totalGlu.toFixed(1) + 'g';
+  if (l) l.textContent = totalLip.toFixed(1) + 'g';
+
+  if (al) {
+    if (foundAllergens.size > 0) {
+      al.textContent = Array.from(foundAllergens).map(a => t(a) || a).join(', ').toUpperCase();
+    } else {
+      al.textContent = "Aucun / Non renseigné";
+    }
+  }
 }
 
 // ============================================================================
@@ -2033,6 +2234,7 @@ function bindEvents() {
 
   // Exports
   $('#btnExportPdf').addEventListener('click', exportPdf);
+  if ($('#btnExportDevis')) $('#btnExportDevis').addEventListener('click', exportDevisPdf);
   $('#btnExportJson').addEventListener('click', exportJson);
   $('#btnSaveRecipe').addEventListener('click', saveCurrentRecipe);
 
