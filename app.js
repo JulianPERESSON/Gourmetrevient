@@ -5260,3 +5260,159 @@ function renderTraceability() {
       '</tr>';
   }).join('');
 }
+
+// ============================================================================
+// OMNISEARCH SPOTLIGHT (CTRL+K)
+// ============================================================================
+
+let omniSelectedIndex = -1;
+let currentOmniActions = [];
+
+function toggleOmniSearch() {
+  const modal = $('#omniModal');
+  if (modal.style.display === 'flex') {
+    modal.style.display = 'none';
+  } else {
+    modal.style.display = 'flex';
+    $('#omniSearchInput').value = '';
+    $('#omniResults').innerHTML = '';
+    $('#omniEmpty').style.display = 'none';
+    setTimeout(() => $('#omniSearchInput').focus(), 100);
+  }
+}
+
+document.addEventListener('keydown', (e) => {
+  // Handle Cmd+K (Mac) or Ctrl+K (Windows)
+  if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+    e.preventDefault();
+    toggleOmniSearch();
+  }
+  // Handle Escape to close
+  if (e.key === 'Escape' && $('#omniModal').style.display === 'flex') {
+    toggleOmniSearch();
+  }
+});
+
+$('#omniModal').addEventListener('click', (e) => {
+  if (e.target.id === 'omniModal') toggleOmniSearch();
+});
+
+$('#omniSearchInput').addEventListener('input', (e) => {
+  const query = e.target.value.toLowerCase().trim();
+  omniSelectedIndex = -1;
+
+  if (!query) {
+    $('#omniResults').innerHTML = '';
+    $('#omniEmpty').style.display = 'none';
+    currentOmniActions = [];
+    return;
+  }
+
+  currentOmniActions = [];
+
+  // 1. Navigation / Modules
+  const modules = [
+    { title: t('nav.dash') || 'Dashboard', desc: 'Retourner à l\'accueil', icon: '🏠', action: () => $('#navHub').click() },
+    { title: t('nav.recipes') || 'Recettes', desc: 'Créer ou modifier une recette', icon: '📝', action: () => $('#navRecettes').click() },
+    { title: t('nav.lab') || 'Laboratoire', desc: 'Gestion du local et des équipements', icon: '🔬', action: () => $('#navLaboratoire').click() },
+    { title: t('nav.hygiene') || 'Hygiène & HACCP', desc: 'Relevés de température et traçabilité', icon: '🧼', action: () => $('#navHygiene').click() },
+    { title: t('nav.inventory') || 'Inventaire', desc: 'Gérer les stocks et alertes', icon: '📦', action: () => $('#navInventaire').click() },
+    { title: t('nav.suppliers') || 'Fournisseurs', desc: 'Consulter la liste des fournisseurs', icon: '🚚', action: () => $('#navSuppliers').click() }
+  ];
+
+  modules.forEach(m => {
+    if (m.title.toLowerCase().includes(query) || m.desc.toLowerCase().includes(query)) {
+      currentOmniActions.push(m);
+    }
+  });
+
+  // 2. Saved Recipes
+  APP.savedRecipes.forEach(r => {
+    if (r.name.toLowerCase().includes(query)) {
+      currentOmniActions.push({
+        title: r.name,
+        desc: `Recette sauvegardée · ${r.category || 'Général'}`,
+        icon: '🍰',
+        action: () => {
+          toggleOmniSearch();
+          $('#navRecettes').click();
+          loadRecipeToEditor(r.id);
+        }
+      });
+    }
+  });
+
+  // 3. Quick Actions
+  const qActions = [
+    { title: 'Nouvel Ingrédient', desc: 'Ajouter à la base de données', icon: '➕', action: () => { toggleOmniSearch(); $('#navRecettes').click(); setTimeout(() => showIngredientDbModal(), 300); } },
+    { title: 'Nouvelle Recette', desc: 'Commencer une feuille de calcul vide', icon: '✨', action: () => { toggleOmniSearch(); $('#navRecettes').click(); setTimeout(() => $('#btnCreateRecipe').click(), 300); } }
+  ];
+
+  qActions.forEach(m => {
+    if (m.title.toLowerCase().includes(query) || m.desc.toLowerCase().includes(query)) {
+      currentOmniActions.push(m);
+    }
+  });
+
+  renderOmniResults();
+});
+
+function renderOmniResults() {
+  const container = $('#omniResults');
+  container.innerHTML = '';
+
+  if (currentOmniActions.length === 0) {
+    $('#omniEmpty').style.display = 'block';
+    return;
+  }
+
+  $('#omniEmpty').style.display = 'none';
+
+  currentOmniActions.slice(0, 8).forEach((item, index) => {
+    const el = document.createElement('div');
+    el.className = 'omni-item' + (index === omniSelectedIndex ? ' active' : '');
+
+    el.innerHTML = `
+      <div class="omni-item-icon">${item.icon}</div>
+      <div class="omni-item-content">
+        <div class="omni-item-title">${escapeHtml(item.title)}</div>
+        <div class="omni-item-desc">${escapeHtml(item.desc)}</div>
+      </div>
+      <div class="omni-item-action">Ouvrir ➜</div>
+    `;
+
+    el.addEventListener('click', () => {
+      if (item.action) item.action();
+      toggleOmniSearch();
+    });
+
+    container.appendChild(el);
+  });
+}
+
+$('#omniSearchInput').addEventListener('keydown', (e) => {
+  const items = $$('#omniResults .omni-item');
+  if (items.length === 0) return;
+
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    omniSelectedIndex = (omniSelectedIndex + 1) % items.length;
+    updateOmniSelection(items);
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    omniSelectedIndex = omniSelectedIndex - 1 < 0 ? items.length - 1 : omniSelectedIndex - 1;
+    updateOmniSelection(items);
+  } else if (e.key === 'Enter' && omniSelectedIndex >= 0) {
+    e.preventDefault();
+    items[omniSelectedIndex].click();
+  }
+});
+
+function updateOmniSelection(items) {
+  items.forEach((item, i) => {
+    item.classList.toggle('active', i === omniSelectedIndex);
+    if (i === omniSelectedIndex) {
+      item.scrollIntoView({ block: 'nearest' });
+    }
+  });
+}

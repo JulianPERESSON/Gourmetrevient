@@ -2251,6 +2251,27 @@
     </div>
   </div>
 
+  <!-- OMNI-SEARCH SPOTLIGHT MODAL -->
+  <div id="omniModal" class="omni-overlay" style="display:none;">
+    <div class="omni-card">
+      <div class="omni-header">
+        <span class="omni-icon">🔍</span>
+        <input type="text" id="omniSearchInput" class="omni-input"
+          placeholder="Rechercher une recette, une fonction... (Ctrl+K)" autocomplete="off">
+        <span class="omni-shortcut-hint">ESC</span>
+      </div>
+      <div class="omni-body">
+        <div id="omniResults" class="omni-results-list">
+          <!-- Results injected via JS -->
+        </div>
+        <div id="omniEmpty"
+          style="display:none; padding:1.5rem; text-align:center; color:var(--text-muted); font-size:0.9rem;">
+          Aucun résultat trouvé.
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Libraries -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.2/html2pdf.bundle.min.js"></script>
   <!-- Change PIN Modal -->

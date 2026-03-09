@@ -7045,3 +7045,130 @@ select.form-input {
 .dark-theme ::-webkit-scrollbar-thumb {
   background: var(--surface-border);
 }
+
+/* --- OmniSearch Spotlight Modal --- */
+.omni-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(8px);
+  z-index: 4000;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 10vh;
+  display: flex;
+}
+
+.omni-card {
+  width: 100%;
+  max-width: 600px;
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  border: 1px solid var(--surface-border);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.omni-header {
+  display: flex;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--surface-border);
+  background: var(--surface);
+}
+
+.omni-icon {
+  font-size: 1.2rem;
+  color: var(--text-muted);
+  margin-right: 1rem;
+}
+
+.omni-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 1.2rem;
+  color: var(--text);
+  padding: 0.5rem 0;
+}
+
+.omni-input::placeholder {
+  color: var(--text-muted);
+}
+
+.omni-shortcut-hint {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  padding: 0.2rem 0.5rem;
+  background: var(--bg-alt);
+  border-radius: 4px;
+  border: 1px solid var(--surface-border);
+  font-family: monospace;
+}
+
+.omni-body {
+  max-height: 50vh;
+  overflow-y: auto;
+}
+
+.omni-results-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.omni-item {
+  display: flex;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--surface-border);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.omni-item:last-child {
+  border-bottom: none;
+}
+
+.omni-item:hover,
+.omni-item.active {
+  background: var(--bg-alt);
+}
+
+.omni-item-icon {
+  font-size: 1.5rem;
+  margin-right: 1rem;
+  width: 30px;
+  text-align: center;
+}
+
+.omni-item-content {
+  flex: 1;
+}
+
+.omni-item-title {
+  font-weight: 700;
+  color: var(--text);
+  font-size: 1rem;
+  margin-bottom: 0.2rem;
+}
+
+.omni-item-desc {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.omni-item-action {
+  font-size: 0.8rem;
+  color: var(--primary);
+  font-weight: 600;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.omni-item:hover .omni-item-action,
+.omni-item.active .omni-item-action {
+  opacity: 1;
+}
