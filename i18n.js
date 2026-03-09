@@ -3949,7 +3949,16 @@ function applyLanguage(lang) {
     // Update all [data-i18n] elements
     document.querySelectorAll('[data-i18n]').forEach(el => {
         const key = el.getAttribute('data-i18n');
-        const val = t(key);
+        const dataAttr = el.getAttribute('data-i18n-data');
+        let dataStr = {};
+        if (dataAttr) {
+            try {
+                dataStr = JSON.parse(dataAttr);
+            } catch (e) {
+                console.error("I18n invalid JSON parsing data-i18n-data:", dataAttr);
+            }
+        }
+        const val = t(key, dataStr);
         if (val) el.innerHTML = val;
     });
 
