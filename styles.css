@@ -6663,3 +6663,355 @@ select.form-input {
     gap: 1.5rem;
   }
 }
+
+/* =============================================================
+   COMPREHENSIVE DARK MODE OVERRIDES
+   ============================================================= */
+
+/* --- Header --- */
+.dark-theme .app-header {
+  background: rgba(26, 26, 26, 0.92);
+  border-bottom-color: var(--surface-border);
+}
+
+/* --- Auth --- */
+.dark-theme .auth-tab:hover:not(.active) {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* --- General cards & surfaces --- */
+.dark-theme .card,
+.dark-theme .glass-card {
+  background: var(--surface) !important;
+  color: var(--text);
+  border-color: var(--surface-border) !important;
+}
+
+/* --- Planning / Calendar --- */
+.dark-theme .month-view {
+  background: var(--surface);
+  color: var(--text);
+}
+
+.dark-theme .day-cell:hover:not(.empty) {
+  background: var(--surface-hover);
+}
+
+/* --- Roadmap / About --- */
+.dark-theme .roadmap-item.active {
+  background: var(--surface);
+}
+
+/* --- Dashboard Hero Stats --- */
+.dark-theme .hero-stat-item:hover {
+  background: var(--surface-hover);
+}
+
+/* --- Action Tiles --- */
+.dark-theme .action-tile:hover {
+  background: var(--surface-hover);
+}
+
+.dark-theme .tile-icon {
+  background: var(--bg-alt);
+}
+
+/* --- Recent items --- */
+.dark-theme .recent-item-premium:hover {
+  background: var(--surface-hover);
+}
+
+/* --- Inventory --- */
+.dark-theme .inv-stat-box {
+  background: var(--surface);
+  border-color: var(--surface-border);
+}
+
+.dark-theme .premium-table-container {
+  background: var(--surface);
+}
+
+.dark-theme .btn-stock {
+  background: var(--bg-alt);
+  color: var(--text);
+  border-color: var(--surface-border);
+}
+
+.dark-theme .search-bar-premium input {
+  background: var(--bg-alt);
+  color: var(--text);
+  border-color: var(--surface-border);
+}
+
+.dark-theme .wide-table {
+  background: var(--surface);
+}
+
+.dark-theme .wide-table th {
+  background: var(--bg-alt);
+  color: var(--text-secondary);
+}
+
+.dark-theme .wide-table td {
+  color: var(--text);
+  border-color: var(--surface-border);
+}
+
+.dark-theme .wide-table tr:hover td {
+  background: var(--surface-hover);
+}
+
+/* --- Labeling --- */
+.dark-theme .labeling-form-card {
+  background: var(--surface);
+  color: var(--text);
+}
+
+/* --- Production --- */
+.dark-theme .production-main {
+  background: var(--surface);
+}
+
+.dark-theme .prod-check-item {
+  background: var(--bg-alt);
+  color: var(--text);
+}
+
+/* --- Suppliers --- */
+.dark-theme .supplier-search-input {
+  background: var(--bg-alt) !important;
+  color: var(--text) !important;
+  border-color: var(--surface-border) !important;
+}
+
+.dark-theme .supplier-card {
+  background: var(--surface);
+  color: var(--text);
+  border-color: var(--surface-border);
+}
+
+.dark-theme .supplier-card-body {
+  color: var(--text-secondary);
+}
+
+.dark-theme .tag-supplier {
+  background: var(--bg-alt);
+  color: var(--text-secondary);
+}
+
+/* --- Forms and Inputs --- */
+.dark-theme .form-input,
+.dark-theme input[type="text"],
+.dark-theme input[type="number"],
+.dark-theme input[type="email"],
+.dark-theme input[type="password"],
+.dark-theme textarea,
+.dark-theme select {
+  background: var(--bg-alt);
+  color: var(--text);
+  border-color: var(--surface-border);
+}
+
+/* --- Modals --- */
+.dark-theme .modal-content,
+.dark-theme .modal-card {
+  background: var(--surface);
+  color: var(--text);
+}
+
+/* --- Carousel PDF --- */
+.dark-theme .carousel-pdf-btn {
+  background: var(--surface);
+}
+
+/* --- Dropdowns & Profiles --- */
+.dark-theme .dropdown-content,
+.dark-theme .profile-dropdown .dropdown-content {
+  background: var(--surface);
+  border-color: var(--surface-border);
+}
+
+.dark-theme .dropdown-content button {
+  color: var(--text);
+}
+
+.dark-theme .dropdown-content button:hover {
+  background: var(--surface-hover);
+}
+
+/* --- Notifications --- */
+.dark-theme .notif-dropdown {
+  background: var(--surface);
+  border-color: var(--surface-border);
+}
+
+/* --- Stats V2 Alerts card inline bg fix --- */
+.dark-theme .dash-card[style*="F1F5F9"],
+.dark-theme .dash-card[style*="f1f5f9"] {
+  background: var(--bg-alt) !important;
+}
+
+/* --- KPI cards --- */
+.dark-theme .kpi-card-v2 {
+  background: var(--surface);
+}
+
+.dark-theme .kpi-card-v2::before {
+  background: var(--accent);
+}
+
+/* --- Stats alerts panel --- */
+.dark-theme .alert-recipe-card {
+  background: var(--bg-alt);
+}
+
+.dark-theme .alert-recipe-card.danger {
+  background: rgba(239, 68, 68, 0.08);
+}
+
+/* --- Modern Table V2 --- */
+.dark-theme .modern-table-v2 th {
+  color: var(--text-muted);
+  border-bottom-color: var(--surface-border);
+}
+
+.dark-theme .modern-table-v2 td {
+  border-bottom-color: var(--surface-border);
+  color: var(--text);
+}
+
+.dark-theme .modern-table-v2 tr:hover td {
+  background: var(--surface-hover);
+}
+
+/* --- Stats filter bar --- */
+.dark-theme .stats-filter-card {
+  background: var(--surface);
+  border-color: var(--surface-border);
+}
+
+.dark-theme .stats-toggle-btn {
+  color: var(--text-muted);
+}
+
+.dark-theme .stats-toggle-btn.active {
+  background: var(--bg-alt);
+  color: var(--accent);
+}
+
+.dark-theme .stats-toggle-group {
+  background: var(--surface);
+}
+
+/* --- Dash cards --- */
+.dark-theme .dash-card {
+  background: var(--surface);
+  border-color: var(--surface-border);
+}
+
+/* --- Saved Recipes Modal --- */
+.dark-theme .saved-recipe-card {
+  background: var(--surface);
+  border-color: var(--surface-border);
+}
+
+/* --- Body BG override --- */
+.dark-theme .app-main {
+  background: var(--bg);
+}
+
+/* --- HACCP / Hygiene --- */
+.dark-theme .haccp-table th,
+.dark-theme .haccp-table td {
+  border-color: var(--surface-border);
+  color: var(--text);
+}
+
+.dark-theme .haccp-card {
+  background: var(--surface);
+  border-color: var(--surface-border);
+}
+
+.dark-theme .clean-row {
+  background: var(--surface);
+  border-color: var(--surface-border);
+}
+
+/* --- Hero section --- */
+.dark-theme .hero {
+  background: var(--bg);
+}
+
+/* --- Carousel --- */
+.dark-theme .carousel-card {
+  background: var(--surface);
+  border-color: var(--surface-border);
+}
+
+/* --- Fix Status tag --- */
+.dark-theme .status-tag.active {
+  background: rgba(243, 156, 18, 0.15);
+  color: var(--accent);
+}
+
+/* --- Fix inline label preview (should stay white for print) --- */
+
+/* --- Portfolio --- */
+.dark-theme .portfolio-card {
+  background: var(--surface);
+  border-color: var(--surface-border);
+}
+
+/* --- Restock modal etc --- */
+.dark-theme .modal-overlay>div,
+.dark-theme [class*="modal"]>.card {
+  background: var(--surface);
+  color: var(--text);
+}
+
+/* --- Filter pills --- */
+.dark-theme .filter-pill {
+  background: var(--bg-alt);
+  color: var(--text-muted);
+  border-color: var(--surface-border);
+}
+
+.dark-theme .filter-pill.active {
+  background: var(--accent);
+  color: white;
+}
+
+/* --- Rating stars --- */
+.dark-theme .rating-stars span {
+  color: var(--text-muted);
+}
+
+/* --- Progress bars in tables --- */
+.dark-theme .progress-bar-container {
+  background: var(--surface-border);
+}
+
+/* --- Nav bar links --- */
+.dark-theme .nav-link {
+  color: var(--text-secondary);
+}
+
+.dark-theme .nav-link:hover,
+.dark-theme .nav-link.active {
+  color: var(--accent);
+}
+
+/* --- Premium header --- */
+.dark-theme .premium-header {
+  background: var(--surface);
+  border-color: var(--surface-border);
+}
+
+/* --- Scrollbar in dark mode --- */
+.dark-theme ::-webkit-scrollbar-track {
+  background: var(--bg-alt);
+}
+
+.dark-theme ::-webkit-scrollbar-thumb {
+  background: var(--surface-border);
+}
