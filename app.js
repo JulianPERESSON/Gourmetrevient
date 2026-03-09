@@ -5297,6 +5297,10 @@ $('#omniModal').addEventListener('click', (e) => {
   if (e.target.id === 'omniModal') toggleOmniSearch();
 });
 
+if ($('#navOmniSearch')) {
+  $('#navOmniSearch').addEventListener('click', toggleOmniSearch);
+}
+
 $('#omniSearchInput').addEventListener('input', (e) => {
   const query = e.target.value.toLowerCase().trim();
   omniSelectedIndex = -1;
@@ -5312,9 +5316,9 @@ $('#omniSearchInput').addEventListener('input', (e) => {
 
   // 1. Navigation / Modules
   const modules = [
-    { title: t('nav.dash') || 'Dashboard', desc: 'Retourner à l\'accueil', icon: '🏠', action: () => $('#navHub').click() },
+    { title: t('nav.home') || 'Accueil', desc: 'Retourner à l\'accueil', icon: '🏠', action: () => $('#navHub').click() },
     { title: t('nav.recipes') || 'Recettes', desc: 'Créer ou modifier une recette', icon: '📝', action: () => $('#navRecettes').click() },
-    { title: t('nav.lab') || 'Laboratoire', desc: 'Gestion du local et des équipements', icon: '🔬', action: () => $('#navLaboratoire').click() },
+    { title: t('nav.lab') || 'Laboratoire', desc: 'Gestion du local et des équipements', icon: '🔬', action: () => $('#navLabo').click() },
     { title: t('nav.hygiene') || 'Hygiène & HACCP', desc: 'Relevés de température et traçabilité', icon: '🧼', action: () => $('#navHygiene').click() },
     { title: t('nav.inventory') || 'Inventaire', desc: 'Gérer les stocks et alertes', icon: '📦', action: () => $('#navInventaire').click() },
     { title: t('nav.suppliers') || 'Fournisseurs', desc: 'Consulter la liste des fournisseurs', icon: '🚚', action: () => $('#navSuppliers').click() }
