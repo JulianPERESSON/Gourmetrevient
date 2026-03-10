@@ -5822,3 +5822,56 @@ function updateOmniSelection(items) {
     }
   });
 }
+
+// ============================================================================
+// UI HELPERS (EMPTY STATES & TOAST)
+// ============================================================================
+
+function showToast(message, type = 'info', duration = 3000) {
+  let container = document.getElementById('toast-container');
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'toast-container';
+    document.body.appendChild(container);
+  }
+
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+
+  let icon = 'ℹ️';
+  if (type === 'success') icon = '✅';
+  if (type === 'error') icon = '❌';
+  if (type === 'warning') icon = '⚠️';
+
+  toast.innerHTML = `
+    <div class="toast-icon">${icon}</div>
+    <div class="toast-content">
+      <p class="toast-message">${message}</p>
+    </div>
+  `;
+
+  container.appendChild(toast);
+
+  // Trigger animation
+  setTimeout(() => toast.classList.add('show'), 10);
+
+  // Remove toast
+  setTimeout(() => {
+    toast.classList.remove('show');
+    toast.classList.add('removing');
+    setTimeout(() => {
+      if (toast.parentNode) toast.parentNode.removeChild(toast);
+    }, 300);
+  }, duration);
+}
+
+function renderEmptyState(container, title, message, icon = '📋') {
+  if (!container) return;
+  container.innerHTML = `
+    <div class="empty-state">
+      <div class="empty-state-icon">${icon}</div>
+      <h3 class="empty-state-title">${title}</h3>
+      <p class="empty-state-text">${message}</p>
+    </div>
+  `;
+}
