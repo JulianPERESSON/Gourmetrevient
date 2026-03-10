@@ -1,4 +1,4 @@
-﻿/*
+/*
   =====================================================================
   APP.JS — GourmetRevient Professional Recipe Cost Calculator
   Modular Vanilla JavaScript
@@ -27,7 +27,8 @@ const APP = {
   haccpLogs: { temp: [], trace: [], clean: [], reception: [] },
   viewOwner: null,
   notifications: [],
-  baselineCosts: null
+  baselineCosts: null,
+  wasteLogs: []
 };
 
 // ============================================================================
@@ -57,7 +58,8 @@ const STORAGE_KEYS = {
   notifications: 'gourmet_notifications',
   vacationZone: 'gourmet_vacation_zone',
   inventory: 'gourmet_inventory',
-  haccpLogs: 'gourmet_haccp_logs'
+  haccpLogs: 'gourmet_haccp_logs',
+  wasteLogs: 'gourmet_waste_logs'
 };
 
 // Default ingredient database (pre-loaded)
@@ -1870,159 +1872,204 @@ function exportJson() {
 // ============================================================================
 
 function exportPdf() {
-  const summaryCard = $('#summaryCard');
-  if (!summaryCard) return;
+  const summaryCard = document.getElementById('summaryCard');
+  if (!summaryCard) {
+    showToast('Erreur: Conteneur de résumé introuvable.', 'error');
+    return;
+  }
 
   const recipeName = APP.recipe.name || 'recette';
   showToast(`${t('toast.pdf.preparing')} ${recipeName}...`, 'info');
 
-  // Clone the summary
+  // Create a clean container for export and append to body
+  const container = document.createElement('div');
+  container.style.position = 'absolute';
+  container.style.top = '-10000px';
+  container.style.left = '0';
+  container.style.width = '800px';
+  container.style.backgroundColor = '#ffffff';
+  container.style.color = '#333333';
+  
   const pdfClone = summaryCard.cloneNode(true);
-
-  // Setup the clone to be visible but off-stage
   pdfClone.id = "pdf-export-temp-node";
-  pdfClone.style.position = 'fixed';
-  pdfClone.style.top = '0';
-  pdfClone.style.left = '0';
-  pdfClone.style.zIndex = '-9999'; // Behind everything
-  pdfClone.style.display = 'block'; // Force block
-  pdfClone.style.visibility = 'visible'; // Force visibility
-  pdfClone.style.opacity = '1';
-  pdfClone.style.width = '780px';
-  pdfClone.style.height = 'auto';
-  pdfClone.style.backgroundColor = 'white';
+  pdfClone.style.display = 'block';
+  pdfClone.style.padding = '40px';
+  pdfClone.style.boxShadow = 'none';
+  pdfClone.style.border = 'none';
+  pdfClone.style.width = '100%';
+  pdfClone.style.backgroundColor = '#ffffff';
+
+  // Force all text colors and opacity
+  pdfClone.querySelectorAll('*').forEach(el => {
+    el.style.opacity = '1';
+    el.style.visibility = 'visible';
+    el.style.color = '#333333';
+    el.style.backgroundColor = 'transparent';
+    el.style.transition = 'none';
+    el.style.animation = 'none';
+    if (el.tagName === 'H1' || el.tagName === 'H2' || el.tagName === 'H3' || el.classList.contains('card-title')) {
+      el.style.color = '#10b981';
+    }
+    // Fix grid issues by converting to flex for PDF rendering
+    if (getComputedStyle(el).display === 'grid' || el.classList.contains('summary-sections-grid')) {
+       el.style.display = 'flex';
+       el.style.flexDirection = 'row';
+       el.style.flexWrap = 'wrap';
+       el.style.gap = '20px';
+    }
+  });
 
   pdfClone.classList.add('pdf-export-mode');
 
   // Clean UI elements
-  const uiElements = pdfClone.querySelectorAll('.export-actions, .step-nav, .btn, button');
+  const uiElements = pdfClone.querySelectorAll('.export-actions, .step-nav, .btn, button, .close-qr');
   uiElements.forEach(el => el.remove());
 
-  const pdfFooter = pdfClone.querySelector('.pdf-footer-credits');
-  if (pdfFooter) {
-    pdfFooter.style.display = 'block';
-    console.log("PDF Footer enabled in clone");
-  }
+  container.appendChild(pdfClone);
+  document.body.appendChild(container);
 
-  // Clean filename
   const safeFilename = recipeName.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/gi, '_').toLowerCase();
 
-  document.body.appendChild(pdfClone);
-
   const opt = {
-    margin: 8,
+    margin: [10, 10, 10, 10],
     filename: `${safeFilename}_fiche.pdf`,
     image: { type: 'jpeg', quality: 0.98 },
     html2canvas: {
       scale: 2,
       useCORS: true,
       backgroundColor: '#ffffff',
-      logging: false
+      letterRendering: true,
+      logging: false,
+      scrollY: -window.scrollY // Key fix for scrolled pages
     },
     jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
   };
 
-  // Wait for layout calculation
   setTimeout(() => {
-    html2pdf().from(pdfClone).set(opt).save().then(() => {
-      if (document.body.contains(pdfClone)) document.body.removeChild(pdfClone);
+    html2pdf().from(container).set(opt).save().then(() => {
+      document.body.removeChild(container);
       showToast(t('toast.pdf.done'), 'success');
     }).catch((err) => {
       console.error('PDF Export Error:', err);
-      if (document.body.contains(pdfClone)) document.body.removeChild(pdfClone);
+      if (document.body.contains(container)) document.body.removeChild(container);
       showToast(t('toast.pdf.error'), 'error');
     });
-  }, 300); // 300ms is safer
+  }, 800); 
 }
 
 function exportDevisPdf() {
   const recipeName = APP.recipe.name || 'Prestation';
   const costs = calcFullCost(APP.margin);
 
-  // Create a stylized container for the Quote
+  const container = document.createElement('div');
+  container.style.position = 'absolute';
+  container.style.top = '-10000px';
+  container.style.left = '0';
+  container.style.width = '800px';
+  container.style.backgroundColor = '#ffffff';
+
   const quoteDiv = document.createElement('div');
   quoteDiv.style.padding = '40px';
-  quoteDiv.style.fontFamily = "'Inter', sans-serif";
-  quoteDiv.style.color = '#333';
-  quoteDiv.style.backgroundColor = '#fff';
-  quoteDiv.style.width = '780px';
+  quoteDiv.style.fontFamily = "'Inter', Arial, sans-serif";
+  quoteDiv.style.color = '#1a202c';
+  quoteDiv.style.backgroundColor = '#ffffff';
+  quoteDiv.style.width = '100%';
+  quoteDiv.classList.add('pdf-export-mode');
 
   quoteDiv.innerHTML = `
-    <div style="border-bottom:2px solid #333; padding-bottom:20px; margin-bottom:30px; display:flex; justify-content:space-between; align-items:flex-end;">
+    <div style="border-bottom:3px solid #10b981; padding-bottom:20px; margin-bottom:30px; display:flex; justify-content:space-between; align-items:flex-end;">
       <div>
-        <h1 style="color:#6366f1; margin:0; font-size:2rem;">DEVIS CLIENT</h1>
-        <p style="margin:5px 0 0; color:#666;">Pour la réalisation sur mesure de vos besoins.</p>
+        <h1 style="color:#10b981; margin:0; font-size:2.5rem; font-weight:900;">DEVIS CLIENT</h1>
+        <p style="margin:5px 0 0; color:#4a5568; font-size:1.1rem;">GourmetRevient — Solution Pâtissière Pro</p>
       </div>
       <div style="text-align:right;">
-        <h2 style="margin:0;">L'Artisan / GourmetRevient</h2>
-        <p style="margin:5px 0 0; color:#666;">Date: ${new Date().toLocaleDateString()}</p>
+        <p style="margin:5px 0 0; color:#4a5568;"><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
+        <p style="margin:2px 0 0; color:#718096; font-size:0.8rem;">Réf: DEVIS-${Date.now().toString().slice(-6)}</p>
       </div>
     </div>
     
-    <div style="margin-bottom:30px;">
-      <h3 style="background:#f4f4f5; padding:10px; margin:0 0 10px;">Désignation de la prestation</h3>
-      <p style="font-size:1.1rem; font-weight:600;">${recipeName} (${APP.recipe.category || 'Pâtisserie'})</p>
-      <p style="color:#555;">${APP.recipe.description || 'Fabrication artisanale selon demande client.'}</p>
-      <p><strong>Quantité prévue :</strong> ${APP.recipe.portions} portions/pièces.</p>
+    <div style="margin-bottom:40px; background:#f8fafc; padding:25px; border-radius:12px; border:1px solid #e2e8f0;">
+      <h3 style="margin:0 0 15px; color:#2d3748; text-transform:uppercase; font-size:0.9rem; letter-spacing:1px;">Prestation détaillée</h3>
+      <p style="font-size:1.4rem; font-weight:800; color:#1a202c; margin-bottom:10px;">${recipeName}</p>
+      <p style="color:#4a5568; margin-bottom:15px; line-height:1.6;">${APP.recipe.description || 'Réalisation artisanale personnalisée selon vos exigences de qualité.'}</p>
+      <div style="display:inline-block; background:#10b981; color:white; padding:4px 12px; border-radius:20px; font-size:0.85rem; font-weight:700;">
+        Qté : ${APP.recipe.portions} portions
+      </div>
     </div>
     
-    <table style="width:100%; border-collapse:collapse; margin-bottom:30px;">
+    <table style="width:100%; border-collapse:collapse; margin-bottom:40px;">
       <thead>
-        <tr style="background:#333; color:#fff; text-align:left;">
-          <th style="padding:10px;">Description</th>
-          <th style="padding:10px; text-align:right;">Quantité</th>
-          <th style="padding:10px; text-align:right;">Prix Unitaire HT</th>
-          <th style="padding:10px; text-align:right;">Montant HT</th>
+        <tr style="background:#1a202c; color:#ffffff; text-align:left;">
+          <th style="padding:15px; border-radius:8px 0 0 0;">Description</th>
+          <th style="padding:15px; text-align:center;">Unité</th>
+          <th style="padding:15px; text-align:right;">P.U HT</th>
+          <th style="padding:15px; text-align:right; border-radius:0 8px 0 0;">Total HT</th>
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <td style="padding:10px; border-bottom:1px solid #ddd;">Prestation complète : ${recipeName}</td>
-          <td style="padding:10px; text-align:right; border-bottom:1px solid #ddd;">${APP.recipe.portions}</td>
-          <td style="padding:10px; text-align:right; border-bottom:1px solid #ddd;">${costs.sellingPrice.toFixed(2)} €</td>
-          <td style="padding:10px; text-align:right; border-bottom:1px solid #ddd;">${(costs.sellingPrice * APP.recipe.portions).toFixed(2)} €</td>
+        <tr style="border-bottom:1px solid #e2e8f0;">
+          <td style="padding:20px 15px;">
+            <strong>${recipeName}</strong><br>
+            <small style="color:#718096;">Fiche technique professionnelle</small>
+          </td>
+          <td style="padding:20px 15px; text-align:center;">${APP.recipe.portions}</td>
+          <td style="padding:20px 15px; text-align:right;">${costs.sellingPrice.toFixed(2)} €</td>
+          <td style="padding:20px 15px; text-align:right; font-weight:700;">${(costs.sellingPrice * APP.recipe.portions).toFixed(2)} €</td>
         </tr>
       </tbody>
     </table>
-    
+
     <div style="display:flex; justify-content:flex-end;">
-      <div style="width:300px; background:#f4f4f5; padding:20px; border-radius:8px;">
-        <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
-          <span>Total HT</span>
-          <strong>${(costs.sellingPrice * APP.recipe.portions).toFixed(2)} €</strong>
+      <div style="width:300px; background:#f8fafc; padding:20px; border-radius:12px; border:1px solid #e2e8f0;">
+        <div style="display:flex; justify-content:space-between; margin-bottom:12px; color:#4a5568; font-weight:600;">
+          <span>TOTAL HT</span>
+          <span>${(costs.sellingPrice * APP.recipe.portions).toFixed(2)} €</span>
         </div>
-        <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+        <div style="display:flex; justify-content:space-between; margin-bottom:12px; color:#4a5568;">
           <span>TVA (5.5%)</span>
-          <strong>${((costs.sellingPrice * APP.recipe.portions) * 0.055).toFixed(2)} €</strong>
+          <span>${((costs.sellingPrice * APP.recipe.portions) * 0.055).toFixed(2)} €</span>
         </div>
-        <div style="display:flex; justify-content:space-between; font-size:1.2rem; font-weight:bold; border-top:2px solid #333; padding-top:10px;">
+        <div style="display:flex; justify-content:space-between; font-size:1.5rem; font-weight:900; border-top:2px solid #1a202c; padding-top:12px; margin-top:5px;">
           <span>TOTAL TTC</span>
-          <span style="color:#6366f1;">${((costs.sellingPrice * APP.recipe.portions) * 1.055).toFixed(2)} €</span>
+          <span style="color:#10b981;">${((costs.sellingPrice * APP.recipe.portions) * 1.055).toFixed(2)} €</span>
         </div>
       </div>
     </div>
-    
-    <div style="margin-top:50px; text-align:center; font-size:0.8rem; color:#888;">
-      <p>Devis valable 30 jours à compter de la date d'émission.</p>
-      <p>Ce document, une fois signé, vaut pour accord et bon de commande.</p>
+
+    <div style="margin-top:60px; font-size:0.8rem; color:#718096; border-top:1px solid #e2e8f0; padding-top:25px; text-align:center;">
+      <p>Conditions de règlement : À réception · Devis valable 30 jours</p>
+      <p style="margin-top:8px; font-weight:700; color:#1a202c;">GourmetRevient — L'Excellence Artisanale au service de votre rentabilité</p>
     </div>
   `;
 
+  container.appendChild(quoteDiv);
+  document.body.appendChild(container);
+
   const opt = {
-    margin: [0.5, 0.5, 0.5, 0.5],
+    margin: [10, 10, 10, 10],
     filename: `Devis_${recipeName.replace(/\s+/g, '_')}.pdf`,
     image: { type: 'jpeg', quality: 0.98 },
-    html2canvas: { scale: 2, useCORS: true },
-    jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+    html2canvas: { 
+      scale: 2, 
+      useCORS: true, 
+      backgroundColor: '#ffffff',
+      scrollY: -window.scrollY
+    },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
   };
 
-  showToast('Génération du devis PDF en cours...', 'info');
-  html2pdf().set(opt).from(quoteDiv).save().then(() => {
-    showToast('Devis généré avec succès.', 'success');
-  }).catch(err => {
-    console.error('PDF Error:', err);
-    showToast('Erreur lors de la génération du devis.', 'error');
-  });
+  showToast('Génération du devis PDF...', 'info');
+
+  setTimeout(() => {
+    html2pdf().from(container).set(opt).save().then(() => {
+      document.body.removeChild(container);
+      showToast('Devis exporté avec succès !', 'success');
+    }).catch(err => {
+      console.error("Devis PDF Error:", err);
+      showToast("Erreur lors de l'export du devis.", "error");
+      if (document.body.contains(container)) document.body.removeChild(container);
+    });
+  }, 1000);
 }
 
 // ============================================================================
@@ -2358,7 +2405,10 @@ function bindEvents() {
   $('#btnToStep2b').addEventListener('click', () => goToStep(2));
   $('#btnToStep4').addEventListener('click', () => goToStep(4));
   $('#btnToStep3b').addEventListener('click', () => goToStep(3));
-  $('#btnToStep5').addEventListener('click', () => goToStep(5));
+  $('#btnToStep5').addEventListener('click', () => {
+    goToStep(5);
+    if (typeof renderAntiGaspi === 'function') renderAntiGaspi();
+  });
   $('#btnToStep4b').addEventListener('click', () => goToStep(4));
   $('#btnNewRecipe').addEventListener('click', newRecipe);
 
@@ -2424,9 +2474,12 @@ function bindEvents() {
 
   // Exports
   $('#btnExportPdf').addEventListener('click', exportPdf);
+  if ($('#btnGenerateQR')) $('#btnGenerateQR').addEventListener('click', generateQRLable);
   if ($('#btnExportDevis')) $('#btnExportDevis').addEventListener('click', exportDevisPdf);
   $('#btnExportJson').addEventListener('click', exportJson);
   $('#btnSaveRecipe').addEventListener('click', saveCurrentRecipe);
+  const btnLaunchProd = $('#btnLaunchProd');
+  if (btnLaunchProd) btnLaunchProd.addEventListener('click', launchProductionFromRecipe);
 
   // Saved recipes
   $('#btnSavedRecipes').addEventListener('click', toggleSavedRecipes);
@@ -2503,6 +2556,19 @@ function bindEvents() {
       renderSharedList();
     }
   });
+
+  // Handle responsive navigation on resize
+  window.addEventListener('resize', () => {
+    if (localStorage.getItem('gourmet_auth') === 'true') {
+      if (window.innerWidth <= 768) {
+        if ($('#mainNav')) $('#mainNav').style.display = 'none';
+        if ($('#mobileNavBar')) $('#mobileNavBar').style.display = 'flex';
+      } else {
+        if ($('#mainNav')) $('#mainNav').style.display = 'flex';
+        if ($('#mobileNavBar')) $('#mobileNavBar').style.display = 'none';
+      }
+    }
+  });
   // Gender selection in profile
   $$('.gender-btn-profile').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -2551,14 +2617,23 @@ function checkAuth() {
     overlay.classList.add('hidden');
     document.body.classList.remove('auth-pending');
     $('#userProfileArea').style.display = 'flex';
-    if ($('#mobileNavBar')) $('#mobileNavBar').style.display = 'flex';
+    
+    // Proper responsive navigation switching
+    if (window.innerWidth <= 768) {
+      if ($('#mainNav')) $('#mainNav').style.display = 'none';
+      if ($('#mobileNavBar')) $('#mobileNavBar').style.display = 'flex';
+    } else {
+      if ($('#mainNav')) $('#mainNav').style.display = 'flex';
+      if ($('#mobileNavBar')) $('#mobileNavBar').style.display = 'none';
+    }
+    
     updateDashboard();
     loadSavedRecipes();
-    updateDashboard();
   } else {
     overlay.classList.remove('hidden');
     document.body.classList.add('auth-pending');
     $('#userProfileArea').style.display = 'none';
+    if ($('#mainNav')) $('#mainNav').style.display = 'none';
     if ($('#mobileNavBar')) $('#mobileNavBar').style.display = 'none';
 
     let authMode = 'login'; // 'login' or 'register'
@@ -4980,6 +5055,7 @@ function init() {
   loadInventory();
   loadNotifications();
   loadSuppliers();
+  loadWasteLogs();
   bindEvents();
   renderSavedRecipes();
   renderInvitations();
@@ -5025,6 +5101,10 @@ function init() {
     if (isVisible('#appHygiene') && typeof renderHygiene === 'function') renderHygiene();
     if (isVisible('#appSuppliers')) renderSuppliers();
     if (isVisible('#appStats')) renderStats();
+    if (isVisible('#appMgmt')) {
+      if (typeof renderAllergenMatrix === 'function') renderAllergenMatrix();
+      if (typeof renderWasteAnalysis === 'function') renderWasteAnalysis();
+    }
   });
 
   loadHaccpLogs();
@@ -5723,7 +5803,8 @@ $('#omniSearchInput').addEventListener('input', (e) => {
     { title: t('nav.lab') || 'Laboratoire', desc: 'Gestion du local et des équipements', icon: '🔬', action: () => $('#navLabo').click() },
     { title: t('nav.hygiene') || 'Hygiène & HACCP', desc: 'Relevés de température et traçabilité', icon: '🧼', action: () => $('#navHygiene').click() },
     { title: t('nav.inventory') || 'Inventaire', desc: 'Gérer les stocks et alertes', icon: '📦', action: () => $('#navInventaire').click() },
-    { title: t('nav.suppliers') || 'Fournisseurs', desc: 'Consulter la liste des fournisseurs', icon: '🚚', action: () => $('#navSuppliers').click() }
+    { title: t('nav.suppliers') || 'Fournisseurs', desc: 'Consulter la liste des fournisseurs', icon: '🚚', action: () => $('#navSuppliers').click() },
+    { title: t('nav.mgmt') || 'Gestion Pro', desc: 'Planning de production et suivi des pertes', icon: '⚙️', action: () => $('#navMgmt').click() }
   ];
 
   modules.forEach(m => {
@@ -5874,4 +5955,821 @@ function renderEmptyState(container, title, message, icon = '📋') {
       <p class="empty-state-text">${message}</p>
     </div>
   `;
+}
+
+// ============================================================================
+// NEW MODULES: ANTI-GASPI & QR CODE
+// ============================================================================
+
+function renderAntiGaspi() {
+  const mod = $('#antiGaspiModule');
+  const content = $('#antiGaspiContent');
+  if (!mod || !content || !APP.recipe || !APP.recipe.ingredients) return;
+
+  let hasWaste = false;
+  let suggestions = [];
+
+  // Analyze ingredients for potential waste/optimization
+  APP.recipe.ingredients.forEach(ing => {
+    if(!ing.name) return;
+    const name = ing.name.toLowerCase();
+    
+    // Example 1: Egg Yolks/Whites
+    if ((name.includes('jaune') && name.includes('oeuf')) || (name.includes('jaune') && name.includes('œuf'))) {
+      hasWaste = true;
+      suggestions.push(`🥚 <strong>Blancs d'œufs orphelins :</strong> Vous utilisez beaucoup de jaunes. Pensez à réaliser des <em>Macarons</em>, des <em>Financiers</em> ou des <em>Meringues</em> pour écouler vos blancs et optimiser la rentabilité.`);
+    }
+    else if ((name.includes('blanc') && name.includes('oeuf')) || (name.includes('blanc') && name.includes('œuf'))) {
+      hasWaste = true;
+      suggestions.push(`🥚 <strong>Jaunes d'œufs orphelins :</strong> Vous utilisez beaucoup de blancs. Vous pourriez préparer une <em>Crème anglaise</em>, un <em>Crémeux</em> ou une <em>Pâte sablée</em>.`);
+    }
+
+    // Example 2: Fruits
+    if (name.includes('citron') || name.includes('orange') || name.includes('pamplemousse')) {
+      hasWaste = true;
+      suggestions.push(`🍋 <strong>Agrumes :</strong> Si vous n'utilisez que le jus, pensez à zester vos agrumes avant. Les zestes peuvent être séchés ou confits pour de futures préparations.`);
+    }
+    
+    if (name.includes('fraise') || name.includes('framboise') || name.includes('pomme')) {
+      hasWaste = true;
+      suggestions.push(`🍓 <strong>Parures de fruits :</strong> Les parures ou fruits abîmés peuvent être converties en <em>Coulis</em>, <em>Confiture</em> ou <em>Pâte de fruits</em>.`);
+    }
+  });
+
+  // Make suggestions unique
+  suggestions = [...new Set(suggestions)];
+
+  if (hasWaste && suggestions.length > 0) {
+    mod.style.display = 'block';
+    content.innerHTML = `<ul style="margin:0; padding-left:1.5rem; display:flex; flex-direction:column; gap:0.5rem;">
+      ${suggestions.map(s => `<li>${s}</li>`).join('')}
+    </ul>`;
+  } else {
+    // Standard tip if no direct matching
+    mod.style.display = 'block';
+    content.innerHTML = `<p style="margin:0;">✅ <strong>Bilan Anti-Gaspi :</strong> Aucune perte critique identifiée. Pensez à bien peser vos déchets (ex: coquilles, épluchures) pour affiner votre coût de revient réel.</p>`;
+  }
+}
+
+function generateQRLable() {
+  if (!APP.recipe || !APP.recipe.name) {
+    showToast("Veuillez d'abord nommer la recette.", "error");
+    return;
+  }
+  
+  const costData = calcFullCost(APP.margin);
+  const suggestedPrice = costData.suggestedPrice.toFixed(2);
+  
+  $('#qrRecipeName').textContent = APP.recipe.name;
+  $('#qrRecipePrice').textContent = suggestedPrice + ' €';
+  
+  const al = document.getElementById('allergensList');
+  $('#qrAllergens').textContent = al ? al.textContent : 'Non spécifié';
+  
+  // Clear old QR Code
+  const qrbox = document.getElementById('qrcode');
+  if(qrbox) qrbox.innerHTML = '';
+  
+  // Generate QR linking to a fake product page (or the tool itself with recipe param)
+  const recipeUrl = window.location.origin + window.location.pathname;
+  
+  try {
+    if(typeof QRCode !== 'undefined') {
+      new QRCode(qrbox, {
+          text: recipeUrl + "?view=" + encodeURIComponent(APP.recipe.name),
+          width: 140,
+          height: 140,
+          colorDark : "#1f2937",
+          colorLight : "#ffffff",
+          correctLevel : QRCode.CorrectLevel.H
+      });
+      $('#qrModal').style.display = 'flex';
+    } else {
+      showToast("La bibliothèque QR Code est en cours de chargement...", "info");
+    }
+  } catch(e) {
+    console.error("QR Code generation failed", e);
+    showToast("Erreur lors de la génération du QR Code.", "error");
+  }
+}
+
+function exportQRLabelPdf() {
+  const label = document.getElementById('labelPreview');
+  if (!label) return;
+
+  const recipeName = APP.recipe.name || 'etiquette';
+  
+  const container = document.createElement('div');
+  container.style.position = 'absolute';
+  container.style.top = '-10000px';
+  container.style.left = '0';
+  container.style.width = '400px';
+
+  // Clone for export
+  const clone = label.cloneNode(true);
+  clone.style.width = '100%';
+  clone.style.height = 'auto';
+  clone.style.padding = '40px';
+  clone.style.backgroundColor = '#ffffff';
+  clone.style.display = 'block';
+  
+  // Force visibility of children
+  clone.querySelectorAll('*').forEach(el => {
+    el.style.opacity = '1';
+    el.style.visibility = 'visible';
+    el.style.color = '#333333';
+  });
+  
+  // Explicitly fix QR code container if needed
+  const qrInClone = clone.querySelector('#qrcode');
+  if (qrInClone) {
+     qrInClone.style.display = 'block';
+     qrInClone.style.margin = '0 auto';
+  }
+
+  container.appendChild(clone);
+  document.body.appendChild(container);
+
+  const opt = {
+    margin: [10, 10, 10, 10],
+    filename: `Etiquette_${recipeName.replace(/\s+/g, '_')}.pdf`,
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { 
+       scale: 3, 
+       useCORS: true, 
+       backgroundColor: '#ffffff',
+       scrollY: -window.scrollY
+    },
+    jsPDF: { unit: 'mm', format: 'a5', orientation: 'portrait' }
+  };
+
+  showToast('Génération de l\'étiquette PDF...', 'info');
+  
+  setTimeout(() => {
+    html2pdf().from(container).set(opt).save().then(() => {
+      document.body.removeChild(container);
+      showToast('Étiquette exportée.', 'success');
+    }).catch(err => {
+      console.error('PDF Label Error:', err);
+      if(document.body.contains(container)) document.body.removeChild(container);
+      showToast('Erreur lors de l\'export PDF.', 'error');
+    });
+  }, 1000); // More time for QR code
+}
+
+// ============================================================================
+// GESTION PRO MODULE: SHOPPING LIST, ALLERGENS, WASTE, OBJECTIVES, PRODUCTION
+// ============================================================================
+
+let wasteChart = null;
+
+// --- KPI Dashboard ---
+function updateMgmtKpis() {
+  const recipes = APP.savedRecipes || [];
+  const kpiRecipes = document.getElementById('mgmtKpiRecipes');
+  const kpiMargin = document.getElementById('mgmtKpiMargin');
+  const kpiWaste = document.getElementById('mgmtKpiWaste');
+  const kpiAllergens = document.getElementById('mgmtKpiAllergens');
+
+  if (kpiRecipes) kpiRecipes.textContent = recipes.length;
+
+  if (kpiMargin) {
+    if (recipes.length > 0) {
+      let totalMargin = 0;
+      recipes.forEach(r => {
+        totalMargin += (r.margin || 70);
+      });
+      kpiMargin.textContent = (totalMargin / recipes.length).toFixed(1) + '%';
+    } else {
+      kpiMargin.textContent = '—';
+    }
+  }
+
+  if (kpiWaste) {
+    const logs = APP.wasteLogs || [];
+    let totalLoss = 0;
+    logs.forEach(l => totalLoss += (l.lossValue || 0));
+    kpiWaste.textContent = totalLoss.toFixed(2) + ' €';
+  }
+
+  if (kpiAllergens) {
+    const allAllergens = new Set();
+    recipes.forEach(r => {
+      if (!r.ingredients) return;
+      r.ingredients.forEach(ing => {
+        const n = (ing.name || '').toLowerCase();
+        if (n.includes('lait') || n.includes('beurre') || n.includes('crème')) allAllergens.add('Lait');
+        if (n.includes('œuf') || n.includes('oeuf')) allAllergens.add('Œufs');
+        if (n.includes('farine') || n.includes('blé')) allAllergens.add('Gluten');
+        if (n.includes('amande') || n.includes('noisette') || n.includes('noix')) allAllergens.add('Fruits à coque');
+      });
+    });
+    kpiAllergens.textContent = allAllergens.size;
+  }
+}
+
+// --- Shopping List ---
+function addShoppingRecipeRow() {
+  const container = document.getElementById('shoppingRecipeSelectors');
+  if (!container) return;
+
+  const row = document.createElement('div');
+  row.className = 'shopping-row-premium';
+
+  const recipes = [...APP.savedRecipes];
+  const options = recipes.map(r => `<option value="${r.id}">${escapeHtml(r.name)}</option>`).join('');
+
+  row.innerHTML = `
+    <select class="form-select" style="flex:2;">
+      <option value="">— ${t('mgmt.shopping.choose') || 'Choisir une recette'} —</option>
+      ${options}
+    </select>
+    <input type="number" class="form-input" value="10" min="1" style="width:80px; text-align:center; font-weight:700;">
+    <span style="font-size:0.75rem; color:var(--text-muted); white-space:nowrap;">${t('unit.portions') || 'portions'}</span>
+    <button class="remove-row-btn" onclick="this.parentElement.remove()" title="Supprimer">✕</button>
+  `;
+  container.appendChild(row);
+}
+
+function generateShoppingList() {
+  const container = document.getElementById('shoppingRecipeSelectors');
+  const rows = container.querySelectorAll('.shopping-row-premium');
+  const needs = {};
+
+  rows.forEach(row => {
+    const id = row.querySelector('select').value;
+    const qty = parseInt(row.querySelector('input').value) || 0;
+    if (!id || qty <= 0) return;
+
+    const recipe = APP.savedRecipes.find(r => r.id === id);
+    if (!recipe) return;
+
+    const ratio = qty / (recipe.portions || 10);
+    recipe.ingredients.forEach(ing => {
+      const name = ing.name.toLowerCase();
+      if (!needs[name]) {
+        needs[name] = { name: ing.name, qty: 0, unit: ing.unit };
+      }
+      needs[name].qty += (parseFloat(ing.quantity) || 0) * ratio;
+    });
+  });
+
+  const resultContainer = document.getElementById('shoppingListContainer');
+  const resultCard = document.getElementById('shoppingResultCard');
+  const exportBar = document.getElementById('shoppingExportBar');
+  const exportSummary = document.getElementById('shoppingExportSummary');
+
+  if (Object.keys(needs).length === 0) {
+    showToast(t('mgmt.shopping.error_empty') || "Veuillez sélectionner au moins une recette.", "error");
+    return;
+  }
+
+  let totalItems = 0;
+  let itemsToBuy = 0;
+
+  let html = `
+    <table class="mgmt-result-table">
+      <thead>
+        <tr>
+          <th>${t('s2.header.ingredient') || 'Ingrédient'}</th>
+          <th>${t('mgmt.shopping.col_total') || 'Quantité Totale'}</th>
+          <th>${t('mgmt.shopping.col_stock') || 'En Stock'}</th>
+          <th>${t('mgmt.shopping.col_buy') || "Besoin d'Achat"}</th>
+        </tr>
+      </thead>
+      <tbody>
+  `;
+
+  for (const key in needs) {
+    const item = needs[key];
+    const inv = APP.inventory.find(i => i.name.toLowerCase() === key);
+    const stockQty = inv ? inv.stock : 0;
+    const buy = Math.max(0, item.qty - stockQty);
+    totalItems++;
+    if (buy > 0) itemsToBuy++;
+
+    html += `
+      <tr>
+        <td><strong>${escapeHtml(item.name)}</strong></td>
+        <td>${item.qty.toFixed(0)} ${item.unit}</td>
+        <td>${stockQty} ${item.unit}</td>
+        <td><span class="buy-needed ${buy > 0 ? 'critical' : 'ok'}">${buy > 0 ? '⚠ ' : '✅ '}${buy.toFixed(0)} ${item.unit}</span></td>
+      </tr>
+    `;
+  }
+
+  html += `</tbody></table>`;
+  resultContainer.innerHTML = html;
+  resultCard.style.display = 'block';
+
+  if (exportBar) {
+    exportBar.style.display = 'flex';
+    if (exportSummary) {
+      exportSummary.innerHTML = `<strong>${totalItems}</strong> ${t('s2.header.ingredient') || 'ingrédients'} · <strong style="color: var(--danger);">${itemsToBuy}</strong> ${t('mgmt.shopping.to_buy') || 'à commander'}`;
+    }
+  }
+
+  resultCard.scrollIntoView({ behavior: 'smooth' });
+
+  // Store needs data for CSV export
+  window._lastShoppingNeeds = needs;
+}
+
+function exportShoppingCSV() {
+  const needs = window._lastShoppingNeeds;
+  if (!needs || Object.keys(needs).length === 0) {
+    showToast("Aucune donnée à exporter.", "error");
+    return;
+  }
+
+  let csv = "Ingrédient;Quantité Totale;Unité;En Stock;Besoin d'Achat\n";
+  for (const key in needs) {
+    const item = needs[key];
+    const inv = APP.inventory.find(i => i.name.toLowerCase() === key);
+    const stockQty = inv ? inv.stock : 0;
+    const buy = Math.max(0, item.qty - stockQty);
+    csv += `${item.name};${item.qty.toFixed(0)};${item.unit};${stockQty};${buy.toFixed(0)}\n`;
+  }
+
+  const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `GourmetRevient_Courses_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast(t('mgmt.shopping.export_success') || "Liste exportée en CSV !", "success");
+}
+
+// --- Allergen Matrix ---
+function renderAllergenMatrix() {
+  const table = document.getElementById('allergenMatrixTable');
+  if (!table) return;
+
+  const recipes = APP.savedRecipes;
+  if (recipes.length === 0) {
+    table.innerHTML = `<tr><td colspan="15" style="text-align:center; padding:3rem;">
+      <div class="mgmt-empty-state">
+        <div class="empty-icon">🛡️</div>
+        <h4>${t('mgmt.allergens.empty_title') || 'Aucune recette enregistrée'}</h4>
+        <p>${t('mgmt.allergens.empty_desc') || 'Créez et sauvegardez des recettes pour générer la matrice des allergènes automatiquement.'}</p>
+      </div>
+    </td></tr>`;
+    return;
+  }
+
+  const allAllergens = [
+    { key: "Lait", emoji: "🥛" },
+    { key: "Œufs", emoji: "🥚" },
+    { key: "Gluten", emoji: "🌾" },
+    { key: "Fruits à coque", emoji: "🥜" },
+    { key: "Soja", emoji: "🫘" },
+    { key: "Arachides", emoji: "🥜" },
+    { key: "Sésame", emoji: "🌰" },
+    { key: "Moutarde", emoji: "🟡" },
+    { key: "Lupin", emoji: "🌿" },
+    { key: "Sulfites", emoji: "🧪" },
+    { key: "Poisson", emoji: "🐟" },
+    { key: "Crustacés", emoji: "🦐" },
+    { key: "Mollusques", emoji: "🐚" },
+    { key: "Céleri", emoji: "🥬" }
+  ];
+  
+  let html = `
+    <thead>
+      <tr>
+        <th>${t('mgmt.allergens.col_recipe') || 'Recette'}</th>
+        ${allAllergens.map(a => `<th><span title="${a.key}">${a.emoji}</span><br><span style="font-size:0.55rem;">${a.key}</span></th>`).join('')}
+      </tr>
+    </thead>
+    <tbody>
+  `;
+
+  recipes.forEach(r => {
+    const foundAllergens = new Set();
+    r.ingredients.forEach(ing => {
+      const dbItem = APP.ingredientDb.find(db => db.name.toLowerCase() === ing.name.toLowerCase());
+      if (dbItem && dbItem.allergens) {
+        dbItem.allergens.forEach(a => foundAllergens.add(a));
+      }
+      const n = ing.name.toLowerCase();
+      if (n.includes('lait') || n.includes('beurre') || n.includes('crème')) foundAllergens.add('Lait');
+      if (n.includes('œuf') || n.includes('oeuf')) foundAllergens.add('Œufs');
+      if (n.includes('farine') || n.includes('blé')) foundAllergens.add('Gluten');
+      if (n.includes('amande') || n.includes('noisette') || n.includes('noix') || n.includes('pistache')) foundAllergens.add('Fruits à coque');
+      if (n.includes('soja')) foundAllergens.add('Soja');
+      if (n.includes('arachide') || n.includes('cacahu')) foundAllergens.add('Arachides');
+      if (n.includes('sésame')) foundAllergens.add('Sésame');
+      if (n.includes('moutarde')) foundAllergens.add('Moutarde');
+    });
+
+    html += `
+      <tr>
+        <td>${escapeHtml(r.name)}</td>
+        ${allAllergens.map(a => `
+          <td><span class="allergen-badge ${foundAllergens.has(a.key) ? 'present' : 'absent'}">${foundAllergens.has(a.key) ? '●' : '—'}</span></td>
+        `).join('')}
+      </tr>
+    `;
+  });
+
+  html += `</tbody>`;
+  table.innerHTML = html;
+}
+
+// --- Waste Tracking ---
+function populateWasteDropdown() {
+  const select = document.getElementById('wasteRecipeSelect');
+  if (!select) return;
+  const recipes = APP.savedRecipes;
+  select.innerHTML = recipes.map(r => `<option value="${r.id}">${escapeHtml(r.name)}</option>`).join('');
+}
+
+function logWaste() {
+  const id = document.getElementById('wasteRecipeSelect').value;
+  const qty = parseFloat(document.getElementById('wasteQty').value) || 0;
+  const reason = document.getElementById('wasteReason').value;
+  const notesEl = document.getElementById('wasteNotes');
+  const notes = notesEl ? notesEl.value.trim() : '';
+
+  if (!id || qty <= 0) {
+    showToast(t('mgmt.waste.error_qty') || "Veuillez saisir une quantité valide.", "error");
+    return;
+  }
+
+  const recipe = APP.savedRecipes.find(r => r.id === id);
+  if (!recipe) return;
+
+  const costData = calcFullCost(recipe.margin || 70, recipe);
+  const lossAmount = costData.costPerPortion * qty;
+
+  const entry = {
+    date: new Date().toISOString(),
+    recipeId: id,
+    recipeName: recipe.name,
+    qty: qty,
+    reason: reason,
+    notes: notes,
+    lossValue: lossAmount
+  };
+
+  APP.wasteLogs.push(entry);
+  localStorage.setItem(STORAGE_KEYS.wasteLogs, JSON.stringify(APP.wasteLogs));
+
+  showToast(`${t('mgmt.toast.loss') || 'Perte enregistrée'} (${lossAmount.toFixed(2)} €)`, "warning");
+  
+  if (notesEl) notesEl.value = '';
+  document.getElementById('wasteQty').value = '1';
+  
+  renderWasteAnalysis();
+  if (typeof updateMgmtKpis === 'function') updateMgmtKpis();
+}
+
+const WASTE_REASON_ICONS = {
+  invendu: '📦',
+  casse: '💥',
+  degustation: '🍴',
+  peremption: '⏰'
+};
+
+function renderWasteAnalysis() {
+  const totalLossEl = document.getElementById('totalWasteValue');
+  const impactMarginEl = document.getElementById('impactMarginValue');
+  const totalCountEl = document.getElementById('totalWasteCount');
+
+  if (!totalLossEl) return;
+
+  const logs = APP.wasteLogs || [];
+  let totalLoss = 0;
+  logs.forEach(l => totalLoss += (l.lossValue || 0));
+
+  totalLossEl.textContent = totalLoss.toFixed(2) + ' €';
+
+  const turnover = 5000; 
+  const impact = (totalLoss / turnover) * 100;
+  if (impactMarginEl) impactMarginEl.textContent = '-' + impact.toFixed(2) + '%';
+  if (totalCountEl) totalCountEl.textContent = logs.length;
+  
+  // Render history
+  const history = document.getElementById('wasteHistoryList');
+  if (history) {
+    if (logs.length === 0) {
+      history.innerHTML = `<div class="mgmt-empty-state" style="padding:2rem;">
+        <div class="empty-icon">📋</div>
+        <p>${t('mgmt.waste.empty') || 'Aucun historique de pertes.'}</p>
+      </div>`;
+    } else {
+      history.innerHTML = [...logs].reverse().slice(0, 15).map(l => {
+        const icon = WASTE_REASON_ICONS[l.reason] || '📋';
+        return `
+        <div class="waste-entry">
+          <div class="waste-entry-icon reason-${l.reason}">${icon}</div>
+          <div class="waste-entry-info">
+            <div class="waste-entry-name">${escapeHtml(l.recipeName)}</div>
+            <div class="waste-entry-meta">${new Date(l.date).toLocaleDateString()} · ${t('mgmt.reason.' + l.reason) || l.reason}${l.notes ? ' · ' + escapeHtml(l.notes) : ''}</div>
+          </div>
+          <div class="waste-entry-amount">
+            <div class="waste-entry-loss">-${(l.lossValue || 0).toFixed(2)} €</div>
+            <div class="waste-entry-qty">${l.qty} ${l.qty > 1 ? (t('unit.portions') || 'portions') : (t('unit.portion') || 'portion')}</div>
+          </div>
+        </div>`;
+      }).join('');
+    }
+  }
+
+  // Render waste chart
+  renderWasteChart(logs);
+}
+
+function renderWasteChart(logs) {
+  const canvas = document.getElementById('wasteChartCanvas');
+  if (!canvas || typeof Chart === 'undefined') return;
+
+  const reasonCounts = {};
+  const reasonLabels = {
+    invendu: t('mgmt.reason.invendu') || 'Invendu',
+    casse: t('mgmt.reason.casse') || 'Casse',
+    degustation: t('mgmt.reason.degustation') || 'Dégustation',
+    peremption: t('mgmt.reason.peremption') || 'Péremption'
+  };
+
+  logs.forEach(l => {
+    const r = l.reason || 'invendu';
+    reasonCounts[r] = (reasonCounts[r] || 0) + (l.lossValue || 0);
+  });
+
+  const labels = Object.keys(reasonCounts).map(k => reasonLabels[k] || k);
+  const data = Object.values(reasonCounts);
+  const colors = ['#f59e0b', '#ef4444', '#6366f1', '#6b7280'];
+
+  if (wasteChart) {
+    wasteChart.destroy();
+    wasteChart = null;
+  }
+
+  if (data.length === 0) {
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    return;
+  }
+
+  wasteChart = new Chart(canvas, {
+    type: 'doughnut',
+    data: {
+      labels: labels,
+      datasets: [{
+        data: data,
+        backgroundColor: colors.slice(0, data.length),
+        borderWidth: 2,
+        borderColor: getComputedStyle(document.documentElement).getPropertyValue('--surface').trim() || '#ffffff',
+        hoverBorderWidth: 3
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: '60%',
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: {
+            padding: 12,
+            usePointStyle: true,
+            pointStyleWidth: 8,
+            font: { size: 11, family: "'Inter', sans-serif" }
+          }
+        }
+      }
+    }
+  });
+}
+
+function loadWasteLogs() {
+  const saved = localStorage.getItem(STORAGE_KEYS.wasteLogs);
+  APP.wasteLogs = saved ? JSON.parse(saved) : [];
+}
+
+// --- Cost Objectives ---
+function renderObjectives() {
+  const grid = document.getElementById('objectivesGrid');
+  if (!grid) return;
+
+  const recipes = APP.savedRecipes || [];
+  const wasteLogs = APP.wasteLogs || [];
+
+  // Calculate real metrics
+  let avgMargin = 0;
+  let avgCost = 0;
+  let totalWaste = 0;
+  let recipeCount = recipes.length;
+
+  recipes.forEach(r => {
+    avgMargin += (r.margin || 70);
+    const cd = calcFullCost(r.margin || 70, r);
+    avgCost += cd.costPerPortion;
+  });
+  if (recipeCount > 0) {
+    avgMargin /= recipeCount;
+    avgCost /= recipeCount;
+  }
+  wasteLogs.forEach(l => totalWaste += (l.lossValue || 0));
+
+  // Define objectives
+  const objectives = [
+    {
+      title: t('mgmt.obj.margin_target') || 'Marge Moyenne ≥ 70%',
+      current: avgMargin,
+      target: 70,
+      unit: '%',
+      color: avgMargin >= 70 ? '#10b981' : avgMargin >= 60 ? '#f59e0b' : '#ef4444',
+      status: avgMargin >= 70 ? 'on-track' : avgMargin >= 60 ? 'warning' : 'critical',
+      statusLabel: avgMargin >= 70 ? (t('mgmt.obj.on_track') || '✅ Atteint') : avgMargin >= 60 ? (t('mgmt.obj.warning') || '⚠️ Proche') : (t('mgmt.obj.critical') || '❌ Critique')
+    },
+    {
+      title: t('mgmt.obj.cost_target') || 'Coût Moyen/Portion ≤ 3.00 €',
+      current: 3.00 - avgCost,
+      target: 3.00,
+      unit: '€',
+      color: avgCost <= 3 ? '#10b981' : avgCost <= 4 ? '#f59e0b' : '#ef4444',
+      status: avgCost <= 3 ? 'on-track' : avgCost <= 4 ? 'warning' : 'critical',
+      statusLabel: avgCost <= 3 ? (t('mgmt.obj.on_track') || '✅ Atteint') : (t('mgmt.obj.warning') || '⚠️ Proche'),
+      displayValue: avgCost.toFixed(2) + ' €',
+      displayTarget: '≤ 3.00 €'
+    },
+    {
+      title: t('mgmt.obj.waste_target') || 'Pertes Mensuelles ≤ 50 €',
+      current: 50 - totalWaste,
+      target: 50,
+      unit: '€',
+      color: totalWaste <= 50 ? '#10b981' : totalWaste <= 100 ? '#f59e0b' : '#ef4444',
+      status: totalWaste <= 50 ? 'on-track' : totalWaste <= 100 ? 'warning' : 'critical',
+      statusLabel: totalWaste <= 50 ? (t('mgmt.obj.on_track') || '✅ Atteint') : (t('mgmt.obj.critical') || '❌ Critique'),
+      displayValue: totalWaste.toFixed(2) + ' €',
+      displayTarget: '≤ 50 €'
+    },
+    {
+      title: t('mgmt.obj.recipe_count') || 'Catalogue ≥ 10 Recettes',
+      current: recipeCount,
+      target: 10,
+      unit: '',
+      color: recipeCount >= 10 ? '#10b981' : recipeCount >= 5 ? '#f59e0b' : '#ef4444',
+      status: recipeCount >= 10 ? 'on-track' : recipeCount >= 5 ? 'warning' : 'critical',
+      statusLabel: recipeCount >= 10 ? (t('mgmt.obj.on_track') || '✅ Atteint') : (t('mgmt.obj.in_progress') || '🔄 En cours')
+    }
+  ];
+
+  grid.innerHTML = objectives.map(obj => {
+    const pct = obj.title.includes('Marge') ? Math.min(100, (obj.current / obj.target) * 100)
+              : obj.title.includes('Catalogue') ? Math.min(100, (obj.current / obj.target) * 100)
+              : obj.status === 'on-track' ? 100 
+              : obj.status === 'warning' ? 65 : 30;
+
+    const currentDisplay = obj.displayValue || (obj.title.includes('Marge') ? obj.current.toFixed(1) + '%' : obj.current + (obj.unit ? ' ' + obj.unit : ''));
+    const targetDisplay = obj.displayTarget || (obj.target + (obj.unit ? ' ' + obj.unit : ''));
+
+    return `
+      <div class="objective-card">
+        <div class="objective-header">
+          <div class="objective-title">${obj.title}</div>
+          <span class="objective-badge ${obj.status}">${obj.statusLabel}</span>
+        </div>
+        <div class="objective-progress-bar">
+          <div class="objective-progress-fill" style="width:${pct}%; background:${obj.color};"></div>
+        </div>
+        <div class="objective-stats">
+          <span>${t('mgmt.obj.current') || 'Actuel'}: <strong>${currentDisplay}</strong></span>
+          <span>${t('mgmt.obj.target') || 'Objectif'}: <strong>${targetDisplay}</strong></span>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// --- Production Planning ---
+function renderProductionPlan() {
+  const grid = document.getElementById('productionPlanGrid');
+  if (!grid) return;
+
+  const plan = JSON.parse(localStorage.getItem('gourmet_production_plan') || '[]');
+  const recipes = APP.savedRecipes || [];
+
+  if (plan.length === 0 && recipes.length === 0) {
+    grid.innerHTML = `<div class="mgmt-empty-state">
+      <div class="empty-icon">📅</div>
+      <h4>${t('mgmt.production.empty_title') || 'Aucune production planifiée'}</h4>
+      <p>${t('mgmt.production.empty_desc') || 'Ajoutez des productions pour organiser votre semaine de travail.'}</p>
+    </div>`;
+    return;
+  }
+
+  if (plan.length === 0) {
+    grid.innerHTML = `<div class="mgmt-empty-state">
+      <div class="empty-icon">📅</div>
+      <h4>${t('mgmt.production.empty_title') || 'Aucune production planifiée'}</h4>
+      <p>${t('mgmt.production.empty_desc') || 'Cliquez sur "Ajouter" pour planifier votre première production.'}</p>
+    </div>`;
+    return;
+  }
+
+  const statusLabels = {
+    todo: { label: t('dash.prod.todo') || 'À produire', color: 'var(--text-muted)', bg: 'var(--bg-alt)' },
+    ongoing: { label: t('dash.prod.ongoing') || 'En cours', color: '#6366f1', bg: 'rgba(99,102,241,0.1)' },
+    done: { label: t('dash.prod.done') || 'Terminé', color: '#10b981', bg: 'rgba(16,185,129,0.1)' }
+  };
+
+  grid.innerHTML = `<div style="display:flex; flex-direction:column; gap:0.75rem;">
+    ${plan.map((item, idx) => {
+      const st = statusLabels[item.status] || statusLabels.todo;
+      return `
+      <div style="display:flex; align-items:center; gap:1rem; padding:1rem; background:var(--bg-alt); border-radius:var(--radius); border:1px solid var(--surface-border); transition:all 0.2s;"
+        onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--surface-border)'">
+        <div style="font-size:1.5rem; opacity:0.7;">🧁</div>
+        <div style="flex:1;">
+          <div style="font-weight:700; font-size:0.9rem;">${escapeHtml(item.name)}</div>
+          <div style="font-size:0.75rem; color:var(--text-muted);">${item.qty} ${t('unit.portions') || 'portions'} · ${item.date || ''}</div>
+        </div>
+        <select onchange="updateProductionStatus(${idx}, this.value)" class="form-select" style="width:auto; font-size:0.8rem; padding:0.4rem 0.8rem;">
+          <option value="todo" ${item.status === 'todo' ? 'selected' : ''}>${statusLabels.todo.label}</option>
+          <option value="ongoing" ${item.status === 'ongoing' ? 'selected' : ''}>${statusLabels.ongoing.label}</option>
+          <option value="done" ${item.status === 'done' ? 'selected' : ''}>${statusLabels.done.label}</option>
+        </select>
+        <span style="display:inline-block; padding:4px 10px; border-radius:100px; font-size:0.7rem; font-weight:800; background:${st.bg}; color:${st.color};">${st.label}</span>
+        <button class="remove-row-btn" onclick="removeProductionItem(${idx})" style="width:28px;height:28px;border-radius:50%;border:1px solid var(--surface-border);background:var(--surface);color:var(--text-muted);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:0.75rem;" title="Supprimer">🗑️</button>
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+
+function addProductionItem() {
+  const recipes = APP.savedRecipes || [];
+  if (recipes.length === 0) {
+    showToast(t('mgmt.production.no_recipes') || "Ajoutez d'abord des recettes.", "error");
+    return;
+  }
+
+  const plan = JSON.parse(localStorage.getItem('gourmet_production_plan') || '[]');
+  
+  // Pick first recipe as default
+  const defaultRecipe = recipes[0];
+  plan.push({
+    name: defaultRecipe.name,
+    recipeId: defaultRecipe.id,
+    qty: 10,
+    status: 'todo',
+    date: new Date().toLocaleDateString()
+  });
+
+  localStorage.setItem('gourmet_production_plan', JSON.stringify(plan));
+  renderProductionPlan();
+  showToast(t('mgmt.production.added') || "Production ajoutée !", "success");
+}
+
+function updateProductionStatus(idx, status) {
+  const plan = JSON.parse(localStorage.getItem('gourmet_production_plan') || '[]');
+  if (plan[idx]) {
+    plan[idx].status = status;
+    localStorage.setItem('gourmet_production_plan', JSON.stringify(plan));
+    renderProductionPlan();
+  }
+}
+
+function removeProductionItem(idx) {
+  const plan = JSON.parse(localStorage.getItem('gourmet_production_plan') || '[]');
+  plan.splice(idx, 1);
+  localStorage.setItem('gourmet_production_plan', JSON.stringify(plan));
+  renderProductionPlan();
+}
+
+/**
+ * Professional Workflow: Launch production from a recipe summary
+ */
+function launchProductionFromRecipe() {
+  if (!APP.recipe.name) {
+    showToast(t('s5.subtitle.empty'), 'error');
+    return;
+  }
+  
+  // 1. Save it first to ensure existence
+  saveCurrentRecipe();
+  
+  // 2. Add to production log
+  const plan = JSON.parse(localStorage.getItem('gourmet_production_plan') || '[]');
+  plan.push({
+    name: APP.recipe.name,
+    recipeId: APP.recipe.id,
+    qty: APP.recipe.portions || 10,
+    status: 'todo',
+    date: new Date().toLocaleDateString()
+  });
+  localStorage.setItem('gourmet_production_plan', JSON.stringify(plan));
+  
+  // 3. Navigate to appropriate module
+  if (typeof showMgmt === 'function') {
+    showMgmt();
+    if (typeof switchMgmtTab === 'function') switchMgmtTab('production');
+  }
+  
+  if (typeof renderProductionPlan === 'function') renderProductionPlan();
+  
+  showToast(t('mgmt.production.added') || "Production lancée !", "success");
 }

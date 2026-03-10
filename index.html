@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="fr">
 
 <head>
@@ -49,6 +49,7 @@
   <!-- Libraries for new features -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
 
 <body class="auth-pending">
@@ -166,21 +167,51 @@
       </button>
     </div>
 
-    <div class="header-nav" id="mainNav" style="display:none; align-items:center; flex: 1;">
+    <div class="header-nav" id="mainNav" style="display:none; align-items:center; flex: 1; gap: 0.2rem;">
       <button class="nav-link" id="navOmniSearch" title="Recherche Spotlight (Ctrl+K)"
         style="color: var(--accent); font-size: 1.1rem; padding: 0.3rem 0.6rem;">🔍</button>
-      <button class="nav-link" id="navHub" data-i18n="nav.home">Accueil</button>
-      <button class="nav-link" id="navRecettes" data-i18n="nav.recipes">Recettes</button>
-      <button class="nav-link" id="navLabo" data-i18n="nav.lab">Laboratoire</button>
-      <button class="nav-link" id="navSuppliers" data-i18n="nav.suppliers">Fournisseurs</button>
-      <button class="nav-link" id="navInventaire" data-i18n="nav.inventory">Inventaire</button>
-      <button class="nav-link" id="navStats" data-i18n="nav.stats">Statistiques</button>
-      <button class="nav-link" id="navPlanning" data-i18n="nav.planning">Planning</button>
-      <button class="nav-link" id="navLabeling" data-i18n="nav.labeling">Étiquetage</button>
-      <button class="nav-link" id="navHygiene" data-i18n="nav.hygiene">Hygiène & HACCP</button>
-      <button class="nav-link" id="navPortfolio" data-i18n="nav.portfolio">Portfolio</button>
-      <button class="nav-link" id="navAPropos" data-i18n="nav.about">À propos</button>
-      <button class="nav-link" id="navAdmin" style="display:none;" data-i18n="nav.admin">Admin</button>
+      <button class="nav-link" id="navHub"><span data-i18n="nav.home">Accueil</span></button>
+
+      <!-- L'Atelier -->
+      <div class="nav-dropdown">
+        <button class="nav-dropdown-trigger"><span data-i18n="nav.category.atelier">👨‍🍳 L'Atelier</span> <span class="nav-arrow">▼</span></button>
+        <div class="nav-dropdown-content">
+          <button class="nav-link nav-dropdown-link" id="navRecettes">📖 <span data-i18n="nav.recipes">Recettes</span></button>
+          <button class="nav-link nav-dropdown-link" id="navLabo">📐 <span data-i18n="nav.lab">Laboratoire</span></button>
+          <button class="nav-link nav-dropdown-link" id="navLabeling">🏷️ <span data-i18n="nav.labeling">Étiquetage</span></button>
+        </div>
+      </div>
+
+      <!-- Pilotage -->
+      <div class="nav-dropdown">
+        <button class="nav-dropdown-trigger"><span data-i18n="nav.category.mgmt">📈 Pilotage</span> <span class="nav-arrow">▼</span></button>
+        <div class="nav-dropdown-content">
+          <button class="nav-link nav-dropdown-link" id="navMgmt" style="font-weight:800;">⚙️ <span data-i18n="nav.mgmt">Gestion Pro</span></button>
+          <button class="nav-link nav-dropdown-link" id="navStats">📊 <span data-i18n="nav.stats">Statistiques</span></button>
+          <button class="nav-link nav-dropdown-link" id="navInventaire">📦 <span data-i18n="nav.inventory">Inventaire</span></button>
+        </div>
+      </div>
+
+      <!-- Organisation -->
+      <div class="nav-dropdown">
+        <button class="nav-dropdown-trigger"><span data-i18n="nav.category.org">📋 Organisation</span> <span class="nav-arrow">▼</span></button>
+        <div class="nav-dropdown-content">
+          <button class="nav-link nav-dropdown-link" id="navPlanning">📅 <span data-i18n="nav.planning">Planning</span></button>
+          <button class="nav-link nav-dropdown-link" id="navHygiene">🧼 <span data-i18n="nav.hygiene">Hygiène & HACCP</span></button>
+          <button class="nav-link nav-dropdown-link" id="navSuppliers">🚚 <span data-i18n="nav.suppliers">Fournisseurs</span></button>
+        </div>
+      </div>
+
+      <!-- Vitrine -->
+      <div class="nav-dropdown">
+        <button class="nav-dropdown-trigger"><span data-i18n="nav.category.showcase">✨ Vitrine</span> <span class="nav-arrow">▼</span></button>
+        <div class="nav-dropdown-content">
+          <button class="nav-link nav-dropdown-link" id="navPortfolio">🖼️ <span data-i18n="nav.portfolio">Portfolio</span></button>
+          <button class="nav-link nav-dropdown-link" id="navAPropos">📖 <span data-i18n="nav.about">À propos</span></button>
+        </div>
+      </div>
+
+      <button class="nav-link" id="navAdmin" style="display:none;"><span data-i18n="nav.admin">Admin</span></button>
     </div>
     <div class="header-actions" id="userProfileArea" style="display:none; align-items:center; gap:12px;">
       <button class="btn btn-outline btn-sm" id="btnSavedRecipes" title="Mes recettes sauvegardées"
@@ -535,6 +566,270 @@
     </section>
 
     <!-- ================================================ -->
+    <!-- MODULE GESTION PRO (Piliers 2, 3, 4) -->
+    <!-- ================================================ -->
+    <section id="appMgmt" style="display:none; padding-bottom: 3rem;">
+      <!-- Standard Site Hero -->
+      <section class="hero" style="padding-bottom: 3.5rem;">
+        <div class="hero-badge" data-i18n="mgmt.hero.badge">💎 Excellence Opérationnelle</div>
+        <h2 data-i18n="mgmt.hero.title">Pilotage <span class="accent">&amp; Rentabilité</span></h2>
+        <p data-i18n="mgmt.hero.desc">Optimisez vos besoins matières, surveillez vos allergènes, traquez vos pertes et pilotez vos objectifs de coût.</p>
+      </section>
+
+      <div class="mgmt-container hero-mgmt-overlap">
+        <!-- KPI Dashboard Row -->
+        <div class="mgmt-kpi-row">
+          <div class="mgmt-kpi-card kpi-accent">
+            <span class="mgmt-kpi-icon">📋</span>
+            <div class="mgmt-kpi-value" id="mgmtKpiRecipes">0</div>
+            <div class="mgmt-kpi-label" data-i18n="mgmt.kpi.recipes">Recettes Actives</div>
+          </div>
+          <div class="mgmt-kpi-card kpi-success">
+            <span class="mgmt-kpi-icon">📈</span>
+            <div class="mgmt-kpi-value" id="mgmtKpiMargin">—</div>
+            <div class="mgmt-kpi-label" data-i18n="mgmt.kpi.margin">Marge Moyenne</div>
+          </div>
+          <div class="mgmt-kpi-card kpi-danger">
+            <span class="mgmt-kpi-icon">📉</span>
+            <div class="mgmt-kpi-value" id="mgmtKpiWaste">0 €</div>
+            <div class="mgmt-kpi-label" data-i18n="mgmt.kpi.waste">Pertes Cumulées</div>
+          </div>
+          <div class="mgmt-kpi-card kpi-info">
+            <span class="mgmt-kpi-icon">🎯</span>
+            <div class="mgmt-kpi-value" id="mgmtKpiAllergens">0</div>
+            <div class="mgmt-kpi-label" data-i18n="mgmt.kpi.allergens">Allergènes Détectés</div>
+          </div>
+        </div>
+
+        <!-- Premium Pill Tabs -->
+        <div class="mgmt-tabs-premium">
+          <button class="mgmt-tab-pill active" id="mgmtTabShopping" onclick="switchMgmtTab('shopping')">
+            <span class="tab-pill-emoji">🛒</span>
+            <span data-i18n="mgmt.tab.shopping">Liste de Courses</span>
+          </button>
+          <button class="mgmt-tab-pill" id="mgmtTabAllergens" onclick="switchMgmtTab('allergens')">
+            <span class="tab-pill-emoji">🛡️</span>
+            <span data-i18n="mgmt.tab.allergens">Allergènes</span>
+          </button>
+          <button class="mgmt-tab-pill" id="mgmtTabWaste" onclick="switchMgmtTab('waste')">
+            <span class="tab-pill-emoji">📉</span>
+            <span data-i18n="mgmt.tab.waste">Suivi Pertes</span>
+          </button>
+          <button class="mgmt-tab-pill" id="mgmtTabObjectives" onclick="switchMgmtTab('objectives')">
+            <span class="tab-pill-emoji">🎯</span>
+            <span data-i18n="mgmt.tab.objectives">Objectifs</span>
+          </button>
+          <button class="mgmt-tab-pill" id="mgmtTabProduction" onclick="switchMgmtTab('production')">
+            <span class="tab-pill-emoji">📅</span>
+            <span data-i18n="mgmt.tab.production">Planning Prod.</span>
+          </button>
+        </div>
+
+        <!-- TAB 1: SHOPPING LIST -->
+        <div id="mgmtViewShopping" class="mgmt-view">
+          <div class="mgmt-shopping-grid">
+            <!-- Left: Planning Card -->
+            <div class="mgmt-glass-card">
+              <div class="mgmt-card-header header-centered">
+                <div class="mgmt-card-title">
+                  <div class="title-icon icon-orange">🛒</div>
+                  <div>
+                    <h3 data-i18n="mgmt.shopping.title">Planifier une Production</h3>
+                    <p data-i18n="mgmt.shopping.desc">Sélectionnez vos recettes et quantités pour générer le bon de commande.</p>
+                  </div>
+                </div>
+              </div>
+              <div id="shoppingRecipeSelectors" style="display:flex; flex-direction:column; gap:0.75rem; margin-bottom:1.5rem;">
+                <!-- JS populated rows -->
+              </div>
+              <button class="btn btn-outline btn-full" onclick="addShoppingRecipeRow()" data-i18n="mgmt.shopping.add">✚ Ajouter une recette</button>
+              <button class="btn btn-primary btn-full" style="margin-top:0.75rem;" onclick="generateShoppingList()" data-i18n="mgmt.shopping.calc">🔄 Calculer les besoins</button>
+            </div>
+            
+            <!-- Right: Results Card -->
+            <div class="mgmt-glass-card" id="shoppingResultCard" style="display:none;">
+              <div class="mgmt-card-header header-centered">
+                <div class="mgmt-card-title">
+                  <div class="title-icon icon-green">📦</div>
+                  <div>
+                    <h3 data-i18n="mgmt.shopping.result">Besoins Matières Totaux</h3>
+                    <p data-i18n="mgmt.shopping.result_desc">Comparaison automatique avec vos stocks actuels</p>
+                  </div>
+                </div>
+              </div>
+              <div id="shoppingListContainer" class="table-responsive">
+                <!-- Table generated by JS -->
+              </div>
+              <div class="mgmt-export-bar" id="shoppingExportBar" style="display:none;">
+                <div class="export-summary" id="shoppingExportSummary"></div>
+                <div class="mgmt-export-actions">
+                  <button class="btn btn-sm btn-outline" onclick="exportShoppingCSV()" data-i18n="mgmt.shopping.export_csv">📁 CSV</button>
+                  <button class="btn btn-sm btn-primary" onclick="window.print()" data-i18n="ui.btn.print">🖨️ Imprimer</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 2: ALLERGEN MATRIX -->
+        <div id="mgmtViewAllergens" class="mgmt-view" style="display:none;">
+          <div class="mgmt-glass-card">
+            <div class="mgmt-card-header header-centered">
+              <div class="mgmt-card-title">
+                <div class="title-icon icon-red">🛡️</div>
+                <div>
+                  <h3 data-i18n="mgmt.allergens.title">Matrice Réglementaire des Allergènes</h3>
+                  <p data-i18n="mgmt.allergens.subtitle">Mise à jour automatique selon vos recettes — Conforme INCO (UE) n°1169/2011</p>
+                </div>
+              </div>
+              <button class="btn btn-sm btn-outline" onclick="window.print()" data-i18n="ui.btn.print">🖨️ Imprimer</button>
+            </div>
+            <div class="table-responsive">
+              <table class="allergen-matrix-premium" id="allergenMatrixTable">
+                <!-- Generated by JS -->
+              </table>
+            </div>
+            <div class="allergen-legend" id="allergenLegend">
+              <div class="allergen-legend-item">
+                <span class="allergen-badge present" style="width:20px;height:20px;font-size:0.7rem;">●</span>
+                <span data-i18n="mgmt.allergens.present">Présent dans la recette</span>
+              </div>
+              <div class="allergen-legend-item">
+                <span class="allergen-badge absent" style="width:20px;height:20px;font-size:0.7rem;">—</span>
+                <span data-i18n="mgmt.allergens.absent">Non détecté</span>
+              </div>
+              <div class="allergen-legend-item">
+                <span style="font-size:0.85rem;">ℹ️</span>
+                <span data-i18n="mgmt.allergens.disclaimer">Vérifiez auprès de vos fournisseurs pour les traces éventuelles</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 3: WASTE TRACKING -->
+        <div id="mgmtViewWaste" class="mgmt-view" style="display:none;">
+          <div class="mgmt-waste-grid">
+            <!-- Left: Waste Declaration -->
+            <div class="mgmt-glass-card">
+              <div class="mgmt-card-header header-centered">
+                <div class="mgmt-card-title">
+                  <div class="title-icon icon-red">🚨</div>
+                  <div>
+                    <h3 data-i18n="mgmt.waste.title">Déclarer une Perte</h3>
+                    <p data-i18n="mgmt.waste.title_desc">Enregistrez chaque perte pour un suivi précis</p>
+                  </div>
+                </div>
+              </div>
+              <div class="waste-declare-form">
+                <div class="form-group">
+                  <label data-i18n="mgmt.waste.recipe">Recette concernée</label>
+                  <select id="wasteRecipeSelect" class="form-select"></select>
+                </div>
+                <div class="form-group">
+                  <label data-i18n="mgmt.waste.qty">Quantité perdue (Portions)</label>
+                  <input type="number" id="wasteQty" class="form-input" value="1" min="1">
+                </div>
+                <div class="form-group">
+                  <label data-i18n="mgmt.waste.reason">Cause</label>
+                  <select id="wasteReason" class="form-select">
+                    <option value="invendu" data-i18n="mgmt.reason.invendu">Invendu</option>
+                    <option value="casse" data-i18n="mgmt.reason.casse">Casse / Erreur technique</option>
+                    <option value="degustation" data-i18n="mgmt.reason.degustation">Dégustation / Promo</option>
+                    <option value="peremption" data-i18n="mgmt.reason.peremption">Date dépassée</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label data-i18n="mgmt.waste.notes">Notes (optionnel)</label>
+                  <input type="text" id="wasteNotes" class="form-input" placeholder="Ex: lot n°245">
+                </div>
+                <button class="btn btn-primary btn-full" onclick="logWaste()" data-i18n="mgmt.waste.save">🚨 Enregistrer la perte</button>
+              </div>
+            </div>
+
+            <!-- Right: Analysis Panel -->
+            <div style="display:flex; flex-direction:column; gap:1.5rem;">
+              <!-- Waste Stats KPIs -->
+              <div class="waste-stats-row">
+                <div class="waste-stat-card" style="background:rgba(239,68,68,0.04); border-color:rgba(239,68,68,0.12);">
+                  <div class="ws-icon">💸</div>
+                  <div class="ws-value" id="totalWasteValue" style="color:#ef4444;">0.00 €</div>
+                  <div class="ws-label" data-i18n="mgmt.waste.total">Valeur Totale</div>
+                </div>
+                <div class="waste-stat-card" style="background:rgba(245,158,11,0.04); border-color:rgba(245,158,11,0.12);">
+                  <div class="ws-icon">📊</div>
+                  <div class="ws-value" id="impactMarginValue" style="color:#f59e0b;">-0.00%</div>
+                  <div class="ws-label" data-i18n="mgmt.waste.impact">Impact Marge</div>
+                </div>
+                <div class="waste-stat-card" style="background:rgba(99,102,241,0.04); border-color:rgba(99,102,241,0.12);">
+                  <div class="ws-icon">📋</div>
+                  <div class="ws-value" id="totalWasteCount" style="color:#6366f1;">0</div>
+                  <div class="ws-label" data-i18n="mgmt.waste.count">Total Déclarations</div>
+                </div>
+              </div>
+
+              <!-- Chart + History -->
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.5rem;">
+                <div class="mgmt-glass-card">
+                  <div class="mgmt-card-title" style="margin-bottom:1rem;">
+                    <div class="title-icon icon-purple">📊</div>
+                    <div><h3 data-i18n="mgmt.waste.chart_title">Répartition par Cause</h3></div>
+                  </div>
+                  <div class="waste-chart-container">
+                    <canvas id="wasteChartCanvas"></canvas>
+                  </div>
+                </div>
+                <div class="mgmt-glass-card">
+                  <div class="mgmt-card-title" style="margin-bottom:1rem;">
+                    <div class="title-icon icon-orange">📜</div>
+                    <div><h3 data-i18n="mgmt.waste.history">Historique Récent</h3></div>
+                  </div>
+                  <div id="wasteHistoryList" style="max-height:260px; overflow-y:auto; border-radius:var(--radius); border:1px solid var(--surface-border); background:var(--bg-alt);">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 4: COST OBJECTIVES -->
+        <div id="mgmtViewObjectives" class="mgmt-view" style="display:none;">
+          <div class="mgmt-glass-card">
+            <div class="mgmt-card-header header-centered">
+              <div class="mgmt-card-title">
+                <div class="title-icon icon-blue">🎯</div>
+                <div>
+                  <h3 data-i18n="mgmt.objectives.title">Objectifs de Rentabilité</h3>
+                  <p data-i18n="mgmt.objectives.desc">Suivez vos indicateurs clés et atteignez vos objectifs de performance</p>
+                </div>
+              </div>
+            </div>
+            <div class="mgmt-objectives-grid" id="objectivesGrid">
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 5: PRODUCTION PLANNING -->
+        <div id="mgmtViewProduction" class="mgmt-view" style="display:none;">
+          <div class="mgmt-glass-card">
+            <div class="mgmt-card-header header-centered">
+              <div class="mgmt-card-title">
+                <div class="title-icon icon-purple">📅</div>
+                <div>
+                  <h3 data-i18n="mgmt.production.title">Planning de Production</h3>
+                  <p data-i18n="mgmt.production.desc">Planifiez votre semaine de production et suivez l'avancement</p>
+                </div>
+              </div>
+              <button class="btn btn-sm btn-primary" onclick="addProductionItem()" data-i18n="mgmt.production.add">✚ Ajouter</button>
+            </div>
+            <div id="productionPlanGrid">
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ================================================ -->
     <!-- RECIPES APP -->
     <!-- ================================================ -->
     <div id="appRecettes" style="display:none;">
@@ -842,16 +1137,23 @@
       <!-- ================================================ -->
       <div class="step-content" id="step5">
         <div class="card" id="summaryCard">
-          <div class="card-title" data-i18n="s5.title">📋 Récapitulatif de la recette</div>
+          <div class="card-title" id="summaryTitle" data-i18n="s5.title">📋 Récapitulatif de la recette</div>
           <div class="card-subtitle" id="summarySubtitle"></div>
 
           <div id="summaryContent"></div>
 
-          <div class="export-actions">
+          <!-- Anti-Gaspi Module -->
+          <div id="antiGaspiModule" class="card" style="margin-top: 1.5rem; background: rgba(16, 185, 129, 0.05); border: 1px dashed #10b981; display: none;">
+            <div class="card-title" style="color: #10b981; font-size: 1.1rem; margin-bottom: 0.5rem;">🌱 Module Anti-Gaspi & Optimisation</div>
+            <div id="antiGaspiContent" style="font-size: 0.9rem; color: var(--text-secondary);"></div>
+          </div>
+
+          <div class="export-actions" style="margin-top: 1.5rem;">
+            <button class="btn btn-primary" id="btnLaunchProd" data-i18n="s5.btn.production" style="background:#8b5cf6; color:white; border-color:#8b5cf6; font-weight:700;">🛒 Lancer la production</button>
+            <button class="btn btn-outline" id="btnGenerateQR" style="border-color:var(--accent); color:var(--accent);">🔲 Étiquette QR & Vitrine</button>
             <button class="btn btn-primary" id="btnExportPdf" data-i18n="s5.btn.pdf">📄 Exporter en PDF</button>
             <button class="btn btn-outline" id="btnExportDevis" data-i18n="s5.btn.quote"
               style="border-color:var(--accent); color:var(--accent);">🤝 Devis Client (B2B)</button>
-            <button class="btn btn-secondary" id="btnExportJson" data-i18n="s5.btn.json">💾 Exporter en JSON</button>
             <button class="btn btn-success" id="btnSaveRecipe" data-i18n="s5.btn.save">✅ Sauvegarder la
               recette</button>
           </div>
@@ -2254,6 +2556,7 @@
         </div>
       </div>
     </section>
+
   </main>
 
   <!-- Footer -->
@@ -2578,11 +2881,7 @@
     </div>
   </div>
 
-  <script src="./data.js?v=2.1.0"></script>
-  <script src="./i18n.js?v=3.5.0"></script>
-  <script src="./app.js?v=2.2.1"></script>
-  <script src="./equipment.js?v=2.1.0"></script>
-  <script src="./lab-logic.js?v=2.1.0"></script>
+  <!-- Scripts moved to end of body for reliability -->
 
   <script>
     // Simple logic to switch between Hub, Recettes, and Lab
@@ -2610,6 +2909,8 @@
     const navHygiene = document.getElementById('navHygiene');
     const appPortfolio = document.getElementById('appPortfolio');
     const navPortfolio = document.getElementById('navPortfolio');
+    const appMgmt = document.getElementById('appMgmt');
+    const navMgmt = document.getElementById('navMgmt');
 
     function hideAllApps() {
       hubSec.style.display = 'none';
@@ -2620,6 +2921,7 @@
       appPlanning.style.display = 'none';
       appAdmin.style.display = 'none';
       appHygiene.style.display = 'none';
+      if (appMgmt) appMgmt.style.display = 'none';
 
       const appMain = document.getElementById('appMain');
       if (appMain) appMain.style.maxWidth = ''; // Reset global width constraint
@@ -2637,6 +2939,7 @@
       navPlanning.classList.remove('active');
       navAdmin.classList.remove('active');
       navHygiene.classList.remove('active');
+      if (navMgmt) navMgmt.classList.remove('active');
 
       const navSuppliers = document.getElementById('navSuppliers');
       const navStats = document.getElementById('navStats');
@@ -2771,29 +3074,48 @@
     const headerBrand = document.getElementById('headerBrand');
     if (headerBrand) headerBrand.addEventListener('click', showHub);
 
-    if (btnRec) btnRec.addEventListener('click', showRecettes);
-    if (btnLab) btnLab.addEventListener('click', showLabo);
-    if (navHub) navHub.addEventListener('click', showHub);
-    if (navRec) navRec.addEventListener('click', showRecettes);
-    if (navLab) navLab.addEventListener('click', showLabo);
-    if (navPlanning) navPlanning.addEventListener('click', showPlanning);
-    if (navAPropos) navAPropos.addEventListener('click', showAPropos);
-    if (navPortfolio) navPortfolio.addEventListener('click', showPortfolio);
-    if (navAdmin) navAdmin.addEventListener('click', showAdmin);
-    if (navInventory) navInventory.addEventListener('click', showInventaire);
-    if (navLabeling) navLabeling.addEventListener('click', showLabeling);
-    if (navHygiene) navHygiene.addEventListener('click', showHygiene);
+    function showMgmt() {
+      hideAllApps();
+      if (appMgmt) appMgmt.style.display = 'block';
+      if (navMgmt) navMgmt.classList.add('active');
+      switchMgmtTab('shopping');
+      if (typeof updateMgmtKpis === 'function') updateMgmtKpis();
+      if (typeof updateRandomTip === 'function') updateRandomTip();
+    }
 
-    const navSuppliers = document.getElementById('navSuppliers');
-    if (navSuppliers) navSuppliers.addEventListener('click', showSuppliers);
-    const navStats = document.getElementById('navStats');
-    if (navStats) navStats.addEventListener('click', showStats);
+    function switchMgmtTab(tab) {
+      const views = ['shopping', 'allergens', 'waste', 'objectives', 'production'];
+      views.forEach(v => {
+        const el = document.getElementById('mgmtView' + v.charAt(0).toUpperCase() + v.slice(1));
+        const btn = document.getElementById('mgmtTab' + v.charAt(0).toUpperCase() + v.slice(1));
+        if (el) el.style.display = (v === tab) ? 'block' : 'none';
+        if (btn) btn.classList.toggle('active', v === tab);
+      });
 
-    const hubBtnRecettes = document.getElementById('hubBtnRecettes');
-    if (hubBtnRecettes) hubBtnRecettes.addEventListener('click', showRecettes);
-    const hubBtnLabo = document.getElementById('hubBtnLabo');
-    if (hubBtnLabo) hubBtnLabo.addEventListener('click', showLabo);
+      if (tab === 'shopping' && typeof addShoppingRecipeRow === 'function') {
+         const container = document.getElementById('shoppingRecipeSelectors');
+         if (container && container.children.length === 0) addShoppingRecipeRow();
+      }
+      if (tab === 'allergens' && typeof renderAllergenMatrix === 'function') renderAllergenMatrix();
+      if (tab === 'waste' && typeof populateWasteDropdown === 'function') {
+        populateWasteDropdown();
+        renderWasteAnalysis();
+      }
+      if (tab === 'objectives' && typeof renderObjectives === 'function') renderObjectives();
+      if (tab === 'production' && typeof renderProductionPlan === 'function') renderProductionPlan();
+    }
 
+  </script>
+
+  <!-- Core Scripts -->
+  <script src="./data.js?v=2.2.0"></script>
+  <script src="./i18n.js?v=3.5.0"></script>
+  <script src="./app.js?v=2.3.0"></script>
+  <script src="./equipment.js?v=2.1.0"></script>
+  <script src="./lab-logic.js?v=2.1.0"></script>
+  <script src="./dashboard-premium.js?v=1.0.0"></script>
+
+  <script>
     function switchLabTab(tab) {
       document.getElementById('labViewConfig').style.display = tab === 'config' ? 'block' : 'none';
       document.getElementById('labViewPlan').style.display = tab === 'plan' ? 'block' : 'none';
@@ -2808,8 +3130,82 @@
     }
 
     // After auth success hide the hero inside the original app logic. We adapt app.js for this.
+
+    // --- Consolidated Navigation & Dropdown Management ---
+    document.addEventListener('click', function(e) {
+      const target = e.target;
+
+      // 1. Handle Dropdown Triggers (L'Atelier, Pilotage, etc.)
+      const trigger = target.closest('.nav-dropdown-trigger');
+      if (trigger) {
+        e.preventDefault();
+        e.stopPropagation();
+        const dropdown = trigger.closest('.nav-dropdown');
+        const wasActive = dropdown.classList.contains('active');
+        
+        // Close all other dropdowns
+        document.querySelectorAll('.nav-dropdown').forEach(d => {
+          if (d !== dropdown) d.classList.remove('active');
+        });
+        
+        // Toggle current one
+        dropdown.classList.toggle('active');
+        return;
+      }
+
+      // 2. Handle Navigation Links (including those inside dropdowns)
+      const navLink = target.closest('.nav-link') || target.closest('.mobile-nav-item');
+      if (navLink) {
+        // Find which function to call based on ID
+        const navId = navLink.id;
+        const navActions = {
+          'navHub': showHub, 'mNavHub': showHub,
+          'navRecettes': showRecettes, 'mLinkRecettes': showRecettes,
+          'navLabo': showLabo, 'mLinkLabo': showLabo,
+          'navPlanning': showPlanning, 'mLinkPlanning': showPlanning,
+          'navAPropos': showAPropos, 'mLinkAbout': showAPropos,
+          'navPortfolio': showPortfolio, 'mLinkPortfolio': showPortfolio,
+          'navAdmin': showAdmin,
+          'navInventaire': showInventaire, 'mLinkInv': showInventaire,
+          'navLabeling': showLabeling, 'mLinkLabeling': showLabeling,
+          'navHygiene': showHygiene, 'mLinkHygiene': showHygiene,
+          'navSuppliers': showSuppliers, 'mLinkSuppliers': showSuppliers,
+          'navStats': showStats, 'mLinkStats': showStats,
+          'navMgmt': showMgmt, 'mLinkMgmt': showMgmt,
+          'navOmniSearch': () => { if (typeof showOmniSearch === 'function') showOmniSearch(); }
+        };
+
+        if (navActions[navId]) {
+          navActions[navId]();
+          // Close all dropdowns after navigation
+          document.querySelectorAll('.nav-dropdown').forEach(d => d.classList.remove('active'));
+          // Update active state for mobile bottom bar if needed
+          if (navLink.classList.contains('mobile-nav-item')) {
+            updateMobileNavActive(navId);
+          }
+        }
+        return;
+      }
+
+      // 3. Close dropdowns when clicking outside
+      if (!target.closest('.nav-dropdown')) {
+        document.querySelectorAll('.nav-dropdown').forEach(d => d.classList.remove('active'));
+      }
+    });
+
+    // Mobile Navbar specific logic for triggers
+    const mNavAtelier = document.getElementById('mNavAtelier');
+    if (mNavAtelier) mNavAtelier.onclick = () => { openMobileCategory('atelier'); updateMobileNavActive('mNavAtelier'); };
+    const mNavPilotage = document.getElementById('mNavPilotage');
+    if (mNavPilotage) mNavPilotage.onclick = () => { openMobileCategory('pilotage'); updateMobileNavActive('mNavAtelier'); };
+    const mNavOrg = document.getElementById('mNavOrg');
+    if (mNavOrg) mNavOrg.onclick = () => { openMobileCategory('org'); updateMobileNavActive('mNavAtelier'); };
+    const mNavMore = document.getElementById('mNavMore');
+    if (mNavMore) mNavMore.onclick = () => { openMobileCategory('more'); updateMobileNavActive('mNavAtelier'); };
+
+    if (document.getElementById('headerBrand')) document.getElementById('headerBrand').onclick = showHub;
   </script>
-  <script src="./dashboard-premium.js?v=1.0.0"></script>
+
   <!-- RECIPE COMPARATOR MODAL -->
   <div id="comparatorModal" class="modal-overlay" style="display:none; align-items:center; justify-content:center;">
     <div class="modal-content glass-panel" style="width: 500px; max-width: 95%;">
@@ -2852,21 +3248,21 @@
       <span class="icon">🏠</span>
       <span class="label" data-i18n="nav.home">Accueil</span>
     </button>
-    <button class="mobile-nav-item" id="mNavRecettes">
-      <span class="icon">📖</span>
-      <span class="label" data-i18n="nav.recipes">Recettes</span>
+    <button class="mobile-nav-item" id="mNavAtelier">
+      <span class="icon">👨‍🍳</span>
+      <span class="label" data-i18n="nav.category.atelier">Atelier</span>
     </button>
-    <button class="mobile-nav-item" id="mNavLabo">
-      <span class="icon">📐</span>
-      <span class="label" data-i18n="nav.lab">Labo</span>
+    <button class="mobile-nav-item" id="mNavPilotage">
+      <span class="icon">📈</span>
+      <span class="label" data-i18n="nav.category.mgmt">Pilotage</span>
     </button>
-    <button class="mobile-nav-item" id="mNavStats">
-      <span class="icon">📊</span>
-      <span class="label" data-i18n="nav.stats">Stats</span>
+    <button class="mobile-nav-item" id="mNavOrg">
+      <span class="icon">📋</span>
+      <span class="label" data-i18n="nav.category.org">Org</span>
     </button>
     <button class="mobile-nav-item" id="mNavMore">
       <span class="icon">➕</span>
-      <span class="label">Plus</span>
+      <span class="label">Menu</span>
     </button>
   </nav>
 
@@ -2874,107 +3270,134 @@
   <div class="mobile-more-menu" id="mobileMoreMenu">
     <div class="more-menu-content">
       <div class="more-menu-header">
-        <h3 style="margin:0;">Menu</h3>
+        <h3 id="moreMenuTitle">Menu</h3>
         <button class="btn-icon" id="closeMoreMenu"
           style="background:var(--bg-alt); width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center;">✕</button>
       </div>
-      <div class="more-menu-grid">
-        <button class="menu-item" id="mNavSuppliers">
-          <span class="icon">🚚</span>
-          <span data-i18n="nav.suppliers">Fournisseurs</span>
-        </button>
-        <button class="menu-item" id="mNavInventaire">
-          <span class="icon">📦</span>
-          <span data-i18n="nav.inventory">Stock</span>
-        </button>
-        <button class="menu-item" id="mNavPlanning">
-          <span class="icon">🗓️</span>
-          <span data-i18n="nav.planning">Planning</span>
-        </button>
-        <button class="menu-item" id="mNavLabeling">
-          <span class="icon">🏷️</span>
-          <span data-i18n="nav.labeling">Étiquettes</span>
-        </button>
-        <button class="menu-item" id="mNavHygiene">
-          <span class="icon">🛡️</span>
-          <span data-i18n="nav.hygiene">HACCP</span>
-        </button>
-        <button class="menu-item" id="mNavPortfolio">
-          <span class="icon">🖼️</span>
-          <span data-i18n="nav.portfolio">Portfolio</span>
-        </button>
-        <button class="menu-item" id="mNavAPropos">
-          <span class="icon">ℹ️</span>
-          <span data-i18n="nav.about">À propos</span>
-        </button>
+      <div class="more-menu-grid" id="moreMenuGrid">
+        <!-- Dynamically populated to match choices -->
       </div>
     </div>
   </div>
 
   <script>
-    // Mobile Navigation Logic
-    function updateMobileNavActive(id) {
-      document.querySelectorAll('.mobile-nav-item').forEach(el => el.classList.remove('active'));
-      const activeBtn = document.getElementById(id);
-      if (activeBtn) activeBtn.classList.add('active');
-    }
-
-    document.getElementById('mNavHub').addEventListener('click', () => { showHub(); updateMobileNavActive('mNavHub'); });
-    document.getElementById('mNavRecettes').addEventListener('click', () => { showRecettes(); updateMobileNavActive('mNavRecettes'); });
-    document.getElementById('mNavLabo').addEventListener('click', () => { showLabo(); updateMobileNavActive('mNavLabo'); });
-    document.getElementById('mNavStats').addEventListener('click', () => { showStats(); updateMobileNavActive('mNavStats'); });
-
-    // Drawer Logic
+    // --- Improved Navigation & Mobile Logic ---
     const drawer = document.getElementById('mobileMoreMenu');
-    document.getElementById('mNavMore').addEventListener('click', () => {
+    const moreMenuGrid = document.getElementById('moreMenuGrid');
+    const moreMenuTitle = document.getElementById('moreMenuTitle');
+
+    function openMobileCategory(category) {
+      moreMenuGrid.innerHTML = '';
+      let items = [];
+      
+      if (category === 'atelier') {
+        moreMenuTitle.textContent = "👨‍🍳 L'Atelier";
+        items = [
+          { id: 'mLinkRecettes', icon: '📖', label: 'nav.recipes', action: showRecettes },
+          { id: 'mLinkLabo', icon: '📐', label: 'nav.lab', action: showLabo },
+          { id: 'mLinkLabeling', icon: '🏷️', label: 'nav.labeling', action: showLabeling }
+        ];
+      } else if (category === 'pilotage') {
+        moreMenuTitle.textContent = "📈 Pilotage";
+        items = [
+          { id: 'mLinkMgmt', icon: '⚙️', label: 'nav.mgmt', action: showMgmt },
+          { id: 'mLinkStats', icon: '📊', label: 'nav.stats', action: showStats },
+          { id: 'mLinkInv', icon: '📦', label: 'nav.inventory', action: showInventaire }
+        ];
+      } else if (category === 'org') {
+        moreMenuTitle.textContent = "📋 Organisation";
+        items = [
+          { id: 'mLinkPlanning', icon: '📅', label: 'nav.planning', action: showPlanning },
+          { id: 'mLinkHygiene', icon: '🧼', label: 'nav.hygiene', action: showHygiene },
+          { id: 'mLinkSuppliers', icon: '🚚', label: 'nav.suppliers', action: showSuppliers }
+        ];
+      } else if (category === 'more') {
+        moreMenuTitle.textContent = "Menu";
+        items = [
+          { id: 'mLinkPortfolio', icon: '🖼️', label: 'nav.portfolio', action: showPortfolio },
+          { id: 'mLinkAbout', icon: '📖', label: 'nav.about', action: showAPropos }
+        ];
+      }
+
+      items.forEach(item => {
+        const btn = document.createElement('button');
+        btn.className = 'menu-item';
+        btn.id = item.id;
+        btn.innerHTML = `<span class="icon">${item.icon}</span> <span data-i18n="${item.label}">${i18n.t(item.label)}</span>`;
+        btn.onclick = () => {
+          item.action();
+          closeDrawer();
+        };
+        moreMenuGrid.appendChild(btn);
+      });
+
       drawer.style.display = 'flex';
       setTimeout(() => drawer.classList.add('show'), 10);
-    });
+    }
 
     const closeDrawer = () => {
       drawer.classList.remove('show');
       setTimeout(() => drawer.style.display = 'none', 400);
     };
 
-    document.getElementById('closeMoreMenu').addEventListener('click', closeDrawer);
-    drawer.addEventListener('click', (e) => { if (e.target === drawer) closeDrawer(); });
+    function updateMobileNavActive(id) {
+      document.querySelectorAll('.mobile-nav-item').forEach(el => el.classList.remove('active'));
+      const activeBtn = document.getElementById(id);
+      if (activeBtn) activeBtn.classList.add('active');
+    }
 
-    // Drawer Links
-    const drawerActions = {
-      'mNavSuppliers': showSuppliers,
-      'mNavInventaire': showInventaire,
-      'mNavPlanning': showPlanning,
-      'mNavLabeling': showLabeling,
-      'mNavHygiene': showHygiene,
-      'mNavPortfolio': showPortfolio,
-      'mNavAPropos': showAPropos
-    };
-
-    Object.keys(drawerActions).forEach(id => {
-      document.getElementById(id).addEventListener('click', () => {
-        drawerActions[id]();
-        closeDrawer();
-        updateMobileNavActive('mNavMore'); // Keep Plus active as a visual hint
-      });
-    });
-
-    // Handle initial show/hide based on auth
     function updateMobileNavVisibility() {
       const isAuth = localStorage.getItem('gourmet_auth') === 'true';
       const bar = document.getElementById('mobileNavBar');
       if (bar) bar.style.display = isAuth ? 'flex' : 'none';
     }
 
-    // Patch existing funcs to update mobile nav
+    // Wrap hideAllApps to include mobile nav update
     const originalHideAllApps = window.hideAllApps;
     window.hideAllApps = function () {
       if (originalHideAllApps) originalHideAllApps();
       updateMobileNavVisibility();
     };
-
-    // Initial call
+    
+    // Initial calls
     updateMobileNavVisibility();
+    if (document.getElementById('closeMoreMenu')) document.getElementById('closeMoreMenu').onclick = closeDrawer;
+    if (drawer) drawer.onclick = (e) => { if (e.target === drawer) closeDrawer(); };
+
+
   </script>
+
+  <!-- QR Code / Label Modal -->
+  <div id="qrModal" class="modal" style="display:none; position:fixed; z-index:9999; left:0; top:0; width:100%; height:100%; overflow:auto; background-color:rgba(0,0,0,0.5); align-items:center; justify-content:center;">
+    <div class="modal-content" style="background:var(--surface); margin:10% auto; padding:2rem; border-radius:12px; max-width:400px; text-align:center; position:relative; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);">
+      <span class="close-qr" onclick="document.getElementById('qrModal').style.display='none'" style="position:absolute; right:15px; top:10px; font-size:1.5rem; cursor:pointer; color:var(--text-muted);">&times;</span>
+      <h3 style="margin-bottom:1.5rem; color:var(--text); font-family:var(--font-heading);">Étiquette Point de Vente</h3>
+      
+      <div id="labelPreview" style="border:2px dashed var(--surface-border); padding:2rem; border-radius:8px; display:flex; flex-direction:column; align-items:center; background:var(--bg-alt);">
+        <h4 id="qrRecipeName" style="font-size:1.3rem; color:var(--text); margin-bottom:0.5rem; text-transform:uppercase; font-family:var(--font-heading); letter-spacing:1px;">Nom de la Recette</h4>
+        <div style="font-size:0.8rem; color:var(--text-muted); text-transform:uppercase; margin-bottom:0.2rem;">Prix de Vente Conseillé</div>
+        <p id="qrRecipePrice" style="font-size:2rem; font-weight:800; color:var(--accent); margin:0 0 1.5rem 0;">4.50 €</p>
+        
+        <div id="qrcodeBox" style="margin: 0 0 1.5rem 0; padding:15px; background:white; border-radius:12px; box-shadow:0 4px 15px rgba(0,0,0,0.05); border:1px solid #eee;">
+          <div id="qrcode"></div>
+        </div>
+        
+        <div style="width:100%; text-align:left; border-top:1px solid var(--surface-border); padding-top:1rem;">
+          <strong style="font-size:0.8rem; color:var(--text); display:block; margin-bottom:0.3rem;">Allergènes Majeurs :</strong>
+          <p id="qrAllergens" style="font-size:0.8rem; color:var(--danger); font-weight:600; margin:0; line-height:1.4;">Aucun</p>
+        </div>
+      </div>
+      
+      <div style="margin-top:1.5rem; display:flex; gap:10px; justify-content:center;">
+         <button class="btn btn-primary" onclick="exportQRLabelPdf()" style="gap:8px; flex:1;">
+           💾 PDF
+         </button>
+         <button class="btn btn-outline" onclick="window.print()" style="gap:8px; flex:1;">
+           🖨️ Imprimer
+         </button>
+      </div>
+    </div>
+  </div>
 
   <div id="toast-container"></div>
 </body>
