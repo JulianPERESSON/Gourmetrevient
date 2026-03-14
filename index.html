@@ -188,6 +188,7 @@
         <button class="nav-dropdown-trigger"><span data-i18n="nav.category.mgmt">📈 Pilotage</span> <span class="nav-arrow">▼</span></button>
         <div class="nav-dropdown-content">
           <button class="nav-link nav-dropdown-link" id="navMgmt" style="font-weight:800;">⚙️ <span data-i18n="nav.mgmt">Gestion Pro</span></button>
+          <button class="nav-link nav-dropdown-link" id="navExam">🎓 <span data-i18n="mgmt.tab.exam">Simulateur CAP</span></button>
           <button class="nav-link nav-dropdown-link" id="navSuppliers">🚚 <span data-i18n="nav.suppliers">Fournisseurs</span></button>
           <button class="nav-link nav-dropdown-link" id="navInventaire">📦 <span data-i18n="nav.inventory">Inventaire</span></button>
         </div>
@@ -1044,17 +1045,28 @@
                   <p data-i18n="exam.intro">Sélectionnez votre épreuve pour générer un plan de travail optimisé.</p>
                 </div>
               </div>
+              <button class="btn btn-sm btn-outline" onclick="seedCapToolkit()" style="border-radius:20px; color:var(--purple); border-color:var(--purple); font-weight:700;">
+                🎓 Importer le Catalogue CAP 2026
+              </button>
             </div>
 
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; padding: 1rem 0;">
-              <button class="btn btn-outline" style="height: 120px; flex-direction: column; gap: 0.5rem;" onclick="generateCapOrdonnancement('EP1')">
-                <span style="font-size: 2rem;">🥖</span>
-                <span data-i18n="exam.ep1">EP1 : Tourtage, Tartes, Goûters</span>
-              </button>
-              <button class="btn btn-outline" style="height: 120px; flex-direction: column; gap: 0.5rem;" onclick="generateCapOrdonnancement('EP2')">
-                <span style="font-size: 2rem;">🍰</span>
-                <span data-i18n="exam.ep2">EP2 : Entremets & Petits Gâteaux</span>
-              </button>
+            <div style="background: var(--bg-alt); padding: 1.5rem; border-radius: var(--radius); margin-bottom: 1.5rem;">
+               <label style="display:block; margin-bottom:0.5rem; font-weight:700; color:var(--text-secondary);">Sujet d'examen :</label>
+               <select id="examSubjectSelect" class="form-input" onchange="generateCapOrdonnancement(this.value)" style="width:100%; font-weight:600;">
+                  <option value="">-- Choisir un sujet --</option>
+                  <optgroup label="EP1 : Tour / Tartes / Goûters">
+                    <option value="EP1_S1">Sujet 1 : Croissants / Tarte aux Pommes / Sablés</option>
+                    <option value="EP1_S2">Sujet 2 : Pains Choc / Tarte Bourdaloue / Madeleines</option>
+                    <option value="EP1_S3">Sujet 3 : Brioches / Tarte Citron / Tuiles Amandes</option>
+                    <option value="EP1_S4">Sujet 4 : Pain au Lait / Flan / Cookies</option>
+                  </optgroup>
+                  <optgroup label="EP2 : Entremets / Petits Gâteaux">
+                    <option value="EP2_S1">Sujet 1 : Royal Choco / Éclairs Choco</option>
+                    <option value="EP2_S2">Sujet 2 : Fraisier / Religieuses Café</option>
+                    <option value="EP2_S3">Sujet 3 : Opéra / Paris-Brest</option>
+                    <option value="EP2_S4">Sujet 4 : Forêt Noire / Choux Craquelin</option>
+                  </optgroup>
+               </select>
             </div>
 
             <div id="examOrdonnancementOutput" style="margin-top: 2rem; display: none;">
@@ -3233,6 +3245,11 @@
       switchMgmtTab('protools');
     }
 
+    function showExam() {
+      showMgmt();
+      switchMgmtTab('exam');
+    }
+
     function switchMgmtTab(tab) {
       // 1. Reset all views and buttons
       const allViews = document.querySelectorAll('.mgmt-view');
@@ -3364,6 +3381,7 @@
           'navSuppliers': showSuppliers, 'mLinkSuppliers': showSuppliers,
           'navStats': showStats, 'mLinkStats': showStats,
           'navMgmt': showMgmt, 'mLinkMgmt': showMgmt,
+          'navExam': showExam,
           'navProTools': showProTools, 'mLinkProTools': showProTools,
           'navOmniSearch': () => { if (typeof showOmniSearch === 'function') showOmniSearch(); }
         };
@@ -3495,6 +3513,7 @@
         moreMenuTitle.textContent = "📈 Pilotage";
         items = [
           { id: 'mLinkMgmt', icon: '⚙️', label: 'nav.mgmt', action: showMgmt },
+          { id: 'mLinkExam', icon: '🎓', label: 'mgmt.tab.exam', action: showExam },
           { id: 'mLinkStats', icon: '📊', label: 'nav.stats', action: showStats },
           { id: 'mLinkInv', icon: '📦', label: 'nav.inventory', action: showInventaire }
         ];

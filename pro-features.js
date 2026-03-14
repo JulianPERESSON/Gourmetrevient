@@ -1,4 +1,4 @@
-﻿/*
+/*
   =====================================================================
   PRO-FEATURES.JS â€” GourmetRevient v4.0 Advanced Modules
   - Scanner OCR Factures (Tesseract.js)
@@ -898,38 +898,73 @@ let isExamRunning = false;
 let currentOrdonnancement = [];
 
 const CAP_DATABASE = {
-  EP1: {
+  EP1_S1: {
     totalDuration: 5.5 * 3600,
     tasks: [
-      { time: 0, duration: 30, title: "Accueil & Ordonnancement", desc: "Lecture du sujet, rédaction du plan de travail, calculs des pesées." },
-      { time: 30, duration: 20, title: "Pesées & Mise en place", desc: "Peser tous les ingrédients pour toutes les recettes. Préparer le poste." },
-      { time: 50, duration: 15, title: "Détrempe PLF / Feuilletage", desc: "Pétrissage court, boulage, mise au frais." },
-      { time: 65, duration: 15, title: "Pâte à Tarte / Pâte Brisée", desc: "Réalisation de la pâte, fraisage, mise au frais." },
-      { time: 80, duration: 20, title: "Gâteau de Voyage / Biscuit", desc: "Réalisation de l'appareil, cuisson." },
-      { time: 100, duration: 15, title: "PLF : Premier Tour", desc: "Enchâsser le beurre de tourage, donner 2 tours simples." },
-      { time: 115, duration: 20, title: "Fonçage des Tartes", desc: "Abaisser, foncer, chiqueter, mise au frais (repos avant cuisson)." },
-      { time: 135, duration: 15, title: "PLF : Deuxième Tour", desc: "Donner les tours restants, remise au frais." },
-      { time: 150, duration: 20, title: "Crème pâtissière / Garniture", desc: "Réalisation des crèmes de base pour tartes ou choux." },
-      { time: 170, duration: 30, title: "Façonnage PLF", desc: "Détaillage (croissants, pains choc), mise en étuve." },
-      { time: 200, duration: 40, title: "Cuisson Tartes & Goûters", desc: "Garnir les tartes, cuisson, lustrage." },
-      { time: 240, duration: 30, title: "Cuisson PLF & Dorure", desc: "Sortie de pousse, dorure, cuisson." },
-      { time: 270, duration: 45, title: "Finitions & Décors", desc: "Nappage, décors, mise en valeur sur plat." },
-      { time: 315, duration: 15, title: "Nettoyage & Présentation", desc: "Nettoyage final du poste, présentation au jury." }
+      { time: 0, duration: 30, title: "Épreuve Écrite (EP1)", desc: "Ordonnancement, technologie et calculs de pesées." },
+      { time: 30, duration: 25, title: "Pesées & Mise en place", desc: "Effectuer toutes les pesées (PFL, Pâte Brisée, Sablés, Compote)." },
+      { time: 55, duration: 15, title: "Détrempe PFL", desc: "Pétrissage court, boulage, mise au frais (0 à 4°C)." },
+      { time: 70, duration: 15, title: "Pâte Brisée / Fonçage Pomme", desc: "Réalisation de la pâte et fonçage." },
+      { time: 85, duration: 20, title: "Pâte à Sablés", desc: "Crémage, sablage, mise au frais." },
+      { time: 105, duration: 15, title: "PFL : Premier Tour", desc: "Tourage (1 tour simple + 1 tour double ou 2 simples)." },
+      { time: 120, duration: 20, title: "Préparation compote & fruits", desc: "Épluchage, tranchage des pommes pour la tarte." },
+      { time: 140, duration: 15, title: "PFL : Deuxième Tour", desc: "Finition du tourage, repos au frais." },
+      { time: 155, duration: 30, title: "Façonnage Sablés", desc: "Détaillage et mise sur plaque / cuisson." },
+      { time: 185, duration: 30, title: "Façonnage Croissants", desc: "Abaisser, détailler, rouler, mise en pousse." },
+      { time: 215, duration: 30, title: "Garnissage & Cuisson Tarte", desc: "Compote, pommes rangées, cuisson." },
+      { time: 245, duration: 25, title: "Cuisson Croissants", desc: "Dorer, cuisson à 180°C." },
+      { time: 270, duration: 45, title: "Lustrage & Finition", desc: "Nappage tarte, présentation." },
+      { time: 315, duration: 15, title: "Nettoyage final", desc: "Rendu du poste propre." }
     ]
   },
-  EP2: {
+  EP1_S2: {
     totalDuration: 5.5 * 3600,
     tasks: [
-      { time: 0, duration: 45, title: "Épreuve Écrite & Ordonnancement", desc: "Théorie, hygiène, gestion et planification." },
-      { time: 45, duration: 25, title: "Pesées & Préparation", desc: "Organisation générale et pesées." },
-      { time: 70, duration: 30, title: "Basics : Génoise / Biscuit Joconde", desc: "Réalisation, pochage, cuisson et refroidissement." },
-      { time: 100, duration: 40, title: "Entremets : Mousse & Montage", desc: "Préparation de la mousse, montage à l'envers/endroit, blocage froid." },
-      { time: 140, duration: 40, title: "Petits Gâteaux : Multi-bases", desc: "Préparation des éléments secondaires." },
-      { time: 180, duration: 30, title: "Réalisation du Fondant / Glaçage", desc: "Préparation de la finition miroir ou velours." },
-      { time: 210, duration: 30, title: "Décors Chocolat / Sucre", desc: "Réalisation des éléments de décorations personnalisés." },
-      { time: 240, duration: 30, title: "Glaçage Entremets", desc: "Sortie du froid, glaçage, transfert sur socle." },
-      { time: 270, duration: 40, title: "Finitions Petits Gâteaux", desc: "Montage final et décors." },
-      { time: 310, duration: 20, title: "Présentation Finale & Oral", desc: "Dressage, entretien avec le jury." }
+      { time: 0, duration: 30, title: "Accueil & Écrit", desc: "Ordonnancement pour Pains Choc / Bourdaloue / Madeleines." },
+      { time: 30, duration: 25, title: "Pesées", desc: "Peser ingrédients pour PFL, Pâte Sucrée, Mousseline, Madeleines." },
+      { time: 55, duration: 20, title: "Détrempe PFL & Sucrée", desc: "Réalisation des deux pâtes de base." },
+      { time: 75, duration: 20, title: "Appareil à Madeleines", desc: "Réaliser l'appareil (doit reposer au frais)." },
+      { time: 95, duration: 15, title: "PFL : Tourage 1", desc: "Premier tourage du pâton." },
+      { time: 110, duration: 20, title: "Fonçage Tarte Bourdaloue", desc: "Abaisser, foncer, préparer la crème d'amande." },
+      { time: 130, duration: 15, title: "PFL : Tourage 2", desc: "Dernier tourage, repos." },
+      { time: 145, duration: 40, title: "Cuisson Madeleines", desc: "Pochage et cuisson à 210°C puis 180°C." },
+      { time: 185, duration: 30, title: "Façonnage Pains au Chocolat", desc: "Détaillage, insertion bâtons, rouler, pousse." },
+      { time: 215, duration: 40, title: "Cuisson Bourdaloue", desc: "Poires, amandes effilées, cuisson." },
+      { time: 255, duration: 25, title: "Cuisson PFL", desc: "Dorer et cuire les pains au chocolat." },
+      { time: 280, duration: 35, title: "Finition & Présentation", desc: "Nappage, décors, nettoyage." }
+    ]
+  },
+  EP2_S1: {
+    totalDuration: 5.5 * 3600,
+    tasks: [
+      { time: 0, duration: 45, title: "Épreuve Écrite (EP2)", desc: "Gestion, hygiène et ordonnancement." },
+      { time: 45, duration: 20, title: "Pesées Générales", desc: "Royal Choco & Éclairs." },
+      { time: 65, duration: 30, title: "Fabrication Biscuit Succès", desc: "Monter les blancs, mélanger, pocher, cuire." },
+      { time: 95, duration: 15, title: "Panade Pâte à Choux", desc: "Cuisson de la panade sur feu." },
+      { time: 110, duration: 15, title: "Appareil Pâte à Choux", desc: "Incorporation œufs, pochage éclairs." },
+      { time: 125, duration: 40, title: "Cuisson Éclairs", desc: "Cuisson sans ouvrir la porte." },
+      { time: 165, duration: 30, title: "Réalisation Croustillant & Montage Royal", desc: "Étaler croustillant sur biscuit, mousse choco, montage." },
+      { time: 195, duration: 30, title: "Blocage froid Royal", desc: "Mise au congélateur." },
+      { time: 225, duration: 30, title: "Crème pâtissière Choco", desc: "Réaliser, refroidir, garnir les éclairs." },
+      { time: 255, duration: 30, title: "Glaçage Éclairs", desc: "Fondant chocolat à 37°C." },
+      { time: 285, duration: 30, title: "Décoration Royal", desc: "Poudrage, décors chocolat, transfert." },
+      { time: 315, duration: 15, title: "Nettoyage & Oral", desc: "Entretien final." }
+    ]
+  },
+  EP2_S2: {
+    totalDuration: 5.5 * 3600,
+    tasks: [
+      { time: 0, duration: 45, title: "Accueil & Écrit", desc: "Fraisier & Religieuses." },
+      { time: 45, duration: 20, title: "Pesées", desc: "Génoise, Mousseline, Choux, Crème Café." },
+      { time: 65, duration: 25, title: "Génoise", desc: "Bain-marie, montage, cuisson." },
+      { time: 90, duration: 30, title: "Pâte à Choux", desc: "Préparation et pochage gros/petits choux." },
+      { time: 120, duration: 35, title: "Cuisson Choux", desc: "Surveiller la cuisson." },
+      { time: 155, duration: 30, title: "Crème Mousseline (Partie 1)", desc: "Faire la pâtissière de base, refroidir." },
+      { time: 185, duration: 40, title: "Montage Fraisier", desc: "Chemiser fraises, biscuit imbibé, crème, blocage froide." },
+      { time: 225, duration: 30, title: "Garnissage Religieuses", desc: "Crème café et montage tête sur corps." },
+      { time: 255, duration: 30, title: "Glaçage & Collerette", desc: "Fondant café, crème beurre pour collerette." },
+      { time: 285, duration: 30, title: "Finition Fraisier", desc: "Pâte d'amande, décors." },
+      { time: 315, duration: 15, title: "Nettoyage", desc: "Fin de l'épreuve." }
     ]
   }
 };
@@ -953,7 +988,7 @@ function generateCapOrdonnancement(type) {
       <div class="exam-task-card">
         <div class="exam-task-title">
           <span>${task.title}</span>
-          <span class="exam-duration-badge">?? ${task.duration} min</span>
+          <span class="exam-duration-badge">⏱️ ${task.duration} min</span>
         </div>
         <div class="exam-task-desc">${task.desc}</div>
       </div>
@@ -1016,4 +1051,184 @@ function toggleExamTimer() {
     }, 1000);
   }
 }
+
+
+// ============================================================================
+// 9. CATALOGUE CAP 2026 (Seeding)
+// ============================================================================
+
+function seedCapToolkit() {
+  const capRecipes = [
+    {
+      name: "CAP : Croissants (PFL)",
+      category: "EP1 - Tourtage",
+      portions: 12,
+      prepTime: 180,
+      cookTime: 18,
+      ingredients: [
+        { name: "Farine T45", quantity: 500, unit: "g", pricePerUnit: 0.0013 },
+        { name: "Beurre de tourage (AOP)", quantity: 250, unit: "g", pricePerUnit: 0.0085 },
+        { name: "Lait entier", quantity: 150, unit: "ml", pricePerUnit: 0.0009 },
+        { name: "Sucre", quantity: 60, unit: "g", pricePerUnit: 0.001 },
+        { name: "Levure fraîche", quantity: 20, unit: "g", pricePerUnit: 0.012 },
+        { name: "Sel", quantity: 10, unit: "g", pricePerUnit: 0.001 }
+      ],
+      steps: ["Détrempe", "Pointage", "Tourage (3 tours simples)", "Détaillage (triangles 120g)", "Pousse (2h)", "Cuisson 180°C"],
+      isCap: true
+    },
+    {
+      name: "CAP : Brioche à Tête",
+      category: "EP1 - Tourtage",
+      portions: 10,
+      prepTime: 120,
+      cookTime: 20,
+      ingredients: [
+        { name: "Farine T45", quantity: 500, unit: "g", pricePerUnit: 0.0013 },
+        { name: "Œufs entiers", quantity: 300, unit: "g", pricePerUnit: 0.004 },
+        { name: "Beurre (pommade)", quantity: 250, unit: "g", pricePerUnit: 0.008 },
+        { name: "Sucre", quantity: 60, unit: "g", pricePerUnit: 0.001 },
+        { name: "Levure fraîche", quantity: 20, unit: "g", pricePerUnit: 0.012 },
+        { name: "Sel", quantity: 10, unit: "g", pricePerUnit: 0.001 }
+      ],
+      steps: ["Pétrissage", "Premier pointage (1h ambient)", "Deuxième pointage (froid)", "Division & Boulage", "Pousse (1h30 @ 28°C)", "Cuisson"],
+      isCap: true
+    },
+    {
+      name: "CAP : Tarte aux Pommes (Pâte Brisée)",
+      category: "EP1 - Tartes",
+      portions: 8,
+      prepTime: 60,
+      cookTime: 35,
+      ingredients: [
+        { name: "Farine T55", quantity: 250, unit: "g", pricePerUnit: 0.001 },
+        { name: "Beurre doux", quantity: 125, unit: "g", pricePerUnit: 0.008 },
+        { name: "Eau", quantity: 50, unit: "ml", pricePerUnit: 0.0001 },
+        { name: "Sel", quantity: 5, unit: "g", pricePerUnit: 0.001 },
+        { name: "Pommes Golden", quantity: 1000, unit: "g", pricePerUnit: 0.0025 },
+        { name: "Compote de pommes", quantity: 200, unit: "g", pricePerUnit: 0.004 }
+      ],
+      steps: ["Sablage farine/beurre", "Frasage avec eau/sel", "Abaissage & Fonçage", "Garnissage compote + pommes rangées", "Cuisson 180°C", "Nappage après cuisson"],
+      isCap: true
+    },
+    {
+      name: "CAP : Éclairs Chocolat (Pâte à Choux)",
+      category: "EP2 - Petits Gâteaux",
+      portions: 10,
+      prepTime: 90,
+      cookTime: 30,
+      ingredients: [
+        { name: "Eau/Lait", quantity: 250, unit: "ml", pricePerUnit: 0.0008 },
+        { name: "Beurre", quantity: 100, unit: "g", pricePerUnit: 0.008 },
+        { name: "Farine", quantity: 150, unit: "g", pricePerUnit: 0.001 },
+        { name: "Œufs", quantity: 4, unit: "pcs", pricePerUnit: 0.20 },
+        { name: "Crème pâtissière chocolat", quantity: 500, unit: "g", pricePerUnit: 0.005 },
+        { name: "Fondant chocolat", quantity: 200, unit: "g", pricePerUnit: 0.004 }
+      ],
+      steps: ["Mise en ébullition eau/lait/beurre/sel", "Dessèchement de la panade", "Incorporation des œufs", "Pochage (12cm)", "Cuisson", "Garnissage & Glaçage"],
+      isCap: true
+    },
+    {
+      name: "CAP : Royal Chocolat (Entremets)",
+      category: "EP2 - Entremets",
+      portions: 8,
+      prepTime: 120,
+      cookTime: 15,
+      ingredients: [
+        { name: "Biscuit Succès/Dacquoise amande", quantity: 200, unit: "g", pricePerUnit: 0.008 },
+        { name: "Croustillant praliné", quantity: 150, unit: "g", pricePerUnit: 0.012 },
+        { name: "Mousse au chocolat noir", quantity: 450, unit: "g", pricePerUnit: 0.009 }
+      ],
+      steps: ["Biscuit Dacquoise (cuisson)", "Étaler croustillant", "Réaliser mousse chocolat (pâte à bombe ou anglaise)", "Montage en cercle", "Blocage froid", "Poudrage cacao"],
+      isCap: true
+    },
+    {
+      name: "CAP : Fraisier (Crème Mousseline)",
+      category: "EP2 - Entremets",
+      portions: 8,
+      prepTime: 100,
+      cookTime: 20,
+      ingredients: [
+        { name: "Génoise", quantity: 300, unit: "g", pricePerUnit: 0.005 },
+        { name: "Crème mousseline vanille", quantity: 600, unit: "g", pricePerUnit: 0.007 },
+        { name: "Fraises fraîches", quantity: 500, unit: "g", pricePerUnit: 0.009 },
+        { name: "Pâte d'amandes", quantity: 100, unit: "g", pricePerUnit: 0.015 }
+      ],
+      steps: ["Réalisation génoise (bain-marie)", "Crème pâtissière -> Incorporation beurre (mousseline)", "Montage chemisé fraises", "Imbibage sirop kirsch", "Finition pâte d'amandes"],
+      isCap: true
+    }
+  ];
+
+  // Add more common CAP subjects...
+  const moreCap = [
+    { name: "CAP : Tarte au Citron Meringuée", category: "EP1 - Tartes", portions: 8, prepTime: 90, cookTime: 25 },
+    { name: "CAP : Flan Pâtissier", category: "EP1 - Goûters", portions: 8, prepTime: 40, cookTime: 50 },
+    { name: "CAP : Paris-Brest", category: "EP2 - Petits Gâteaux", portions: 8, prepTime: 120, cookTime: 35 },
+    { name: "CAP : Mille-Feuille", category: "EP2 - Entremets", portions: 8, prepTime: 180, cookTime: 30 },
+    { name: "CAP : Forêt Noire", category: "EP2 - Entremets", portions: 8, prepTime: 120, cookTime: 20 }
+  ];
+
+  // Merge (simulate real recipes for the missing ones)
+  moreCap.forEach(m => {
+     if (!capRecipes.find(r => r.name === m.name)) {
+        capRecipes.push({ ...m, ingredients: [{name: "Base Pâtissière", quantity:1000, unit:"g", pricePerUnit:0.005}], steps: ["Réalisation pas à pas"] });
+     }
+  });
+
+  // Inject into APP.savedRecipes
+  if (!APP.savedRecipes) APP.savedRecipes = [];
+  
+  let added = 0;
+  capRecipes.forEach(r => {
+    if (!APP.savedRecipes.find(existing => existing.name === r.name)) {
+      APP.savedRecipes.push({
+        ...r,
+        id: "cap_" + Math.random().toString(36).substr(2, 9),
+        savedAt: new Date().toISOString()
+      });
+      added++;
+    }
+  });
+
+  saveSavedRecipes();
+  if (typeof renderRecipeLibrary === "function") renderRecipeLibrary();
+  showToast(`${added} recettes CAP ajoutées à votre bibliothèque !`, "success");
+}
+
+
+// Extended CAP Subjects
+CAP_DATABASE.EP1_S3 = {
+  totalDuration: 5.5 * 3600,
+  tasks: [
+    { time: 0, duration: 40, title: "�crit & Ordonnancement", desc: "Brioche / Tarte Citron / Tuiles Amandes." },
+    { time: 40, duration: 20, title: "Pes�es", desc: "Tous les �l�ments." },
+    { time: 60, duration: 25, title: "P�trissage Brioche", desc: "Vitesse 1 puis 2 jusqu'au d�collement." },
+    { time: 85, duration: 20, title: "P�te Sucr�e (Tarte Citron)", desc: "Cr�mage, repos frais." },
+    { time: 105, duration: 20, title: "Appareil � Tuiles", desc: "M�lange blancs, sucre, amandes effil�es, beurre fondu." },
+    { time: 125, duration: 20, title: "Cr�meux Citron", desc: "Cuisson � 85�C, refroidissement." },
+    { time: 145, duration: 30, title: "Fon�age & Cuisson � blanc", desc: "Tarte citron." },
+    { time: 175, duration: 30, title: "Fa�onnage Brioche", desc: "Nanterre ou tress�e, mise en �tuve." },
+    { time: 205, duration: 30, title: "Cuisson Tuiles", desc: "Pochage fin et cuisson rapide." },
+    { time: 235, duration: 20, title: "Meringue Italienne", desc: "Sirop 118�C sur blancs." },
+    { time: 255, duration: 25, title: "Cuisson Brioche", desc: "Dorure et four." },
+    { time: 280, duration: 40, title: "Finition Tarte Citron", desc: "Garnissage cr�meux, pochage meringue, chalumeau." },
+    { time: 320, duration: 10, title: "Nettoyage final", desc: "Poste propre." }
+  ]
+};
+
+CAP_DATABASE.EP2_S3 = {
+  totalDuration: 5.5 * 3600,
+  tasks: [
+    { time: 0, duration: 45, title: "�preuve �crite", desc: "Op�ra & Paris-Brest." },
+    { time: 45, duration: 20, title: "Pes�es", desc: "Joconde, Ganache, Cr�me Beurre, Mousseline Pralin�." },
+    { time: 65, duration: 30, title: "Biscuit Joconde", desc: "Plaquage et cuisson 200�C." },
+    { time: 95, duration: 20, title: "P�te � Choux (Paris-Brest)", desc: "Pochage en couronne." },
+    { time: 115, duration: 40, title: "Cuisson Choux", desc: "Sur plaque." },
+    { time: 155, duration: 30, title: "Sirop Caf� & Ganache Choco", desc: "�l�ments de l'Op�ra." },
+    { time: 185, duration: 30, title: "Cr�me au Beurre Caf�", desc: "R�alisation p�te � bombe + beurre." },
+    { time: 215, duration: 40, title: "Montage Op�ra", desc: "Succession biscuits imbib�s et cr�mes." },
+    { time: 255, duration: 25, title: "Cr�me Mousseline Pralin�", desc: "Garnir les couronnes Paris-Brest." },
+    { time: 280, duration: 30, title: "Gla�age Op�ra", desc: "Gla�age chocolat noir et �criture." },
+    { time: 310, duration: 20, title: "Finition & Pr�sentation", desc: "Coupe des bords, sucre glace." }
+  ]
+};
 
