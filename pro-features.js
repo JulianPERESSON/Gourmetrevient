@@ -1,11 +1,11 @@
-/*
+﻿/*
   =====================================================================
-  PRO-FEATURES.JS — GourmetRevient v4.0 Advanced Modules
+  PRO-FEATURES.JS â€” GourmetRevient v4.0 Advanced Modules
   - Scanner OCR Factures (Tesseract.js)
-  - Étiquettes INCO Réglementaires
+  - Ã‰tiquettes INCO RÃ©glementaires
   - Calculateur de Foisonnement
   - Matrice de Boston (BCG)
-  - Simulation d'Inflation / Scénario Crise
+  - Simulation d'Inflation / ScÃ©nario Crise
   - Synchronisation Cloud (Supabase)
   - QR Code "Fiche Client"
   =====================================================================
@@ -36,7 +36,7 @@ function openOCRScanner() {
   const preview = document.getElementById('ocrPreview');
   const results = document.getElementById('ocrResults');
   const status = document.getElementById('ocrStatus');
-  if (preview) preview.innerHTML = '<div class="ocr-upload-zone" id="ocrUploadZone"><span class="ocr-upload-icon">📷</span><p>' + t('ocr.upload.hint') + '</p><input type="file" id="ocrFileInput" accept="image/*" capture="environment" style="display:none"></div>';
+  if (preview) preview.innerHTML = '<div class="ocr-upload-zone" id="ocrUploadZone"><span class="ocr-upload-icon">ðŸ“·</span><p>' + t('ocr.upload.hint') + '</p><input type="file" id="ocrFileInput" accept="image/*" capture="environment" style="display:none"></div>';
   if (results) results.innerHTML = '';
   if (status) { status.style.display = 'none'; status.textContent = ''; }
 
@@ -89,7 +89,7 @@ async function handleOCRFile(file) {
   } catch (err) {
     console.error('OCR Error:', err);
     if (status) {
-      status.innerHTML = '❌ ' + (t('ocr.error') || 'Erreur lors de l\'analyse. Réessayez avec une image plus nette.');
+      status.innerHTML = 'âŒ ' + (t('ocr.error') || 'Erreur lors de l\'analyse. RÃ©essayez avec une image plus nette.');
     }
   }
 }
@@ -100,8 +100,8 @@ function parseInvoiceText(text) {
 
   // Common patterns for French invoices:
   // Product name ... quantity ... unit price ... total
-  const priceRegex = /(\d+[.,]\d{2})\s*€?/g;
-  const qtyRegex = /(\d+[.,]?\d*)\s*(kg|g|L|ml|pce?s?|unit[ée]s?)/gi;
+  const priceRegex = /(\d+[.,]\d{2})\s*â‚¬?/g;
+  const qtyRegex = /(\d+[.,]?\d*)\s*(kg|g|L|ml|pce?s?|unit[Ã©e]s?)/gi;
 
   for (const line of lines) {
     const prices = [...line.matchAll(priceRegex)];
@@ -109,7 +109,7 @@ function parseInvoiceText(text) {
 
     if (prices.length > 0) {
       // Try to extract ingredient name (text before first number)
-      const nameMatch = line.match(/^([A-Za-zÀ-ÿ\s\-']+)/);
+      const nameMatch = line.match(/^([A-Za-zÃ€-Ã¿\s\-']+)/);
       const name = nameMatch ? nameMatch[1].trim() : '';
 
       if (name.length > 2) {
@@ -157,8 +157,8 @@ function renderOCRResults(items, rawText) {
   if (items.length === 0) {
     results.innerHTML = `
       <div class="ocr-no-results">
-        <span>🔍</span>
-        <p>${t('ocr.no_items') || 'Aucun article détecté. Texte brut extrait :'}</p>
+        <span>ðŸ”</span>
+        <p>${t('ocr.no_items') || 'Aucun article dÃ©tectÃ©. Texte brut extrait :'}</p>
         <pre class="ocr-raw-text">${escapeHtml(rawText)}</pre>
       </div>`;
     return;
@@ -166,27 +166,27 @@ function renderOCRResults(items, rawText) {
 
   results.innerHTML = `
     <div class="ocr-results-header">
-      <h4>📋 ${t('ocr.found') || 'Articles détectés'} (${items.length})</h4>
+      <h4>ðŸ“‹ ${t('ocr.found') || 'Articles dÃ©tectÃ©s'} (${items.length})</h4>
     </div>
     <div class="ocr-items-list">
       ${items.map((item, i) => `
         <div class="ocr-item ${item.matched ? 'matched' : ''}">
           <div class="ocr-item-info">
             <div class="ocr-item-name">${escapeHtml(item.name)}</div>
-            ${item.matched ? `<span class="ocr-match-badge">✅ ${item.dbName}</span>` : '<span class="ocr-no-match-badge">❓ Non reconnu</span>'}
+            ${item.matched ? `<span class="ocr-match-badge">âœ… ${item.dbName}</span>` : '<span class="ocr-no-match-badge">â“ Non reconnu</span>'}
             <div class="ocr-item-price">
-              ${item.unitPrice.toFixed(2)} €${item.unit ? '/' + item.unit : ''}
-              ${item.matched && item.oldPrice ? `<span class="ocr-old-price">(ancien: ${item.oldPrice.toFixed(2)} €)</span>` : ''}
+              ${item.unitPrice.toFixed(2)} â‚¬${item.unit ? '/' + item.unit : ''}
+              ${item.matched && item.oldPrice ? `<span class="ocr-old-price">(ancien: ${item.oldPrice.toFixed(2)} â‚¬)</span>` : ''}
             </div>
           </div>
           <div class="ocr-item-actions">
-            ${item.matched ? `<button class="btn btn-sm btn-primary" onclick="applyOCRPrice(${i})" data-items='${JSON.stringify(item).replace(/'/g, "&#39;")}'>${t('ocr.btn.apply') || 'Mettre à jour'}</button>` : ''}
+            ${item.matched ? `<button class="btn btn-sm btn-primary" onclick="applyOCRPrice(${i})" data-items='${JSON.stringify(item).replace(/'/g, "&#39;")}'>${t('ocr.btn.apply') || 'Mettre Ã  jour'}</button>` : ''}
           </div>
         </div>
       `).join('')}
     </div>
     <div class="ocr-actions-bar">
-      <button class="btn btn-primary btn-full" onclick="applyAllOCRPrices()">${t('ocr.btn.apply_all') || '✅ Appliquer toutes les mises à jour'}</button>
+      <button class="btn btn-primary btn-full" onclick="applyAllOCRPrices()">${t('ocr.btn.apply_all') || 'âœ… Appliquer toutes les mises Ã  jour'}</button>
     </div>`;
 
   // Store items for later use
@@ -202,7 +202,7 @@ function applyOCRPrice(idx) {
   if (dbItem) {
     dbItem.pricePerUnit = item.unitPrice;
     saveIngredientDb();
-    showToast(`${item.dbName}: ${item.oldPrice?.toFixed(2)}€ → ${item.unitPrice.toFixed(2)}€`, 'success');
+    showToast(`${item.dbName}: ${item.oldPrice?.toFixed(2)}â‚¬ â†’ ${item.unitPrice.toFixed(2)}â‚¬`, 'success');
 
     // Update visual
     const el = document.querySelectorAll('.ocr-item')[idx];
@@ -227,13 +227,13 @@ function applyAllOCRPrices() {
     }
   });
   saveIngredientDb();
-  showToast(`${count} ${t('ocr.updated') || 'prix mis à jour depuis la facture'}`, 'success');
+  showToast(`${count} ${t('ocr.updated') || 'prix mis Ã  jour depuis la facture'}`, 'success');
   closeOCRScanner();
 }
 
 
 // ============================================================================
-// 2. GÉNÉRATEUR D'ÉTIQUETTES INCO
+// 2. GÃ‰NÃ‰RATEUR D'Ã‰TIQUETTES INCO
 // ============================================================================
 
 function openINCoGenerator() {
@@ -251,7 +251,7 @@ function populateINCoRecipeSelect() {
   const select = document.getElementById('incoRecipeSelect');
   if (!select) return;
   const recipes = APP.savedRecipes || [];
-  select.innerHTML = '<option value="">' + (t('inco.select') || '— Sélectionner une recette —') + '</option>' +
+  select.innerHTML = '<option value="">' + (t('inco.select') || 'â€” SÃ©lectionner une recette â€”') + '</option>' +
     recipes.map((r, i) => `<option value="${i}">${escapeHtml(r.name)}</option>`).join('');
 }
 
@@ -296,7 +296,7 @@ function generateINCOLabel() {
   // 4. Allergen list
   const allergenList = allergenSet.size > 0
     ? Array.from(allergenSet).map(a => `<strong>${a}</strong>`).join(', ')
-    : (t('inco.no_allergens') || 'Aucun allergène déclaré');
+    : (t('inco.no_allergens') || 'Aucun allergÃ¨ne dÃ©clarÃ©');
 
   // 5. Compute costs for price
   const costs = calcFullCost(recipe.margin || 70, recipe);
@@ -314,18 +314,18 @@ function generateINCOLabel() {
     <div class="inco-label" id="incoLabelContent">
       <div class="inco-label-name">${escapeHtml(recipe.name)}</div>
       <div class="inco-label-section">
-        <div class="inco-label-title">${t('inco.ingredients_list') || 'Ingrédients :'}</div>
+        <div class="inco-label-title">${t('inco.ingredients_list') || 'IngrÃ©dients :'}</div>
         <div class="inco-label-text">${ingredientList}</div>
       </div>
       <div class="inco-label-section">
-        <div class="inco-label-title">${t('inco.allergens') || 'Allergènes :'}</div>
+        <div class="inco-label-title">${t('inco.allergens') || 'AllergÃ¨nes :'}</div>
         <div class="inco-label-text inco-allergens">${allergenList}</div>
       </div>
       <div class="inco-label-footer">
         <span>${t('inco.net_weight') || 'Poids net'} : ~${netWeightPerPortion}g</span>
-        <span>${t('inco.price') || 'PVC'} : ${price.toFixed(2)} €</span>
+        <span>${t('inco.price') || 'PVC'} : ${price.toFixed(2)} â‚¬</span>
       </div>
-      <div class="inco-label-legal">${t('inco.storage') || 'Conserver au frais entre 2°C et 6°C. À consommer dans les 48h.'}</div>
+      <div class="inco-label-legal">${t('inco.storage') || 'Conserver au frais entre 2Â°C et 6Â°C. Ã€ consommer dans les 48h.'}</div>
     </div>`;
 }
 
@@ -335,14 +335,14 @@ function convertToGrams(ing) {
   if (unit === 'kg') return qty * 1000;
   if (unit === 'l') return qty * 1000;
   if (unit === 'ml') return qty;
-  if (unit === 'pièce' || unit === 'pcs' || unit === 'pce') return qty * 50; // avg weight
+  if (unit === 'piÃ¨ce' || unit === 'pcs' || unit === 'pce') return qty * 50; // avg weight
   return qty; // g
 }
 
 function exportINCOPdf() {
   const el = document.getElementById('incoLabelContent');
   if (!el || typeof html2pdf === 'undefined') {
-    showToast(t('toast.pdf.error') || 'html2pdf non chargé', 'error');
+    showToast(t('toast.pdf.error') || 'html2pdf non chargÃ©', 'error');
     return;
   }
   html2pdf().set({
@@ -356,7 +356,7 @@ function exportINCOPdf() {
       orientation: 'landscape'
     }
   }).from(el).save().then(() => {
-    showToast(t('inco.exported') || 'Étiquette INCO exportée !', 'success');
+    showToast(t('inco.exported') || 'Ã‰tiquette INCO exportÃ©e !', 'success');
   });
 }
 
@@ -396,10 +396,10 @@ function calcFoisonnement() {
   const gainVolume = (after - before).toFixed(0);
 
   let qualityLabel, qualityClass;
-  if (coeff < 50) { qualityLabel = t('fois.dense') || 'Dense — Crème épaisse, ganache'; qualityClass = 'fois-dense'; }
-  else if (coeff < 100) { qualityLabel = t('fois.medium') || 'Moyen — Mousse chocolat, bavaroise'; qualityClass = 'fois-medium'; }
-  else if (coeff < 200) { qualityLabel = t('fois.light') || 'Aéré — Mousse aux fruits, chantilly'; qualityClass = 'fois-light'; }
-  else { qualityLabel = t('fois.ultra') || 'Ultra-aéré — Chantilly très montée, espuma'; qualityClass = 'fois-ultra'; }
+  if (coeff < 50) { qualityLabel = t('fois.dense') || 'Dense â€” CrÃ¨me Ã©paisse, ganache'; qualityClass = 'fois-dense'; }
+  else if (coeff < 100) { qualityLabel = t('fois.medium') || 'Moyen â€” Mousse chocolat, bavaroise'; qualityClass = 'fois-medium'; }
+  else if (coeff < 200) { qualityLabel = t('fois.light') || 'AÃ©rÃ© â€” Mousse aux fruits, chantilly'; qualityClass = 'fois-light'; }
+  else { qualityLabel = t('fois.ultra') || 'Ultra-aÃ©rÃ© â€” Chantilly trÃ¨s montÃ©e, espuma'; qualityClass = 'fois-ultra'; }
 
   result.innerHTML = `
     <div class="fois-results-grid">
@@ -408,7 +408,7 @@ function calcFoisonnement() {
         <div class="fois-kpi-label">${t('fois.coefficient') || 'Coefficient de foisonnement'}</div>
       </div>
       <div class="fois-kpi">
-        <div class="fois-kpi-val">×${multiplier}</div>
+        <div class="fois-kpi-val">Ã—${multiplier}</div>
         <div class="fois-kpi-label">${t('fois.multiplier') || 'Multiplicateur de volume'}</div>
       </div>
       <div class="fois-kpi">
@@ -417,17 +417,17 @@ function calcFoisonnement() {
       </div>
     </div>
     <div class="fois-quality ${qualityClass}">
-      <span class="fois-quality-icon">💨</span>
+      <span class="fois-quality-icon">ðŸ’¨</span>
       <span>${qualityLabel}</span>
     </div>
     <div class="fois-tip">
-      💡 ${t('fois.tip') || 'Le foisonnement affecte le rendement final. Ajustez la quantité de votre appareil en conséquence.'}
+      ðŸ’¡ ${t('fois.tip') || 'Le foisonnement affecte le rendement final. Ajustez la quantitÃ© de votre appareil en consÃ©quence.'}
     </div>`;
 }
 
 
 // ============================================================================
-// 4. MATRICE DE BOSTON (BCG) — ANALYSE DE MIX-PRODUIT
+// 4. MATRICE DE BOSTON (BCG) â€” ANALYSE DE MIX-PRODUIT
 // ============================================================================
 
 let bcgChartInstance = null;
@@ -473,10 +473,10 @@ function renderBCGMatrix() {
   };
 
   const labels = {
-    star: t('bcg.star') || '⭐ Stars',
-    cash_cow: t('bcg.cash_cow') || '🐄 Vaches à Lait',
-    question: t('bcg.question') || '❓ Dilemmes',
-    dead_weight: t('bcg.dead_weight') || '💀 Poids Morts'
+    star: t('bcg.star') || 'â­ Stars',
+    cash_cow: t('bcg.cash_cow') || 'ðŸ„ Vaches Ã  Lait',
+    question: t('bcg.question') || 'â“ Dilemmes',
+    dead_weight: t('bcg.dead_weight') || 'ðŸ’€ Poids Morts'
   };
 
   // Destroy previous chart
@@ -513,11 +513,11 @@ function renderBCGMatrix() {
       },
       scales: {
         x: {
-          title: { display: true, text: t('bcg.axis.popularity') || 'Popularité →', font: { weight: '700' } },
+          title: { display: true, text: t('bcg.axis.popularity') || 'PopularitÃ© â†’', font: { weight: '700' } },
           grid: { color: 'rgba(0,0,0,0.05)' }
         },
         y: {
-          title: { display: true, text: t('bcg.axis.margin') || 'Rentabilité (%) →', font: { weight: '700' } },
+          title: { display: true, text: t('bcg.axis.margin') || 'RentabilitÃ© (%) â†’', font: { weight: '700' } },
           grid: { color: 'rgba(0,0,0,0.05)' }
         }
       }
@@ -526,11 +526,11 @@ function renderBCGMatrix() {
 
   // Legend with recommendations
   legendContainer.innerHTML = metrics.map(m => {
-    const icon = m.quadrant === 'star' ? '⭐' : m.quadrant === 'cash_cow' ? '🐄' : m.quadrant === 'question' ? '❓' : '💀';
+    const icon = m.quadrant === 'star' ? 'â­' : m.quadrant === 'cash_cow' ? 'ðŸ„' : m.quadrant === 'question' ? 'â“' : 'ðŸ’€';
     let action = '';
     if (m.quadrant === 'star') action = t('bcg.action.star') || 'Maintenir et promouvoir';
-    else if (m.quadrant === 'cash_cow') action = t('bcg.action.cash_cow') || 'Optimiser les coûts';
-    else if (m.quadrant === 'question') action = t('bcg.action.question') || 'Augmenter le prix ou réduire les coûts';
+    else if (m.quadrant === 'cash_cow') action = t('bcg.action.cash_cow') || 'Optimiser les coÃ»ts';
+    else if (m.quadrant === 'question') action = t('bcg.action.question') || 'Augmenter le prix ou rÃ©duire les coÃ»ts';
     else action = t('bcg.action.dead_weight') || 'Retirer ou transformer la recette';
 
     return `
@@ -539,14 +539,14 @@ function renderBCGMatrix() {
           <span>${icon} ${escapeHtml(m.name)}</span>
           <span class="bcg-item-margin" style="color:${colors[m.quadrant]};">${m.margin.toFixed(1)}%</span>
         </div>
-        <div class="bcg-item-action">💡 ${action}</div>
+        <div class="bcg-item-action">ðŸ’¡ ${action}</div>
       </div>`;
   }).join('');
 }
 
 
 // ============================================================================
-// 5. SIMULATION D'INFLATION / SCÉNARIO CRISE
+// 5. SIMULATION D'INFLATION / SCÃ‰NARIO CRISE
 // ============================================================================
 
 function renderInflationSimulation() {
@@ -560,7 +560,7 @@ function renderInflationSimulation() {
 
   const recipes = APP.savedRecipes || [];
   if (recipes.length === 0) {
-    container.innerHTML = `<p style="text-align:center; color:var(--text-muted);">${t('inflation.no_data') || 'Aucune recette à simuler.'}</p>`;
+    container.innerHTML = `<p style="text-align:center; color:var(--text-muted);">${t('inflation.no_data') || 'Aucune recette Ã  simuler.'}</p>`;
     return;
   }
 
@@ -631,9 +631,9 @@ function renderInflationSimulation() {
               <td style="color:${r.isCritical ? '#ef4444' : r.isDeficit ? '#f59e0b' : '#10b981'}; font-weight:800;">${r.newMargin.toFixed(1)}%</td>
               <td style="color:#ef4444;">-${r.marginDrop.toFixed(1)}%</td>
               <td>
-                ${r.isCritical ? '<span class="badge-crisis">🚨 ' + (t('inflation.status.critical') || 'CRITIQUE') + '</span>'
-                  : r.isDeficit ? '<span class="badge-warn">⚠️ ' + (t('inflation.status.warning') || 'ALERTE') + '</span>'
-                  : '<span class="badge-ok">✅ ' + (t('inflation.status.ok') || 'OK') + '</span>'}
+                ${r.isCritical ? '<span class="badge-crisis">ðŸš¨ ' + (t('inflation.status.critical') || 'CRITIQUE') + '</span>'
+                  : r.isDeficit ? '<span class="badge-warn">âš ï¸ ' + (t('inflation.status.warning') || 'ALERTE') + '</span>'
+                  : '<span class="badge-ok">âœ… ' + (t('inflation.status.ok') || 'OK') + '</span>'}
               </td>
             </tr>
           `).join('')}
@@ -675,9 +675,9 @@ function updateCloudStatus() {
 
   if (statusEl) {
     if (saved.url && saved.key) {
-      statusEl.innerHTML = `<span class="cloud-status-dot connected"></span> ${t('cloud.connected') || 'Connecté à Supabase'}`;
+      statusEl.innerHTML = `<span class="cloud-status-dot connected"></span> ${t('cloud.connected') || 'ConnectÃ© Ã  Supabase'}`;
     } else {
-      statusEl.innerHTML = `<span class="cloud-status-dot disconnected"></span> ${t('cloud.disconnected') || 'Non configuré'}`;
+      statusEl.innerHTML = `<span class="cloud-status-dot disconnected"></span> ${t('cloud.disconnected') || 'Non configurÃ©'}`;
     }
   }
 }
@@ -695,7 +695,7 @@ async function saveCloudConfig() {
   SUPABASE_CONFIG.url = url;
   SUPABASE_CONFIG.key = key;
   updateCloudStatus();
-  showToast(t('cloud.saved') || 'Configuration cloud enregistrée !', 'success');
+  showToast(t('cloud.saved') || 'Configuration cloud enregistrÃ©e !', 'success');
 }
 
 async function syncToCloud() {
@@ -733,7 +733,7 @@ async function syncToCloud() {
 
     if (response.ok) {
       localStorage.setItem('gourmet_last_sync', new Date().toISOString());
-      showToast(t('cloud.sync_success') || 'Données synchronisées avec le cloud !', 'success');
+      showToast(t('cloud.sync_success') || 'DonnÃ©es synchronisÃ©es avec le cloud !', 'success');
     } else {
       throw new Error(`HTTP ${response.status}`);
     }
@@ -744,7 +744,7 @@ async function syncToCloud() {
 
   if (syncBtn) {
     syncBtn.disabled = false;
-    syncBtn.innerHTML = '☁️ ' + (t('cloud.btn.sync') || 'Synchroniser maintenant');
+    syncBtn.innerHTML = 'â˜ï¸ ' + (t('cloud.btn.sync') || 'Synchroniser maintenant');
   }
 }
 
@@ -773,7 +773,7 @@ async function syncFromCloud() {
           APP.ingredientDb = JSON.parse(record.ingredientDb);
           saveIngredientDb();
         }
-        showToast(t('cloud.restored') || 'Données restaurées depuis le cloud !', 'success');
+        showToast(t('cloud.restored') || 'DonnÃ©es restaurÃ©es depuis le cloud !', 'success');
       }
     }
   } catch (err) {
@@ -817,17 +817,17 @@ function generateClientQR(recipeIdx) {
     category: recipe.category || '',
     allergens: Array.from(allergenSet),
     ingredients: ingredientList,
-    price: costs.sellingPrice?.toFixed(2) || '—'
+    price: costs.sellingPrice?.toFixed(2) || 'â€”'
   };
 
   // Render card
   document.getElementById('clientQRRecipeName').textContent = recipe.name;
-  document.getElementById('clientQRPrice').textContent = costs.sellingPrice?.toFixed(2) + ' €';
+  document.getElementById('clientQRPrice').textContent = costs.sellingPrice?.toFixed(2) + ' â‚¬';
   document.getElementById('clientQRDescription').textContent = recipe.description || '';
   document.getElementById('clientQRIngredients').innerHTML = ingredientList;
   document.getElementById('clientQRAllergens').innerHTML = clientData.allergens.length > 0
     ? clientData.allergens.map(a => `<strong>${a}</strong>`).join(', ')
-    : (t('inco.no_allergens') || 'Aucun allergène déclaré');
+    : (t('inco.no_allergens') || 'Aucun allergÃ¨ne dÃ©clarÃ©');
 
   // Generate QR Code
   const qrBox = document.getElementById('clientQRCode');
@@ -859,7 +859,7 @@ function closeClientQR() {
 function exportClientQRPdf() {
   const el = document.getElementById('clientQRContent');
   if (!el || typeof html2pdf === 'undefined') {
-    showToast(t('toast.pdf.error') || 'html2pdf non chargé', 'error');
+    showToast(t('toast.pdf.error') || 'html2pdf non chargÃ©', 'error');
     return;
   }
   html2pdf().set({
@@ -873,7 +873,7 @@ function exportClientQRPdf() {
 
 
 // ============================================================================
-// INIT — Register new nav items and modules
+// INIT â€” Register new nav items and modules
 // ============================================================================
 
 // Initialize all pro features when DOM is ready
@@ -887,3 +887,133 @@ document.addEventListener('DOMContentLoaded', function() {
     inflSlider.addEventListener('input', renderInflationSimulation);
   }
 });
+
+// ============================================================================
+// 8. SIMULATEUR ORDONNANCEMENT CAP 2026
+// ============================================================================
+
+let examTimerInterval = null;
+let examSecondsRemaining = 0;
+let isExamRunning = false;
+let currentOrdonnancement = [];
+
+const CAP_DATABASE = {
+  EP1: {
+    totalDuration: 5.5 * 3600,
+    tasks: [
+      { time: 0, duration: 30, title: "Accueil & Ordonnancement", desc: "Lecture du sujet, rédaction du plan de travail, calculs des pesées." },
+      { time: 30, duration: 20, title: "Pesées & Mise en place", desc: "Peser tous les ingrédients pour toutes les recettes. Préparer le poste." },
+      { time: 50, duration: 15, title: "Détrempe PLF / Feuilletage", desc: "Pétrissage court, boulage, mise au frais." },
+      { time: 65, duration: 15, title: "Pâte à Tarte / Pâte Brisée", desc: "Réalisation de la pâte, fraisage, mise au frais." },
+      { time: 80, duration: 20, title: "Gâteau de Voyage / Biscuit", desc: "Réalisation de l'appareil, cuisson." },
+      { time: 100, duration: 15, title: "PLF : Premier Tour", desc: "Enchâsser le beurre de tourage, donner 2 tours simples." },
+      { time: 115, duration: 20, title: "Fonçage des Tartes", desc: "Abaisser, foncer, chiqueter, mise au frais (repos avant cuisson)." },
+      { time: 135, duration: 15, title: "PLF : Deuxième Tour", desc: "Donner les tours restants, remise au frais." },
+      { time: 150, duration: 20, title: "Crème pâtissière / Garniture", desc: "Réalisation des crèmes de base pour tartes ou choux." },
+      { time: 170, duration: 30, title: "Façonnage PLF", desc: "Détaillage (croissants, pains choc), mise en étuve." },
+      { time: 200, duration: 40, title: "Cuisson Tartes & Goûters", desc: "Garnir les tartes, cuisson, lustrage." },
+      { time: 240, duration: 30, title: "Cuisson PLF & Dorure", desc: "Sortie de pousse, dorure, cuisson." },
+      { time: 270, duration: 45, title: "Finitions & Décors", desc: "Nappage, décors, mise en valeur sur plat." },
+      { time: 315, duration: 15, title: "Nettoyage & Présentation", desc: "Nettoyage final du poste, présentation au jury." }
+    ]
+  },
+  EP2: {
+    totalDuration: 5.5 * 3600,
+    tasks: [
+      { time: 0, duration: 45, title: "Épreuve Écrite & Ordonnancement", desc: "Théorie, hygiène, gestion et planification." },
+      { time: 45, duration: 25, title: "Pesées & Préparation", desc: "Organisation générale et pesées." },
+      { time: 70, duration: 30, title: "Basics : Génoise / Biscuit Joconde", desc: "Réalisation, pochage, cuisson et refroidissement." },
+      { time: 100, duration: 40, title: "Entremets : Mousse & Montage", desc: "Préparation de la mousse, montage à l'envers/endroit, blocage froid." },
+      { time: 140, duration: 40, title: "Petits Gâteaux : Multi-bases", desc: "Préparation des éléments secondaires." },
+      { time: 180, duration: 30, title: "Réalisation du Fondant / Glaçage", desc: "Préparation de la finition miroir ou velours." },
+      { time: 210, duration: 30, title: "Décors Chocolat / Sucre", desc: "Réalisation des éléments de décorations personnalisés." },
+      { time: 240, duration: 30, title: "Glaçage Entremets", desc: "Sortie du froid, glaçage, transfert sur socle." },
+      { time: 270, duration: 40, title: "Finitions Petits Gâteaux", desc: "Montage final et décors." },
+      { time: 310, duration: 20, title: "Présentation Finale & Oral", desc: "Dressage, entretien avec le jury." }
+    ]
+  }
+};
+
+function generateCapOrdonnancement(type) {
+  const data = CAP_DATABASE[type];
+  if (!data) return;
+
+  currentOrdonnancement = data.tasks;
+  examSecondsRemaining = data.totalDuration;
+
+  document.getElementById("examOrdonnancementOutput").style.display = "block";
+  document.getElementById("examSubjectBadge").textContent = type;
+  updateExamTimerDisplay();
+
+  const grid = document.getElementById("examTimelineGrid");
+  grid.innerHTML = currentOrdonnancement.map((task, i) => `
+    <div class="exam-task-row" id="examTask_${i}">
+      <div class="exam-task-dot"></div>
+      <div class="exam-task-time">T+${task.time}'</div>
+      <div class="exam-task-card">
+        <div class="exam-task-title">
+          <span>${task.title}</span>
+          <span class="exam-duration-badge">?? ${task.duration} min</span>
+        </div>
+        <div class="exam-task-desc">${task.desc}</div>
+      </div>
+    </div>
+  `).join("");
+
+  // Sync translation for new elements if needed
+  if (typeof i18n !== "undefined") i18n.translatePage();
+}
+
+function updateExamTimerDisplay() {
+  const h = Math.floor(examSecondsRemaining / 3600);
+  const m = Math.floor((examSecondsRemaining % 3600) / 60);
+  const s = examSecondsRemaining % 60;
+  
+  const display = document.getElementById("examTimerDisplay");
+  if (display) {
+    display.textContent = `${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
+  }
+
+  // Update active task based on elapsed time
+  const elapsedMinutes = (CAP_DATABASE[document.getElementById("examSubjectBadge").textContent].totalDuration - examSecondsRemaining) / 60;
+  
+  currentOrdonnancement.forEach((task, i) => {
+    const el = document.getElementById(`examTask_${i}`);
+    if (!el) return;
+    
+    if (elapsedMinutes >= task.time && elapsedMinutes < (task.time + task.duration)) {
+      el.classList.add("active");
+      el.classList.remove("done");
+    } else if (elapsedMinutes >= (task.time + task.duration)) {
+      el.classList.add("done");
+      el.classList.remove("active");
+    } else {
+      el.classList.remove("active", "done");
+    }
+  });
+}
+
+function toggleExamTimer() {
+  const btn = document.getElementById("btnStartExam");
+  if (isExamRunning) {
+    clearInterval(examTimerInterval);
+    isExamRunning = false;
+    btn.textContent = t("exam.btn.start") || "Démarrer";
+    btn.classList.replace("btn-danger", "btn-primary");
+  } else {
+    isExamRunning = true;
+    btn.textContent = "⏸️ Pause";
+    btn.classList.replace("btn-primary", "btn-danger");
+    
+    examTimerInterval = setInterval(() => {
+      if (examSecondsRemaining > 0) {
+        examSecondsRemaining--;
+        updateExamTimerDisplay();
+      } else {
+        clearInterval(examTimerInterval);
+        showToast("Épreuve terminée !", "info");
+      }
+    }, 1000);
+  }
+}
+

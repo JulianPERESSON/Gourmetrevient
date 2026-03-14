@@ -620,6 +620,10 @@
             <span class="tab-pill-emoji">📅</span>
             <span data-i18n="mgmt.tab.production">Planning Prod.</span>
           </button>
+          <button class="mgmt-tab-pill" id="mgmtTabExam" onclick="switchMgmtTab('exam')">
+            <span class="tab-pill-emoji">🎓</span>
+            <span data-i18n="mgmt.tab.exam">Simulateur CAP</span>
+          </button>
           <button class="mgmt-tab-pill" id="mgmtTabQuality" onclick="switchMgmtTab('quality')">
             <span class="tab-pill-emoji">📉</span>
             <span data-i18n="mgmt.tab.quality">Qualité & Pertes</span>
@@ -706,6 +710,22 @@
                   <button class="btn btn-sm btn-outline btn-full" onclick="switchMgmtTab('dashboard_config')" style="margin-top: 1rem;">⚙️ Configurer mes charges fixes</button>
                 </div>
               </div>
+            </div>
+          </div>
+
+          <!-- Section: CAP Prep (Featured for User) -->
+          <div class="mgmt-glass-card" style="margin-bottom: 2rem; border-left: 5px solid var(--purple);">
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: 1.5rem;">
+              <div style="display: flex; align-items: center; gap: 20px;">
+                <div style="font-size: 3rem;">🎓</div>
+                <div>
+                  <h3 style="margin:0;" data-i18n="exam.title">Préparation CAP 2026</h3>
+                  <p style="margin:0; color:var(--text-muted);">Préparez vos épreuves EP1 & EP2 avec l'ordonnancement intelligent.</p>
+                </div>
+              </div>
+              <button class="btn btn-primary" onclick="switchMgmtTab('exam')" style="border-radius:25px; padding: 10px 25px;">
+                Accéder au Simulateur →
+              </button>
             </div>
           </div>
         </div>
@@ -1009,6 +1029,45 @@
               <button class="btn btn-sm btn-primary" onclick="addProductionItem()" data-i18n="mgmt.production.add">✚ Ajouter</button>
             </div>
             <div id="productionPlanGrid">
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 7: CAP EXAM SIMULATOR -->
+        <div id="mgmtViewExam" class="mgmt-view" style="display:none;">
+          <div class="mgmt-glass-card" style="margin-bottom: 2rem;">
+            <div class="mgmt-card-header header-centered">
+              <div class="mgmt-card-title">
+                <div class="title-icon icon-purple">🎓</div>
+                <div>
+                  <h3 data-i18n="exam.title">Ordonnancement CAP 2026</h3>
+                  <p data-i18n="exam.intro">Sélectionnez votre épreuve pour générer un plan de travail optimisé.</p>
+                </div>
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; padding: 1rem 0;">
+              <button class="btn btn-outline" style="height: 120px; flex-direction: column; gap: 0.5rem;" onclick="generateCapOrdonnancement('EP1')">
+                <span style="font-size: 2rem;">🥖</span>
+                <span data-i18n="exam.ep1">EP1 : Tourtage, Tartes, Goûters</span>
+              </button>
+              <button class="btn btn-outline" style="height: 120px; flex-direction: column; gap: 0.5rem;" onclick="generateCapOrdonnancement('EP2')">
+                <span style="font-size: 2rem;">🍰</span>
+                <span data-i18n="exam.ep2">EP2 : Entremets & Petits Gâteaux</span>
+              </button>
+            </div>
+
+            <div id="examOrdonnancementOutput" style="margin-top: 2rem; display: none;">
+               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--surface-border);">
+                  <div style="display: flex; gap: 1rem; align-items: center;">
+                    <span id="examSubjectBadge" class="badge-pill" style="background: var(--primary); color: white; padding: 5px 15px; border-radius: 20px; font-weight: 700;">EP1</span>
+                    <h4 id="examTimerDisplay" style="margin:0; font-family: 'Courier New', monospace; font-size: 1.5rem;">05:30:00</h4>
+                  </div>
+                  <button class="btn btn-primary" onclick="toggleExamTimer()" id="btnStartExam" data-i18n="exam.btn.start">Démarrer le chrono</button>
+               </div>
+               <div id="examTimelineGrid" class="exam-timeline-grid">
+                  <!-- Generated Tasks -->
+               </div>
             </div>
           </div>
         </div>
@@ -3208,6 +3267,10 @@
         document.getElementById('mgmtTabAnalysis').classList.add('active');
         if (typeof renderBCGMatrix === 'function') renderBCGMatrix();
         if (typeof renderInflationSimulation === 'function') renderInflationSimulation();
+      }
+      else if (tab === 'exam') {
+        document.getElementById('mgmtViewExam').style.display = 'block';
+        document.getElementById('mgmtTabExam').classList.add('active');
       }
       else if (tab === 'protools') {
         document.getElementById('mgmtViewProTools').style.display = 'block';

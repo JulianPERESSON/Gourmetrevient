@@ -9341,4 +9341,101 @@ select.form-input {
 .mgmt-card-title .title-icon.icon-red {
   background: rgba(239, 68, 68, 0.1);
 }
-
+
+/* CAP Exam Simulator Timeline */
+.exam-timeline-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  position: relative;
+  padding-left: 20px;
+  margin-top: 2rem;
+}
+
+.exam-timeline-grid::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--surface-border);
+}
+
+.exam-task-row {
+  display: flex;
+  gap: 15px;
+  align-items: flex-start;
+  position: relative;
+}
+
+.exam-task-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--text-muted);
+  border: 2px solid var(--surface);
+  position: absolute;
+  left: -26px;
+  top: 6px;
+  z-index: 2;
+  transition: var(--transition);
+}
+
+.exam-task-row.active .exam-task-dot {
+  background: var(--primary);
+  transform: scale(1.3);
+  box-shadow: 0 0 0 4px var(--primary-light);
+}
+
+.exam-task-row.done .exam-task-dot {
+  background: var(--success);
+}
+
+.exam-task-time {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  color: var(--primary);
+  min-width: 60px;
+  font-size: 0.9rem;
+}
+
+.exam-task-card {
+  flex: 1;
+  background: var(--bg-alt);
+  padding: 1rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--surface-border);
+  transition: var(--transition);
+}
+
+.exam-task-row.active .exam-task-card {
+  background: var(--surface);
+  border-color: var(--primary);
+  box-shadow: var(--shadow-sm);
+}
+
+.exam-task-row.done .exam-task-card {
+  opacity: 0.6;
+  filter: grayscale(0.5);
+}
+
+.exam-task-title {
+  font-weight: 600;
+  margin-bottom: 4px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.exam-task-desc {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.exam-duration-badge {
+  font-size: 0.75rem;
+  background: rgba(0,0,0,0.05);
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
