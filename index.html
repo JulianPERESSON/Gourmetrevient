@@ -188,7 +188,7 @@
         <button class="nav-dropdown-trigger"><span data-i18n="nav.category.mgmt">📈 Pilotage</span> <span class="nav-arrow">▼</span></button>
         <div class="nav-dropdown-content">
           <button class="nav-link nav-dropdown-link" id="navMgmt" style="font-weight:800;">⚙️ <span data-i18n="nav.mgmt">Gestion Pro</span></button>
-          <button class="nav-link nav-dropdown-link" id="navStats">📊 <span data-i18n="nav.stats">Statistiques</span></button>
+          <button class="nav-link nav-dropdown-link" id="navSuppliers">🚚 <span data-i18n="nav.suppliers">Fournisseurs</span></button>
           <button class="nav-link nav-dropdown-link" id="navInventaire">📦 <span data-i18n="nav.inventory">Inventaire</span></button>
         </div>
       </div>
@@ -197,17 +197,8 @@
       <div class="nav-dropdown">
         <button class="nav-dropdown-trigger"><span data-i18n="nav.category.showcase">✨ Catalogue</span> <span class="nav-arrow">▼</span></button>
         <div class="nav-dropdown-content">
-          <button class="nav-link nav-dropdown-link" id="navSuppliers">🚚 <span data-i18n="nav.suppliers">Fournisseurs</span></button>
           <button class="nav-link nav-dropdown-link" id="navPortfolio">🖼️ <span data-i18n="nav.portfolio">Portfolio</span></button>
           <button class="nav-link nav-dropdown-link" id="navAPropos">📖 <span data-i18n="nav.about">À propos</span></button>
-        </div>
-      </div>
-
-      <!-- Outils Pro -->
-      <div class="nav-dropdown">
-        <button class="nav-dropdown-trigger"><span data-i18n="nav.category.protools">🧰 Outils Pro</span> <span class="nav-arrow">▼</span></button>
-        <div class="nav-dropdown-content">
-          <button class="nav-link nav-dropdown-link" id="navProTools">🧰 <span data-i18n="nav.protools">Boîte à Outils</span></button>
         </div>
       </div>
 
@@ -229,6 +220,12 @@
             </div>
           </div>
         </div>
+
+        <!-- Cloud Sync -->
+        <button id="cloudSyncBtn" onclick="openCloudSync()" aria-label="Synchronisation Cloud"
+          style="background:none; border:none; cursor:pointer; font-size:1.4rem; display:flex; align-items:center; justify-content:center; width:40px; height:40px; border-radius:12px; transition:all 0.3s; color:var(--text-secondary);">
+          <span class="icon">☁️</span>
+        </button>
 
         <!-- Theme Toggle -->
         <button id="themeToggleBtn" class="theme-toggle-btn" aria-label="Changer de thème"
@@ -603,38 +600,171 @@
 
         <!-- Premium Pill Tabs -->
         <div class="mgmt-tabs-premium">
-          <button class="mgmt-tab-pill active" id="mgmtTabShopping" onclick="switchMgmtTab('shopping')">
+          <button class="mgmt-tab-pill active" id="mgmtTabDashboard" onclick="switchMgmtTab('dashboard')">
+            <span class="tab-pill-emoji">📊</span>
+            <span data-i18n="mgmt.tab.dashboard">Tableau de Bord</span>
+          </button>
+          <button class="mgmt-tab-pill" id="mgmtTabShopping" onclick="switchMgmtTab('shopping')">
             <span class="tab-pill-emoji">🛒</span>
-            <span data-i18n="mgmt.tab.shopping">Liste de Courses</span>
+            <span data-i18n="mgmt.tab.shopping">Approvisionnement</span>
           </button>
-          <button class="mgmt-tab-pill" id="mgmtTabAllergens" onclick="switchMgmtTab('allergens')">
-            <span class="tab-pill-emoji">🛡️</span>
-            <span data-i18n="mgmt.tab.allergens">Allergènes</span>
+          <button class="mgmt-tab-pill" id="mgmtTabAnalysis" onclick="switchMgmtTab('analysis')">
+            <span class="tab-pill-emoji">📈</span>
+            <span data-i18n="mgmt.tab.analysis">Analyses Pro</span>
           </button>
-          <button class="mgmt-tab-pill" id="mgmtTabWaste" onclick="switchMgmtTab('waste')">
-            <span class="tab-pill-emoji">📉</span>
-            <span data-i18n="mgmt.tab.waste">Suivi Pertes</span>
-          </button>
-          <button class="mgmt-tab-pill" id="mgmtTabObjectives" onclick="switchMgmtTab('objectives')">
-            <span class="tab-pill-emoji">🎯</span>
-            <span data-i18n="mgmt.tab.objectives">Objectifs</span>
+          <button class="mgmt-tab-pill" id="mgmtTabProTools" onclick="switchMgmtTab('protools')">
+            <span class="tab-pill-emoji">🧰</span>
+            <span data-i18n="mgmt.tab.protools">Outils Métier</span>
           </button>
           <button class="mgmt-tab-pill" id="mgmtTabProduction" onclick="switchMgmtTab('production')">
             <span class="tab-pill-emoji">📅</span>
             <span data-i18n="mgmt.tab.production">Planning Prod.</span>
           </button>
-          <button class="mgmt-tab-pill" id="mgmtTabBoston" onclick="switchMgmtTab('boston')">
-            <span class="tab-pill-emoji">📊</span>
-            <span data-i18n="mgmt.tab.boston">Matrice BCG</span>
-          </button>
-          <button class="mgmt-tab-pill" id="mgmtTabInflation" onclick="switchMgmtTab('inflation')">
-            <span class="tab-pill-emoji">🔥</span>
-            <span data-i18n="mgmt.tab.inflation">Scénario Crise</span>
+          <button class="mgmt-tab-pill" id="mgmtTabQuality" onclick="switchMgmtTab('quality')">
+            <span class="tab-pill-emoji">📉</span>
+            <span data-i18n="mgmt.tab.quality">Qualité & Pertes</span>
           </button>
         </div>
 
+        <!-- TAB: DASHBOARD (Merged Stats + Objectives) -->
+        <div id="mgmtViewDashboard" class="mgmt-view" style="display:none;">
+          <!-- Section: Filters & Actions -->
+          <div class="stats-filter-bar" style="margin-bottom: 2rem;">
+            <div class="stats-filter-card">
+              <span class="stats-filter-label" data-i18n="stats.filter_by" style="white-space: nowrap;">Filtrer par catégorie :</span>
+              <div id="statsCategoryFilters" style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <button class="stats-toggle-btn active" onclick="filterStatsCat('all')" data-cat="all" data-i18n="ui.all">Toutes</button>
+              </div>
+            </div>
+            <button class="btn btn-primary" onclick="exportStatsPDF()" style="flex-shrink: 0;">
+              <span style="font-size: 1.2rem;">📄</span> <span data-i18n="stats.btn.export">Exporter le Rapport</span>
+            </button>
+          </div>
+
+          <!-- Automatic Insights -->
+          <div class="insight-box" style="margin-bottom: 2rem;">
+            <div class="insight-icon">📊</div>
+            <div class="insight-text">
+              <h4 data-i18n="stats.insight.title">Analyse Stratégique Automatique</h4>
+              <p id="statsInsightText" data-i18n="stats.insight.loading">Calcul en cours...</p>
+            </div>
+          </div>
+
+          <!-- Charts Grid -->
+          <div class="stats-main-grid" style="margin-bottom: 2rem;">
+            <div class="dash-card col-span-4">
+              <div class="dash-card-header">
+                <h3 class="dash-card-title" data-i18n="stats.margin_dist">Répartition des Marges</h3>
+              </div>
+              <div style="height: 300px; display: flex; align-items: center; justify-content: center;">
+                <canvas id="v2MarginChart"></canvas>
+              </div>
+            </div>
+            <div class="dash-card col-span-8">
+              <div class="dash-card-header">
+                <h3 class="dash-card-title" data-i18n="stats.top_profitable">Performance des Recettes</h3>
+                <div class="stats-toggle-group">
+                  <button class="stats-toggle-btn active" id="toggleTopProfitable" data-i18n="stats.toggle.top">Top 5 Rentables</button>
+                  <button class="stats-toggle-btn" id="toggleWorstProfitable" data-i18n="stats.toggle.worst">Top 5 à améliorer</button>
+                </div>
+              </div>
+              <div style="height: 300px;">
+                <canvas id="v2PerformanceChart"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- Objectives & Breaking Point -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
+            <div class="mgmt-glass-card">
+              <div class="mgmt-card-header">
+                <div class="mgmt-card-title">
+                  <div class="title-icon icon-blue">🎯</div>
+                  <h3 data-i18n="mgmt.objectives.title" style="margin:0;">Objectifs de Rentabilité</h3>
+                </div>
+              </div>
+              <div class="mgmt-objectives-grid" id="objectivesGrid"></div>
+            </div>
+
+            <div class="mgmt-glass-card">
+              <div class="mgmt-card-header">
+                <div class="mgmt-card-title">
+                  <div class="title-icon icon-yellow">🧀</div>
+                  <h3 data-i18n="mgmt.bp.title" style="margin:0;">Seuil de Rentabilité</h3>
+                </div>
+              </div>
+              <div style="padding: 1.5rem;">
+                <div style="text-align: center; margin-bottom: 1.5rem;">
+                  <div id="bpTargetRevenue" style="font-size: 2.5rem; font-weight: 900; color: var(--success);">-- €</div>
+                  <div style="font-size: 0.8rem; color: var(--text-muted); text-transform:uppercase; font-weight:700;" data-i18n="mgmt.bp.target_revenue">Chiffre d'Affaires Cible</div>
+                </div>
+                <div style="background: var(--bg-alt); padding: 1.2rem; border-radius: var(--radius); font-size: 0.9rem;">
+                  <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                    <span data-i18n="mgmt.bp.daily">Soit par jour (sur 24j) :</span>
+                    <strong id="bpDailyRevenue">-- €</strong>
+                  </div>
+                  <button class="btn btn-sm btn-outline btn-full" onclick="switchMgmtTab('dashboard_config')" style="margin-top: 1rem;">⚙️ Configurer mes charges fixes</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB: DASHBOARD CONFIG (Hidden sub-tab) -->
+        <div id="mgmtViewDashboardConfig" class="mgmt-view" style="display:none;">
+           <div class="mgmt-glass-card">
+              <div class="mgmt-card-header">
+                <button class="btn btn-sm btn-outline" style="border-radius:20px; padding:6px 15px;" onclick="switchMgmtTab('dashboard')">← Retour</button>
+                <h3 data-i18n="mgmt.bp.fixed_costs" style="margin:0; flex:1; text-align:center;">Configuration des Charges Fixes</h3>
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; padding: 2rem;">
+                <div class="form-group">
+                  <label class="form-label" data-i18n="mgmt.bp.rent">Loyer & Assurances (€)</label>
+                  <input type="number" id="bpRent" class="form-input" value="1500" oninput="calculateBreakingPoint()">
+                </div>
+                <div class="form-group">
+                  <label class="form-label" data-i18n="mgmt.bp.salaries">Salaires & Charges (€)</label>
+                  <input type="number" id="bpSalaries" class="form-input" value="5000" oninput="calculateBreakingPoint()">
+                </div>
+                <div class="form-group">
+                  <label class="form-label" data-i18n="mgmt.bp.energy">Énergie & Eau (€)</label>
+                  <input type="number" id="bpEnergy" class="form-input" value="800" oninput="calculateBreakingPoint()">
+                </div>
+                <div class="form-group">
+                  <label class="form-label" data-i18n="mgmt.bp.other">Autres frais fixes (€)</label>
+                  <input type="number" id="bpOther" class="form-input" value="400" oninput="calculateBreakingPoint()">
+                </div>
+              </div>
+              <div style="padding: 1.5rem; text-align: center; border-top: 1px solid var(--surface-border);">
+                <button class="btn btn-primary" style="padding: 10px 30px;" onclick="switchMgmtTab('dashboard')">Enregistrer et fermer</button>
+              </div>
+           </div>
+        </div>
+
         <!-- TAB 1: SHOPPING LIST -->
-        <div id="mgmtViewShopping" class="mgmt-view">
+        <div id="mgmtViewShopping" class="mgmt-view" style="display:none;">
+          <!-- Quick Supply Tools -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
+            <div class="card glass-widget" style="padding: 1.5rem; cursor: pointer; border-left: 5px solid var(--primary);" onclick="showInventaire()">
+              <div style="display: flex; align-items: center; gap: 15px;">
+                <div style="font-size: 2rem;">📦</div>
+                <div>
+                   <h4 style="margin:0; font-size: 1.1rem;" data-i18n="nav.inventory">Inventaire & Stocks</h4>
+                   <p style="margin:0; font-size: 0.85rem; color: var(--text-muted);">Gérez vos stocks et prix d'achat</p>
+                </div>
+              </div>
+            </div>
+            <div class="card glass-widget" style="padding: 1.5rem; cursor: pointer; border-left: 5px solid var(--accent);" onclick="openOCRScanner()">
+              <div style="display: flex; align-items: center; gap: 15px;">
+                <div style="font-size: 2rem;">📷</div>
+                <div>
+                   <h4 style="margin:0; font-size: 1.1rem;" data-i18n="ocr.card.title">Scanner Facture</h4>
+                   <p style="margin:0; font-size: 0.85rem; color: var(--text-muted);">Mise à jour automatique par OCR</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div class="mgmt-shopping-grid">
             <!-- Left: Planning Card -->
             <div class="mgmt-glass-card">
@@ -799,71 +929,6 @@
           </div>
         </div>
 
-        <!-- TAB 4: COST OBJECTIVES -->
-        <div id="mgmtViewObjectives" class="mgmt-view" style="display:none;">
-          <div class="mgmt-glass-card" style="margin-bottom: 2rem;">
-            <div class="mgmt-card-header header-centered">
-              <div class="mgmt-card-title">
-                <div class="title-icon icon-blue">🎯</div>
-                <div>
-                  <h3 data-i18n="mgmt.objectives.title">Objectifs de Rentabilité</h3>
-                  <p data-i18n="mgmt.objectives.desc">Suivez vos indicateurs clés et atteignez vos objectifs de performance</p>
-                </div>
-              </div>
-            </div>
-            <div class="mgmt-objectives-grid" id="objectivesGrid">
-            </div>
-          </div>
-
-          <!-- BREAKING POINT MODULE -->
-          <div class="mgmt-glass-card">
-            <div class="mgmt-card-header header-centered">
-              <div class="mgmt-card-title">
-                <div class="title-icon icon-yellow">🧀</div>
-                <div>
-                  <h3 data-i18n="mgmt.bp.title">Seuil de Rentabilité (Point Mort)</h3>
-                  <p data-i18n="mgmt.bp.desc">Calculez le chiffre d'affaires minimum pour absorber vos charges fixes.</p>
-                </div>
-              </div>
-            </div>
-            
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; padding: 1rem 0;">
-              <!-- Inputs -->
-              <div style="background: var(--bg-alt); padding: 1.5rem; border-radius: var(--radius); border: 1px solid var(--surface-border);">
-                <h4 style="margin-top: 0; margin-bottom: 1.2rem; font-size: 1.05rem;" data-i18n="mgmt.bp.fixed_costs">Charges Fixes Mensuelles</h4>
-                
-                <div class="form-group">
-                  <label class="form-label" data-i18n="mgmt.bp.rent">Loyer & Assurances (€)</label>
-                  <input type="number" id="bpRent" class="form-input" placeholder="Ex: 1500" value="1500">
-                </div>
-                <div class="form-group">
-                  <label class="form-label" data-i18n="mgmt.bp.salaries">Salaires & Charges (€)</label>
-                  <input type="number" id="bpSalaries" class="form-input" placeholder="Ex: 5000" value="5000">
-                </div>
-                <div class="form-group">
-                  <label class="form-label" data-i18n="mgmt.bp.energy">Énergie & Eau (€)</label>
-                  <input type="number" id="bpEnergy" class="form-input" placeholder="Ex: 800" value="800">
-                </div>
-                <div class="form-group">
-                  <label class="form-label" data-i18n="mgmt.bp.other">Autres frais fixes (€)</label>
-                  <input type="number" id="bpOther" class="form-input" placeholder="Ex: 400" value="400">
-                </div>
-                
-                <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--surface-border); display: flex; justify-content: space-between; font-weight: 800; font-size: 1.2rem;">
-                  <span data-i18n="mgmt.bp.total_fixed">Total Fixe:</span>
-                  <span id="bpTotalFixed" style="color: var(--accent);">8700 €</span>
-                </div>
-              </div>
-
-              <!-- Results -->
-              <div style="display: flex; flex-direction: column; justify-content: center;">
-                <div style="text-align: center; margin-bottom: 2rem;">
-                  <div style="font-size: 0.9rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; letter-spacing: 1px; margin-bottom: 0.5rem;" data-i18n="mgmt.bp.target_revenue">Chiffre d'Affaires Cible (Mensuel)</div>
-                  <div id="bpTargetRevenue" style="font-size: 3rem; font-weight: 900; color: var(--success); line-height: 1.1;">-- €</div>
-                  <div style="font-size: 0.95rem; color: var(--text-muted); margin-top: 0.5rem;">
-                    <span data-i18n="mgmt.bp.daily">Soit par jour (sur 24j) :</span> <strong id="bpDailyRevenue" style="color: var(--text-primary);">-- €</strong>
-                  </div>
-                </div>
 
                 <div style="background: var(--bg-alt); padding: 1.2rem; border-radius: var(--radius); font-size: 0.9rem;">
                   <div style="display: flex; justify-content: space-between; margin-bottom: 0.8rem;">
@@ -890,6 +955,57 @@
                   <p data-i18n="mgmt.production.desc">Planifiez votre semaine de production et suivez l'avancement</p>
                 </div>
               </div>
+              <button class="btn btn-sm btn-primary" onclick="addProductionItem()" data-i18n="mgmt.production.add">✚ Ajouter</button>
+            </div>
+            <div class="mgmt-production-grid" id="productionPlanGrid">
+              <!-- Generated by JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB: PRO TOOLS (Merged from appProTools) -->
+        <div id="mgmtViewProTools" class="mgmt-view" style="display:none;">
+          <div class="protools-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
+            <!-- OCR Scanner Card -->
+            <div class="protools-card" onclick="openOCRScanner()">
+              <div class="protools-card-icon" style="background:rgba(99,102,241,0.1); color:#6366f1;">📷</div>
+              <div class="protools-card-body">
+                <h3 data-i18n="ocr.card.title">Scanner de Factures</h3>
+                <p data-i18n="ocr.card.desc">Photographiez une facture fournisseur pour mettre à jour automatiquement vos prix d'achat.</p>
+              </div>
+              <div class="protools-card-footer">
+                <span class="protools-tag">Tesseract OCR</span>
+                <span class="protools-arrow">→</span>
+              </div>
+            </div>
+
+            <!-- INCO Label Card -->
+            <div class="protools-card" onclick="openINCoGenerator()">
+              <div class="protools-card-icon" style="background:rgba(16,185,129,0.1); color:#10b981;">🏷️</div>
+              <div class="protools-card-body">
+                <h3 data-i18n="inco.card.title">Étiquettes INCO</h3>
+                <p data-i18n="inco.card.desc">Générez des étiquettes réglementaires conformes UE n°1169/2011 avec allergènes en gras.</p>
+              </div>
+              <div class="protools-card-footer">
+                <span class="protools-tag">Format 60×40mm</span>
+                <span class="protools-arrow">→</span>
+              </div>
+            </div>
+
+            <!-- Foisonnement Calculator Card -->
+            <div class="protools-card" onclick="openFoisonnement()">
+              <div class="protools-card-icon" style="background:rgba(245,158,11,0.1); color:#f59e0b;">💨</div>
+              <div class="protools-card-body">
+                <h3 data-i18n="fois.card.title">Foisonnement</h3>
+                <p data-i18n="fois.card.desc">Calculez le coefficient de foisonnement de vos mousses et crèmes pour ajuster le rendement.</p>
+              </div>
+              <div class="protools-card-footer">
+                <span class="protools-tag">Rendement</span>
+                <span class="protools-arrow">→</span>
+              </div>
+            </div>
+          </div>
+        </div>
               <button class="btn btn-sm btn-primary" onclick="addProductionItem()" data-i18n="mgmt.production.add">✚ Ajouter</button>
             </div>
             <div id="productionPlanGrid">
@@ -2525,244 +2641,7 @@
       </div>
     </section>
 
-    <!-- ================================================ -->
-    <!-- STATISTIQUES SECTION -->
-    <!-- ================================================ -->
-    <section class="stats-container-v2" id="appStats" style="display:none;">
-      <section class="hero" id="statsHeroSection" style="padding-bottom: 5rem;">
-        <div class="hero-badge" data-i18n="stats.badge">📊 Analyse Commerciale</div>
-        <h2 data-i18n="stats.title">Performance & <span class="accent">Rentabilité</span></h2>
-        <p data-i18n="stats.desc">Décryptez vos marges, identifiez vos produits stars et optimisez votre rentabilité
-          pour un laboratoire plus performant.</p>
-      </section>
 
-      <!-- Section: Filters & Actions -->
-      <div class="stats-filter-bar">
-        <div class="stats-filter-card">
-          <div class="stats-filter-group">
-            <span class="stats-filter-label" data-i18n="stats.filter_by" style="white-space: nowrap;">Filtrer par
-              catégorie :</span>
-            <div id="statsCategoryFilters" style="display: flex; gap: 10px; flex-wrap: wrap;">
-              <button class="stats-toggle-btn active" onclick="filterStatsCat('all')" data-cat="all"
-                data-i18n="ui.all">Toutes</button>
-            </div>
-          </div>
-          <button class="btn btn-primary" onclick="exportStatsPDF()" style="flex-shrink: 0;">
-            <span style="font-size: 1.2rem;">📄</span> <span data-i18n="stats.btn.export">Exporter le Rapport</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- Section 10: Automatic Insights -->
-      <div class="insight-box">
-        <div class="insight-icon">📊</div>
-        <div class="insight-text">
-          <h4 data-i18n="stats.insight.title">Analyse Stratégique Automatique</h4>
-          <p id="statsInsightText" data-i18n="stats.insight.loading">Calcul en cours...</p>
-        </div>
-      </div>
-
-      <!-- Section 1: KPIs -->
-      <div class="kpi-grid-v2">
-        <div class="kpi-card-v2">
-          <div class="kpi-icon-v2" style="background: rgba(99, 102, 241, 0.1); color: #6366F1;">💰</div>
-          <span class="kpi-label-v2" data-i18n="stats.kpi.avg_margin">Marge moyenne</span>
-          <div class="kpi-value-v2" id="v2KpiAvgMargin">0%</div>
-        </div>
-        <div class="kpi-card-v2">
-          <div class="kpi-icon-v2" style="background: rgba(34, 197, 94, 0.1); color: #22C55E;">🏆</div>
-          <span class="kpi-label-v2" data-i18n="stats.kpi.hero">Recette Star</span>
-          <div class="kpi-value-v2" id="v2KpiBestRecipe"
-            style="font-size: 1.1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">—</div>
-        </div>
-        <div class="kpi-card-v2">
-          <div class="kpi-icon-v2" style="background: rgba(239, 68, 68, 0.1); color: #EF4444;">⚠️</div>
-          <span class="kpi-label-v2" data-i18n="stats.kpi.worst">À surveiller</span>
-          <div class="kpi-value-v2" id="v2KpiWorstRecipe"
-            style="font-size: 1.1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">—</div>
-        </div>
-        <div class="kpi-card-v2">
-          <div class="kpi-icon-v2" style="background: rgba(245, 158, 11, 0.1); color: #F59E0B;">🍰</div>
-          <span class="kpi-label-v2" data-i18n="stats.kpi.avg_cost">Coût moyen/Portion</span>
-          <div class="kpi-value-v2" id="v2KpiAvgCost">0€</div>
-        </div>
-        <div class="kpi-card-v2">
-          <div class="kpi-icon-v2" style="background: rgba(100, 116, 139, 0.1); color: #64748B;">🏷️</div>
-          <span class="kpi-label-v2" data-i18n="stats.kpi.avg_price">Prix moyen conseillé</span>
-          <div class="kpi-value-v2" id="v2KpiAvgPrice">0€</div>
-        </div>
-      </div>
-
-      <div class="stats-main-grid">
-        <!-- Section 2: Margin Dist -->
-        <div class="dash-card col-span-4">
-          <div class="dash-card-header">
-            <h3 class="dash-card-title" data-i18n="stats.margin_dist">Répartition des Marges</h3>
-          </div>
-          <div style="height: 300px; display: flex; align-items: center; justify-content: center;">
-            <canvas id="v2MarginChart"></canvas>
-          </div>
-          <p id="v2MarginAnalysis"
-            style="font-size: 0.85rem; padding-top: 1rem; color: var(--dash-text-muted); line-height: 1.5;"></p>
-        </div>
-
-        <!-- Section 3: Top Profitability / To Improve -->
-        <div class="dash-card col-span-8">
-          <div class="dash-card-header">
-            <h3 class="dash-card-title" data-i18n="stats.top_profitable">Performance des Recettes</h3>
-            <div class="stats-toggle-group">
-              <button class="stats-toggle-btn active" id="toggleTopProfitable" data-i18n="stats.toggle.top">Top 5
-                Rentables</button>
-              <button class="stats-toggle-btn" id="toggleWorstProfitable" data-i18n="stats.toggle.worst">Top 5 à
-                améliorer</button>
-            </div>
-          </div>
-          <div style="height: 300px;">
-            <canvas id="v2PerformanceChart"></canvas>
-          </div>
-        </div>
-
-        <!-- Section 6: Strategic Scatter Plot -->
-        <div class="dash-card col-span-8">
-          <div class="dash-card-header">
-            <h3 class="dash-card-title" data-i18n="stats.strategic_map">Matrice Stratégique (Coût vs Marge)</h3>
-          </div>
-          <div style="height: 400px; position: relative; padding: 1rem;">
-            <!-- Quadrants Overlay background in JS -->
-            <canvas id="v2ScatterChart"></canvas>
-          </div>
-        </div>
-
-        <!-- Section 4: Smart Alert Cards -->
-        <div class="dash-card col-span-4" style="background: var(--bg-alt); border: none;">
-          <div class="dash-card-header">
-            <h3 class="dash-card-title" data-i18n="stats.alerts.title">Alertes & Optimisations</h3>
-          </div>
-          <div id="v2AlertsContainer">
-            <!-- Populated by JS -->
-          </div>
-        </div>
-
-        <!-- Section 5: Advanced Data Table -->
-        <div class="dash-card col-span-12">
-          <div class="dash-card-header">
-            <h3 class="dash-card-title" data-i18n="stats.detailed_report">Liste Détaillée des Recettes</h3>
-            <div style="display: flex; gap: 1rem; align-items: center;">
-              <input type="text" id="statsSearch" placeholder="Rechercher une recette..."
-                style="padding: 0.5rem 1rem; border-radius: 0.5rem; border: 1px solid #CBD5E1; font-size: 0.85rem;">
-            </div>
-          </div>
-          <div style="overflow-x: auto;">
-            <table class="modern-table-v2">
-              <thead>
-                <tr>
-                  <th data-i18n="s1.name" style="cursor: pointer;">Recette ↕</th>
-                  <th data-i18n="s4.material" style="cursor: pointer;">Coût Mat. ↕</th>
-                  <th data-i18n="ui.kpi.per_portion">Coût/Port.</th>
-                  <th data-i18n="ui.kpi.suggested_price">Prix Vente</th>
-                  <th data-i18n="s4.margin" style="cursor: pointer;">Marge % ↕</th>
-                  <th style="text-align: right;">Action</th>
-                </tr>
-              </thead>
-              <tbody id="v2DetailedTableBody">
-                <!-- Populated by JS -->
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ================================================ -->
-    <!-- PRO TOOLBOX SECTION -->
-    <!-- ================================================ -->
-    <section id="appProTools" style="display:none; padding-bottom: 3rem;">
-      <section class="hero" style="padding-bottom: 3.5rem;">
-        <div class="hero-badge" data-i18n="protools.badge">🧰 Boîte à Outils Pro</div>
-        <h2 data-i18n="protools.title">Outils <span class="accent">Métier Avancés</span></h2>
-        <p data-i18n="protools.desc">Scanner OCR, étiquettes réglementaires INCO et calculateur de foisonnement pour optimiser votre production.</p>
-      </section>
-
-      <div class="protools-grid hero-mgmt-overlap">
-        <!-- OCR Scanner Card -->
-        <div class="protools-card" onclick="openOCRScanner()">
-          <div class="protools-card-icon" style="background:rgba(99,102,241,0.1); color:#6366f1;">📷</div>
-          <div class="protools-card-body">
-            <h3 data-i18n="ocr.card.title">Scanner de Factures</h3>
-            <p data-i18n="ocr.card.desc">Photographiez une facture fournisseur pour mettre à jour automatiquement vos prix d'achat.</p>
-          </div>
-          <div class="protools-card-footer">
-            <span class="protools-tag">Tesseract OCR</span>
-            <span class="protools-arrow">→</span>
-          </div>
-        </div>
-
-        <!-- INCO Label Card -->
-        <div class="protools-card" onclick="openINCoGenerator()">
-          <div class="protools-card-icon" style="background:rgba(16,185,129,0.1); color:#10b981;">🏷️</div>
-          <div class="protools-card-body">
-            <h3 data-i18n="inco.card.title">Étiquettes INCO</h3>
-            <p data-i18n="inco.card.desc">Générez des étiquettes réglementaires conformes UE n°1169/2011 avec allergènes en gras.</p>
-          </div>
-          <div class="protools-card-footer">
-            <span class="protools-tag">Format 60×40mm</span>
-            <span class="protools-arrow">→</span>
-          </div>
-        </div>
-
-        <!-- Foisonnement Calculator Card -->
-        <div class="protools-card" onclick="openFoisonnement()">
-          <div class="protools-card-icon" style="background:rgba(245,158,11,0.1); color:#f59e0b;">💨</div>
-          <div class="protools-card-body">
-            <h3 data-i18n="fois.card.title">Foisonnement</h3>
-            <p data-i18n="fois.card.desc">Calculez le coefficient de foisonnement de vos mousses et crèmes pour ajuster le rendement.</p>
-          </div>
-          <div class="protools-card-footer">
-            <span class="protools-tag">Rendement</span>
-            <span class="protools-arrow">→</span>
-          </div>
-        </div>
-
-        <!-- BCG Matrix Card -->
-        <div class="protools-card" onclick="if(typeof showMgmt==='function'){showMgmt();switchMgmtTab('boston');}">
-          <div class="protools-card-icon" style="background:rgba(139,92,246,0.1); color:#8b5cf6;">📊</div>
-          <div class="protools-card-body">
-            <h3 data-i18n="bcg.card.title">Matrice de Boston</h3>
-            <p data-i18n="bcg.card.desc">Classez vos recettes en Stars, Vaches à Lait, Dilemmes et Poids Morts pour optimiser votre catalogue.</p>
-          </div>
-          <div class="protools-card-footer">
-            <span class="protools-tag">Mix-Produit</span>
-            <span class="protools-arrow">→</span>
-          </div>
-        </div>
-
-        <!-- Inflation Simulation Card -->
-        <div class="protools-card" onclick="if(typeof showMgmt==='function'){showMgmt();switchMgmtTab('inflation');}">
-          <div class="protools-card-icon" style="background:rgba(239,68,68,0.1); color:#ef4444;">🔥</div>
-          <div class="protools-card-body">
-            <h3 data-i18n="inflation.card.title">Scénario Crise</h3>
-            <p data-i18n="inflation.card.desc">Simulez une hausse des prix pour identifier instantanément les recettes qui deviennent déficitaires.</p>
-          </div>
-          <div class="protools-card-footer">
-            <span class="protools-tag">Simulation</span>
-            <span class="protools-arrow">→</span>
-          </div>
-        </div>
-
-        <!-- Cloud Sync Card -->
-        <div class="protools-card" onclick="openCloudSync()">
-          <div class="protools-card-icon" style="background:rgba(59,130,246,0.1); color:#3b82f6;">☁️</div>
-          <div class="protools-card-body">
-            <h3 data-i18n="cloud.card.title">Synchronisation Cloud</h3>
-            <p data-i18n="cloud.card.desc">Sauvegardez vos données sur Supabase pour y accéder depuis n'importe quel appareil.</p>
-          </div>
-          <div class="protools-card-footer">
-            <span class="protools-tag">Supabase</span>
-            <span class="protools-arrow">→</span>
-          </div>
-        </div>
-      </div>
-    </section>
 
   </main>
 
@@ -3274,13 +3153,8 @@
     }
 
     function showStats() {
-      hideAllApps();
-      const appStats = document.getElementById('appStats');
-      if (appStats) appStats.style.display = 'block';
-      const navStats = document.getElementById('navStats');
-      if (navStats) navStats.classList.add('active');
-      if (typeof renderStats === 'function') renderStats();
-      if (typeof updateRandomTip === 'function') updateRandomTip();
+      showMgmt();
+      switchMgmtTab('dashboard');
     }
 
     const headerBrand = document.getElementById('headerBrand');
@@ -3290,43 +3164,73 @@
       hideAllApps();
       if (appMgmt) appMgmt.style.display = 'block';
       if (navMgmt) navMgmt.classList.add('active');
-      switchMgmtTab('shopping');
+      switchMgmtTab('dashboard');
       if (typeof updateMgmtKpis === 'function') updateMgmtKpis();
       if (typeof updateRandomTip === 'function') updateRandomTip();
     }
 
     function showProTools() {
-      hideAllApps();
-      const appProTools = document.getElementById('appProTools');
-      const navProTools = document.getElementById('navProTools');
-      if (appProTools) appProTools.style.display = 'block';
-      mainNav.style.display = 'flex';
-      if (navProTools) navProTools.classList.add('active');
-      if (typeof updateRandomTip === 'function') updateRandomTip();
+      showMgmt();
+      switchMgmtTab('protools');
     }
 
     function switchMgmtTab(tab) {
-      const views = ['shopping', 'allergens', 'waste', 'objectives', 'production', 'boston', 'inflation'];
-      views.forEach(v => {
-        const el = document.getElementById('mgmtView' + v.charAt(0).toUpperCase() + v.slice(1));
-        const btn = document.getElementById('mgmtTab' + v.charAt(0).toUpperCase() + v.slice(1));
-        if (el) el.style.display = (v === tab) ? 'block' : 'none';
-        if (btn) btn.classList.toggle('active', v === tab);
-      });
+      // 1. Reset all views and buttons
+      const allViews = document.querySelectorAll('.mgmt-view');
+      allViews.forEach(v => v.style.display = 'none');
+      
+      const allButtons = document.querySelectorAll('.mgmt-tab-pill');
+      allButtons.forEach(b => b.classList.remove('active'));
 
-      if (tab === 'shopping' && typeof addShoppingRecipeRow === 'function') {
-         const container = document.getElementById('shoppingRecipeSelectors');
-         if (container && container.children.length === 0) addShoppingRecipeRow();
+      // 2. Map logical tab to physical views
+      if (tab === 'dashboard') {
+        document.getElementById('mgmtViewDashboard').style.display = 'block';
+        document.getElementById('mgmtTabDashboard').classList.add('active');
+        if (typeof renderStats === 'function') renderStats(); // Stats are now on dashboard
+        if (typeof renderObjectives === 'function') renderObjectives();
       }
-      if (tab === 'allergens' && typeof renderAllergenMatrix === 'function') renderAllergenMatrix();
-      if (tab === 'waste' && typeof populateWasteDropdown === 'function') {
-        populateWasteDropdown();
-        renderWasteAnalysis();
+      else if (tab === 'dashboard_config') {
+        document.getElementById('mgmtViewDashboardConfig').style.display = 'block';
+        document.getElementById('mgmtTabDashboard').classList.add('active');
+        if (typeof bindBreakingPointEvents === 'function') bindBreakingPointEvents();
       }
-      if (tab === 'objectives' && typeof renderObjectives === 'function') renderObjectives();
-      if (tab === 'production' && typeof renderProductionPlan === 'function') renderProductionPlan();
-      if (tab === 'boston' && typeof renderBCGMatrix === 'function') renderBCGMatrix();
-      if (tab === 'inflation' && typeof renderInflationSimulation === 'function') renderInflationSimulation();
+      else if (tab === 'shopping') {
+        document.getElementById('mgmtViewShopping').style.display = 'block';
+        document.getElementById('mgmtTabShopping').classList.add('active');
+        if (typeof addShoppingRecipeRow === 'function') {
+           const container = document.getElementById('shoppingRecipeSelectors');
+           if (container && container.children.length === 0) addShoppingRecipeRow();
+        }
+      }
+      else if (tab === 'analysis') {
+        document.getElementById('mgmtViewBoston').style.display = 'block';
+        document.getElementById('mgmtViewInflation').style.display = 'block';
+        document.getElementById('mgmtTabAnalysis').classList.add('active');
+        if (typeof renderBCGMatrix === 'function') renderBCGMatrix();
+        if (typeof renderInflationSimulation === 'function') renderInflationSimulation();
+      }
+      else if (tab === 'protools') {
+        document.getElementById('mgmtViewProTools').style.display = 'block';
+        document.getElementById('mgmtTabProTools').classList.add('active');
+      }
+      else if (tab === 'production') {
+        document.getElementById('mgmtViewProduction').style.display = 'block';
+        document.getElementById('mgmtTabProduction').classList.add('active');
+        if (typeof renderProductionPlan === 'function') renderProductionPlan();
+      }
+      else if (tab === 'quality') {
+        document.getElementById('mgmtViewWaste').style.display = 'block';
+        document.getElementById('mgmtViewAllergens').style.display = 'block';
+        document.getElementById('mgmtTabQuality').classList.add('active');
+        if (typeof renderAllergenMatrix === 'function') renderAllergenMatrix();
+        if (typeof populateWasteDropdown === 'function') {
+          populateWasteDropdown();
+          renderWasteAnalysis();
+        }
+      }
+
+      // Special redirect for old triggers (BCG/Inflation from ProTools cards)
+      if (tab === 'boston' || tab === 'inflation') switchMgmtTab('analysis');
     }
 
   </script>
@@ -3483,12 +3387,12 @@
       <span class="label" data-i18n="nav.category.mgmt">Pilotage</span>
     </button>
     <button class="mobile-nav-item" id="mNavCatalogue">
-      <span class="icon">✨</span>
-      <span class="label" data-i18n="nav.category.showcase">Catalogue</span>
+      <span class="icon">🖼️</span>
+      <span class="label" data-i18n="nav.portfolio">Portfolio</span>
     </button>
     <button class="mobile-nav-item" id="mNavMore">
-      <span class="icon">➕</span>
-      <span class="label">Menu</span>
+      <span class="icon">⚙️</span>
+      <span class="label">Réglages</span>
     </button>
   </nav>
 

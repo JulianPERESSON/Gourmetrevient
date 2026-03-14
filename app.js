@@ -3878,7 +3878,7 @@ function filterStatsCat(cat) {
 }
 
 function renderStats() {
-  const container = document.getElementById('appStats');
+  const container = document.getElementById('mgmtViewDashboard');
   if (!container || container.style.display === 'none') return;
 
   if (APP.savedRecipes.length === 0) {
