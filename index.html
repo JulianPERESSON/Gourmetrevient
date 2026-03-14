@@ -211,6 +211,14 @@
         </div>
       </div>
 
+      <!-- Outils Pro -->
+      <div class="nav-dropdown">
+        <button class="nav-dropdown-trigger"><span data-i18n="nav.category.protools">🧰 Outils Pro</span> <span class="nav-arrow">▼</span></button>
+        <div class="nav-dropdown-content">
+          <button class="nav-link nav-dropdown-link" id="navProTools">🧰 <span data-i18n="nav.protools">Boîte à Outils</span></button>
+        </div>
+      </div>
+
       <button class="nav-link" id="navAdmin" style="display:none;"><span data-i18n="nav.admin">Admin</span></button>
     </div>
     <div class="header-actions" id="userProfileArea" style="display:none; align-items:center; gap:12px;">
@@ -623,6 +631,14 @@
             <span class="tab-pill-emoji">📅</span>
             <span data-i18n="mgmt.tab.production">Planning Prod.</span>
           </button>
+          <button class="mgmt-tab-pill" id="mgmtTabBoston" onclick="switchMgmtTab('boston')">
+            <span class="tab-pill-emoji">📊</span>
+            <span data-i18n="mgmt.tab.boston">Matrice BCG</span>
+          </button>
+          <button class="mgmt-tab-pill" id="mgmtTabInflation" onclick="switchMgmtTab('inflation')">
+            <span class="tab-pill-emoji">🔥</span>
+            <span data-i18n="mgmt.tab.inflation">Scénario Crise</span>
+          </button>
         </div>
 
         <!-- TAB 1: SHOPPING LIST -->
@@ -823,6 +839,51 @@
             </div>
             <div id="productionPlanGrid">
             </div>
+          </div>
+        </div>
+
+        <!-- TAB 6: BCG MATRIX -->
+        <div id="mgmtViewBoston" class="mgmt-view" style="display:none;">
+          <div class="mgmt-glass-card">
+            <div class="mgmt-card-header header-centered">
+              <div class="mgmt-card-title">
+                <div class="title-icon icon-purple">📊</div>
+                <div>
+                  <h3 data-i18n="bcg.title">Matrice de Boston (BCG)</h3>
+                  <p data-i18n="bcg.desc">Classez vos recettes en Stars, Vaches à Lait, Dilemmes et Poids Morts</p>
+                </div>
+              </div>
+            </div>
+            <div style="height:400px; position:relative; margin-bottom:1.5rem;">
+              <canvas id="bcgChartCanvas"></canvas>
+            </div>
+            <div id="bcgLegend" class="bcg-legend-container"></div>
+          </div>
+        </div>
+
+        <!-- TAB 7: INFLATION SIMULATION -->
+        <div id="mgmtViewInflation" class="mgmt-view" style="display:none;">
+          <div class="mgmt-glass-card">
+            <div class="mgmt-card-header header-centered">
+              <div class="mgmt-card-title">
+                <div class="title-icon icon-red">🔥</div>
+                <div>
+                  <h3 data-i18n="inflation.title">Simulation de Crise</h3>
+                  <p data-i18n="inflation.desc">Simulez l'impact d'une hausse des matières premières et de l'énergie</p>
+                </div>
+              </div>
+            </div>
+            <div class="inflation-slider-container">
+              <label class="inflation-slider-label">
+                <span data-i18n="inflation.slider.label">Hausse des prix :</span>
+                <span id="inflationValue" class="inflation-slider-value">20%</span>
+              </label>
+              <input type="range" id="inflationSlider" class="inflation-slider" min="0" max="100" value="20" step="5">
+              <div class="inflation-slider-marks">
+                <span>0%</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span>
+              </div>
+            </div>
+            <div id="inflationResults"></div>
           </div>
         </div>
 
@@ -2557,6 +2618,97 @@
       </div>
     </section>
 
+    <!-- ================================================ -->
+    <!-- PRO TOOLBOX SECTION -->
+    <!-- ================================================ -->
+    <section id="appProTools" style="display:none; padding-bottom: 3rem;">
+      <section class="hero" style="padding-bottom: 3.5rem;">
+        <div class="hero-badge" data-i18n="protools.badge">🧰 Boîte à Outils Pro</div>
+        <h2 data-i18n="protools.title">Outils <span class="accent">Métier Avancés</span></h2>
+        <p data-i18n="protools.desc">Scanner OCR, étiquettes réglementaires INCO et calculateur de foisonnement pour optimiser votre production.</p>
+      </section>
+
+      <div class="protools-grid hero-mgmt-overlap">
+        <!-- OCR Scanner Card -->
+        <div class="protools-card" onclick="openOCRScanner()">
+          <div class="protools-card-icon" style="background:rgba(99,102,241,0.1); color:#6366f1;">📷</div>
+          <div class="protools-card-body">
+            <h3 data-i18n="ocr.card.title">Scanner de Factures</h3>
+            <p data-i18n="ocr.card.desc">Photographiez une facture fournisseur pour mettre à jour automatiquement vos prix d'achat.</p>
+          </div>
+          <div class="protools-card-footer">
+            <span class="protools-tag">Tesseract OCR</span>
+            <span class="protools-arrow">→</span>
+          </div>
+        </div>
+
+        <!-- INCO Label Card -->
+        <div class="protools-card" onclick="openINCoGenerator()">
+          <div class="protools-card-icon" style="background:rgba(16,185,129,0.1); color:#10b981;">🏷️</div>
+          <div class="protools-card-body">
+            <h3 data-i18n="inco.card.title">Étiquettes INCO</h3>
+            <p data-i18n="inco.card.desc">Générez des étiquettes réglementaires conformes UE n°1169/2011 avec allergènes en gras.</p>
+          </div>
+          <div class="protools-card-footer">
+            <span class="protools-tag">Format 60×40mm</span>
+            <span class="protools-arrow">→</span>
+          </div>
+        </div>
+
+        <!-- Foisonnement Calculator Card -->
+        <div class="protools-card" onclick="openFoisonnement()">
+          <div class="protools-card-icon" style="background:rgba(245,158,11,0.1); color:#f59e0b;">💨</div>
+          <div class="protools-card-body">
+            <h3 data-i18n="fois.card.title">Foisonnement</h3>
+            <p data-i18n="fois.card.desc">Calculez le coefficient de foisonnement de vos mousses et crèmes pour ajuster le rendement.</p>
+          </div>
+          <div class="protools-card-footer">
+            <span class="protools-tag">Rendement</span>
+            <span class="protools-arrow">→</span>
+          </div>
+        </div>
+
+        <!-- BCG Matrix Card -->
+        <div class="protools-card" onclick="if(typeof showMgmt==='function'){showMgmt();switchMgmtTab('boston');}">
+          <div class="protools-card-icon" style="background:rgba(139,92,246,0.1); color:#8b5cf6;">📊</div>
+          <div class="protools-card-body">
+            <h3 data-i18n="bcg.card.title">Matrice de Boston</h3>
+            <p data-i18n="bcg.card.desc">Classez vos recettes en Stars, Vaches à Lait, Dilemmes et Poids Morts pour optimiser votre catalogue.</p>
+          </div>
+          <div class="protools-card-footer">
+            <span class="protools-tag">Mix-Produit</span>
+            <span class="protools-arrow">→</span>
+          </div>
+        </div>
+
+        <!-- Inflation Simulation Card -->
+        <div class="protools-card" onclick="if(typeof showMgmt==='function'){showMgmt();switchMgmtTab('inflation');}">
+          <div class="protools-card-icon" style="background:rgba(239,68,68,0.1); color:#ef4444;">🔥</div>
+          <div class="protools-card-body">
+            <h3 data-i18n="inflation.card.title">Scénario Crise</h3>
+            <p data-i18n="inflation.card.desc">Simulez une hausse des prix pour identifier instantanément les recettes qui deviennent déficitaires.</p>
+          </div>
+          <div class="protools-card-footer">
+            <span class="protools-tag">Simulation</span>
+            <span class="protools-arrow">→</span>
+          </div>
+        </div>
+
+        <!-- Cloud Sync Card -->
+        <div class="protools-card" onclick="openCloudSync()">
+          <div class="protools-card-icon" style="background:rgba(59,130,246,0.1); color:#3b82f6;">☁️</div>
+          <div class="protools-card-body">
+            <h3 data-i18n="cloud.card.title">Synchronisation Cloud</h3>
+            <p data-i18n="cloud.card.desc">Sauvegardez vos données sur Supabase pour y accéder depuis n'importe quel appareil.</p>
+          </div>
+          <div class="protools-card-footer">
+            <span class="protools-tag">Supabase</span>
+            <span class="protools-arrow">→</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
   </main>
 
   <!-- Footer -->
@@ -2950,6 +3102,11 @@
       if (appInventaire) appInventaire.style.display = 'none';
       if (navLabeling) navLabeling.classList.remove('active');
       if (appLabeling) appLabeling.style.display = 'none';
+
+      const appProTools = document.getElementById('appProTools');
+      const navProTools = document.getElementById('navProTools');
+      if (appProTools) appProTools.style.display = 'none';
+      if (navProTools) navProTools.classList.remove('active');
     }
 
     function showHub() {
@@ -3083,8 +3240,18 @@
       if (typeof updateRandomTip === 'function') updateRandomTip();
     }
 
+    function showProTools() {
+      hideAllApps();
+      const appProTools = document.getElementById('appProTools');
+      const navProTools = document.getElementById('navProTools');
+      if (appProTools) appProTools.style.display = 'block';
+      mainNav.style.display = 'flex';
+      if (navProTools) navProTools.classList.add('active');
+      if (typeof updateRandomTip === 'function') updateRandomTip();
+    }
+
     function switchMgmtTab(tab) {
-      const views = ['shopping', 'allergens', 'waste', 'objectives', 'production'];
+      const views = ['shopping', 'allergens', 'waste', 'objectives', 'production', 'boston', 'inflation'];
       views.forEach(v => {
         const el = document.getElementById('mgmtView' + v.charAt(0).toUpperCase() + v.slice(1));
         const btn = document.getElementById('mgmtTab' + v.charAt(0).toUpperCase() + v.slice(1));
@@ -3103,6 +3270,8 @@
       }
       if (tab === 'objectives' && typeof renderObjectives === 'function') renderObjectives();
       if (tab === 'production' && typeof renderProductionPlan === 'function') renderProductionPlan();
+      if (tab === 'boston' && typeof renderBCGMatrix === 'function') renderBCGMatrix();
+      if (tab === 'inflation' && typeof renderInflationSimulation === 'function') renderInflationSimulation();
     }
 
   </script>
@@ -3111,6 +3280,7 @@
   <script src="./data.js?v=2.2.0"></script>
   <script src="./i18n.js?v=3.5.0"></script>
   <script src="./app.js?v=2.3.0"></script>
+  <script src="./pro-features.js?v=1.0.0"></script>
   <script src="./equipment.js?v=2.1.0"></script>
   <script src="./lab-logic.js?v=2.1.0"></script>
   <script src="./dashboard-premium.js?v=1.0.0"></script>
@@ -3172,6 +3342,7 @@
           'navSuppliers': showSuppliers, 'mLinkSuppliers': showSuppliers,
           'navStats': showStats, 'mLinkStats': showStats,
           'navMgmt': showMgmt, 'mLinkMgmt': showMgmt,
+          'navProTools': showProTools, 'mLinkProTools': showProTools,
           'navOmniSearch': () => { if (typeof showOmniSearch === 'function') showOmniSearch(); }
         };
 
@@ -3395,6 +3566,133 @@
          <button class="btn btn-outline" onclick="window.print()" style="gap:8px; flex:1;">
            🖨️ Imprimer
          </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================================================ -->
+  <!-- OCR SCANNER MODAL -->
+  <!-- ================================================ -->
+  <div id="ocrScannerModal" class="modal-overlay" style="display:none;">
+    <div class="modal-content glass-panel" style="max-width:700px; width:95%;">
+      <div class="modal-header" style="display:flex; justify-content:space-between; margin-bottom:1.2rem;">
+        <h3 style="margin:0;">📷 <span data-i18n="ocr.modal.title">Scanner de Facture OCR</span></h3>
+        <button class="btn-icon" onclick="closeOCRScanner()">✕</button>
+      </div>
+      <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1.5rem;" data-i18n="ocr.modal.desc">Importez une photo de facture fournisseur. L'OCR extraira les prix pour mettre à jour votre base d'ingrédients.</p>
+      <div id="ocrPreview" class="ocr-preview-container"></div>
+      <div id="ocrStatus" class="ocr-status" style="display:none;"></div>
+      <div id="ocrResults" class="ocr-results-container"></div>
+    </div>
+  </div>
+
+  <!-- ================================================ -->
+  <!-- INCO LABEL MODAL -->
+  <!-- ================================================ -->
+  <div id="incoModal" class="modal-overlay" style="display:none;">
+    <div class="modal-content glass-panel" style="max-width:550px; width:95%;">
+      <div class="modal-header" style="display:flex; justify-content:space-between; margin-bottom:1.2rem;">
+        <h3 style="margin:0;">🏷️ <span data-i18n="inco.modal.title">Générateur d'Étiquettes INCO</span></h3>
+        <button class="btn-icon" onclick="closeINCoModal()">✕</button>
+      </div>
+      <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1rem;" data-i18n="inco.modal.desc">Sélectionnez une recette pour générer son étiquette réglementaire conforme UE n°1169/2011.</p>
+      <div class="form-group">
+        <label data-i18n="inco.label.recipe">Recette</label>
+        <select id="incoRecipeSelect" class="form-select" onchange="generateINCOLabel()"></select>
+      </div>
+      <div id="incoLabelPreview" class="inco-preview-container" style="margin-top:1.5rem;"></div>
+      <div style="margin-top:1.5rem; display:flex; gap:10px;">
+        <button class="btn btn-primary btn-full" onclick="exportINCOPdf()" data-i18n="inco.btn.export">💾 Exporter PDF (60×40mm)</button>
+        <button class="btn btn-outline btn-full" onclick="window.print()" data-i18n="ui.btn.print">🖨️ Imprimer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================================================ -->
+  <!-- FOISONNEMENT MODAL -->
+  <!-- ================================================ -->
+  <div id="foisonnementModal" class="modal-overlay" style="display:none;">
+    <div class="modal-content glass-panel" style="max-width:500px; width:95%;">
+      <div class="modal-header" style="display:flex; justify-content:space-between; margin-bottom:1.2rem;">
+        <h3 style="margin:0;">💨 <span data-i18n="fois.modal.title">Calculateur de Foisonnement</span></h3>
+        <button class="btn-icon" onclick="closeFoisonnement()">✕</button>
+      </div>
+      <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1.5rem;" data-i18n="fois.modal.desc">Mesurez le gain de volume de vos mousses et crèmes pour ajuster le rendement réel.</p>
+      <div class="form-group">
+        <label data-i18n="fois.label.before">Volume avant foisonnement (ml)</label>
+        <input type="number" id="foisVolumeBefore" class="form-input" placeholder="Ex: 500" min="0" step="1">
+      </div>
+      <div class="form-group">
+        <label data-i18n="fois.label.after">Volume après foisonnement (ml)</label>
+        <input type="number" id="foisVolumeAfter" class="form-input" placeholder="Ex: 1000" min="0" step="1">
+      </div>
+      <button class="btn btn-primary btn-full" onclick="calcFoisonnement()" data-i18n="fois.btn.calc">📐 Calculer le coefficient</button>
+      <div id="foisResult" style="margin-top:1.5rem;"></div>
+    </div>
+  </div>
+
+  <!-- ================================================ -->
+  <!-- CLOUD SYNC MODAL -->
+  <!-- ================================================ -->
+  <div id="cloudSyncModal" class="modal-overlay" style="display:none;">
+    <div class="modal-content glass-panel" style="max-width:500px; width:95%;">
+      <div class="modal-header" style="display:flex; justify-content:space-between; margin-bottom:1.2rem;">
+        <h3 style="margin:0;">☁️ <span data-i18n="cloud.modal.title">Synchronisation Cloud</span></h3>
+        <button class="btn-icon" onclick="closeCloudSync()">✕</button>
+      </div>
+      <div id="cloudStatus" class="cloud-status-bar" style="margin-bottom:1.5rem;"></div>
+      <div class="form-group">
+        <label data-i18n="cloud.label.url">URL Supabase</label>
+        <input type="url" id="supabaseUrl" class="form-input" placeholder="https://xxxx.supabase.co">
+      </div>
+      <div class="form-group">
+        <label data-i18n="cloud.label.key">Clé API (anon)</label>
+        <input type="password" id="supabaseKey" class="form-input" placeholder="eyJhbGc...">
+      </div>
+      <button class="btn btn-outline btn-full" onclick="saveCloudConfig()" style="margin-bottom:1rem;" data-i18n="cloud.btn.save">💾 Enregistrer la configuration</button>
+      <hr style="opacity:0.1; margin:1.5rem 0;">
+      <div style="display:flex; gap:10px;">
+        <button class="btn btn-primary btn-full" id="btnCloudSync" onclick="syncToCloud()" data-i18n="cloud.btn.sync">☁️ Synchroniser maintenant</button>
+        <button class="btn btn-outline btn-full" onclick="syncFromCloud()" data-i18n="cloud.btn.restore">📥 Restaurer depuis le cloud</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================================================ -->
+  <!-- CLIENT QR CODE MODAL -->
+  <!-- ================================================ -->
+  <div id="clientQRModal" class="modal-overlay" style="display:none;">
+    <div class="modal-content glass-panel" style="max-width:420px; width:95%;">
+      <div class="modal-header" style="display:flex; justify-content:space-between; margin-bottom:1.2rem;">
+        <h3 style="margin:0;">📱 <span data-i18n="clientqr.modal.title">Fiche Client QR Code</span></h3>
+        <button class="btn-icon" onclick="closeClientQR()">✕</button>
+      </div>
+      <div id="clientQRContent" class="client-qr-card">
+        <div class="client-qr-header">
+          <div class="client-qr-logo">🧁</div>
+          <h4 id="clientQRRecipeName" class="client-qr-name">—</h4>
+          <p id="clientQRDescription" class="client-qr-desc"></p>
+        </div>
+        <div class="client-qr-price-badge">
+          <span id="clientQRPrice">—</span>
+        </div>
+        <div class="client-qr-code-box">
+          <div id="clientQRCode"></div>
+        </div>
+        <div class="client-qr-details">
+          <div class="client-qr-section">
+            <strong data-i18n="clientqr.ingredients">Ingrédients :</strong>
+            <p id="clientQRIngredients" class="client-qr-text"></p>
+          </div>
+          <div class="client-qr-section">
+            <strong data-i18n="clientqr.allergens">Allergènes :</strong>
+            <p id="clientQRAllergens" class="client-qr-text" style="color:var(--danger);"></p>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:1.5rem; display:flex; gap:10px;">
+        <button class="btn btn-primary btn-full" onclick="exportClientQRPdf()">💾 PDF</button>
+        <button class="btn btn-outline btn-full" onclick="window.print()">🖨️ Imprimer</button>
       </div>
     </div>
   </div>
