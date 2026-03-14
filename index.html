@@ -178,7 +178,8 @@
         <div class="nav-dropdown-content">
           <button class="nav-link nav-dropdown-link" id="navRecettes">📖 <span data-i18n="nav.recipes">Recettes</span></button>
           <button class="nav-link nav-dropdown-link" id="navLabo">📐 <span data-i18n="nav.lab">Laboratoire</span></button>
-          <button class="nav-link nav-dropdown-link" id="navLabeling">🏷️ <span data-i18n="nav.labeling">Étiquetage</span></button>
+          <button class="nav-link nav-dropdown-link" id="navHygiene">🧼 <span data-i18n="nav.hygiene">Hygiène & HACCP</span></button>
+          <button class="nav-link nav-dropdown-link" id="navPlanning">📅 <span data-i18n="nav.planning">Planning</span></button>
         </div>
       </div>
 
@@ -192,20 +193,11 @@
         </div>
       </div>
 
-      <!-- Organisation -->
+      <!-- Catalogue -->
       <div class="nav-dropdown">
-        <button class="nav-dropdown-trigger"><span data-i18n="nav.category.org">📋 Organisation</span> <span class="nav-arrow">▼</span></button>
+        <button class="nav-dropdown-trigger"><span data-i18n="nav.category.showcase">✨ Catalogue</span> <span class="nav-arrow">▼</span></button>
         <div class="nav-dropdown-content">
-          <button class="nav-link nav-dropdown-link" id="navPlanning">📅 <span data-i18n="nav.planning">Planning</span></button>
-          <button class="nav-link nav-dropdown-link" id="navHygiene">🧼 <span data-i18n="nav.hygiene">Hygiène & HACCP</span></button>
           <button class="nav-link nav-dropdown-link" id="navSuppliers">🚚 <span data-i18n="nav.suppliers">Fournisseurs</span></button>
-        </div>
-      </div>
-
-      <!-- Vitrine -->
-      <div class="nav-dropdown">
-        <button class="nav-dropdown-trigger"><span data-i18n="nav.category.showcase">✨ Vitrine</span> <span class="nav-arrow">▼</span></button>
-        <div class="nav-dropdown-content">
           <button class="nav-link nav-dropdown-link" id="navPortfolio">🖼️ <span data-i18n="nav.portfolio">Portfolio</span></button>
           <button class="nav-link nav-dropdown-link" id="navAPropos">📖 <span data-i18n="nav.about">À propos</span></button>
         </div>
@@ -809,7 +801,7 @@
 
         <!-- TAB 4: COST OBJECTIVES -->
         <div id="mgmtViewObjectives" class="mgmt-view" style="display:none;">
-          <div class="mgmt-glass-card">
+          <div class="mgmt-glass-card" style="margin-bottom: 2rem;">
             <div class="mgmt-card-header header-centered">
               <div class="mgmt-card-title">
                 <div class="title-icon icon-blue">🎯</div>
@@ -820,6 +812,69 @@
               </div>
             </div>
             <div class="mgmt-objectives-grid" id="objectivesGrid">
+            </div>
+          </div>
+
+          <!-- BREAKING POINT MODULE -->
+          <div class="mgmt-glass-card">
+            <div class="mgmt-card-header header-centered">
+              <div class="mgmt-card-title">
+                <div class="title-icon icon-yellow">🧀</div>
+                <div>
+                  <h3 data-i18n="mgmt.bp.title">Seuil de Rentabilité (Point Mort)</h3>
+                  <p data-i18n="mgmt.bp.desc">Calculez le chiffre d'affaires minimum pour absorber vos charges fixes.</p>
+                </div>
+              </div>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; padding: 1rem 0;">
+              <!-- Inputs -->
+              <div style="background: var(--bg-alt); padding: 1.5rem; border-radius: var(--radius); border: 1px solid var(--surface-border);">
+                <h4 style="margin-top: 0; margin-bottom: 1.2rem; font-size: 1.05rem;" data-i18n="mgmt.bp.fixed_costs">Charges Fixes Mensuelles</h4>
+                
+                <div class="form-group">
+                  <label class="form-label" data-i18n="mgmt.bp.rent">Loyer & Assurances (€)</label>
+                  <input type="number" id="bpRent" class="form-input" placeholder="Ex: 1500" value="1500">
+                </div>
+                <div class="form-group">
+                  <label class="form-label" data-i18n="mgmt.bp.salaries">Salaires & Charges (€)</label>
+                  <input type="number" id="bpSalaries" class="form-input" placeholder="Ex: 5000" value="5000">
+                </div>
+                <div class="form-group">
+                  <label class="form-label" data-i18n="mgmt.bp.energy">Énergie & Eau (€)</label>
+                  <input type="number" id="bpEnergy" class="form-input" placeholder="Ex: 800" value="800">
+                </div>
+                <div class="form-group">
+                  <label class="form-label" data-i18n="mgmt.bp.other">Autres frais fixes (€)</label>
+                  <input type="number" id="bpOther" class="form-input" placeholder="Ex: 400" value="400">
+                </div>
+                
+                <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--surface-border); display: flex; justify-content: space-between; font-weight: 800; font-size: 1.2rem;">
+                  <span data-i18n="mgmt.bp.total_fixed">Total Fixe:</span>
+                  <span id="bpTotalFixed" style="color: var(--accent);">8700 €</span>
+                </div>
+              </div>
+
+              <!-- Results -->
+              <div style="display: flex; flex-direction: column; justify-content: center;">
+                <div style="text-align: center; margin-bottom: 2rem;">
+                  <div style="font-size: 0.9rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; letter-spacing: 1px; margin-bottom: 0.5rem;" data-i18n="mgmt.bp.target_revenue">Chiffre d'Affaires Cible (Mensuel)</div>
+                  <div id="bpTargetRevenue" style="font-size: 3rem; font-weight: 900; color: var(--success); line-height: 1.1;">-- €</div>
+                  <div style="font-size: 0.95rem; color: var(--text-muted); margin-top: 0.5rem;">
+                    <span data-i18n="mgmt.bp.daily">Soit par jour (sur 24j) :</span> <strong id="bpDailyRevenue" style="color: var(--text-primary);">-- €</strong>
+                  </div>
+                </div>
+
+                <div style="background: var(--bg-alt); padding: 1.2rem; border-radius: var(--radius); font-size: 0.9rem;">
+                  <div style="display: flex; justify-content: space-between; margin-bottom: 0.8rem;">
+                    <span data-i18n="mgmt.bp.avg_margin">Taux de Marge Moyen :</span>
+                    <strong id="bpAvgMargin">-- %</strong>
+                  </div>
+                  <p style="color: var(--text-muted); margin: 0; line-height: 1.4; font-size: 0.85rem;" data-i18n="mgmt.bp.explanation">
+                    Ce montant correspond au moment exact où votre laboratoire commence à gagner de l'argent (bénéfice net > 0). Ce calcul est basé sur la moyenne de marge de vos recettes.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -3368,11 +3423,11 @@
     const mNavAtelier = document.getElementById('mNavAtelier');
     if (mNavAtelier) mNavAtelier.onclick = () => { openMobileCategory('atelier'); updateMobileNavActive('mNavAtelier'); };
     const mNavPilotage = document.getElementById('mNavPilotage');
-    if (mNavPilotage) mNavPilotage.onclick = () => { openMobileCategory('pilotage'); updateMobileNavActive('mNavAtelier'); };
-    const mNavOrg = document.getElementById('mNavOrg');
-    if (mNavOrg) mNavOrg.onclick = () => { openMobileCategory('org'); updateMobileNavActive('mNavAtelier'); };
+    if (mNavPilotage) mNavPilotage.onclick = () => { openMobileCategory('pilotage'); updateMobileNavActive('mNavPilotage'); };
+    const mNavCatalogue = document.getElementById('mNavCatalogue');
+    if (mNavCatalogue) mNavCatalogue.onclick = () => { openMobileCategory('catalogue'); updateMobileNavActive('mNavCatalogue'); };
     const mNavMore = document.getElementById('mNavMore');
-    if (mNavMore) mNavMore.onclick = () => { openMobileCategory('more'); updateMobileNavActive('mNavAtelier'); };
+    if (mNavMore) mNavMore.onclick = () => { openMobileCategory('more'); updateMobileNavActive('mNavMore'); };
 
     if (document.getElementById('headerBrand')) document.getElementById('headerBrand').onclick = showHub;
   </script>
@@ -3427,9 +3482,9 @@
       <span class="icon">📈</span>
       <span class="label" data-i18n="nav.category.mgmt">Pilotage</span>
     </button>
-    <button class="mobile-nav-item" id="mNavOrg">
-      <span class="icon">📋</span>
-      <span class="label" data-i18n="nav.category.org">Org</span>
+    <button class="mobile-nav-item" id="mNavCatalogue">
+      <span class="icon">✨</span>
+      <span class="label" data-i18n="nav.category.showcase">Catalogue</span>
     </button>
     <button class="mobile-nav-item" id="mNavMore">
       <span class="icon">➕</span>
@@ -3466,7 +3521,8 @@
         items = [
           { id: 'mLinkRecettes', icon: '📖', label: 'nav.recipes', action: showRecettes },
           { id: 'mLinkLabo', icon: '📐', label: 'nav.lab', action: showLabo },
-          { id: 'mLinkLabeling', icon: '🏷️', label: 'nav.labeling', action: showLabeling }
+          { id: 'mLinkHygiene', icon: '🧼', label: 'nav.hygiene', action: showHygiene },
+          { id: 'mLinkPlanning', icon: '📅', label: 'nav.planning', action: showPlanning }
         ];
       } else if (category === 'pilotage') {
         moreMenuTitle.textContent = "📈 Pilotage";
@@ -3475,18 +3531,17 @@
           { id: 'mLinkStats', icon: '📊', label: 'nav.stats', action: showStats },
           { id: 'mLinkInv', icon: '📦', label: 'nav.inventory', action: showInventaire }
         ];
-      } else if (category === 'org') {
-        moreMenuTitle.textContent = "📋 Organisation";
+      } else if (category === 'catalogue') {
+        moreMenuTitle.textContent = "✨ Catalogue";
         items = [
-          { id: 'mLinkPlanning', icon: '📅', label: 'nav.planning', action: showPlanning },
-          { id: 'mLinkHygiene', icon: '🧼', label: 'nav.hygiene', action: showHygiene },
-          { id: 'mLinkSuppliers', icon: '🚚', label: 'nav.suppliers', action: showSuppliers }
-        ];
-      } else if (category === 'more') {
-        moreMenuTitle.textContent = "Menu";
-        items = [
+          { id: 'mLinkSuppliers', icon: '🚚', label: 'nav.suppliers', action: showSuppliers },
           { id: 'mLinkPortfolio', icon: '🖼️', label: 'nav.portfolio', action: showPortfolio },
           { id: 'mLinkAbout', icon: '📖', label: 'nav.about', action: showAPropos }
+        ];
+      } else if (category === 'more') {
+        moreMenuTitle.textContent = "🧰 Outils Pro";
+        items = [
+          { id: 'mLinkProTools', icon: '🧰', label: 'nav.protools', action: showProTools }
         ];
       }
 

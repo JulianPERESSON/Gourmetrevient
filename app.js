@@ -354,20 +354,38 @@ function getIngredientIcon(name) {
 // INGREDIENT COST CALCULATION
 // ============================================================================
 
-function calcIngredientCost(ing) {
+function calcIngredientCost(ing, depth = 0) {
+  if (depth > 5) return 0; // Prevent infinite recursion
+
   const qty = parseFloat(ing.quantity) || 0;
   const unit = ing.unit || 'g';
 
-  // RECURSIVE COST CALCULATION: Check if ingredient is a sub-recipe
-  const savedRecipes = JSON.parse(localStorage.getItem('gourmet_saved_recipes') || '[]');
+  // RECURSIVE COST CALCULATION: Check if ingredient is a sub-recipe (Composition)
+  const savedRecipes = JSON.parse(localStorage.getItem(getUserRecipesKey()) || '[]');
   const subRecipe = savedRecipes.find(r => r.name.toLowerCase() === ing.name.toLowerCase());
 
   if (subRecipe) {
     let subCost = 0;
+    let subWeightGrams = 0;
     subRecipe.ingredients.forEach(subIng => {
-      subCost += calcIngredientCost(subIng);
+      subCost += calcIngredientCost(subIng, depth + 1);
+      let subQty = parseFloat(subIng.quantity) || 0;
+      if (subIng.unit === 'kg' || subIng.unit === 'L') subQty *= 1000;
+      subWeightGrams += subQty;
     });
-    return (subCost / subRecipe.portions) * qty;
+
+    if (subWeightGrams === 0) return 0;
+
+    // Convert requested qty to grams
+    let reqQtyInGrams = qty;
+    if (unit === 'kg' || unit === 'L') reqQtyInGrams *= 1000;
+    // If unit is 'piece', we fallback to treating qty as chunks of total weight (e.g. 1 piece = 1 whole recipe).
+    if (unit === 'pièce') {
+       return subCost * qty; // Total sub-recipe cost * number of pieces
+    }
+
+    // Cost per gram * requested grams
+    return (subCost / subWeightGrams) * reqQtyInGrams;
   }
 
   let price = parseFloat(ing.pricePerUnit);
@@ -874,21 +892,59 @@ function showAutocomplete(input, listEl, idx) {
   const val = input.value.toLowerCase().trim();
   if (val.length < 1) { listEl.classList.remove('show'); return; }
 
-  const matches = APP.ingredientDb.filter(i =>
+  // 1. Core ingredients
+  let matches = APP.ingredientDb.filter(i =>
     i.name.toLowerCase().includes(val)
-  ).slice(0, 8);
+  ).map(i => ({...i, isRecipe: false}));
+
+  // 2. Saved Recipes (Compositions)
+  const savedRecipes = JSON.parse(localStorage.getItem(getUserRecipesKey()) || '[]');
+  
+  // Filter out the *current* recipe to prevent self-reference
+  const currentRecipeName = (APP.recipe.name || '').toLowerCase();
+  
+  const recipeMatches = savedRecipes
+    .filter(r => r.name.toLowerCase().includes(val) && r.name.toLowerCase() !== currentRecipeName)
+    .map(r => {
+      // Calculate sub-recipe total cost and weight to give a price per kg
+      let subCost = 0;
+      let subWeightGrams = 0;
+      r.ingredients.forEach(subIng => {
+        subCost += calcIngredientCost(subIng);
+        let subQty = parseFloat(subIng.quantity) || 0;
+        if (subIng.unit === 'kg' || subIng.unit === 'L') subQty *= 1000;
+        subWeightGrams += subQty;
+      });
+      // Cost per kg = (Cost / Weight in g) * 1000
+      let pricePerKg = subWeightGrams > 0 ? (subCost / subWeightGrams) * 1000 : 0;
+      
+      return {
+        name: r.name,
+        unit: 'kg', // By default, we use compositions by weight
+        pricePerUnit: pricePerKg,
+        priceRef: 'kg',
+        isRecipe: true
+      };
+    });
+
+  matches = [...recipeMatches, ...matches].slice(0, 8);
 
   if (matches.length === 0) { listEl.classList.remove('show'); return; }
 
-  listEl.innerHTML = matches.map(m => `
-    <div class="autocomplete-item" data-name="${escapeHtml(m.name)}" data-unit="${m.unit}" data-price="${m.pricePerUnit}" style="display:flex; align-items:center; gap:8px;">
-      <span style="font-size:1.1rem; width:24px; text-align:center;">${getIngredientIcon(m.name)}</span>
+  listEl.innerHTML = matches.map(m => {
+    const icon = m.isRecipe ? '📦' : getIngredientIcon(m.name);
+    const badgeHtml = m.isRecipe ? `<span style="font-size:0.6rem; background:var(--accent); color:white; padding:2px 4px; border-radius:4px; margin-left:6px; font-weight:800; text-transform:uppercase;">COMPOSITION</span>` : '';
+    
+    return `
+    <div class="autocomplete-item" data-name="${escapeHtml(m.name)}" data-unit="${escapeHtml(m.unit || 'g')}" data-price="${m.pricePerUnit}" style="display:flex; align-items:center; gap:8px;">
+      <span style="font-size:1.1rem; width:24px; text-align:center;">${icon}</span>
       <div style="flex:1;">
-        <div style="font-weight:600;">${escapeHtml(m.name)}</div>
-        <small style="color:var(--text-muted)">${m.pricePerUnit.toFixed(2)} €/${m.priceRef}</small>
+        <div style="font-weight:600;">${escapeHtml(m.name)}${badgeHtml}</div>
+        <small style="color:var(--text-muted)">${parseFloat(m.pricePerUnit).toFixed(2)} €/${escapeHtml(m.priceRef || m.unit)}</small>
       </div>
     </div>
-  `).join('');
+    `;
+  }).join('');
 
   listEl.classList.add('show');
 
@@ -903,6 +959,7 @@ function showAutocomplete(input, listEl, idx) {
     });
   });
 }
+
 
 // ============================================================================
 // STEP 3 — PROCEDURE
@@ -5525,7 +5582,11 @@ function loadHaccpLogs() {
     APP.haccpLogs.clean = [
       { id: 'c1', areaKey: 'haccp.clean.c1', done: false, icon: '🧼' },
       { id: 'c2', areaKey: 'haccp.clean.c2', done: false, icon: '🧹' },
-      { id: 'c3', areaKey: 'haccp.clean.c3', done: false, icon: '🔥' }
+      { id: 'c3', areaKey: 'haccp.clean.c3', done: false, icon: '🔥' },
+      { id: 'c4', areaKey: 'haccp.clean.c4', done: false, icon: '📦' },
+      { id: 'c5', areaKey: 'haccp.clean.c5', done: false, icon: '❄️' },
+      { id: 'c6', areaKey: 'haccp.clean.c6', done: false, icon: '🥣' },
+      { id: 'c7', areaKey: 'haccp.clean.c7', done: false, icon: '🗑️' }
     ];
     saveHaccpLogs();
   }
@@ -6643,6 +6704,57 @@ function renderObjectives() {
       </div>
     `;
   }).join('');
+
+  // Breaking Point module
+  calculateBreakingPoint();
+  bindBreakingPointEvents();
+}
+
+function bindBreakingPointEvents() {
+  const inputs = ['bpRent', 'bpSalaries', 'bpEnergy', 'bpOther'];
+  
+  // Load saved fixed costs
+  const savedData = JSON.parse(localStorage.getItem('gourmet_fixed_costs') || '{}');
+  inputs.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      if (savedData[id] !== undefined) el.value = savedData[id];
+      // Avoid binding multiple times
+      el.removeEventListener('input', calculateBreakingPoint);
+      el.addEventListener('input', calculateBreakingPoint);
+    }
+  });
+}
+
+function calculateBreakingPoint() {
+  const rent = parseFloat(document.getElementById('bpRent')?.value) || 0;
+  const salaries = parseFloat(document.getElementById('bpSalaries')?.value) || 0;
+  const energy = parseFloat(document.getElementById('bpEnergy')?.value) || 0;
+  const other = parseFloat(document.getElementById('bpOther')?.value) || 0;
+
+  const totalFixed = rent + salaries + energy + other;
+
+  // Save to localStorage
+  localStorage.setItem('gourmet_fixed_costs', JSON.stringify({ bpRent: rent, bpSalaries: salaries, bpEnergy: energy, bpOther: other }));
+
+  document.getElementById('bpTotalFixed').textContent = totalFixed.toLocaleString('fr-FR') + ' €';
+
+  const recipes = APP.savedRecipes || [];
+  let avgMargin = 0;
+  let validRecipesCount = 0;
+
+  recipes.forEach(r => {
+    avgMargin += (r.margin || 70);
+    validRecipesCount++;
+  });
+
+  const marginRate = validRecipesCount > 0 ? (avgMargin / validRecipesCount) : 70;
+  document.getElementById('bpAvgMargin').textContent = marginRate.toFixed(1) + ' %';
+
+  const breakingPoint = (marginRate > 0) ? (totalFixed / (marginRate / 100)) : 0;
+  
+  document.getElementById('bpTargetRevenue').textContent = breakingPoint.toLocaleString('fr-FR', { maximumFractionDigits: 0 }) + ' €';
+  document.getElementById('bpDailyRevenue').textContent = (breakingPoint / 24).toLocaleString('fr-FR', { maximumFractionDigits: 0 }) + ' €';
 }
 
 // --- Production Planning ---
