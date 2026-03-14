@@ -187,8 +187,8 @@
       <div class="nav-dropdown">
         <button class="nav-dropdown-trigger"><span data-i18n="nav.category.mgmt">📈 Pilotage</span> <span class="nav-arrow">▼</span></button>
         <div class="nav-dropdown-content">
-          <button class="nav-link nav-dropdown-link" id="navMgmt" style="font-weight:800;">⚙️ <span data-i18n="nav.mgmt">Gestion Pro</span></button>
-          <button class="nav-link nav-dropdown-link" id="navExam">🎓 <span data-i18n="mgmt.tab.exam">Simulateur CAP</span></button>
+          <button class="nav-link nav-dropdown-link" id="navExam" style="font-weight:800; color:var(--purple);">🎓 <span data-i18n="mgmt.tab.exam">Simulateur CAP</span></button>
+          <button class="nav-link nav-dropdown-link" id="navMgmt">⚙️ <span data-i18n="nav.mgmt">Gestion Pro</span></button>
           <button class="nav-link nav-dropdown-link" id="navSuppliers">🚚 <span data-i18n="nav.suppliers">Fournisseurs</span></button>
           <button class="nav-link nav-dropdown-link" id="navInventaire">📦 <span data-i18n="nav.inventory">Inventaire</span></button>
         </div>
@@ -1054,7 +1054,7 @@
                <label style="display:block; margin-bottom:0.5rem; font-weight:700; color:var(--text-secondary);">Sujet d'examen :</label>
                <select id="examSubjectSelect" class="form-input" onchange="generateCapOrdonnancement(this.value)" style="width:100%; font-weight:600;">
                   <option value="">-- Choisir un sujet --</option>
-                  <optgroup label="EP1 : Tour / Tartes / Goûters">
+                  <optgroup label="EP1 : Tour / Tartes / Petits Fours">
                     <option value="EP1_S1">Sujet 1 : Croissants / Tarte aux Pommes / Sablés</option>
                     <option value="EP1_S2">Sujet 2 : Pains Choc / Tarte Bourdaloue / Madeleines</option>
                     <option value="EP1_S3">Sujet 3 : Brioches / Tarte Citron / Tuiles Amandes</option>
