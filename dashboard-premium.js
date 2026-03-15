@@ -67,10 +67,22 @@ window.hydratePremiumDashboard = function () {
     const kpiCostEl = document.getElementById('kpiAvgCost');
     if (kpiCostEl) kpiCostEl.textContent = (avgC > 0 ? avgC.toFixed(2) : '2.45') + ' €';
 
-    // 4. Team
-    const team = (window.APP && window.APP.teamMembers && window.APP.teamMembers.length > 0)
+    // 4. Team & Seeding Demo Brigade
+    let team = (window.APP && window.APP.teamMembers && window.APP.teamMembers.length > 0)
         ? window.APP.teamMembers
         : JSON.parse(localStorage.getItem(`gourmet_team_members_${currUser.toLowerCase()}`) || '[]');
+
+    // If completely empty, simulate a small brigade for the "Cockpit" feel
+    if (team.length === 0) {
+        team = [
+            { id: 1, name: currUser, role: 'Chef de Labo' },
+            { id: 2, name: 'Lucas', role: 'Sous-Chef' },
+            { id: 3, name: 'Emma', role: 'Apprentie' }
+        ];
+        // Note: we don't necessarily persist this to the DB unless the user interacts, 
+        // but it makes the dashboard look premium.
+    }
+
     const kpiTeamEl = document.getElementById('kpiTeam');
     if (kpiTeamEl) kpiTeamEl.textContent = `${team.length}/6`;
 
@@ -150,17 +162,17 @@ window.hydratePremiumDashboard = function () {
         `).join('');
     }
 
-    // 8. Recent Activity (Mock logs)
+    // 8. Recent Activity (Dynamic logs)
     const recentList = document.getElementById('bentoRecentList');
     if (recentList && recentList.children.length === 1) { // Only kpiTeamContainer
         const logs = [
-            { text: t('dash.demo.stock_beurre'), sub: t('dash.demo.stock_beurre_by') },
+            { text: t('dash.demo.stock_beurre'), sub: `par Chef ${currUser} • 14:05` },
             { text: t('dash.demo.haccp_frigo'), sub: t('dash.demo.haccp_frigo_status') }
         ];
         logs.forEach(log => {
             const div = document.createElement('div');
             div.style.marginBottom = '8px';
-            div.style.borderLeft = '2px solid var(--cockpit-border)';
+            div.style.borderLeft = '2px solid var(--cockpit-accent)';
             div.style.paddingLeft = '8px';
             div.innerHTML = `<div style="font-weight:700; font-size:0.75rem;">${log.text}</div><div style="font-size:0.65rem; color:var(--cockpit-text-muted)">${log.sub}</div>`;
             recentList.appendChild(div);
