@@ -187,7 +187,6 @@
       <div class="nav-dropdown">
         <button class="nav-dropdown-trigger"><span data-i18n="nav.category.mgmt">📈 Pilotage</span> <span class="nav-arrow">▼</span></button>
         <div class="nav-dropdown-content">
-          <button class="nav-link nav-dropdown-link" id="navExam" style="font-weight:800; color:var(--purple);">🎓 <span data-i18n="mgmt.tab.exam">Simulateur CAP</span></button>
           <button class="nav-link nav-dropdown-link" id="navMgmt">⚙️ <span data-i18n="nav.mgmt">Gestion Pro</span></button>
           <button class="nav-link nav-dropdown-link" id="navSuppliers">🚚 <span data-i18n="nav.suppliers">Fournisseurs</span></button>
           <button class="nav-link nav-dropdown-link" id="navInventaire">📦 <span data-i18n="nav.inventory">Inventaire</span></button>
@@ -621,10 +620,7 @@
             <span class="tab-pill-emoji">📅</span>
             <span data-i18n="mgmt.tab.production">Planning Prod.</span>
           </button>
-          <button class="mgmt-tab-pill" id="mgmtTabExam" onclick="switchMgmtTab('exam')">
-            <span class="tab-pill-emoji">🎓</span>
-            <span data-i18n="mgmt.tab.exam">Simulateur CAP</span>
-          </button>
+
           <button class="mgmt-tab-pill" id="mgmtTabQuality" onclick="switchMgmtTab('quality')">
             <span class="tab-pill-emoji">📉</span>
             <span data-i18n="mgmt.tab.quality">Qualité & Pertes</span>
@@ -698,37 +694,37 @@
                   <h3 data-i18n="mgmt.bp.title" style="margin:0;">Seuil de Rentabilité</h3>
                 </div>
               </div>
-              <div style="padding: 1.5rem;">
-                <div style="text-align: center; margin-bottom: 1.5rem;">
-                  <div id="bpTargetRevenue" style="font-size: 2.5rem; font-weight: 900; color: var(--success);">-- €</div>
-                  <div style="font-size: 0.8rem; color: var(--text-muted); text-transform:uppercase; font-weight:700;" data-i18n="mgmt.bp.target_revenue">Chiffre d'Affaires Cible</div>
-                </div>
-                <div style="background: var(--bg-alt); padding: 1.2rem; border-radius: var(--radius); font-size: 0.9rem;">
-                  <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-                    <span data-i18n="mgmt.bp.daily">Soit par jour (sur 24j) :</span>
-                    <strong id="bpDailyRevenue">-- €</strong>
+                <div style="padding: 1.5rem;">
+                  <div style="text-align: center; margin-bottom: 1.5rem;">
+                    <div id="bpTargetRevenue" style="font-size: 2.5rem; font-weight: 900; color: var(--success);">-- €</div>
+                    <div style="font-size: 0.8rem; color: var(--text-muted); text-transform:uppercase; font-weight:700;" data-i18n="mgmt.bp.target_revenue">Chiffre d'Affaires Cible</div>
                   </div>
-                  <button class="btn btn-sm btn-outline btn-full" onclick="switchMgmtTab('dashboard_config')" style="margin-top: 1rem;">⚙️ Configurer mes charges fixes</button>
+                  
+                  <div style="background: var(--bg-alt); padding: 1.2rem; border-radius: var(--radius); font-size: 0.9rem; margin-bottom: 1rem;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.8rem; border-bottom: 1px dashed var(--surface-border); padding-bottom: 0.5rem;">
+                      <span data-i18n="mgmt.bp.fixed_costs">Total Charges Fixes :</span>
+                      <strong id="bpTotalFixed">-- €</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.8rem;">
+                      <span data-i18n="mgmt.bp.avg_margin">Taux de Marge Moyen :</span>
+                      <strong id="bpAvgMargin">-- %</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                      <span data-i18n="mgmt.bp.daily">Soit par jour (sur 24j) :</span>
+                      <strong id="bpDailyRevenue">-- €</strong>
+                    </div>
+                  </div>
+
+                  <p style="color: var(--text-muted); margin: 0; line-height: 1.4; font-size: 0.85rem; padding: 0 0.5rem;" data-i18n="mgmt.bp.explanation">
+                    Ce montant correspond au moment exact où votre laboratoire commence à gagner de l'argent (bénéfice net > 0). Ce calcul est basé sur la moyenne de marge de vos recettes.
+                  </p>
+                  
+                  <button class="btn btn-sm btn-outline btn-full" onclick="switchMgmtTab('dashboard_config')" style="margin-top: 1.5rem;">⚙️ Configurer mes charges fixes</button>
                 </div>
-              </div>
             </div>
           </div>
 
-          <!-- Section: CAP Prep (Featured for User) -->
-          <div class="mgmt-glass-card" style="margin-bottom: 2rem; border-left: 5px solid var(--purple);">
-            <div style="display: flex; align-items: center; justify-content: space-between; padding: 1.5rem;">
-              <div style="display: flex; align-items: center; gap: 20px;">
-                <div style="font-size: 3rem;">🎓</div>
-                <div>
-                  <h3 style="margin:0;" data-i18n="exam.title">Préparation CAP 2026</h3>
-                  <p style="margin:0; color:var(--text-muted);">Préparez vos épreuves EP1 & EP2 avec l'ordonnancement intelligent.</p>
-                </div>
-              </div>
-              <button class="btn btn-primary" onclick="switchMgmtTab('exam')" style="border-radius:25px; padding: 10px 25px;">
-                Accéder au Simulateur →
-              </button>
-            </div>
-          </div>
+
         </div>
 
         <!-- TAB: DASHBOARD CONFIG (Hidden sub-tab) -->
@@ -950,19 +946,6 @@
           </div>
         </div>
 
-
-                <div style="background: var(--bg-alt); padding: 1.2rem; border-radius: var(--radius); font-size: 0.9rem;">
-                  <div style="display: flex; justify-content: space-between; margin-bottom: 0.8rem;">
-                    <span data-i18n="mgmt.bp.avg_margin">Taux de Marge Moyen :</span>
-                    <strong id="bpAvgMargin">-- %</strong>
-                  </div>
-                  <p style="color: var(--text-muted); margin: 0; line-height: 1.4; font-size: 0.85rem;" data-i18n="mgmt.bp.explanation">
-                    Ce montant correspond au moment exact où votre laboratoire commence à gagner de l'argent (bénéfice net > 0). Ce calcul est basé sur la moyenne de marge de vos recettes.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
 
         <!-- TAB 5: PRODUCTION PLANNING -->
@@ -1027,62 +1010,8 @@
             </div>
           </div>
         </div>
-              <button class="btn btn-sm btn-primary" onclick="addProductionItem()" data-i18n="mgmt.production.add">✚ Ajouter</button>
-            </div>
-            <div id="productionPlanGrid">
-            </div>
-          </div>
-        </div>
 
-        <!-- TAB 7: CAP EXAM SIMULATOR -->
-        <div id="mgmtViewExam" class="mgmt-view" style="display:none;">
-          <div class="mgmt-glass-card" style="margin-bottom: 2rem;">
-            <div class="mgmt-card-header header-centered">
-              <div class="mgmt-card-title">
-                <div class="title-icon icon-purple">🎓</div>
-                <div>
-                  <h3 data-i18n="exam.title">Ordonnancement CAP 2026</h3>
-                  <p data-i18n="exam.intro">Sélectionnez votre épreuve pour générer un plan de travail optimisé.</p>
-                </div>
-              </div>
-              <button class="btn btn-sm btn-outline" onclick="seedCapToolkit()" style="border-radius:20px; color:var(--purple); border-color:var(--purple); font-weight:700;">
-                🎓 Importer le Catalogue CAP 2026
-              </button>
-            </div>
 
-            <div style="background: var(--bg-alt); padding: 1.5rem; border-radius: var(--radius); margin-bottom: 1.5rem;">
-               <label style="display:block; margin-bottom:0.5rem; font-weight:700; color:var(--text-secondary);">Sujet d'examen :</label>
-               <select id="examSubjectSelect" class="form-input" onchange="generateCapOrdonnancement(this.value)" style="width:100%; font-weight:600;">
-                  <option value="">-- Choisir un sujet --</option>
-                  <optgroup label="EP1 : Tour / Tartes / Petits Fours">
-                    <option value="EP1_S1">Sujet 1 : Croissants / Tarte aux Pommes / Sablés</option>
-                    <option value="EP1_S2">Sujet 2 : Pains Choc / Tarte Bourdaloue / Madeleines</option>
-                    <option value="EP1_S3">Sujet 3 : Brioches / Tarte Citron / Tuiles Amandes</option>
-                    <option value="EP1_S4">Sujet 4 : Pain au Lait / Flan / Cookies</option>
-                  </optgroup>
-                  <optgroup label="EP2 : Entremets / Petits Gâteaux">
-                    <option value="EP2_S1">Sujet 1 : Royal Choco / Éclairs Choco</option>
-                    <option value="EP2_S2">Sujet 2 : Fraisier / Religieuses Café</option>
-                    <option value="EP2_S3">Sujet 3 : Opéra / Paris-Brest</option>
-                    <option value="EP2_S4">Sujet 4 : Forêt Noire / Choux Craquelin</option>
-                  </optgroup>
-               </select>
-            </div>
-
-            <div id="examOrdonnancementOutput" style="margin-top: 2rem; display: none;">
-               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--surface-border);">
-                  <div style="display: flex; gap: 1rem; align-items: center;">
-                    <span id="examSubjectBadge" class="badge-pill" style="background: var(--primary); color: white; padding: 5px 15px; border-radius: 20px; font-weight: 700;">EP1</span>
-                    <h4 id="examTimerDisplay" style="margin:0; font-family: 'Courier New', monospace; font-size: 1.5rem;">05:30:00</h4>
-                  </div>
-                  <button class="btn btn-primary" onclick="toggleExamTimer()" id="btnStartExam" data-i18n="exam.btn.start">Démarrer le chrono</button>
-               </div>
-               <div id="examTimelineGrid" class="exam-timeline-grid">
-                  <!-- Generated Tasks -->
-               </div>
-            </div>
-          </div>
-        </div>
 
         <!-- TAB 6: BCG MATRIX -->
         <div id="mgmtViewBoston" class="mgmt-view" style="display:none;">
@@ -3245,10 +3174,6 @@
       switchMgmtTab('protools');
     }
 
-    function showExam() {
-      showMgmt();
-      switchMgmtTab('exam');
-    }
 
     function switchMgmtTab(tab) {
       // 1. Reset all views and buttons
@@ -3284,10 +3209,6 @@
         document.getElementById('mgmtTabAnalysis').classList.add('active');
         if (typeof renderBCGMatrix === 'function') renderBCGMatrix();
         if (typeof renderInflationSimulation === 'function') renderInflationSimulation();
-      }
-      else if (tab === 'exam') {
-        document.getElementById('mgmtViewExam').style.display = 'block';
-        document.getElementById('mgmtTabExam').classList.add('active');
       }
       else if (tab === 'protools') {
         document.getElementById('mgmtViewProTools').style.display = 'block';
@@ -3381,7 +3302,6 @@
           'navSuppliers': showSuppliers, 'mLinkSuppliers': showSuppliers,
           'navStats': showStats, 'mLinkStats': showStats,
           'navMgmt': showMgmt, 'mLinkMgmt': showMgmt,
-          'navExam': showExam,
           'navProTools': showProTools, 'mLinkProTools': showProTools,
           'navOmniSearch': () => { if (typeof showOmniSearch === 'function') showOmniSearch(); }
         };
@@ -3513,7 +3433,6 @@
         moreMenuTitle.textContent = "📈 Pilotage";
         items = [
           { id: 'mLinkMgmt', icon: '⚙️', label: 'nav.mgmt', action: showMgmt },
-          { id: 'mLinkExam', icon: '🎓', label: 'mgmt.tab.exam', action: showExam },
           { id: 'mLinkStats', icon: '📊', label: 'nav.stats', action: showStats },
           { id: 'mLinkInv', icon: '📦', label: 'nav.inventory', action: showInventaire }
         ];

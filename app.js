@@ -6737,7 +6737,8 @@ function calculateBreakingPoint() {
   // Save to localStorage
   localStorage.setItem('gourmet_fixed_costs', JSON.stringify({ bpRent: rent, bpSalaries: salaries, bpEnergy: energy, bpOther: other }));
 
-  document.getElementById('bpTotalFixed').textContent = totalFixed.toLocaleString('fr-FR') + ' €';
+  const elFixed = document.getElementById('bpTotalFixed');
+  if (elFixed) elFixed.textContent = totalFixed.toLocaleString('fr-FR') + ' €';
 
   const recipes = APP.savedRecipes || [];
   let avgMargin = 0;
@@ -6749,12 +6750,16 @@ function calculateBreakingPoint() {
   });
 
   const marginRate = validRecipesCount > 0 ? (avgMargin / validRecipesCount) : 70;
-  document.getElementById('bpAvgMargin').textContent = marginRate.toFixed(1) + ' %';
+  const elAvgMargin = document.getElementById('bpAvgMargin');
+  if (elAvgMargin) elAvgMargin.textContent = marginRate.toFixed(1) + ' %';
 
   const breakingPoint = (marginRate > 0) ? (totalFixed / (marginRate / 100)) : 0;
   
-  document.getElementById('bpTargetRevenue').textContent = breakingPoint.toLocaleString('fr-FR', { maximumFractionDigits: 0 }) + ' €';
-  document.getElementById('bpDailyRevenue').textContent = (breakingPoint / 24).toLocaleString('fr-FR', { maximumFractionDigits: 0 }) + ' €';
+  const elTarget = document.getElementById('bpTargetRevenue');
+  if (elTarget) elTarget.textContent = breakingPoint.toLocaleString('fr-FR', { maximumFractionDigits: 0 }) + ' €';
+
+  const elDaily = document.getElementById('bpDailyRevenue');
+  if (elDaily) elDaily.textContent = (breakingPoint / 24).toLocaleString('fr-FR', { maximumFractionDigits: 0 }) + ' €';
 }
 
 // --- Production Planning ---
