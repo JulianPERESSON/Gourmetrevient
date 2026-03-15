@@ -10,21 +10,17 @@ window.hydratePremiumDashboard = function () {
         return;
     }
 
-    // 1. Live Time
-    const liveTimeEl = document.getElementById('dashLiveTime');
+    // 1. Date & Time
     const dateHeaderEl = document.getElementById('dashDateHeader');
     if (dateHeaderEl) {
         const now = new Date();
         const opts = { weekday: 'long', day: 'numeric', month: 'long' };
-        let dateStr = now.toLocaleDateString('fr-FR', opts);
+        let dateStr = now.toLocaleDateString(i18n.currentLang === 'fr' ? 'fr-FR' : (i18n.currentLang === 'es' ? 'es-ES' : 'en-US'), opts);
         dateStr = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
-        dateHeaderEl.childNodes[0].nodeValue = dateStr + " ";
-    }
-    if (liveTimeEl) {
-        liveTimeEl.textContent = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+        dateHeaderEl.textContent = dateStr + " • " + now.toLocaleTimeString(i18n.currentLang === 'fr' ? 'fr-FR' : 'en-US', { hour: '2-digit', minute: '2-digit' });
     }
 
-    // 2. Avatar & Global State
+    // 2. Avatar
     const currentUser = JSON.parse(localStorage.getItem('gourmet_users_db') || '{}');
     const currName = localStorage.getItem('gourmet_current_user');
     let gender = 'male';
@@ -36,7 +32,17 @@ window.hydratePremiumDashboard = function () {
         avatarEl.textContent = gender === 'female' ? '👩‍🍳' : '👨‍🍳';
     }
 
-    // 3. Populate KPIs
+    // 3. Lab Weather & Priority
+    const labWeatherEl = document.getElementById('labWeather');
+    const priorityEl = document.getElementById('nextPriorityTime');
+    if (priorityEl) {
+        // Mock next priority: +2 hours from now
+        const now = new Date();
+        now.setHours(now.getHours() + 2);
+        priorityEl.textContent = now.getHours() + ":" + (now.getMinutes() < 10 ? '0' : '') + now.getMinutes();
+    }
+
+    // 4. KPIs
     const recipes = (window.APP && window.APP.savedRecipes && window.APP.savedRecipes.length > 0)
         ? window.APP.savedRecipes
         : JSON.parse(localStorage.getItem(`gourmetrevient_recipes_${(localStorage.getItem('gourmet_current_user') || 'Ami').toLowerCase()}`) || '[]');
@@ -44,18 +50,13 @@ window.hydratePremiumDashboard = function () {
     const kpiRecEl = document.getElementById('kpiRecipes');
     if (kpiRecEl) kpiRecEl.textContent = recipes.length;
 
-    // Averages
     let totalMargin = 0;
     let totalCost = 0;
     let count = 0;
 
     if (recipes.length > 0) {
         recipes.forEach(r => {
-            // Priority: r.costs (saved) or r.data (live) or calculate if missing
             let m = r.costs || r.data;
-            if (!m && typeof window.calcFullCost === 'function') {
-                try { m = window.calcFullCost(r.margin || 70, r); } catch (e) { }
-            }
             if (m) {
                 totalMargin += m.marginPct || 0;
                 totalCost += m.costPerPortion || 0;
@@ -68,92 +69,128 @@ window.hydratePremiumDashboard = function () {
 
         const kpiMargEl = document.getElementById('kpiMargin');
         if (kpiMargEl) kpiMargEl.textContent = avgM.toFixed(1) + '%';
-        const dashPerfMargEl = document.getElementById('dashPerfMargin');
-        if (dashPerfMargEl) dashPerfMargEl.textContent = avgM.toFixed(1) + '%';
-
         const kpiCostEl = document.getElementById('kpiAvgCost');
         if (kpiCostEl) kpiCostEl.textContent = avgC.toFixed(2) + ' €';
-
-        // Update trends if they were 0
-        const trendM = document.getElementById('trendMargin');
-        if (trendM && avgM > 0 && trendM.textContent.includes('0.0')) {
-            trendM.textContent = '▲ ' + (avgM - 65 > 0 ? (avgM - 65).toFixed(1) : '0.4') + '%';
-        }
-    } else {
-        if (document.getElementById('kpiMargin')) document.getElementById('kpiMargin').textContent = '0%';
-        if (document.getElementById('kpiAvgCost')) document.getElementById('kpiAvgCost').textContent = '0.00 €';
     }
 
-    // Team
+    // 5. Team
     const team = (window.APP && window.APP.teamMembers && window.APP.teamMembers.length > 0)
         ? window.APP.teamMembers
         : JSON.parse(localStorage.getItem(`gourmet_team_members_${(localStorage.getItem('gourmet_current_user') || 'Ami').toLowerCase()}`) || '[]');
     const kpiTeamEl = document.getElementById('kpiTeam');
     if (kpiTeamEl) kpiTeamEl.textContent = `${team.length}/6`;
 
-    // 4. Inventaire/Logistics alerts
+    // 6. Logistics Radar (Stocks)
     const inv = (window.APP && window.APP.inventory && window.APP.inventory.length > 0)
         ? window.APP.inventory
         : JSON.parse(localStorage.getItem(`gourmet_inventory_${(localStorage.getItem('gourmet_current_user') || 'Ami').toLowerCase()}`) || '[]');
+    
     let alerts = 0;
-    inv.forEach(i => {
-        if ((i.stock || i.qty) <= (i.alertThreshold || i.minStock || 0)) alerts++;
-    });
+    const radarList = document.getElementById('dashRuptureList');
+    if (radarList) {
+        const sortedInv = [...inv].sort((a,b) => (a.stock || 0) - (b.stock || 0)).slice(0, 3);
+        if (sortedInv.length > 0) {
+            radarList.innerHTML = sortedInv.map(item => {
+                const stock = item.stock || 0;
+                const min = item.alertThreshold || 5;
+                const pct = Math.min(100, (stock / (min * 2)) * 100);
+                const isLow = stock <= min;
+                if (isLow) alerts++;
+                return `
+                    <div class="radar-item">
+                        <div class="radar-meta">
+                            <span>${item.name}</span>
+                            <span style="color:${isLow ? 'var(--cockpit-danger)' : 'inherit'}">${stock} ${item.unit || 'kg'}</span>
+                        </div>
+                        <div class="radar-gauge">
+                            <div class="radar-fill" style="width:${pct}%; background:${isLow ? 'var(--cockpit-danger)' : 'var(--cockpit-success)'}"></div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        } else {
+            radarList.innerHTML = `<p style="font-size:0.8rem; color:var(--cockpit-text-muted); text-align:center;">${i18n.t('dash.no_stock_alerts') || 'Stocks OK'}</p>`;
+        }
+    }
+
     const kpiAlertsEl = document.getElementById('kpiAlerts');
-    if (kpiAlertsEl) kpiAlertsEl.textContent = alerts;
-    const healthStockDot = document.getElementById('healthStockDot');
-    if (healthStockDot) {
-        healthStockDot.className = alerts > 0 ? 'health-status-dot err' : 'health-status-dot ok';
-        healthStockDot.nextElementSibling.textContent = alerts > 0 ? (i18n.t('dash.stock_alert') || 'Stock: Alerte') : (i18n.t('dash.stock_ok') || 'Stock: OK');
+    if (kpiAlertsEl) {
+        kpiAlertsEl.textContent = alerts;
+        if (labWeatherEl) {
+            const icon = document.getElementById('labWeatherIcon');
+            const text = document.getElementById('labWeatherText');
+            if (alerts > 2) {
+                labWeatherEl.className = 'lab-weather storm';
+                if (icon) icon.textContent = '⛈️';
+                if (text) text.textContent = i18n.t('dash.cockpit.status.storm');
+            } else {
+                labWeatherEl.className = 'lab-weather';
+                if (icon) icon.textContent = '☀️';
+                if (text) text.textContent = i18n.t('dash.cockpit.status.ok');
+            }
+        }
     }
 
-    // Entrance animation for dashboard elements
-    const hubSection = document.getElementById('hubSection');
-    if (hubSection && !hubSection.dataset.animated && window.gsap) {
-        hubSection.dataset.animated = 'true';
-
-        // Initial state
-        gsap.set('.premium-kpi-bar > div, .premium-card, .dash-footer-tips', {
-            opacity: 0,
-            y: 30,
-            scale: 0.98
-        });
-
-        // Staggered arrival
-        gsap.to('.premium-kpi-bar > div, .premium-card, .dash-footer-tips', {
-            opacity: 1,
-            y: 0,
-            scale: 1,
-            duration: 0.6,
-            stagger: 0.1,
-            ease: 'expo.out',
-            clearProps: 'all'
-        });
+    // 7. Production Hub
+    const prodList = document.getElementById('dashProductionList');
+    if (prodList) {
+        // In a real app, this would come from a production planning state.
+        // For the demo/cockpit, we use a mix of real recipes and mock status.
+        const activeProd = recipes.slice(0, 4);
+        if (activeProd.length > 0) {
+            prodList.innerHTML = activeProd.map((r, idx) => {
+                const progresses = [65, 0, 0, 100];
+                const statusIcons = ['🔄', '⏳', '📅', '✅'];
+                const prog = progresses[idx] || 0;
+                return `
+                    <div class="prod-pill-card">
+                        <div class="prod-circle">
+                            <svg viewBox="0 0 36 36" style="width:100%; height:100%; transform: rotate(-90deg);">
+                                <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#eee" stroke-width="3" />
+                                <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="var(--cockpit-accent)" stroke-width="3" stroke-dasharray="${prog}, 100" />
+                                <text x="18" y="20.35" font-size="8" text-anchor="middle" fill="var(--cockpit-text-main)" style="transform: rotate(90deg); transform-origin: center;">${statusIcons[idx] || '•'}</text>
+                            </svg>
+                        </div>
+                        <div class="prod-info-main">
+                            <h4>${r.name}</h4>
+                            <p>${prog}% • ${prog === 100 ? i18n.t('dash.prod.done') : (prog > 0 ? i18n.t('dash.prod.ongoing') : i18n.t('dash.prod.todo'))}</p>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        } else {
+             prodList.innerHTML = `<div style="grid-column:span 2; text-align:center; padding:20px; color:var(--cockpit-text-muted); font-size:0.85rem;">${i18n.t('mgmt.production.no_recipes')}</div>`;
+        }
     }
 
-    // Top and Worst Recipes
+    // 8. Performance Sparkline & Lists
     const sortedByMargin = [...recipes].sort((a, b) => (b.costs?.marginPct || 0) - (a.costs?.marginPct || 0));
     const topDash = document.getElementById('dashTopRecipes');
     if (topDash) {
-        const top3 = sortedByMargin.slice(0, 3);
-        topDash.innerHTML = top3.map(r => `
-            <div class="recipe-row" style="margin-bottom:2px; font-size:0.75rem;">
-                <span>${r.name}</span><span class="recipe-label-badge badge-success" style="font-size:0.65rem;">${r.costs?.marginPct ? Math.round(r.costs.marginPct) : 0}%</span>
-            </div>
-        `).join('') || '<div class="recipe-row"><span style="color:#aaa;">Aucune recette</span></div>';
+        const top2 = sortedByMargin.slice(0, 2);
+        topDash.innerHTML = `<span class="kpi-label">💎 Top</span>` + top2.map(r => `
+            <div style="font-size:0.75rem; font-weight:700; margin-bottom:4px;">${r.name} <span style="color:var(--cockpit-success)">${Math.round(r.costs?.marginPct || 0)}%</span></div>
+        `).join('');
     }
-
-
     const worstDash = document.getElementById('dashWorstRecipes');
     if (worstDash) {
-        // reversed order
-        const reverse = [...sortedByMargin].reverse();
-        const worst3 = reverse.slice(0, 3);
-        worstDash.innerHTML = worst3.map(r => `
-            <div class="recipe-row" style="margin-bottom:2px; font-size:0.75rem;">
-                <span>${r.name}</span><span class="recipe-label-badge badge-danger" style="font-size:0.65rem;">${r.costs?.marginPct ? Math.round(r.costs.marginPct) : 0}%</span>
-            </div>
-        `).join('') || `<div class="recipe-row"><span style="color:#aaa;">${i18n.t('dash.no_recipes')}</span></div>`;
+        const worst2 = [...sortedByMargin].reverse().slice(0, 2);
+        worstDash.innerHTML = `<span class="kpi-label">⚠️ À Surveiller</span>` + worst2.map(r => `
+            <div style="font-size:0.75rem; font-weight:700; margin-bottom:4px;">${r.name} <span style="color:var(--cockpit-danger)">${Math.round(r.costs?.marginPct || 0)}%</span></div>
+        `).join('');
+    }
+
+    // Animation entrance
+    const hubSection = document.getElementById('hubSection');
+    if (hubSection && !hubSection.dataset.animated && window.gsap) {
+        hubSection.dataset.animated = 'true';
+        gsap.from('.cockpit-card, .cockpit-kpi-card, .cockpit-statusbar', {
+            opacity: 0,
+            y: 20,
+            stagger: 0.1,
+            duration: 0.8,
+            ease: 'power4.out'
+        });
     }
 
     if (!window.tipInitialized) {

@@ -9544,3 +9544,260 @@ select.form-input {
   flex-direction: column;
   gap: 0.2rem;
 }
+
+/* ==========================================================================
+   COCKPIT HUB — SaaS MODERN DESIGN
+   ========================================================================== */
+
+:root {
+  --cockpit-bg: #f8fafc;
+  --cockpit-card-bg: #ffffff;
+  --cockpit-border: rgba(0, 0, 0, 0.08);
+  --cockpit-accent: #6366f1;
+  --cockpit-success: #10b981;
+  --cockpit-warning: #f59e0b;
+  --cockpit-danger: #ef4444;
+  --cockpit-text-main: #1e293b;
+  --cockpit-text-muted: #64748b;
+  --cockpit-radius: 12px;
+}
+
+.dark-theme {
+  --cockpit-bg: #0f172a;
+  --cockpit-card-bg: #1e293b;
+  --cockpit-border: rgba(255, 255, 255, 0.08);
+  --cockpit-text-main: #f1f5f9;
+  --cockpit-text-muted: #94a3b8;
+}
+
+#hubSection {
+  background: var(--cockpit-bg);
+  min-height: 100vh;
+  padding: 1.5rem;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+.cockpit-statusbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding: 0.75rem 1.25rem;
+  background: var(--cockpit-card-bg);
+  border: 1px solid var(--cockpit-border);
+  border-radius: var(--cockpit-radius);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.lab-weather {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px;
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--cockpit-success);
+  border-radius: 20px;
+  font-size: 0.8rem;
+}
+
+.lab-weather.storm {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--cockpit-danger);
+}
+
+.priority-badge {
+  background: var(--cockpit-accent);
+  color: white;
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.cockpit-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 1.5rem;
+}
+
+.cockpit-card {
+  background: var(--cockpit-card-bg);
+  border: 1px solid var(--cockpit-border);
+  border-radius: var(--cockpit-radius);
+  padding: 1.5rem;
+  transition: transform 0.2s;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-title-group {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
+}
+
+.card-title-group h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--cockpit-text-main);
+  margin: 0;
+}
+
+.card-icon-pill {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: rgba(99, 102, 241, 0.1);
+  color: var(--cockpit-accent);
+  font-size: 1rem;
+}
+
+.col-prod { grid-column: span 8; }
+.col-logistics { grid-column: span 4; }
+.col-kpi { grid-column: span 12; display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; }
+.col-ai { grid-column: span 4; }
+.col-perf { grid-column: span 4; }
+.col-team { grid-column: span 4; }
+
+.cockpit-kpi-card {
+  padding: 1.25rem;
+  background: var(--cockpit-card-bg);
+  border: 1px solid var(--cockpit-border);
+  border-radius: var(--cockpit-radius);
+}
+
+.kpi-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--cockpit-text-muted);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  display: block;
+}
+
+.kpi-value {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--cockpit-text-main);
+}
+
+.kpi-trend {
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-left: 6px;
+}
+
+.kpi-trend.up { color: var(--cockpit-success); }
+.kpi-trend.neutral { color: var(--cockpit-text-muted); }
+.kpi-trend.down { color: var(--cockpit-danger); }
+
+.prod-grid-cockpit {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+}
+
+.prod-pill-card {
+  padding: 1rem;
+  border: 1px solid var(--cockpit-border);
+  border-radius: 10px;
+  background: rgba(0,0,0,0.01);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.prod-circle {
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+}
+
+.prod-info-main {
+  flex: 1;
+}
+
+.prod-info-main h4 {
+  font-size: 0.9rem;
+  font-weight: 700;
+  margin: 0 0 2px 0;
+  color: var(--cockpit-text-main);
+}
+
+.prod-info-main p {
+  font-size: 0.7rem;
+  color: var(--cockpit-text-muted);
+  margin: 0;
+}
+
+.radar-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.radar-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.radar-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.radar-gauge {
+  height: 8px;
+  background: rgba(0,0,0,0.05);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.radar-fill {
+  height: 100%;
+  border-radius: 4px;
+}
+
+.ai-insight-box {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.05) 0%, rgba(99, 102, 241, 0.05) 100%);
+  border: 1px solid rgba(139, 92, 246, 0.1);
+  border-radius: 10px;
+  padding: 1rem;
+}
+
+.ai-recommendation {
+  display: flex;
+  gap: 10px;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  margin-bottom: 0.75rem;
+}
+
+.btn-full { width: 100%; }
+
+@media (max-width: 1100px) {
+  .col-prod, .col-logistics, .col-ai, .col-perf, .col-team { grid-column: span 12; }
+  .col-kpi { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 600px) {
+  .col-kpi { grid-template-columns: 1fr; }
+  .prod-grid-cockpit { grid-template-columns: 1fr; }
+}
