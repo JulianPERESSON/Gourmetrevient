@@ -9059,10 +9059,16 @@ select.form-input {
 .summary-pill.safe { background: rgba(16, 185, 129, 0.1); color: #10b981; }
 .summary-pill.info { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
 
+#inflationResults {
+  min-height: 400px; /* Stabilizes scroll during updates */
+  contain: layout;
+}
+
 .inflation-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: 15px;
+  min-height: 200px;
 }
 
 .inflation-card {

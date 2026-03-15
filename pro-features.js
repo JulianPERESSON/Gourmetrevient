@@ -226,16 +226,15 @@ function calcFoisonnement() {
 
 let bcgChartInstance = null;
 
-function renderBCGMatrix() {
+function renderBCGMatrix(isUpdate = false) {
   const canvas = document.getElementById('bcgChartCanvas');
   const ctx = canvas?.getContext('2d');
   const legendContainer = document.getElementById('bcgLegend');
   if (!ctx) return;
   
-  if (bcgChartInstance) bcgChartInstance.destroy();
-  
-  const recipes = APP.savedRecipes || [];
+  const recipes = (window.APP && window.APP.savedRecipes) || [];
   if (recipes.length === 0) {
+    if (bcgChartInstance) { bcgChartInstance.destroy(); bcgChartInstance = null; }
     if (legendContainer) legendContainer.innerHTML = `<p style="text-align:center; color:var(--text-muted); padding:2rem;">${i18n.t('bcg.no_data')}</p>`;
     return;
   }
@@ -247,27 +246,38 @@ function renderBCGMatrix() {
         : (r.costs || r.data);
         
     const margin = costObj?.marginPct || 70;
-    // For popularity, we use a mix of real data (if it existed) and randomness for the 'demo' effect
-    // But let's try to base it on something if possible, e.g. number of portions as a proxy
-    const popularity = 30 + (Math.random() * 50); 
+    
+    // Stable "random" popularity based on name to prevent jumpy animation
+    const seed = r.name.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    const popularity = 10 + ((seed * 7) % 80); 
     
     let quadrant = '';
     let color = '';
     
-    if (margin >= 75 && popularity >= 50) { quadrant = 'star'; color = '#10b981'; } // Star
-    else if (margin >= 75 && popularity < 50) { quadrant = 'question'; color = '#f59e0b'; } // Dilemma
-    else if (margin < 75 && popularity >= 50) { quadrant = 'cash_cow'; color = '#3b82f6'; } // Cash Cow
-    else { quadrant = 'dead_weight'; color = '#ef4444'; } // Dog
+    if (margin >= 75 && popularity >= 50) { quadrant = 'star'; color = '#10b981'; } 
+    else if (margin >= 75 && popularity < 50) { quadrant = 'question'; color = '#f59e0b'; } 
+    else if (margin < 75 && popularity >= 50) { quadrant = 'cash_cow'; color = '#3b82f6'; } 
+    else { quadrant = 'dead_weight'; color = '#ef4444'; } 
     
     return {
       x: popularity,
       y: margin,
-      v: r.costs?.unitCost || 0, // value for bubble size
+      v: r.costs?.unitCost || 0,
       name: r.name,
       quadrant: quadrant,
       color: color
     };
   });
+
+  // If chart exists, just update data and colors for maximum smoothness
+  if (bcgChartInstance) {
+     bcgChartInstance.data.datasets[0].data = data;
+     bcgChartInstance.data.datasets[0].pointBackgroundColor = data.map(d => d.color);
+     bcgChartInstance.options.animation = false; // Disable animation during live moves
+     bcgChartInstance.update('none'); 
+     updateBCGLegend(data, legendContainer);
+     return;
+  }
 
   // 2. Custom Plugin for Quadrants
   const quadrantPlugin = {
@@ -349,6 +359,7 @@ function renderBCGMatrix() {
     options: {
       responsive: true,
       maintainAspectRatio: false,
+      animation: { duration: 400 }, // Default animation for initial load
       plugins: {
         legend: { display: false },
         tooltip: {
@@ -376,31 +387,33 @@ function renderBCGMatrix() {
     plugins: [quadrantPlugin]
   });
 
-  // 4. Update Legend List
-  if (legendContainer) {
-    legendContainer.innerHTML = `
-      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:1rem; margin-top:1rem;">
-        ${['star', 'cash_cow', 'question', 'dead_weight'].map(q => {
-          const items = data.filter(d => d.quadrant === q);
-          if (items.length === 0) return '';
-          return `
-            <div class="bcg-quadrant-group" style="padding:1rem; border-radius:12px; border: 1px solid rgba(0,0,0,0.05); background: #fdfdfd;">
-              <h4 style="margin:0 0 10px 0; font-size:0.8rem; display:flex; align-items:center; gap:8px;">
-                <span style="width:10px; height:10px; border-radius:50%; background:${items[0].color}"></span>
-                ${i18n.t('bcg.' + q)}
-              </h4>
-              <ul style="list-style:none; padding:0; margin:0; font-size:0.75rem; color:var(--text-muted);">
-                ${items.map(it => `<li>• ${it.name}</li>`).join('')}
-              </ul>
-              <div style="margin-top:8px; font-size:0.65rem; font-style:italic; color:var(--accent);">
-                Target: ${i18n.t('bcg.action.' + q)}
-              </div>
+  updateBCGLegend(data, legendContainer);
+}
+
+function updateBCGLegend(data, legendContainer) {
+  if (!legendContainer) return;
+  legendContainer.innerHTML = `
+    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:1rem; margin-top:1rem;">
+      ${['star', 'cash_cow', 'question', 'dead_weight'].map(q => {
+        const items = data.filter(d => d.quadrant === q);
+        if (items.length === 0) return '';
+        return `
+          <div class="bcg-quadrant-group" style="padding:1rem; border-radius:12px; border: 1px solid rgba(0,0,0,0.05); background: #fdfdfd;">
+            <h4 style="margin:0 0 10px 0; font-size:0.8rem; display:flex; align-items:center; gap:8px;">
+              <span style="width:10px; height:10px; border-radius:50%; background:${items[0].color}"></span>
+              ${i18n.t('bcg.' + q)}
+            </h4>
+            <ul style="list-style:none; padding:0; margin:0; font-size:0.75rem; color:var(--text-muted);">
+              ${items.map(it => `<li>• ${it.name}</li>`).join('')}
+            </ul>
+            <div style="margin-top:8px; font-size:0.65rem; font-style:italic; color:var(--accent);">
+              Target: ${i18n.t('bcg.action.' + q)}
             </div>
-          `;
-        }).join('')}
-      </div>
-    `;
-  }
+          </div>
+        `;
+      }).join('')}
+    </div>
+  `;
 }
 
 // ============================================================================
@@ -509,12 +522,17 @@ function renderInflationSimulation() {
     </div>
   `;
 
-  // Trigger UI refreshes in other parts (wrapped in setTimeout to avoid blocking)
-  setTimeout(() => {
-    if (typeof hydratePremiumDashboard === 'function') hydratePremiumDashboard();
+  // Trigger UI refreshes in other parts (throttled to avoid layout thrashing)
+  if (this.simTimeout) clearTimeout(this.simTimeout);
+  this.simTimeout = setTimeout(() => {
+    // Only hydrate if the hub is potentially visible to avoid off-screen layout work
+    const hub = document.getElementById('hubSection');
+    if (hub && hub.style.display !== 'none' && typeof hydratePremiumDashboard === 'function') {
+        hydratePremiumDashboard();
+    }
     if (typeof calculateBreakingPoint === 'function') calculateBreakingPoint();
-    if (typeof renderBCGMatrix === 'function') renderBCGMatrix();
-  }, 10);
+    if (typeof renderBCGMatrix === 'function') renderBCGMatrix(true);
+  }, 32); // ~30fps for cross-app updates
 }
 
 // ============================================================================
