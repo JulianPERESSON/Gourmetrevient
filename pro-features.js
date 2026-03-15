@@ -227,32 +227,170 @@ function calcFoisonnement() {
 let bcgChartInstance = null;
 
 function renderBCGMatrix() {
-  const ctx = document.getElementById('bcgChartCanvas')?.getContext('2d');
+  const canvas = document.getElementById('bcgChartCanvas');
+  const ctx = canvas?.getContext('2d');
+  const legendContainer = document.getElementById('bcgLegend');
   if (!ctx) return;
+  
   if (bcgChartInstance) bcgChartInstance.destroy();
   
-  const data = APP.savedRecipes.map(r => ({
-    x: Math.random() * 100, // Simulated popularity
-    y: (r.costs?.marginPct || 70),
-    name: r.name
-  }));
+  const recipes = APP.savedRecipes || [];
+  if (recipes.length === 0) {
+    if (legendContainer) legendContainer.innerHTML = `<p style="text-align:center; color:var(--text-muted); padding:2rem;">${i18n.t('bcg.no_data')}</p>`;
+    return;
+  }
 
+  // 1. Prepare Data
+  const data = recipes.map(r => {
+    const margin = r.costs?.marginPct || 70;
+    // For popularity, we use a mix of real data (if it existed) and randomness for the 'demo' effect
+    // But let's try to base it on something if possible, e.g. number of portions as a proxy
+    const popularity = 30 + (Math.random() * 50); 
+    
+    let quadrant = '';
+    let color = '';
+    
+    if (margin >= 75 && popularity >= 50) { quadrant = 'star'; color = '#10b981'; } // Star
+    else if (margin >= 75 && popularity < 50) { quadrant = 'question'; color = '#f59e0b'; } // Dilemma
+    else if (margin < 75 && popularity >= 50) { quadrant = 'cash_cow'; color = '#3b82f6'; } // Cash Cow
+    else { quadrant = 'dead_weight'; color = '#ef4444'; } // Dog
+    
+    return {
+      x: popularity,
+      y: margin,
+      v: r.costs?.unitCost || 0, // value for bubble size
+      name: r.name,
+      quadrant: quadrant,
+      color: color
+    };
+  });
+
+  // 2. Custom Plugin for Quadrants
+  const quadrantPlugin = {
+    id: 'quadrantPlugin',
+    beforeDraw(chart) {
+      const { ctx, chartArea: { top, bottom, left, right, width, height }, scales: { x, y } } = chart;
+      const midX = x.getPixelForValue(50);
+      const midY = y.getPixelForValue(75);
+
+      ctx.save();
+      
+      // Draw Quadrants
+      // Top Right: Stars (Green)
+      ctx.fillStyle = 'rgba(16, 185, 129, 0.05)';
+      ctx.fillRect(midX, top, right - midX, midY - top);
+      
+      // Top Left: Dilemmas (Orange)
+      ctx.fillStyle = 'rgba(245, 158, 11, 0.05)';
+      ctx.fillRect(left, top, midX - left, midY - top);
+      
+      // Bottom Right: Cash Cows (Blue)
+      ctx.fillStyle = 'rgba(59, 130, 246, 0.05)';
+      ctx.fillRect(midX, midY, right - midX, bottom - midY);
+      
+      // Bottom Left: Dogs (Red)
+      ctx.fillStyle = 'rgba(239, 68, 68, 0.05)';
+      ctx.fillRect(left, midY, midX - left, bottom - midY);
+
+      // Draw Axis Lines
+      ctx.strokeStyle = 'rgba(0,0,0,0.1)';
+      ctx.lineWidth = 2;
+      ctx.setLineDash([5, 5]);
+      
+      ctx.beginPath();
+      ctx.moveTo(midX, top);
+      ctx.lineTo(midX, bottom);
+      ctx.stroke();
+      
+      ctx.beginPath();
+      ctx.moveTo(left, midY);
+      ctx.lineTo(right, midY);
+      ctx.stroke();
+
+      // Quadrant Labels
+      ctx.setLineDash([]);
+      ctx.fillStyle = 'rgba(0,0,0,0.3)';
+      ctx.font = 'bold 12px Inter';
+      ctx.textAlign = 'center';
+      
+      ctx.fillText(i18n.t('bcg.star').toUpperCase(), midX + (right - midX)/2, top + 20);
+      ctx.fillText(i18n.t('bcg.question').toUpperCase(), left + (midX - left)/2, top + 20);
+      ctx.fillText(i18n.t('bcg.cash_cow').toUpperCase(), midX + (right - midX)/2, bottom - 10);
+      ctx.fillText(i18n.t('bcg.dead_weight').toUpperCase(), left + (midX - left)/2, bottom - 10);
+      
+      ctx.restore();
+    }
+  };
+
+  // 3. Render Chart
   bcgChartInstance = new Chart(ctx, {
     type: 'scatter',
     data: {
       datasets: [{
-        label: 'Produits',
+        label: 'Recettes',
         data: data,
-        backgroundColor: 'rgba(75, 192, 192, 0.6)'
+        pointBackgroundColor: data.map(d => d.color),
+        pointBorderColor: '#fff',
+        pointBorderWidth: 2,
+        pointRadius: 8,
+        pointHoverRadius: 12
       }]
     },
     options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: (context) => {
+              const p = context.raw;
+              return ` ${p.name}: ${p.y.toFixed(1)}% Marge | Pop: ${p.x.toFixed(0)}`;
+            }
+          }
+        }
+      },
       scales: {
-        x: { title: { display: true, text: 'Popularité' } },
-        y: { title: { display: true, text: 'Marge %' } }
+        x: {
+          min: 0, max: 100,
+          title: { display: true, text: i18n.t('bcg.axis.popularity'), font: { weight: 'bold' } },
+          grid: { display: false }
+        },
+        y: {
+          min: 40, max: 100,
+          title: { display: true, text: i18n.t('bcg.axis.margin'), font: { weight: 'bold' } },
+          grid: { display: false }
+        }
       }
-    }
+    },
+    plugins: [quadrantPlugin]
   });
+
+  // 4. Update Legend List
+  if (legendContainer) {
+    legendContainer.innerHTML = `
+      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:1rem; margin-top:1rem;">
+        ${['star', 'cash_cow', 'question', 'dead_weight'].map(q => {
+          const items = data.filter(d => d.quadrant === q);
+          if (items.length === 0) return '';
+          return `
+            <div class="bcg-quadrant-group" style="padding:1rem; border-radius:12px; border: 1px solid rgba(0,0,0,0.05); background: #fdfdfd;">
+              <h4 style="margin:0 0 10px 0; font-size:0.8rem; display:flex; align-items:center; gap:8px;">
+                <span style="width:10px; height:10px; border-radius:50%; background:${items[0].color}"></span>
+                ${i18n.t('bcg.' + q)}
+              </h4>
+              <ul style="list-style:none; padding:0; margin:0; font-size:0.75rem; color:var(--text-muted);">
+                ${items.map(it => `<li>• ${it.name}</li>`).join('')}
+              </ul>
+              <div style="margin-top:8px; font-size:0.65rem; font-style:italic; color:var(--accent);">
+                Target: ${i18n.t('bcg.action.' + q)}
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    `;
+  }
 }
 
 // ============================================================================

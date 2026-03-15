@@ -8995,6 +8995,17 @@ select.form-input {
   gap: 0.6rem;
 }
 
+.bcg-quadrant-group {
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: default;
+}
+
+.bcg-quadrant-group:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  border-color: var(--accent) !important;
+}
+
 .bcg-item {
   padding: 0.8rem 1rem;
   background: var(--bg-alt);
