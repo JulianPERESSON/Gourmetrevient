@@ -30,6 +30,7 @@ const APP = {
   baselineCosts: null,
   wasteLogs: []
 };
+window.APP = APP;
 
 // ============================================================================
 // UTILS

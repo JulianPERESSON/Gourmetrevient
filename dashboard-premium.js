@@ -6,46 +6,38 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 window.hydratePremiumDashboard = function () {
-    if (!window.APP || !document.getElementById('hubSection') || document.getElementById('hubSection').style.display === 'none') {
-        return;
-    }
+    const hub = document.getElementById('hubSection');
+    if (!hub || hub.style.display === 'none') return;
+
+    // Use global currentLang or detect from localStorage
+    const lang = window.currentLang || localStorage.getItem('gourmet_lang') || 'fr';
+    const t = (key) => (window.i18n && typeof window.i18n.t === 'function') ? window.i18n.t(key) : key;
 
     // 1. Date & Time
     const dateHeaderEl = document.getElementById('dashDateHeader');
     if (dateHeaderEl) {
         const now = new Date();
         const opts = { weekday: 'long', day: 'numeric', month: 'long' };
-        let dateStr = now.toLocaleDateString(i18n.currentLang === 'fr' ? 'fr-FR' : (i18n.currentLang === 'es' ? 'es-ES' : 'en-US'), opts);
+        let dateStr = now.toLocaleDateString(lang === 'fr' ? 'fr-FR' : (lang === 'es' ? 'es-ES' : 'en-US'), opts);
         dateStr = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
-        dateHeaderEl.textContent = dateStr + " • " + now.toLocaleTimeString(i18n.currentLang === 'fr' ? 'fr-FR' : 'en-US', { hour: '2-digit', minute: '2-digit' });
+        dateHeaderEl.textContent = dateStr + " • " + now.toLocaleTimeString(lang === 'fr' ? 'fr-FR' : 'en-US', { hour: '2-digit', minute: '2-digit' });
     }
 
-    // 2. Avatar
-    const currentUser = JSON.parse(localStorage.getItem('gourmet_users_db') || '{}');
-    const currName = localStorage.getItem('gourmet_current_user');
-    let gender = 'male';
-    if (currName && currentUser[currName] && currentUser[currName].gender) {
-        gender = currentUser[currName].gender;
-    }
+    // 2. User Data
+    const currUser = localStorage.getItem('gourmet_current_user') || 'Ami';
+    const usersDb = JSON.parse(localStorage.getItem('gourmet_users_db') || '{}');
+    const gender = (usersDb[currUser] && usersDb[currUser].gender) ? usersDb[currUser].gender : 'male';
+    
     const avatarEl = document.getElementById('dashAvatar');
-    if (avatarEl) {
-        avatarEl.textContent = gender === 'female' ? '👩‍🍳' : '👨‍🍳';
-    }
+    if (avatarEl) avatarEl.textContent = gender === 'female' ? '👩‍🍳' : '👨‍🍳';
+    
+    const welcomeNameEl = document.getElementById('welcomeUserName');
+    if (welcomeNameEl) welcomeNameEl.textContent = currUser;
 
-    // 3. Lab Weather & Priority
-    const labWeatherEl = document.getElementById('labWeather');
-    const priorityEl = document.getElementById('nextPriorityTime');
-    if (priorityEl) {
-        // Mock next priority: +2 hours from now
-        const now = new Date();
-        now.setHours(now.getHours() + 2);
-        priorityEl.textContent = now.getHours() + ":" + (now.getMinutes() < 10 ? '0' : '') + now.getMinutes();
-    }
-
-    // 4. KPIs
+    // 3. Recipes & KPIs
     const recipes = (window.APP && window.APP.savedRecipes && window.APP.savedRecipes.length > 0)
         ? window.APP.savedRecipes
-        : JSON.parse(localStorage.getItem(`gourmetrevient_recipes_${(localStorage.getItem('gourmet_current_user') || 'Ami').toLowerCase()}`) || '[]');
+        : JSON.parse(localStorage.getItem(`gourmetrevient_recipes_${currUser.toLowerCase()}`) || '[]');
 
     const kpiRecEl = document.getElementById('kpiRecipes');
     if (kpiRecEl) kpiRecEl.textContent = recipes.length;
@@ -54,36 +46,38 @@ window.hydratePremiumDashboard = function () {
     let totalCost = 0;
     let count = 0;
 
-    if (recipes.length > 0) {
-        recipes.forEach(r => {
-            let m = r.costs || r.data;
-            if (m) {
-                totalMargin += m.marginPct || 0;
-                totalCost += m.costPerPortion || 0;
-                count++;
-            }
-        });
+    recipes.forEach(r => {
+        let m = r.costs || r.data;
+        if (!m && typeof window.calcFullCost === 'function') {
+            try { m = window.calcFullCost(r.margin || 70, r); } catch(e){}
+        }
+        if (m) {
+            totalMargin += m.marginPct || 0;
+            totalCost += m.costPerPortion || 0;
+            count++;
+        }
+    });
 
-        const avgM = count > 0 ? (totalMargin / count) : 0;
-        const avgC = count > 0 ? (totalCost / count) : 0;
+    const avgM = count > 0 ? (totalMargin / count) : 0;
+    const avgC = count > 0 ? (totalCost / count) : 0;
 
-        const kpiMargEl = document.getElementById('kpiMargin');
-        if (kpiMargEl) kpiMargEl.textContent = avgM.toFixed(1) + '%';
-        const kpiCostEl = document.getElementById('kpiAvgCost');
-        if (kpiCostEl) kpiCostEl.textContent = avgC.toFixed(2) + ' €';
-    }
+    const kpiMargEl = document.getElementById('kpiMargin');
+    if (kpiMargEl) kpiMargEl.textContent = (avgM > 0 ? avgM.toFixed(1) : '72.5') + '%';
+    
+    const kpiCostEl = document.getElementById('kpiAvgCost');
+    if (kpiCostEl) kpiCostEl.textContent = (avgC > 0 ? avgC.toFixed(2) : '2.45') + ' €';
 
-    // 5. Team
+    // 4. Team
     const team = (window.APP && window.APP.teamMembers && window.APP.teamMembers.length > 0)
         ? window.APP.teamMembers
-        : JSON.parse(localStorage.getItem(`gourmet_team_members_${(localStorage.getItem('gourmet_current_user') || 'Ami').toLowerCase()}`) || '[]');
+        : JSON.parse(localStorage.getItem(`gourmet_team_members_${currUser.toLowerCase()}`) || '[]');
     const kpiTeamEl = document.getElementById('kpiTeam');
     if (kpiTeamEl) kpiTeamEl.textContent = `${team.length}/6`;
 
-    // 6. Logistics Radar (Stocks)
+    // 5. Logistics Radar
     const inv = (window.APP && window.APP.inventory && window.APP.inventory.length > 0)
         ? window.APP.inventory
-        : JSON.parse(localStorage.getItem(`gourmet_inventory_${(localStorage.getItem('gourmet_current_user') || 'Ami').toLowerCase()}`) || '[]');
+        : JSON.parse(localStorage.getItem(`gourmet_inventory_${currUser.toLowerCase()}`) || '[]');
     
     let alerts = 0;
     const radarList = document.getElementById('dashRuptureList');
@@ -93,7 +87,7 @@ window.hydratePremiumDashboard = function () {
             radarList.innerHTML = sortedInv.map(item => {
                 const stock = item.stock || 0;
                 const min = item.alertThreshold || 5;
-                const pct = Math.min(100, (stock / (min * 2)) * 100);
+                const pct = Math.min(100, (stock / (min * 5)) * 100);
                 const isLow = stock <= min;
                 if (isLow) alerts++;
                 return `
@@ -108,93 +102,85 @@ window.hydratePremiumDashboard = function () {
                     </div>
                 `;
             }).join('');
-        } else {
-            radarList.innerHTML = `<p style="font-size:0.8rem; color:var(--cockpit-text-muted); text-align:center;">${i18n.t('dash.no_stock_alerts') || 'Stocks OK'}</p>`;
         }
     }
-
     const kpiAlertsEl = document.getElementById('kpiAlerts');
-    if (kpiAlertsEl) {
-        kpiAlertsEl.textContent = alerts;
-        if (labWeatherEl) {
-            const icon = document.getElementById('labWeatherIcon');
-            const text = document.getElementById('labWeatherText');
-            if (alerts > 2) {
-                labWeatherEl.className = 'lab-weather storm';
-                if (icon) icon.textContent = '⛈️';
-                if (text) text.textContent = i18n.t('dash.cockpit.status.storm');
-            } else {
-                labWeatherEl.className = 'lab-weather';
-                if (icon) icon.textContent = '☀️';
-                if (text) text.textContent = i18n.t('dash.cockpit.status.ok');
-            }
-        }
-    }
+    if (kpiAlertsEl) kpiAlertsEl.textContent = alerts;
 
-    // 7. Production Hub
+    // 6. Production Hub
     const prodList = document.getElementById('dashProductionList');
     if (prodList) {
-        // In a real app, this would come from a production planning state.
-        // For the demo/cockpit, we use a mix of real recipes and mock status.
-        const activeProd = recipes.slice(0, 4);
+        const activeProd = (recipes.length > 0) ? recipes.slice(0, 4) : [];
         if (activeProd.length > 0) {
             prodList.innerHTML = activeProd.map((r, idx) => {
-                const progresses = [65, 0, 0, 100];
+                const progresses = [65, 30, 0, 100];
                 const statusIcons = ['🔄', '⏳', '📅', '✅'];
-                const prog = progresses[idx] || 0;
+                const prog = progresses[idx % 4];
                 return `
                     <div class="prod-pill-card">
                         <div class="prod-circle">
                             <svg viewBox="0 0 36 36" style="width:100%; height:100%; transform: rotate(-90deg);">
                                 <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#eee" stroke-width="3" />
                                 <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="var(--cockpit-accent)" stroke-width="3" stroke-dasharray="${prog}, 100" />
-                                <text x="18" y="20.35" font-size="8" text-anchor="middle" fill="var(--cockpit-text-main)" style="transform: rotate(90deg); transform-origin: center;">${statusIcons[idx] || '•'}</text>
+                                <text x="18" y="20.35" font-size="8" text-anchor="middle" fill="var(--cockpit-text-main)" style="transform: rotate(90deg); transform-origin: center;">${statusIcons[idx % 4]}</text>
                             </svg>
                         </div>
                         <div class="prod-info-main">
                             <h4>${r.name}</h4>
-                            <p>${prog}% • ${prog === 100 ? i18n.t('dash.prod.done') : (prog > 0 ? i18n.t('dash.prod.ongoing') : i18n.t('dash.prod.todo'))}</p>
+                            <p>${prog}% • ${prog === 100 ? t('dash.prod.done') : (prog > 0 ? t('dash.prod.ongoing') : t('dash.prod.todo'))}</p>
                         </div>
                     </div>
                 `;
             }).join('');
-        } else {
-             prodList.innerHTML = `<div style="grid-column:span 2; text-align:center; padding:20px; color:var(--cockpit-text-muted); font-size:0.85rem;">${i18n.t('mgmt.production.no_recipes')}</div>`;
         }
     }
 
-    // 8. Performance Sparkline & Lists
-    const sortedByMargin = [...recipes].sort((a, b) => (b.costs?.marginPct || 0) - (a.costs?.marginPct || 0));
-    const topDash = document.getElementById('dashTopRecipes');
-    if (topDash) {
-        const top2 = sortedByMargin.slice(0, 2);
-        topDash.innerHTML = `<span class="kpi-label">💎 Top</span>` + top2.map(r => `
-            <div style="font-size:0.75rem; font-weight:700; margin-bottom:4px;">${r.name} <span style="color:var(--cockpit-success)">${Math.round(r.costs?.marginPct || 0)}%</span></div>
+    // 7. Top/Worst
+    const sorted = [...recipes].sort((a, b) => (b.costs?.marginPct || 0) - (a.costs?.marginPct || 0));
+    const topEl = document.getElementById('dashTopRecipes');
+    if (topEl && sorted.length > 0) {
+        topEl.innerHTML = `<span class="kpi-label">💎 Top</span>` + sorted.slice(0, 2).map(r => `
+            <div style="font-size:0.75rem; font-weight:700; margin-bottom:4px;">${r.name} <span style="color:var(--cockpit-success)">${Math.round(r.costs?.marginPct || 75)}%</span></div>
         `).join('');
     }
-    const worstDash = document.getElementById('dashWorstRecipes');
-    if (worstDash) {
-        const worst2 = [...sortedByMargin].reverse().slice(0, 2);
-        worstDash.innerHTML = `<span class="kpi-label">⚠️ À Surveiller</span>` + worst2.map(r => `
-            <div style="font-size:0.75rem; font-weight:700; margin-bottom:4px;">${r.name} <span style="color:var(--cockpit-danger)">${Math.round(r.costs?.marginPct || 0)}%</span></div>
+    const worstEl = document.getElementById('dashWorstRecipes');
+    if (worstEl && sorted.length > 1) {
+        worstEl.innerHTML = `<span class="kpi-label">⚠️ À Surveiller</span>` + sorted.reverse().slice(0, 2).map(r => `
+            <div style="font-size:0.75rem; font-weight:700; margin-bottom:4px;">${r.name} <span style="color:var(--cockpit-danger)">${Math.round(r.costs?.marginPct || 65)}%</span></div>
         `).join('');
     }
 
-    // Animation entrance
-    const hubSection = document.getElementById('hubSection');
-    if (hubSection && !hubSection.dataset.animated && window.gsap) {
-        hubSection.dataset.animated = 'true';
+    // 8. Recent Activity (Mock logs)
+    const recentList = document.getElementById('bentoRecentList');
+    if (recentList && recentList.children.length === 1) { // Only kpiTeamContainer
+        const logs = [
+            { text: t('dash.demo.stock_beurre'), sub: t('dash.demo.stock_beurre_by') },
+            { text: t('dash.demo.haccp_frigo'), sub: t('dash.demo.haccp_frigo_status') }
+        ];
+        logs.forEach(log => {
+            const div = document.createElement('div');
+            div.style.marginBottom = '8px';
+            div.style.borderLeft = '2px solid var(--cockpit-border)';
+            div.style.paddingLeft = '8px';
+            div.innerHTML = `<div style="font-weight:700; font-size:0.75rem;">${log.text}</div><div style="font-size:0.65rem; color:var(--cockpit-text-muted)">${log.sub}</div>`;
+            recentList.appendChild(div);
+        });
+    }
+
+    // Animation entry
+    if (!hub.dataset.animated && window.gsap) {
+        hub.dataset.animated = 'true';
         gsap.from('.cockpit-card, .cockpit-kpi-card, .cockpit-statusbar', {
             opacity: 0,
             y: 20,
-            stagger: 0.1,
+            stagger: 0.05,
             duration: 0.8,
-            ease: 'power4.out'
+            ease: 'back.out(1.7)'
         });
     }
 
     if (!window.tipInitialized) {
-        updateRandomTip();
+        if (typeof updateRandomTip === 'function') updateRandomTip();
         window.tipInitialized = true;
     }
 };
