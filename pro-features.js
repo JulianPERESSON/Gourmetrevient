@@ -404,74 +404,89 @@ function renderBCGMatrix() {
 // ============================================================================
 
 function renderInflationSimulation() {
-  const pct = parseFloat(document.getElementById('inflationSlider').value) || 0;
-  document.getElementById('inflationValue').textContent = pct + '%';
+  const slider = document.getElementById('inflationSlider');
+  if (!slider) return;
+  const pct = parseFloat(slider.value) || 0;
+  
+  const valDisp = document.getElementById('inflationValue');
+  if (valDisp) valDisp.textContent = pct + '%';
   
   // Set global factor for cross-app simulation
   window.inflationFactor = pct;
-  localStorage.setItem('gourmet_inflation_factor', pct);
+  if (typeof localStorage !== 'undefined') localStorage.setItem('gourmet_inflation_factor', pct);
 
-  // Trigger UI refreshes
-  if (typeof hydratePremiumDashboard === 'function') hydratePremiumDashboard();
-  if (typeof calculateBreakingPoint === 'function') calculateBreakingPoint();
-  if (typeof renderBCGMatrix === 'function') renderBCGMatrix();
-  
   const container = document.getElementById('inflationResults');
   if (!container) return;
 
-  const recipes = APP.savedRecipes || [];
+  const recipes = (window.APP && window.APP.savedRecipes) || [];
   if (recipes.length === 0) {
-    container.innerHTML = `<p style="text-align:center; padding:2rem; color:var(--text-muted);">${i18n.t('inflation.no_data')}</p>`;
+    container.innerHTML = `<div class="insight-box" style="margin-top:2rem;"><div class="insight-icon">🔍</div><div class="insight-text"><p>${i18n.t('inflation.no_data')}</p></div></div>`;
     return;
   }
 
   let inDanger = 0;
   let totalMarginLoss = 0;
+  let resultsArr = [];
 
-  const results = recipes.map(r => {
-    const currentCosts = r.costs || (typeof calcFullCost === 'function' ? calcFullCost(r.margin || 70, r) : { marginPct: 70, costPerPortion: 2 });
-    const oldMargin = currentCosts.marginPct || 0;
-    const oldCost = currentCosts.costPerPortion || 0;
-    const sellPrice = currentCosts.sellPriceHT || (oldCost / (1 - (oldMargin/100)));
+  recipes.forEach(r => {
+    try {
+      let currentCosts = r.costs || r.data;
+      if (!currentCosts && typeof window.calcFullCost === 'function') {
+        currentCosts = window.calcFullCost(r.margin || 70, r);
+      }
+      
+      if (!currentCosts) return;
 
-    // New cost = old cost + percentage
-    const newCost = oldCost * (1 + pct / 100);
-    const newMargin = ((sellPrice - newCost) / sellPrice) * 100;
-    const marginImpact = oldMargin - newMargin;
+      const oldMargin = currentCosts.marginPct || 0;
+      const oldCost = currentCosts.costPerPortion || 0;
+      const sellPrice = currentCosts.sellPriceHT || (oldMargin < 100 ? (oldCost / (1 - (oldMargin/100))) : oldCost * 4);
 
-    totalMarginLoss += marginImpact;
-    if (newMargin < 50) inDanger++;
+      // New cost = old cost + percentage
+      const newCost = oldCost * (1 + pct / 100);
+      const newMargin = sellPrice > 0 ? (((sellPrice - newCost) / sellPrice) * 100) : 0;
+      const marginImpact = oldMargin - newMargin;
 
-    let statusClass = 'status-ok';
-    let icon = '✅';
-    if (newMargin < 50) { statusClass = 'status-danger'; icon = '💀'; }
-    else if (newMargin < 65) { statusClass = 'status-warning'; icon = '⚠️'; }
+      totalMarginLoss += marginImpact;
+      if (newMargin < 50) inDanger++;
 
-    return `
-      <div class="inflation-card ${statusClass}">
-        <div class="inflation-card-header">
-           <span class="recipe-name">${r.name}</span>
-           <span class="status-icon">${icon}</span>
-        </div>
-        <div class="inflation-stats">
-          <div class="stat-item">
-            <span class="label">${i18n.t('inflation.col.original')}</span>
-            <span class="val">${oldMargin.toFixed(1)}%</span>
+      let statusClass = 'status-ok';
+      let icon = '✅';
+      if (newMargin < 50) { statusClass = 'status-danger'; icon = '💀'; }
+      else if (newMargin < 65) { statusClass = 'status-warning'; icon = '⚠️'; }
+
+      resultsArr.push(`
+        <div class="inflation-card ${statusClass}">
+          <div class="inflation-card-header">
+             <span class="recipe-name">${r.name}</span>
+             <span class="status-icon">${icon}</span>
           </div>
-          <div class="stat-item">
-            <span class="label">${i18n.t('inflation.col.new')}</span>
-            <span class="val highlighted">${newMargin.toFixed(1)}%</span>
+          <div class="inflation-stats">
+            <div class="stat-item">
+              <span class="label">${i18n.t('inflation.col.original')}</span>
+              <span class="val">${oldMargin.toFixed(1)}%</span>
+            </div>
+            <div class="stat-item">
+              <span class="label">${i18n.t('inflation.col.new')}</span>
+              <span class="val highlighted">${newMargin.toFixed(1)}%</span>
+            </div>
+          </div>
+          <div class="inflation-impact-bar">
+            <div class="impact-fill" style="width: ${Math.max(0, Math.min(100, newMargin))}%; background: ${newMargin < 50 ? 'var(--cockpit-danger)' : (newMargin < 65 ? 'var(--cockpit-accent)' : 'var(--cockpit-success)')}"></div>
+          </div>
+          <div class="inflation-diff">
+            -${marginImpact.toFixed(1)} pts de marge
           </div>
         </div>
-        <div class="inflation-impact-bar">
-          <div class="impact-fill" style="width: ${Math.max(0, newMargin)}%; background: ${newMargin < 50 ? 'var(--cockpit-danger)' : (newMargin < 65 ? 'var(--cockpit-accent)' : 'var(--cockpit-success)')}"></div>
-        </div>
-        <div class="inflation-diff">
-          -${marginImpact.toFixed(1)} pts de marge
-        </div>
-      </div>
-    `;
+      `);
+    } catch (err) {
+      console.warn("Failed to simulate inflation for recipe", r.name, err);
+    }
   });
+
+  if (resultsArr.length === 0) {
+     container.innerHTML = `<p style="text-align:center; padding:2rem; color:var(--text-muted);">${i18n.t('inflation.no_data')}</p>`;
+     return;
+  }
 
   container.innerHTML = `
     <div class="inflation-summary">
@@ -483,9 +498,16 @@ function renderInflationSimulation() {
       </div>
     </div>
     <div class="inflation-grid">
-      ${results.join('')}
+      ${resultsArr.join('')}
     </div>
   `;
+
+  // Trigger UI refreshes in other parts (wrapped in setTimeout to avoid blocking)
+  setTimeout(() => {
+    if (typeof hydratePremiumDashboard === 'function') hydratePremiumDashboard();
+    if (typeof calculateBreakingPoint === 'function') calculateBreakingPoint();
+    if (typeof renderBCGMatrix === 'function') renderBCGMatrix();
+  }, 10);
 }
 
 // ============================================================================
@@ -573,3 +595,14 @@ function generateClientQR(idx) {
 function closeClientQR() {
   document.getElementById('clientQRModal').style.display = 'none';
 }
+
+// Auto-run initialization
+document.addEventListener('DOMContentLoaded', () => {
+  const slider = document.getElementById('inflationSlider');
+  if (slider) {
+    slider.addEventListener('input', renderInflationSimulation);
+    // Initialize global factor from slider
+    window.inflationFactor = parseFloat(slider.value) || 0;
+    renderInflationSimulation(); 
+  }
+});

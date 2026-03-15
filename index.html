@@ -882,7 +882,7 @@
                 <span data-i18n="inflation.slider.label">Hausse des prix :</span>
                 <span id="inflationValue" class="inflation-slider-value">20%</span>
               </label>
-              <input type="range" id="inflationSlider" class="inflation-slider" min="0" max="100" value="20" step="5">
+              <input type="range" id="inflationSlider" class="inflation-slider" min="0" max="100" value="0" step="1" oninput="renderInflationSimulation()">
               <div class="inflation-slider-marks">
                 <span>0%</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span>
               </div>
