@@ -1,4 +1,4 @@
-const CACHE_NAME = 'gourmet-v3';
+const CACHE_NAME = 'gourmet-v4';
 const ASSETS = [
     './',
     './index.html',
