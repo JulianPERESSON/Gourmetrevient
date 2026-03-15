@@ -66,7 +66,10 @@ window.hydratePremiumDashboard = function () {
     let count = 0;
 
     recipes.forEach(r => {
-        let m = r.costs || r.data;
+        let m = (window.inflationFactor > 0 && typeof window.calcFullCost === 'function') 
+            ? window.calcFullCost(r.margin || 70, r)
+            : (r.costs || r.data);
+
         if (!m && typeof window.calcFullCost === 'function') {
             try { m = window.calcFullCost(r.margin || 70, r); } catch(e){}
         }

@@ -242,7 +242,11 @@ function renderBCGMatrix() {
 
   // 1. Prepare Data
   const data = recipes.map(r => {
-    const margin = r.costs?.marginPct || 70;
+    let costObj = (window.inflationFactor > 0 && typeof window.calcFullCost === 'function') 
+        ? window.calcFullCost(r.margin || 70, r)
+        : (r.costs || r.data);
+        
+    const margin = costObj?.marginPct || 70;
     // For popularity, we use a mix of real data (if it existed) and randomness for the 'demo' effect
     // But let's try to base it on something if possible, e.g. number of portions as a proxy
     const popularity = 30 + (Math.random() * 50); 
@@ -430,9 +434,12 @@ function renderInflationSimulation() {
 
   recipes.forEach(r => {
     try {
-      let currentCosts = r.costs || r.data;
-      if (!currentCosts && typeof window.calcFullCost === 'function') {
-        currentCosts = window.calcFullCost(r.margin || 70, r);
+      // ALWAYS get baseline (0% inflation) for "Marge Actuelle" in simulation cards
+      let currentCosts = null;
+      if (typeof window.calcFullCost === 'function') {
+        currentCosts = window.calcFullCost(r.margin || 70, r, 0); 
+      } else {
+        currentCosts = r.costs || r.data;
       }
       
       if (!currentCosts) return;

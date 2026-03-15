@@ -404,10 +404,11 @@ function calcTotalMaterialCost() {
   return APP.recipe.ingredients.reduce((sum, ing) => sum + calcIngredientCost(ing), 0);
 }
 
-function calcFullCost(margin, customRecipe = null) {
+function calcFullCost(margin, customRecipe = null, forcedInflation = null) {
   const r = customRecipe || APP.recipe;
   const portions = r.portions || 10;
-  const costMultiplier = (window.inflationFactor || 0) / 100 + 1;
+  const infl = (forcedInflation !== null) ? forcedInflation : (window.inflationFactor || 0);
+  const costMultiplier = infl / 100 + 1;
   const totalMaterial = r.ingredients.reduce((sum, ing) => sum + calcIngredientCost(ing), 0) * costMultiplier;
 
   // Use either live UI values or saved values
