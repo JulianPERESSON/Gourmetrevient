@@ -313,10 +313,16 @@ function renderBCGMatrix() {
       ctx.font = 'bold 12px Inter';
       ctx.textAlign = 'center';
       
-      ctx.fillText(i18n.t('bcg.star').toUpperCase(), midX + (right - midX)/2, top + 20);
-      ctx.fillText(i18n.t('bcg.question').toUpperCase(), left + (midX - left)/2, top + 20);
-      ctx.fillText(i18n.t('bcg.cash_cow').toUpperCase(), midX + (right - midX)/2, bottom - 10);
-      ctx.fillText(i18n.t('bcg.dead_weight').toUpperCase(), left + (midX - left)/2, bottom - 10);
+      const starTxt = i18n.t('bcg.star').toUpperCase();
+      const questionTxt = i18n.t('bcg.question').toUpperCase();
+      const cowTxt = i18n.t('bcg.cash_cow').toUpperCase();
+      const dogTxt = i18n.t('bcg.dead_weight').toUpperCase();
+
+      // Draw Labels with icons (relying on i18n keys having emojis)
+      ctx.fillText(starTxt, midX + (right - midX)/2, top + 25);
+      ctx.fillText(questionTxt, left + (midX - left)/2, top + 25);
+      ctx.fillText(cowTxt, midX + (right - midX)/2, bottom - 15);
+      ctx.fillText(dogTxt, left + (midX - left)/2, bottom - 15);
       
       ctx.restore();
     }
@@ -401,14 +407,75 @@ function renderInflationSimulation() {
   const pct = parseFloat(document.getElementById('inflationSlider').value) || 0;
   document.getElementById('inflationValue').textContent = pct + '%';
   const container = document.getElementById('inflationResults');
-  
-  const rows = APP.savedRecipes.map(r => {
-    const oldCost = r.id ? calcFullCost(70, r).costPerPortion : 0;
-    const newCost = oldCost * (1 + pct/100);
-    return `<tr><td>${r.name}</td><td>${oldCost.toFixed(2)}€</td><td>${newCost.toFixed(2)}€</td></tr>`;
-  }).join('');
-  
-  container.innerHTML = `<table class="table"><thead><tr><th>Recette</th><th>Actuel</th><th>+${pct}%</th></tr></thead><tbody>${rows}</tbody></table>`;
+  if (!container) return;
+
+  const recipes = APP.savedRecipes || [];
+  if (recipes.length === 0) {
+    container.innerHTML = `<p style="text-align:center; padding:2rem; color:var(--text-muted);">${i18n.t('inflation.no_data')}</p>`;
+    return;
+  }
+
+  let inDanger = 0;
+  let totalMarginLoss = 0;
+
+  const results = recipes.map(r => {
+    const currentCosts = r.costs || (typeof calcFullCost === 'function' ? calcFullCost(r.margin || 70, r) : { marginPct: 70, costPerPortion: 2 });
+    const oldMargin = currentCosts.marginPct || 0;
+    const oldCost = currentCosts.costPerPortion || 0;
+    const sellPrice = currentCosts.sellPriceHT || (oldCost / (1 - (oldMargin/100)));
+
+    // New cost = old cost + percentage
+    const newCost = oldCost * (1 + pct / 100);
+    const newMargin = ((sellPrice - newCost) / sellPrice) * 100;
+    const marginImpact = oldMargin - newMargin;
+
+    totalMarginLoss += marginImpact;
+    if (newMargin < 50) inDanger++;
+
+    let statusClass = 'status-ok';
+    let icon = '✅';
+    if (newMargin < 50) { statusClass = 'status-danger'; icon = '💀'; }
+    else if (newMargin < 65) { statusClass = 'status-warning'; icon = '⚠️'; }
+
+    return `
+      <div class="inflation-card ${statusClass}">
+        <div class="inflation-card-header">
+           <span class="recipe-name">${r.name}</span>
+           <span class="status-icon">${icon}</span>
+        </div>
+        <div class="inflation-stats">
+          <div class="stat-item">
+            <span class="label">${i18n.t('inflation.col.original')}</span>
+            <span class="val">${oldMargin.toFixed(1)}%</span>
+          </div>
+          <div class="stat-item">
+            <span class="label">${i18n.t('inflation.col.new')}</span>
+            <span class="val highlighted">${newMargin.toFixed(1)}%</span>
+          </div>
+        </div>
+        <div class="inflation-impact-bar">
+          <div class="impact-fill" style="width: ${Math.max(0, newMargin)}%; background: ${newMargin < 50 ? 'var(--cockpit-danger)' : (newMargin < 65 ? 'var(--cockpit-accent)' : 'var(--cockpit-success)')}"></div>
+        </div>
+        <div class="inflation-diff">
+          -${marginImpact.toFixed(1)} pts de marge
+        </div>
+      </div>
+    `;
+  });
+
+  container.innerHTML = `
+    <div class="inflation-summary">
+      <div class="summary-pill ${inDanger > 0 ? 'danger' : 'safe'}">
+        ${inDanger > 0 ? `❗ ${inDanger} ${i18n.t('inflation.critical')}` : `🛡️ ${i18n.t('inflation.safe')}`}
+      </div>
+      <div class="summary-pill info">
+        📉 Perte moyenne : ${(totalMarginLoss / recipes.length).toFixed(1)}%
+      </div>
+    </div>
+    <div class="inflation-grid">
+      ${results.join('')}
+    </div>
+  `;
 }
 
 // ============================================================================

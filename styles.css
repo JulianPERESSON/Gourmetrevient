@@ -9041,13 +9041,81 @@ select.form-input {
   padding: 1.5rem 0 2rem;
 }
 
-.inflation-slider-label {
+.inflation-summary {
   display: flex;
-  align-items: center;
+  gap: 15px;
+  margin-bottom: 2rem;
+  justify-content: center;
+}
+
+.summary-pill {
+  padding: 8px 16px;
+  border-radius: 50px;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.summary-pill.danger { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
+.summary-pill.safe { background: rgba(16, 185, 129, 0.1); color: #10b981; }
+.summary-pill.info { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
+
+.inflation-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 15px;
+}
+
+.inflation-card {
+  background: var(--bg-alt);
+  border-radius: var(--radius);
+  padding: 1.2rem;
+  border-bottom: 4px solid #eee;
+  transition: transform 0.2s;
+}
+
+.inflation-card:hover { transform: translateY(-5px); }
+
+.inflation-card.status-danger { border-color: var(--cockpit-danger); background: rgba(239, 68, 68, 0.02); }
+.inflation-card.status-warning { border-color: var(--cockpit-accent); }
+.inflation-card.status-ok { border-color: var(--cockpit-success); }
+
+.inflation-card-header {
+  display: flex;
   justify-content: space-between;
-  font-weight: 600;
-  font-size: 0.9rem;
-  margin-bottom: 0.8rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.inflation-stats {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-item .label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; }
+.stat-item .val { font-size: 1.1rem; font-weight: 800; }
+.stat-item .val.highlighted { color: var(--accent); }
+
+.inflation-impact-bar {
+  height: 6px;
+  background: rgba(0,0,0,0.05);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+}
+
+.impact-fill { height: 100%; transition: width 0.3s ease; }
+
+.inflation-diff {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-align: right;
+  color: var(--cockpit-danger);
 }
 
 .inflation-slider-value {
