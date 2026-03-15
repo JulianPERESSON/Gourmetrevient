@@ -23,6 +23,25 @@ window.hydratePremiumDashboard = function () {
         dateHeaderEl.textContent = dateStr + " • " + now.toLocaleTimeString(lang === 'fr' ? 'fr-FR' : 'en-US', { hour: '2-digit', minute: '2-digit' });
     }
 
+    // 1b. Simulation Badge
+    const factor = window.inflationFactor || 0;
+    const statusHeader = document.querySelector('.cockpit-statusbar');
+    let simBadge = document.getElementById('simulationActiveBadge');
+    if (factor > 0) {
+        if (!simBadge) {
+            simBadge = document.createElement('div');
+            simBadge.id = 'simulationActiveBadge';
+            simBadge.className = 'priority-badge';
+            simBadge.style.background = 'rgba(239, 68, 68, 0.1)';
+            simBadge.style.color = 'var(--cockpit-danger)';
+            simBadge.style.border = '1px solid var(--cockpit-danger)';
+            statusHeader.appendChild(simBadge);
+        }
+        simBadge.innerHTML = `⚠️ SIMULATION : +${factor}%`;
+    } else if (simBadge) {
+        simBadge.remove();
+    }
+
     // 2. User Data
     const currUser = localStorage.getItem('gourmet_current_user') || 'Ami';
     const usersDb = JSON.parse(localStorage.getItem('gourmet_users_db') || '{}');

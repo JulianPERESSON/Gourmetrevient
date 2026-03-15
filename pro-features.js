@@ -406,6 +406,16 @@ function renderBCGMatrix() {
 function renderInflationSimulation() {
   const pct = parseFloat(document.getElementById('inflationSlider').value) || 0;
   document.getElementById('inflationValue').textContent = pct + '%';
+  
+  // Set global factor for cross-app simulation
+  window.inflationFactor = pct;
+  localStorage.setItem('gourmet_inflation_factor', pct);
+
+  // Trigger UI refreshes
+  if (typeof hydratePremiumDashboard === 'function') hydratePremiumDashboard();
+  if (typeof calculateBreakingPoint === 'function') calculateBreakingPoint();
+  if (typeof renderBCGMatrix === 'function') renderBCGMatrix();
+  
   const container = document.getElementById('inflationResults');
   if (!container) return;
 

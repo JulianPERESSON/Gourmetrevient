@@ -407,7 +407,8 @@ function calcTotalMaterialCost() {
 function calcFullCost(margin, customRecipe = null) {
   const r = customRecipe || APP.recipe;
   const portions = r.portions || 10;
-  const totalMaterial = r.ingredients.reduce((sum, ing) => sum + calcIngredientCost(ing), 0);
+  const costMultiplier = (window.inflationFactor || 0) / 100 + 1;
+  const totalMaterial = r.ingredients.reduce((sum, ing) => sum + calcIngredientCost(ing), 0) * costMultiplier;
 
   // Use either live UI values or saved values
   let laborRate = 0, fixedCharges = 0, productions = 1, energyRate = 0, amortization = 0;
@@ -435,7 +436,7 @@ function calcFullCost(margin, customRecipe = null) {
   const totalTimeH = (prepTime + cookTime) / 60;
 
   const laborCost = laborRate * totalTimeH;
-  const energyCost = energyRate * (cookTime / 60);
+  const energyCost = (energyRate * (cookTime / 60)) * costMultiplier; // Energy also affected by inflation
   const fixedShare = fixedCharges / productions;
   const amortShare = amortization / productions;
 
@@ -6746,7 +6747,11 @@ function calculateBreakingPoint() {
   let validRecipesCount = 0;
 
   recipes.forEach(r => {
-    avgMargin += (r.margin || 70);
+    let m = r.costs || r.data;
+    if (!m && typeof calcFullCost === 'function') {
+        try { m = calcFullCost(r.margin || 70, r); } catch(e){}
+    }
+    avgMargin += (m ? m.marginPct : (r.margin || 70));
     validRecipesCount++;
   });
 
