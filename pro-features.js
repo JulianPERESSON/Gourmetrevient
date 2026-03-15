@@ -494,8 +494,8 @@ function renderInflationSimulation() {
             <div class="impact-fill" style="width: ${Math.max(0, Math.min(100, newMargin))}%; background: ${newMargin < 50 ? 'var(--cockpit-danger)' : (newMargin < 65 ? 'var(--cockpit-accent)' : 'var(--cockpit-success)')}"></div>
           </div>
           <div class="inflation-diff">
-            -${marginImpact.toFixed(1)} pts de marge
-          </div>
+          ${marginImpact === 0 ? i18n.t('inflation.status.ok') : `-${marginImpact.toFixed(1)} pts de marge`}
+        </div>
         </div>
       `);
     } catch (err) {
