@@ -170,6 +170,11 @@ function openINCoGenerator() {
   }
 }
 
+function closeINCoModal() {
+  const modal = document.getElementById('incoModal');
+  if (modal) modal.style.display = 'none';
+}
+
 function generateINCOLabel() {
   const idx = document.getElementById('incoRecipeSelect')?.value;
   const recipe = APP.savedRecipes[idx];
@@ -209,6 +214,11 @@ function convertToGrams(ing) {
 
 function openFoisonnement() {
   document.getElementById('foisonnementModal').style.display = 'flex';
+}
+
+function closeFoisonnement() {
+  const modal = document.getElementById('foisonnementModal');
+  if (modal) modal.style.display = 'none';
 }
 
 function calcFoisonnement() {
@@ -546,6 +556,11 @@ function openCloudSync() {
   const saved = JSON.parse(localStorage.getItem('gourmet_cloud_config') || '{}');
   document.getElementById('supabaseUrl').value = saved.url || '';
   document.getElementById('supabaseKey').value = saved.key || '';
+}
+
+function closeCloudSync() {
+  const modal = document.getElementById('cloudSyncModal');
+  if (modal) modal.style.display = 'none';
 }
 
 async function saveCloudConfig() {
