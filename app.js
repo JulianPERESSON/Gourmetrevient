@@ -2726,7 +2726,7 @@ function checkAuth() {
       tab.onclick = () => switchMode(tab.dataset.mode);
     });
 
-    $('#btnAuthSubmit').onclick = () => {
+    $('#btnAuthSubmit').onclick = async () => {
       const user = $('#authUsername').value.trim();
       const pin = $('#authPin').value;
       const error = $('#authError');
@@ -2754,6 +2754,24 @@ function checkAuth() {
 
       if (authMode === 'login') {
         if (!usersDb[userKey]) {
+          // If profile not found locally, try Cloud Recovery if configured
+          if (typeof window.tryRemoteLogin === 'function') {
+            const remoteData = await window.tryRemoteLogin(user, pin);
+            if (remoteData) {
+              // Account Found in Cloud!
+              usersDb[userKey] = remoteData.profile;
+              localStorage.setItem(STORAGE_KEYS.users, JSON.stringify(usersDb));
+              
+              // Hydrate data recovered from cloud
+              localStorage.setItem(`gourmetrevient_recipes_${userKey}`, JSON.stringify(remoteData.recipes));
+              localStorage.setItem(`gourmetrevient_ingredient_db`, JSON.stringify(remoteData.ingredients));
+              
+              showToast(t('auth.sync.success') || "Données récupérées depuis le Cloud !", 'success');
+              loginSuccess(user);
+              return;
+            }
+          }
+          
           error.style.display = 'block';
           error.textContent = t('auth.error.unknown');
           error.style.animation = 'none';

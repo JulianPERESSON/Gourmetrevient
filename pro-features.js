@@ -570,15 +570,29 @@ async function saveCloudConfig() {
   showToast('Config enregistrée', 'success');
 }
 
-async function syncToCloud() {
-  const config = JSON.parse(localStorage.getItem('gourmet_cloud_config') || '{}');
-  if (!config.url) return showToast('Config manquante', 'error');
+const STICKY_CLOUD_CONFIG = { 
+  url: '', // L'administrateur peut remplir ceci pour un déploiement "Zéro-Config"
+  key: '' 
+};
+
+async function syncToCloud(silent = false) {
+  const localConfig = JSON.parse(localStorage.getItem('gourmet_cloud_config') || '{}');
+  const config = {
+    url: localConfig.url || STICKY_CLOUD_CONFIG.url,
+    key: localConfig.key || STICKY_CLOUD_CONFIG.key
+  };
+  
+  if (!config.url) {
+    if (!silent) showToast('Config manquante', 'error');
+    return;
+  }
   
   try {
     const data = {
       user: getViewOwner(),
       recipes: JSON.stringify(APP.savedRecipes),
       ingredientDb: JSON.stringify(APP.ingredientDb),
+      profile: JSON.stringify(getUserProfile(getViewOwner())),
       timestamp: new Date().toISOString()
     };
     const response = await fetch(`${config.url}/rest/v1/gourmet_sync`, {
@@ -598,7 +612,11 @@ async function syncToCloud() {
 }
 
 async function syncFromCloud() {
-  const config = JSON.parse(localStorage.getItem('gourmet_cloud_config') || '{}');
+  const localConfig = JSON.parse(localStorage.getItem('gourmet_cloud_config') || '{}');
+  const config = {
+    url: localConfig.url || STICKY_CLOUD_CONFIG.url,
+    key: localConfig.key || STICKY_CLOUD_CONFIG.key
+  };
   if (!config.url) return;
   try {
     const response = await fetch(`${config.url}/rest/v1/gourmet_sync?user=eq.${encodeURIComponent(getViewOwner())}&order=timestamp.desc&limit=1`, {
@@ -613,6 +631,41 @@ async function syncFromCloud() {
   } catch (e) {
     showToast('Erreur restauration', 'error');
   }
+}
+
+function getUserProfile(name) {
+  const users = JSON.parse(localStorage.getItem('gourmet_users') || '{}');
+  return users[name.toLowerCase()] || {};
+}
+
+async function tryRemoteLogin(user, pin) {
+  const localConfig = JSON.parse(localStorage.getItem('gourmet_cloud_config') || '{}');
+  const config = {
+    url: localConfig.url || STICKY_CLOUD_CONFIG.url,
+    key: localConfig.key || STICKY_CLOUD_CONFIG.key
+  };
+  if (!config.url) return null;
+
+  try {
+    const response = await fetch(`${config.url}/rest/v1/gourmet_sync?user=eq.${encodeURIComponent(user)}&order=timestamp.desc&limit=1`, {
+      headers: { 'apikey': config.key, 'Authorization': `Bearer ${config.key}` }
+    });
+    const data = await response.json();
+    if (data?.[0]?.profile) {
+      const cloudProfile = JSON.parse(data[0].profile);
+      if (cloudProfile.pin === pin) {
+        // Success! Return the data to hydrate local state
+        return {
+          profile: cloudProfile,
+          recipes: JSON.parse(data[0].recipes || '[]'),
+          ingredients: JSON.parse(data[0].ingredientDb || '[]')
+        };
+      }
+    }
+  } catch (e) {
+    console.error("Remote login error:", e);
+  }
+  return null;
 }
 
 // ============================================================================
