@@ -636,6 +636,89 @@ function closeClientQR() {
   document.getElementById('clientQRModal').style.display = 'none';
 }
 
+// ============================================================================
+// 8. AUTO-SYNC & ZERO-CONFIG
+// ============================================================================
+
+function setupAutoSync() {
+  // 1. Process URL Parameters for Zero-Config
+  const urlParams = new URLSearchParams(window.location.search);
+  const url = urlParams.get('cloud_url');
+  const key = urlParams.get('cloud_key');
+  
+  if (url && key) {
+    localStorage.setItem('gourmet_cloud_config', JSON.stringify({ url, key }));
+    // Clear URL parameters to avoid leaking key in screenshots/shares
+    window.history.replaceState({}, document.title, window.location.pathname);
+    showToast('Cloud auto-configuré !', 'success');
+  }
+
+  // 2. Monkey-patch save functions to trigger auto-upload
+  const originalSaveRecipes = window.saveSavedRecipes;
+  window.saveSavedRecipes = function() {
+    if (typeof originalSaveRecipes === 'function') originalSaveRecipes();
+    triggerAutoSync();
+  };
+
+  const originalSaveDb = window.saveIngredientDb;
+  window.saveIngredientDb = function() {
+    if (typeof originalSaveDb === 'function') originalSaveDb();
+    triggerAutoSync();
+  };
+
+  // 3. Initial pull if auth is already valid
+  if (localStorage.getItem('gourmet_auth') === 'true') {
+     syncFromCloud();
+  }
+}
+
+let syncTimeout = null;
+function triggerAutoSync() {
+  const config = JSON.parse(localStorage.getItem('gourmet_cloud_config') || '{}');
+  if (!config.url || !config.key) return;
+
+  // Debounce to avoid too many requests during rapid edits
+  if (syncTimeout) clearTimeout(syncTimeout);
+  syncTimeout = setTimeout(() => {
+    syncToCloud(true); // silent sync
+  }, 2000);
+}
+
+// Update syncToCloud to support silent mode
+const originalSyncToCloud = window.syncToCloud;
+window.syncToCloud = async function(silent = false) {
+  const config = JSON.parse(localStorage.getItem('gourmet_cloud_config') || '{}');
+  if (!config.url) {
+    if (!silent) showToast('Config manquante', 'error');
+    return;
+  }
+  
+  try {
+    const data = {
+      user: typeof getViewOwner === 'function' ? getViewOwner() : (localStorage.getItem('gourmet_current_user') || 'Chef'),
+      recipes: JSON.stringify(APP.savedRecipes),
+      ingredientDb: JSON.stringify(APP.ingredientDb),
+      timestamp: new Date().toISOString()
+    };
+    
+    const response = await fetch(`${config.url}/rest/v1/gourmet_sync`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': config.key,
+        'Authorization': `Bearer ${config.key}`,
+        'Prefer': 'resolution=merge-duplicates'
+      },
+      body: JSON.stringify(data)
+    });
+    
+    if (response.ok && !silent) showToast('Sync réussie', 'success');
+  } catch (e) {
+    if (!silent) showToast('Erreur sync', 'error');
+    console.error("Auto-sync error:", e);
+  }
+};
+
 // Auto-run initialization
 document.addEventListener('DOMContentLoaded', () => {
   const slider = document.getElementById('inflationSlider');
@@ -645,4 +728,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.inflationFactor = parseFloat(slider.value) || 0;
     renderInflationSimulation(); 
   }
+  
+  // Initialize Auto-Sync
+  setTimeout(setupAutoSync, 1000);
 });
