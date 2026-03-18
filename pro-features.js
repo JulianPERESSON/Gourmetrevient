@@ -242,7 +242,9 @@ function renderBCGMatrix(isUpdate = false) {
   const legendContainer = document.getElementById('bcgLegend');
   if (!ctx) return;
   
-  const recipes = (window.APP && window.APP.savedRecipes) || [];
+  const savedRecs = (window.APP && window.APP.savedRecipes) || [];
+  const libraryRecs = typeof RECIPES !== 'undefined' ? RECIPES : [];
+  const recipes = [...savedRecs, ...libraryRecs];
   if (recipes.length === 0) {
     if (bcgChartInstance) { bcgChartInstance.destroy(); bcgChartInstance = null; }
     if (legendContainer) legendContainer.innerHTML = `<p style="text-align:center; color:var(--text-muted); padding:2rem;">${i18n.t('bcg.no_data')}</p>`;
@@ -445,7 +447,9 @@ function renderInflationSimulation() {
   const container = document.getElementById('inflationResults');
   if (!container) return;
 
-  const recipes = (window.APP && window.APP.savedRecipes) || [];
+  const savedRecs = (window.APP && window.APP.savedRecipes) || [];
+  const libraryRecs = typeof RECIPES !== 'undefined' ? RECIPES : [];
+  const recipes = [...savedRecs, ...libraryRecs];
   if (recipes.length === 0) {
     container.innerHTML = `<div class="insight-box" style="margin-top:2rem;"><div class="insight-icon">🔍</div><div class="insight-text"><p>${i18n.t('inflation.no_data')}</p></div></div>`;
     return;

@@ -56,19 +56,19 @@ const RECIPES = [
     name: 'Mille-feuille',
     category: 'Feuilletage',
     portions: 10,
-    prepTime: 90,
+    prepTime: 35,
     cookTime: 30,
     image: './img/mille-feuille.jpg',
     description: 'Trois couches de pâte feuilletée croustillante, crème pâtissière vanille et glaçage marbré.',
     ingredients: [
-      { name: 'Farine T55', quantity: 300, unit: 'g', pricePerKg: 0.65 },
-      { name: 'Beurre AOP', quantity: 250, unit: 'g', pricePerKg: 7.50 },
-      { name: 'Lait entier', quantity: 500, unit: 'ml', pricePerL: 0.85 },
-      { name: 'Sucre semoule', quantity: 150, unit: 'g', pricePerKg: 0.85 },
-      { name: 'Jaunes d\'œufs', quantity: 6, unit: 'pcs', pricePerPc: 0.15 },
-      { name: 'Maïzena', quantity: 50, unit: 'g', pricePerKg: 4.00 },
+      { name: 'Farine T55', quantity: 400, unit: 'g', pricePerKg: 0.44 },
+      { name: 'Beurre AOP', quantity: 300, unit: 'g', pricePerKg: 6.15 },
+      { name: 'Lait entier', quantity: 500, unit: 'ml', pricePerL: 0.72 },
+      { name: 'Sucre semoule', quantity: 100, unit: 'g', pricePerKg: 0.68 },
+      { name: 'Jaunes d\'œufs', quantity: 4, unit: 'pcs', pricePerPc: 0.11 },
+      { name: 'Maïzena', quantity: 45, unit: 'g', pricePerKg: 4.00 },
       { name: 'Vanille (gousse)', quantity: 1, unit: 'pcs', pricePerPc: 1.80 },
-      { name: 'Sucre glace', quantity: 100, unit: 'g', pricePerKg: 2.10 },
+      { name: 'Sucre glace', quantity: 50, unit: 'g', pricePerKg: 2.10 },
       { name: 'Sel', quantity: 5, unit: 'g', pricePerKg: 0.80 }
     ],
     steps: [
@@ -85,20 +85,20 @@ const RECIPES = [
     name: 'Paris-Brest',
     category: 'Pâte à choux',
     portions: 10,
-    prepTime: 75,
+    prepTime: 30,
     cookTime: 35,
     image: './img/paris-brest.jpg',
     description: 'Couronne de pâte à choux garnie d\'une crème mousseline au praliné noisette.',
     ingredients: [
-      { name: 'Farine T55', quantity: 200, unit: 'g', pricePerKg: 0.65 },
-      { name: 'Beurre AOP', quantity: 250, unit: 'g', pricePerKg: 7.50 },
-      { name: 'Œufs entiers', quantity: 8, unit: 'pcs', pricePerPc: 0.15 },
-      { name: 'Noisettes torréfiées', quantity: 200, unit: 'g', pricePerKg: 12.50 },
-      { name: 'Praliné noisette', quantity: 150, unit: 'g', pricePerKg: 14.50 },
-      { name: 'Sucre semoule', quantity: 100, unit: 'g', pricePerKg: 0.85 },
-      { name: 'Lait entier', quantity: 250, unit: 'ml', pricePerL: 0.85 },
-      { name: 'Crème 35% MG', quantity: 200, unit: 'ml', pricePerL: 4.20 },
-      { name: 'Amandes effilées', quantity: 50, unit: 'g', pricePerKg: 9.50 },
+      { name: 'Farine T55', quantity: 150, unit: 'g', pricePerKg: 0.44 },
+      { name: 'Beurre AOP', quantity: 120, unit: 'g', pricePerKg: 6.15 },
+      { name: 'Œufs entiers', quantity: 4, unit: 'pcs', pricePerPc: 0.11 },
+      { name: 'Noisettes torréfiées', quantity: 100, unit: 'g', pricePerKg: 12.50 },
+      { name: 'Praliné noisette', quantity: 120, unit: 'g', pricePerKg: 10.50 },
+      { name: 'Sucre semoule', quantity: 80, unit: 'g', pricePerKg: 0.68 },
+      { name: 'Lait entier', quantity: 250, unit: 'ml', pricePerL: 0.72 },
+      { name: 'Beurre pommade', quantity: 100, unit: 'g', pricePerKg: 6.15 },
+      { name: 'Amandes effilées', quantity: 30, unit: 'g', pricePerKg: 9.50 },
       { name: 'Sel', quantity: 3, unit: 'g', pricePerKg: 0.80 }
     ],
     steps: [
@@ -115,20 +115,20 @@ const RECIPES = [
     name: 'Opéra',
     category: 'Entremets',
     portions: 10,
-    prepTime: 120,
+    prepTime: 45,
     cookTime: 15,
     image: './img/opera.jpg',
     description: 'Biscuit Joconde, ganache chocolat, crème au beurre café et glaçage miroir chocolat.',
     ingredients: [
-      { name: 'Poudre d\'amandes', quantity: 200, unit: 'g', pricePerKg: 9.50 },
-      { name: 'Sucre glace', quantity: 200, unit: 'g', pricePerKg: 2.10 },
-      { name: 'Farine T55', quantity: 60, unit: 'g', pricePerKg: 0.65 },
-      { name: 'Œufs entiers', quantity: 6, unit: 'pcs', pricePerPc: 0.15 },
-      { name: 'Beurre AOP', quantity: 250, unit: 'g', pricePerKg: 7.50 },
-      { name: 'Chocolat noir 64%', quantity: 200, unit: 'g', pricePerKg: 11.50 },
-      { name: 'Café soluble', quantity: 10, unit: 'g', pricePerKg: 40.00 },
-      { name: 'Sucre semoule', quantity: 150, unit: 'g', pricePerKg: 0.85 },
-      { name: 'Crème 35% MG', quantity: 200, unit: 'ml', pricePerL: 6.00 }
+      { name: 'Poudre d\'amandes', quantity: 120, unit: 'g', pricePerKg: 9.50 },
+      { name: 'Sucre glace', quantity: 120, unit: 'g', pricePerKg: 2.10 },
+      { name: 'Farine T55', quantity: 40, unit: 'g', pricePerKg: 0.44 },
+      { name: 'Œufs entiers', quantity: 3, unit: 'pcs', pricePerPc: 0.11 },
+      { name: 'Beurre AOP', quantity: 150, unit: 'g', pricePerKg: 6.15 },
+      { name: 'Chocolat noir 64%', quantity: 120, unit: 'g', pricePerKg: 11.50 },
+      { name: 'Café soluble', quantity: 5, unit: 'g', pricePerKg: 40.00 },
+      { name: 'Sucre semoule', quantity: 100, unit: 'g', pricePerKg: 0.68 },
+      { name: 'Crème 35% MG', quantity: 100, unit: 'ml', pricePerL: 3.25 }
     ],
     steps: [
       'Biscuit Joconde : mélanger amandes, sucre glace, œufs et farine. Ajouter beurre fondu.',
@@ -144,20 +144,20 @@ const RECIPES = [
     name: 'Saint-Honoré',
     category: 'Choux & Feuilletage',
     portions: 10,
-    prepTime: 105,
+    prepTime: 50,
     cookTime: 40,
     image: './img/saint-honore.jpg',
     description: 'Base feuilletée, choux caramélisés et crème Chiboust à la vanille.',
     ingredients: [
-      { name: 'Farine T55', quantity: 350, unit: 'g', pricePerKg: 0.65 },
-      { name: 'Beurre AOP', quantity: 300, unit: 'g', pricePerKg: 7.50 },
-      { name: 'Œufs entiers', quantity: 10, unit: 'pcs', pricePerPc: 0.15 },
-      { name: 'Sucre semoule', quantity: 300, unit: 'g', pricePerKg: 0.85 },
-      { name: 'Lait entier', quantity: 500, unit: 'ml', pricePerL: 0.85 },
-      { name: 'Crème 35% MG', quantity: 400, unit: 'ml', pricePerL: 4.20 },
+      { name: 'Farine T55', quantity: 200, unit: 'g', pricePerKg: 0.44 },
+      { name: 'Beurre AOP', quantity: 150, unit: 'g', pricePerKg: 6.15 },
+      { name: 'Œufs entiers', quantity: 5, unit: 'pcs', pricePerPc: 0.11 },
+      { name: 'Sucre semoule', quantity: 150, unit: 'g', pricePerKg: 0.68 },
+      { name: 'Lait entier', quantity: 400, unit: 'ml', pricePerL: 0.72 },
+      { name: 'Crème 35% MG', quantity: 250, unit: 'ml', pricePerL: 3.25 },
       { name: 'Vanille (gousse)', quantity: 1, unit: 'pcs', pricePerPc: 1.80 },
-      { name: 'Gélatine', quantity: 6, unit: 'g', pricePerKg: 30.00 },
-      { name: 'Sel', quantity: 5, unit: 'g', pricePerKg: 0.80 }
+      { name: 'Gélatine', quantity: 4, unit: 'g', pricePerKg: 30.00 },
+      { name: 'Sel', quantity: 3, unit: 'g', pricePerKg: 0.80 }
     ],
     steps: [
       'Réaliser un disque de pâte feuilletée et une couronne de choux.',
@@ -168,33 +168,60 @@ const RECIPES = [
     ]
   },
   {
-    id: 'fraisier',
-    name: 'Fraisier',
-    category: 'Entremets fruits',
+    id: 'dame-blanche',
+    name: 'Dame Blanche',
+    category: 'Entremets',
     portions: 10,
-    prepTime: 80,
-    cookTime: 20,
-    image: './img/fraisier.jpg',
-    description: 'Génoise imbibée, crème mousseline vanille et fraises fraîches sous pâte d\'amandes.',
+    prepTime: 90,
+    cookTime: 25,
+    image: './img/dame-blanche.jpg',
+    description: 'Une réinterprétation pâtissière du classique : mousse vanille intense, ganache chocolat noir et éclats de meringue.',
     ingredients: [
-      { name: 'Fraises fraîches', quantity: 500, unit: 'g', pricePerKg: 4.50 },
-      { name: 'Farine T55', quantity: 120, unit: 'g', pricePerKg: 0.65 },
-      { name: 'Œufs entiers', quantity: 6, unit: 'pcs', pricePerPc: 0.15 },
-      { name: 'Sucre semoule', quantity: 200, unit: 'g', pricePerKg: 0.85 },
-      { name: 'Beurre AOP', quantity: 200, unit: 'g', pricePerKg: 7.50 },
-      { name: 'Lait entier', quantity: 300, unit: 'ml', pricePerL: 0.85 },
-      { name: 'Kirsch', quantity: 30, unit: 'ml', pricePerL: 25.00 },
-      { name: 'Crème 35% MG', quantity: 200, unit: 'ml', pricePerL: 4.20 },
-      { name: 'Pâte d\'amandes', quantity: 150, unit: 'g', pricePerKg: 15.00 },
-      { name: 'Vanille (gousse)', quantity: 1, unit: 'pcs', pricePerPc: 4.00 }
+      { name: 'Crème 35% MG', quantity: 500, unit: 'ml', pricePerL: 3.25 },
+      { name: 'Lait entier', quantity: 250, unit: 'ml', pricePerL: 0.72 },
+      { name: 'Chocolat noir 64%', quantity: 200, unit: 'g', pricePerKg: 11.50 },
+      { name: 'Sucre semoule', quantity: 150, unit: 'g', pricePerKg: 0.68 },
+      { name: 'Blancs d\'œufs', quantity: 3, unit: 'pcs', pricePerPc: 0.11 },
+      { name: 'Jaunes d\'œufs', quantity: 4, unit: 'pcs', pricePerPc: 0.11 },
+      { name: 'Vanille (gousse)', quantity: 2, unit: 'pcs', pricePerPc: 1.80 },
+      { name: 'Gélatine en feuilles', quantity: 10, unit: 'g', pricePerKg: 28.00 },
+      { name: 'Poudre d\'amandes', quantity: 100, unit: 'g', pricePerKg: 9.50 }
     ],
     steps: [
-      'Génoise : œufs et sucre blanchis au bain-marie, ajouter la farine.',
-      'Cuire sur plaque à 180°C pendant 12 min.',
-      'Réaliser une crème mousseline à la vanille.',
-      'Imbiber le biscuit de sirop au Kirsch.',
-      'Disposer les fraises contre les parois.',
-      'Garnir de crème et fraises, recouvrir de pâte d\'amandes.'
+      'Réaliser une dacquoise amande et cuire à 180°C pendant 12 min.',
+      'Préparer une crème anglaise vanillée et coller à la gélatine.',
+      'Réaliser une ganache chocolat noir souple.',
+      'Monter la crème et l\'incorporer à la crème anglaise refroidie.',
+      'Montage à l\'envers : mousse vanille, insert ganache, dacquoise.',
+      'Bloquer au froid, glacer et décorer de petites meringues.'
+    ]
+  },
+  {
+    id: 'pomme-tatin-vanille',
+    name: 'Entremet Pomme Tatin Caramel Vanille',
+    category: 'Entremets',
+    portions: 10,
+    prepTime: 120,
+    cookTime: 45,
+    image: './img/tatin-vanille.jpg',
+    description: 'Le fondant des pommes caramélisées allié à la douceur d\'un crémeux caramel et d\'une mousse vanille légère.',
+    ingredients: [
+      { name: 'Pomme Golden', quantity: 1000, unit: 'g', pricePerKg: 2.20 },
+      { name: 'Sucre semoule', quantity: 300, unit: 'g', pricePerKg: 0.68 },
+      { name: 'Beurre AOP', quantity: 150, unit: 'g', pricePerKg: 6.15 },
+      { name: 'Crème 35% MG', quantity: 400, unit: 'ml', pricePerL: 3.25 },
+      { name: 'Vanille (gousse)', quantity: 1, unit: 'pcs', pricePerPc: 1.80 },
+      { name: 'Farine T55', quantity: 150, unit: 'g', pricePerKg: 0.44 },
+      { name: 'Jaunes d\'œufs', quantity: 4, unit: 'pcs', pricePerPc: 0.11 },
+      { name: 'Gélatine en feuilles', quantity: 8, unit: 'g', pricePerKg: 28.00 }
+    ],
+    steps: [
+      'Caraméliser les pommes coupées en dés avec beurre et sucre.',
+      'Réaliser un disque de sablé breton et cuire à 170°C.',
+      'Préparer un crémeux caramel au beurre salé.',
+      'Confectionner une mousse bavaroise à la vanille.',
+      'Montage : insert pommes tatin, crémeux caramel, mousse vanille, biscuit.',
+      'Congeler minimum 4h avant de démouler et napper.'
     ]
   },
   {
@@ -208,10 +235,10 @@ const RECIPES = [
     description: 'Tarte renversée aux pommes caramélisées sur pâte brisée dorée.',
     ingredients: [
       { name: 'Pommes (Golden)', quantity: 1500, unit: 'g', pricePerKg: 2.10 },
-      { name: 'Farine T55', quantity: 250, unit: 'g', pricePerKg: 0.65 },
-      { name: 'Beurre AOP', quantity: 250, unit: 'g', pricePerKg: 7.50 },
-      { name: 'Sucre semoule', quantity: 200, unit: 'g', pricePerKg: 0.85 },
-      { name: 'Œufs entiers', quantity: 1, unit: 'pcs', pricePerPc: 0.15 },
+      { name: 'Farine T55', quantity: 250, unit: 'g', pricePerKg: 0.44 },
+      { name: 'Beurre AOP', quantity: 250, unit: 'g', pricePerKg: 6.15 },
+      { name: 'Sucre semoule', quantity: 200, unit: 'g', pricePerKg: 0.68 },
+      { name: 'Œufs entiers', quantity: 1, unit: 'pcs', pricePerPc: 0.11 },
       { name: 'Sel', quantity: 5, unit: 'g', pricePerKg: 0.80 }
     ],
     steps: [
@@ -228,18 +255,17 @@ const RECIPES = [
     name: 'Éclair au chocolat',
     category: 'Pâte à choux',
     portions: 10,
-    prepTime: 60,
+    prepTime: 25,
     cookTime: 30,
     image: './img/eclair.jpg',
     description: 'Pâte à choux allongée, crème pâtissière chocolat et glaçage fondant.',
     ingredients: [
-      { name: 'Farine T55', quantity: 150, unit: 'g', pricePerKg: 0.65 },
-      { name: 'Beurre AOP', quantity: 180, unit: 'g', pricePerKg: 7.50 },
-      { name: 'Œufs entiers', quantity: 5, unit: 'pcs', pricePerPc: 0.15 },
-      { name: 'Chocolat noir 64%', quantity: 200, unit: 'g', pricePerKg: 11.50 },
-      { name: 'Lait entier', quantity: 500, unit: 'ml', pricePerL: 0.85 },
-      { name: 'Sucre semoule', quantity: 120, unit: 'g', pricePerKg: 0.85 },
-      { name: 'Crème 35% MG', quantity: 200, unit: 'ml', pricePerL: 4.20 },
+      { name: 'Farine T55', quantity: 150, unit: 'g', pricePerKg: 0.44 },
+      { name: 'Beurre AOP', quantity: 120, unit: 'g', pricePerKg: 6.15 },
+      { name: 'Œufs entiers', quantity: 4, unit: 'pcs', pricePerPc: 0.11 },
+      { name: 'Chocolat noir 64%', quantity: 150, unit: 'g', pricePerKg: 11.50 },
+      { name: 'Lait entier', quantity: 500, unit: 'ml', pricePerL: 0.72 },
+      { name: 'Sucre semoule', quantity: 100, unit: 'g', pricePerKg: 0.68 },
       { name: 'Maïzena', quantity: 40, unit: 'g', pricePerKg: 4.00 },
       { name: 'Vanille (gousse)', quantity: 1, unit: 'pcs', pricePerPc: 1.80 },
       { name: 'Sel', quantity: 3, unit: 'g', pricePerKg: 0.80 }
@@ -264,12 +290,12 @@ const RECIPES = [
     description: 'Savarin doré imbibé de sirop au rhum, crème chantilly et fruits frais.',
     ingredients: [
       { name: 'Farine T45', quantity: 250, unit: 'g', pricePerKg: 1.30 },
-      { name: 'Beurre AOP', quantity: 100, unit: 'g', pricePerKg: 7.50 },
-      { name: 'Œufs entiers', quantity: 4, unit: 'pcs', pricePerPc: 0.15 },
+      { name: 'Beurre AOP', quantity: 100, unit: 'g', pricePerKg: 6.15 },
+      { name: 'Œufs entiers', quantity: 4, unit: 'pcs', pricePerPc: 0.11 },
       { name: 'Levure fraîche', quantity: 10, unit: 'g', pricePerKg: 10.00 },
-      { name: 'Sucre semoule', quantity: 250, unit: 'g', pricePerKg: 0.85 },
+      { name: 'Sucre semoule', quantity: 250, unit: 'g', pricePerKg: 0.68 },
       { name: 'Rhum ambré', quantity: 100, unit: 'ml', pricePerL: 20.00 },
-      { name: 'Crème 35% MG', quantity: 200, unit: 'ml', pricePerL: 4.20 },
+      { name: 'Crème 35% MG', quantity: 200, unit: 'ml', pricePerL: 3.25 },
       { name: 'Vanille (gousse)', quantity: 1, unit: 'pcs', pricePerPc: 1.80 },
       { name: 'Citron (zeste)', quantity: 1, unit: 'pcs', pricePerPc: 0.30 },
       { name: 'Sel', quantity: 3, unit: 'g', pricePerKg: 0.80 }
@@ -295,10 +321,10 @@ const RECIPES = [
     ingredients: [
       { name: 'Poudre d\'amandes', quantity: 200, unit: 'g', pricePerKg: 9.50 },
       { name: 'Sucre glace', quantity: 200, unit: 'g', pricePerKg: 2.10 },
-      { name: 'Sucre semoule', quantity: 75, unit: 'g', pricePerKg: 0.85 },
+      { name: 'Sucre semoule', quantity: 75, unit: 'g', pricePerKg: 0.68 },
       { name: 'Blancs d\'œufs', quantity: 6, unit: 'pcs', pricePerPc: 0.20 },
       { name: 'Chocolat noir 64%', quantity: 100, unit: 'g', pricePerKg: 11.50 },
-      { name: 'Crème 35% MG', quantity: 100, unit: 'ml', pricePerL: 4.20 },
+      { name: 'Crème 35% MG', quantity: 100, unit: 'ml', pricePerL: 3.25 },
       { name: 'Colorant alimentaire', quantity: 5, unit: 'ml', pricePerL: 30.00 }
     ],
     steps: [
@@ -320,13 +346,13 @@ const RECIPES = [
     image: './img/foret-noire.jpg',
     description: 'Génoise au chocolat, chantilly, cerises griottes au kirsch et copeaux de chocolat.',
     ingredients: [
-      { name: 'Farine T55', quantity: 120, unit: 'g', pricePerKg: 0.65 },
-      { name: 'Sucre semoule', quantity: 200, unit: 'g', pricePerKg: 0.85 },
-      { name: 'Œufs entiers', quantity: 6, unit: 'pcs', pricePerPc: 0.15 },
+      { name: 'Farine T55', quantity: 120, unit: 'g', pricePerKg: 0.44 },
+      { name: 'Sucre semoule', quantity: 200, unit: 'g', pricePerKg: 0.68 },
+      { name: 'Œufs entiers', quantity: 6, unit: 'pcs', pricePerPc: 0.11 },
       { name: 'Cacao poudre', quantity: 50, unit: 'g', pricePerKg: 15.00 },
       { name: 'Chocolat noir 64%', quantity: 200, unit: 'g', pricePerKg: 11.50 },
-      { name: 'Crème 35% MG', quantity: 500, unit: 'ml', pricePerL: 4.20 },
-      { name: 'Cerises griottes', quantity: 300, unit: 'g', pricePerKg: 7.50 },
+      { name: 'Crème 35% MG', quantity: 500, unit: 'ml', pricePerL: 3.25 },
+      { name: 'Cerises griottes', quantity: 300, unit: 'g', pricePerKg: 6.15 },
       { name: 'Kirsch', quantity: 50, unit: 'ml', pricePerL: 25.00 },
       { name: 'Beurre AOP', quantity: 50, unit: 'g', pricePerKg: 12.00 }
     ],
@@ -348,13 +374,13 @@ const RECIPES = [
     image: './img/tarte-citron.jpg',
     description: 'Pâte sucrée craquante, crémeux citron jaune acidulé et meringue italienne fondante.',
     ingredients: [
-      { name: 'Beurre AOP', quantity: 300, unit: 'g', pricePerKg: 7.50 },
+      { name: 'Beurre AOP', quantity: 300, unit: 'g', pricePerKg: 6.15 },
       { name: 'Sucre glace', quantity: 90, unit: 'g', pricePerKg: 2.10 },
-      { name: 'Farine T55', quantity: 250, unit: 'g', pricePerKg: 0.65 },
-      { name: 'Œufs entiers', quantity: 6, unit: 'pcs', pricePerPc: 0.15 },
+      { name: 'Farine T55', quantity: 250, unit: 'g', pricePerKg: 0.44 },
+      { name: 'Œufs entiers', quantity: 6, unit: 'pcs', pricePerPc: 0.11 },
       { name: 'Jus de citron', quantity: 150, unit: 'ml', pricePerL: 4.50 },
       { name: 'Zeste de citron', quantity: 3, unit: 'pcs', pricePerPc: 0.60 },
-      { name: 'Sucre semoule', quantity: 300, unit: 'g', pricePerKg: 0.85 },
+      { name: 'Sucre semoule', quantity: 300, unit: 'g', pricePerKg: 0.68 },
       { name: 'Blancs d\'œufs', quantity: 3, unit: 'pcs', pricePerPc: 0.20 },
       { name: 'Sel', quantity: 2, unit: 'g', pricePerKg: 0.80 }
     ],
@@ -379,9 +405,9 @@ const RECIPES = [
     ingredients: [
       { name: 'Pâte sablée (Pâton)', quantity: 300, unit: 'g', pricePerKg: 4.50 },
       { name: 'Poudre d\'amandes', quantity: 100, unit: 'g', pricePerKg: 9.50 },
-      { name: 'Beurre AOP', quantity: 100, unit: 'g', pricePerKg: 7.50 },
-      { name: 'Sucre semoule', quantity: 100, unit: 'g', pricePerKg: 0.85 },
-      { name: 'Œufs entiers', quantity: 2, unit: 'pcs', pricePerPc: 0.15 },
+      { name: 'Beurre AOP', quantity: 100, unit: 'g', pricePerKg: 6.15 },
+      { name: 'Sucre semoule', quantity: 100, unit: 'g', pricePerKg: 0.68 },
+      { name: 'Œufs entiers', quantity: 2, unit: 'pcs', pricePerPc: 0.11 },
       { name: 'Poires au sirop', quantity: 400, unit: 'g', pricePerKg: 5.50 },
       { name: 'Amandes effilées', quantity: 30, unit: 'g', pricePerKg: 9.50 },
       { name: 'Rhum ambré', quantity: 10, unit: 'ml', pricePerL: 20.00 }
@@ -405,11 +431,11 @@ const RECIPES = [
     image: './img/eclair-cafe.png',
     description: 'Pâte à choux moelleuse, crème pâtissière riche au café et fondant classique.',
     ingredients: [
-      { name: 'Farine T55', quantity: 150, unit: 'g', pricePerKg: 0.65 },
-      { name: 'Beurre AOP', quantity: 180, unit: 'g', pricePerKg: 7.50 },
-      { name: 'Œufs entiers', quantity: 5, unit: 'pcs', pricePerPc: 0.15 },
-      { name: 'Lait entier', quantity: 500, unit: 'ml', pricePerL: 0.85 },
-      { name: 'Sucre semoule', quantity: 120, unit: 'g', pricePerKg: 0.85 },
+      { name: 'Farine T55', quantity: 150, unit: 'g', pricePerKg: 0.44 },
+      { name: 'Beurre AOP', quantity: 180, unit: 'g', pricePerKg: 6.15 },
+      { name: 'Œufs entiers', quantity: 5, unit: 'pcs', pricePerPc: 0.11 },
+      { name: 'Lait entier', quantity: 500, unit: 'ml', pricePerL: 0.72 },
+      { name: 'Sucre semoule', quantity: 120, unit: 'g', pricePerKg: 0.68 },
       { name: 'Extrait de café', quantity: 20, unit: 'ml', pricePerL: 45.00 },
       { name: 'Maïzena', quantity: 40, unit: 'g', pricePerKg: 4.00 },
       { name: 'Fondant blanc', quantity: 200, unit: 'g', pricePerKg: 3.50 },
@@ -436,9 +462,9 @@ const RECIPES = [
     ingredients: [
       { name: 'Pâte à baba (Pâton)', quantity: 200, unit: 'g', pricePerKg: 4.80 },
       { name: 'Cointreau', quantity: 80, unit: 'ml', pricePerL: 28.00 },
-      { name: 'Sucre semoule', quantity: 150, unit: 'g', pricePerKg: 0.85 },
+      { name: 'Sucre semoule', quantity: 150, unit: 'g', pricePerKg: 0.68 },
       { name: 'Poires fraîches', quantity: 500, unit: 'g', pricePerKg: 3.80 },
-      { name: 'Crème 35% MG', quantity: 300, unit: 'ml', pricePerL: 4.20 },
+      { name: 'Crème 35% MG', quantity: 300, unit: 'ml', pricePerL: 3.25 },
       { name: 'Mascarpone', quantity: 100, unit: 'g', pricePerKg: 8.50 },
       { name: 'Vanille (gousse)', quantity: 1, unit: 'pcs', pricePerPc: 1.80 },
       { name: 'Spéculoos', quantity: 120, unit: 'g', pricePerKg: 6.00 },
@@ -464,14 +490,14 @@ const RECIPES = [
     image: './img/tarte-chocolat-poire.jpg',
     description: 'Tarte gourmande associant la douceur des poires pochées à une crème diplomate onctueuse au chocolat noir, sublimée par un pochage en fleur.',
     ingredients: [
-      { name: 'Farine T55', quantity: 200, unit: 'g', pricePerKg: 0.65 },
-      { name: 'Beurre AOP', quantity: 120, unit: 'g', pricePerKg: 7.50 },
+      { name: 'Farine T55', quantity: 200, unit: 'g', pricePerKg: 0.44 },
+      { name: 'Beurre AOP', quantity: 120, unit: 'g', pricePerKg: 6.15 },
       { name: 'Poires au sirop', quantity: 500, unit: 'g', pricePerKg: 4.80 },
       { name: 'Chocolat noir 64%', quantity: 150, unit: 'g', pricePerKg: 11.50 },
-      { name: 'Crème 35% MG', quantity: 300, unit: 'ml', pricePerL: 4.20 },
-      { name: 'Lait entier', quantity: 250, unit: 'ml', pricePerL: 0.85 },
-      { name: 'Jaunes d\'œufs', quantity: 4, unit: 'pcs', pricePerPc: 0.15 },
-      { name: 'Sucre semoule', quantity: 80, unit: 'g', pricePerKg: 0.85 },
+      { name: 'Crème 35% MG', quantity: 300, unit: 'ml', pricePerL: 3.25 },
+      { name: 'Lait entier', quantity: 250, unit: 'ml', pricePerL: 0.72 },
+      { name: 'Jaunes d\'œufs', quantity: 4, unit: 'pcs', pricePerPc: 0.11 },
+      { name: 'Sucre semoule', quantity: 80, unit: 'g', pricePerKg: 0.68 },
       { name: 'Gélatine', quantity: 4, unit: 'g', pricePerKg: 22.00 }
     ],
     steps: [
@@ -493,11 +519,11 @@ const RECIPES = [
     image: './img/tarte-fleur-rouge.jpg',
     description: 'Une explosion de fraîcheur avec un confit de fruits rouges et un pochage artistique à la vanille en forme de fleur.',
     ingredients: [
-      { name: 'Farine T55', quantity: 200, unit: 'g', pricePerKg: 0.65 },
-      { name: 'Beurre AOP', quantity: 150, unit: 'g', pricePerKg: 7.50 },
+      { name: 'Farine T55', quantity: 200, unit: 'g', pricePerKg: 0.44 },
+      { name: 'Beurre AOP', quantity: 150, unit: 'g', pricePerKg: 6.15 },
       { name: 'Fraises/Framboises', quantity: 400, unit: 'g', pricePerKg: 6.50 },
       { name: 'Mascarpone', quantity: 200, unit: 'g', pricePerKg: 8.50 },
-      { name: 'Crème 35% MG', quantity: 300, unit: 'ml', pricePerL: 4.20 },
+      { name: 'Crème 35% MG', quantity: 300, unit: 'ml', pricePerL: 3.25 },
       { name: 'Sucre glace', quantity: 100, unit: 'g', pricePerKg: 2.10 },
       { name: 'Vanille (gousse)', quantity: 1, unit: 'pcs', pricePerPc: 1.80 },
       { name: 'Pectine NH', quantity: 5, unit: 'g', pricePerKg: 45.00 }
@@ -521,9 +547,9 @@ const RECIPES = [
     image: './img/tarte-fleur-praline.jpg',
     description: 'Le mariage parfait du croquant des amandes et noisettes avec la légèreté d\'un pochage fleur à la vanille.',
     ingredients: [
-      { name: 'Farine T55', quantity: 200, unit: 'g', pricePerKg: 0.65 },
-      { name: 'Praliné noisette', quantity: 200, unit: 'g', pricePerKg: 14.50 },
-      { name: 'Crème 35% MG', quantity: 400, unit: 'ml', pricePerL: 4.20 },
+      { name: 'Farine T55', quantity: 200, unit: 'g', pricePerKg: 0.44 },
+      { name: 'Praliné noisette', quantity: 200, unit: 'g', pricePerKg: 10.50 },
+      { name: 'Crème 35% MG', quantity: 400, unit: 'ml', pricePerL: 3.25 },
       { name: 'Noisettes entières', quantity: 50, unit: 'g', pricePerKg: 12.50 },
       { name: 'Vanille (gousse)', quantity: 1, unit: 'pcs', pricePerPc: 1.80 },
       { name: 'Sucre glace', quantity: 60, unit: 'g', pricePerKg: 2.10 },
@@ -548,12 +574,12 @@ const RECIPES = [
     image: './img/tarte-framboise-pistache.jpg',
     description: 'Élégance et finesse : crème d\'amande pistache, framboises fraîches et un double pochage vanille-pistache.',
     ingredients: [
-      { name: 'Farine T55', quantity: 200, unit: 'g', pricePerKg: 0.65 },
+      { name: 'Farine T55', quantity: 200, unit: 'g', pricePerKg: 0.44 },
       { name: 'Pâte de pistache', quantity: 80, unit: 'g', pricePerKg: 45.00 },
       { name: 'Framboises fraîches', quantity: 300, unit: 'g', pricePerKg: 8.50 },
       { name: 'Beurre doux', quantity: 100, unit: 'g', pricePerKg: 6.80 },
       { name: 'Poudre d\'amandes', quantity: 100, unit: 'g', pricePerKg: 9.50 },
-      { name: 'Crème 35% MG', quantity: 400, unit: 'ml', pricePerL: 4.20 },
+      { name: 'Crème 35% MG', quantity: 400, unit: 'ml', pricePerL: 3.25 },
       { name: 'Pistaches concassées', quantity: 30, unit: 'g', pricePerKg: 35.00 }
     ],
     steps: [
@@ -575,10 +601,10 @@ const RECIPES = [
     description: 'Une création signature fleurie : biscuit chocolat intense, ganache fondante, mousse légère et décor framboises fraîches.',
     ingredients: [
       { name: 'Chocolat noir 64%', quantity: 200, unit: 'g', pricePerKg: 11.50 },
-      { name: 'Crème 35% MG', quantity: 400, unit: 'ml', pricePerL: 4.20 },
-      { name: 'Œufs entiers', quantity: 4, unit: 'pcs', pricePerPc: 0.15 },
+      { name: 'Crème 35% MG', quantity: 400, unit: 'ml', pricePerL: 3.25 },
+      { name: 'Œufs entiers', quantity: 4, unit: 'pcs', pricePerPc: 0.11 },
       { name: 'Farine T45', quantity: 50, unit: 'g', pricePerKg: 1.30 },
-      { name: 'Sucre semoule', quantity: 100, unit: 'g', pricePerKg: 0.85 },
+      { name: 'Sucre semoule', quantity: 100, unit: 'g', pricePerKg: 0.68 },
       { name: 'Fraises/Framboises', quantity: 150, unit: 'g', pricePerKg: 6.50 }
     ],
     steps: [
@@ -599,11 +625,11 @@ const RECIPES = [
     image: './img/frangine.jpg',
     description: 'La classique galette des rois : feuilletage inversé pur beurre et crème frangipane onctueuse aux amandes.',
     ingredients: [
-      { name: 'Beurre AOP (tourage)', quantity: 300, unit: 'g', pricePerKg: 7.50 },
-      { name: 'Farine T55', quantity: 400, unit: 'g', pricePerKg: 0.65 },
+      { name: 'Beurre AOP (tourage)', quantity: 300, unit: 'g', pricePerKg: 6.15 },
+      { name: 'Farine T55', quantity: 400, unit: 'g', pricePerKg: 0.44 },
       { name: 'Poudre d\'amandes', quantity: 200, unit: 'g', pricePerKg: 9.50 },
-      { name: 'Sucre semoule', quantity: 150, unit: 'g', pricePerKg: 0.85 },
-      { name: 'Œufs entiers', quantity: 3, unit: 'pcs', pricePerPc: 0.15 },
+      { name: 'Sucre semoule', quantity: 150, unit: 'g', pricePerKg: 0.68 },
+      { name: 'Œufs entiers', quantity: 3, unit: 'pcs', pricePerPc: 0.11 },
       { name: 'Rhum ambré', quantity: 10, unit: 'ml', pricePerL: 18.00 }
     ],
     steps: [
@@ -613,6 +639,301 @@ const RECIPES = [
       'Garnir le premier disque, dorer les bords et refermer.',
       'Chiqueter les bords et rayer le dessus.',
       'Cuire à 180°C jusqu\'à coloration dorée.'
+    ]
+  },
+  {
+    id: 'flan-patissier',
+    name: 'Flan Pâtissier',
+    category: 'Classique',
+    portions: 10,
+    prepTime: 40,
+    cookTime: 50,
+    image: './img/flan-patissier.jpg',
+    description: 'Crème onctueuse à la vanille sur pâte brisée croustillante, cuit au four pour une croûte dorée.',
+    ingredients: [
+      { name: 'Lait entier', quantity: 1000, unit: 'ml', pricePerL: 0.72 },
+      { name: 'Crème 35% MG', quantity: 200, unit: 'ml', pricePerL: 3.25 },
+      { name: 'Œufs entiers', quantity: 4, unit: 'pcs', pricePerPc: 0.11 },
+      { name: 'Sucre semoule', quantity: 200, unit: 'g', pricePerKg: 0.68 },
+      { name: 'Maïzena', quantity: 90, unit: 'g', pricePerKg: 4.00 },
+      { name: 'Beurre AOP', quantity: 50, unit: 'g', pricePerKg: 6.15 },
+      { name: 'Vanille (gousse)', quantity: 2, unit: 'pcs', pricePerPc: 1.80 },
+      { name: 'Farine T55', quantity: 250, unit: 'g', pricePerKg: 0.44 }
+    ],
+    steps: [
+      'Réaliser la pâte brisée et foncer un cercle haut.',
+      'Bouillir le lait et la crème avec la vanille.',
+      'Mélanger œufs, sucre et Maïzena. Verser le lait chaud dessus.',
+      'Remettre sur le feu et faire épaissir en remuant constamment.',
+      'Ajouter le beurre, verser dans le moule fonçé.',
+      'Cuire à 180°C pendant 50 min. Laisser refroidir totalement.'
+    ]
+  },
+  {
+    id: 'religieuse-chocolat',
+    name: 'Religieuse au Chocolat',
+    category: 'Pâte à choux',
+    portions: 10,
+    prepTime: 35,
+    cookTime: 35,
+    image: './img/religieuse-chocolat.jpg',
+    description: 'Deux choux superposés, garnis de crème pâtissière chocolat, glacés au fondant.',
+    ingredients: [
+      { name: 'Œufs entiers', quantity: 5, unit: 'pcs', pricePerPc: 0.11 },
+      { name: 'Beurre AOP', quantity: 120, unit: 'g', pricePerKg: 6.15 },
+      { name: 'Farine T55', quantity: 150, unit: 'g', pricePerKg: 0.44 },
+      { name: 'Lait entier', quantity: 500, unit: 'ml', pricePerL: 0.72 },
+      { name: 'Chocolat noir 64%', quantity: 150, unit: 'g', pricePerKg: 11.50 },
+      { name: 'Sucre semoule', quantity: 100, unit: 'g', pricePerKg: 0.68 },
+      { name: 'Fondant blanc', quantity: 150, unit: 'g', pricePerKg: 3.50 }
+    ],
+    steps: [
+      'Réaliser la pâte à choux et pocher 10 gros choux et 10 petits.',
+      'Cuire à 170°C pendant 35 min.',
+      'Préparer la crème pâtissière chocolatée.',
+      'Garnir tous les choux par le dessous.',
+      'Glacer au fondant chocolaté et assembler (le petit sur le gros).',
+      'Décorer d\'une collerette de crème au beurre.'
+    ]
+  },
+  {
+    id: 'royal-chocolat',
+    name: 'Royal Chocolat (Trianon)',
+    category: 'Entremets',
+    portions: 10,
+    prepTime: 120,
+    cookTime: 15,
+    image: './img/royal-chocolat.jpg',
+    description: 'Biscuit dacquoise noisette, croustillant praliné et mousse au chocolat noir intense.',
+    ingredients: [
+      { name: 'Chocolat noir 64%', quantity: 300, unit: 'g', pricePerKg: 11.50 },
+      { name: 'Crème 35% MG', quantity: 500, unit: 'ml', pricePerL: 3.25 },
+      { name: 'Praliné noisette', quantity: 200, unit: 'g', pricePerKg: 10.50 },
+      { name: 'Feuillantine', quantity: 100, unit: 'g', pricePerKg: 12.00 },
+      { name: 'Poudre de noisette', quantity: 150, unit: 'g', pricePerKg: 12.50 },
+      { name: 'Blancs d\'œufs', quantity: 5, unit: 'pcs', pricePerPc: 0.20 },
+      { name: 'Sucre glace', quantity: 150, unit: 'g', pricePerKg: 2.10 }
+    ],
+    steps: [
+      'Réaliser la dacquoise noisette et cuire à 170°C (15 min).',
+      'Mélanger le praliné et la feuillantine, étaler sur le biscuit.',
+      'Réaliser une mousse au chocolat sur base de crème montée.',
+      'Verser la mousse sur le croustillant dans un cercle.',
+      'Bloquer au froid 4h minimum.',
+      'Décorer de cacao poudre et de plaquettes de chocolat.'
+    ]
+  },
+  {
+    id: 'tarte-fraises',
+    name: 'Tarte aux Fraises',
+    category: 'Tarte',
+    portions: 10,
+    prepTime: 60,
+    cookTime: 20,
+    image: './img/tarte-fraises.jpg',
+    description: 'Pâte sablée, crème pâtissière vanille et fraises fraîches nappées.',
+    ingredients: [
+      { name: 'Fraises fraîches', quantity: 750, unit: 'g', pricePerKg: 5.50 },
+      { name: 'Farine T55', quantity: 250, unit: 'g', pricePerKg: 0.44 },
+      { name: 'Beurre AOP', quantity: 125, unit: 'g', pricePerKg: 6.15 },
+      { name: 'Lait entier', quantity: 500, unit: 'ml', pricePerL: 0.72 },
+      { name: 'Sucre semoule', quantity: 100, unit: 'g', pricePerKg: 0.68 },
+      { name: 'Vanille (gousse)', quantity: 1, unit: 'pcs', pricePerPc: 1.80 },
+      { name: 'Nappage blond', quantity: 50, unit: 'g', pricePerKg: 8.00 }
+    ],
+    steps: [
+      'Réaliser la pâte sablée, l\'abaisser et cuire à blanc à 170°C.',
+      'Préparer une crème pâtissière onctueuse à la vanille.',
+      'Garnir le fond de tarte refroidi de crème.',
+      'Disposer les fraises harmonieusement sur le dessus.',
+      'Napper les fruits pour le brillant et la conservation.'
+    ]
+  },
+  {
+    id: 'charlotte-fraises',
+    name: 'Charlotte aux Fraises',
+    category: 'Entremets',
+    portions: 10,
+    prepTime: 90,
+    cookTime: 0,
+    image: './img/charlotte.jpg',
+    description: 'Biscuits cuiller imbibés, mousse légère à la fraise et morceaux de fruits frais.',
+    ingredients: [
+      { name: 'Biscuits cuiller', quantity: 30, unit: 'pcs', pricePerPc: 0.10 },
+      { name: 'Purée de fraise', quantity: 500, unit: 'ml', pricePerL: 11.50 },
+      { name: 'Crème 35% MG', quantity: 400, unit: 'ml', pricePerL: 3.25 },
+      { name: 'Fraises fraîches', quantity: 300, unit: 'g', pricePerKg: 5.50 },
+      { name: 'Sucre semoule', quantity: 100, unit: 'g', pricePerKg: 0.68 },
+      { name: 'Gélatine', quantity: 10, unit: 'g', pricePerKg: 22.00 }
+    ],
+    steps: [
+      'Chemiser un moule à charlotte avec les biscuits imbibés de sirop.',
+      'Préparer la mousse fraise : purée de fruit + gélatine + crème montée.',
+      'Couler la moitié de la mousse, ajouter des morceaux de fraises.',
+      'Recouvrir du reste de mousse.',
+      'Réserver au froid 12h avant de démouler.',
+      'Décorer de fruits frais et d\'un ruban.'
+    ]
+  },
+  {
+    id: 'trois-chocolats',
+    name: 'Entremet Trois Chocolats',
+    category: 'Entremets',
+    portions: 10,
+    prepTime: 150,
+    cookTime: 12,
+    image: './img/trois-chocs.jpg',
+    description: 'Succession de trois mousses : chocolat noir, lait et blanc sur un biscuit cacao.',
+    ingredients: [
+      { name: 'Chocolat noir 64%', quantity: 150, unit: 'g', pricePerKg: 11.50 },
+      { name: 'Chocolat au lait 35%', quantity: 150, unit: 'g', pricePerKg: 10.50 },
+      { name: 'Chocolat blanc 33%', quantity: 150, unit: 'g', pricePerKg: 9.80 },
+      { name: 'Crème 35% MG', quantity: 600, unit: 'ml', pricePerL: 3.25 },
+      { name: 'Lait entier', quantity: 150, unit: 'ml', pricePerL: 0.72 },
+      { name: 'Sucre semoule', quantity: 100, unit: 'g', pricePerKg: 0.68 },
+      { name: 'Cacao poudre', quantity: 30, unit: 'g', pricePerKg: 12.00 }
+    ],
+    steps: [
+      'Cuire un biscuit au cacao moelleux.',
+      'Réaliser la mousse chocolat noir et couler sur le biscuit.',
+      'Réserver au congélateur 20 min.',
+      'Réaliser la mousse chocolat au lait et couler par-dessus.',
+      'Réserver encore 20 min.',
+      'Finir par la mousse chocolat blanc et bloquer au froid.'
+    ]
+  },
+  {
+    id: 'kouign-amann',
+    name: 'Kouign-Amann',
+    category: 'Viennoiserie',
+    portions: 10,
+    prepTime: 120,
+    cookTime: 30,
+    image: './img/kouign-amann.jpg',
+    description: 'Gâteau breton feuilleté au beurre et au sucre, caramélisé à la cuisson.',
+    ingredients: [
+      { name: 'Farine T55', quantity: 500, unit: 'g', pricePerKg: 0.44 },
+      { name: 'Beurre AOP', quantity: 300, unit: 'g', pricePerKg: 6.15 },
+      { name: 'Sucre semoule', quantity: 300, unit: 'g', pricePerKg: 0.68 },
+      { name: 'Eau', quantity: 300, unit: 'ml', pricePerL: 0.00 },
+      { name: 'Levure fraîche', quantity: 20, unit: 'g', pricePerKg: 10.00 },
+      { name: 'Sel', quantity: 10, unit: 'g', pricePerKg: 0.80 }
+    ],
+    steps: [
+      'Réaliser une pâte à pain souple.',
+      'Effectuer le tourage en incorporant le beurre demi-sel.',
+      'Ajouter le sucre à chaque tour (tours doubles).',
+      'Plier la pâte dans un moule beurré et sucré.',
+      'Cuire à 200°C pendant 30 min jusqu\'à caramélisation intense.',
+      'Démouler dès la sortie du four.'
+    ]
+  },
+  {
+    id: 'tropezienne',
+    name: 'Tarte Tropézienne',
+    category: 'Brioche',
+    portions: 10,
+    prepTime: 120,
+    cookTime: 20,
+    image: './img/tropezienne.jpg',
+    description: 'Brioche moelleuse parfumée à la fleur d\'oranger, garnie d\'un mélange onctueux de deux crèmes.',
+    ingredients: [
+      { name: 'Farine T45', quantity: 500, unit: 'g', pricePerKg: 1.30 },
+      { name: 'Beurre AOP', quantity: 200, unit: 'g', pricePerKg: 6.15 },
+      { name: 'Œufs entiers', quantity: 4, unit: 'pcs', pricePerPc: 0.11 },
+      { name: 'Lait entier', quantity: 500, unit: 'ml', pricePerL: 0.72 },
+      { name: 'Sucre semoule', quantity: 150, unit: 'g', pricePerKg: 0.68 },
+      { name: 'Fleur d\'oranger', quantity: 20, unit: 'ml', pricePerL: 15.00 },
+      { name: 'Crème 35% MG', quantity: 300, unit: 'ml', pricePerL: 3.25 },
+      { name: 'Sucre grain', quantity: 50, unit: 'g', pricePerKg: 2.50 }
+    ],
+    steps: [
+      'Réaliser la pâte à brioche et laisser pousser 2h.',
+      'Détailler un disque, dorer et parsemer de sucre grain.',
+      'Cuire à 180°C pendant 20 min.',
+      'Préparer une crème diplomate parfumée à la fleur d\'oranger.',
+      'Couper la brioche froide en deux et garnir généreusement.',
+      'Saupoudrer de sucre glace avant de servir.'
+    ]
+  },
+  {
+    id: 'entremet-exotique',
+    name: 'Entremet Exotique Mangue Passion',
+    category: 'Entremets',
+    portions: 10,
+    prepTime: 150,
+    cookTime: 15,
+    image: './img/exotique.jpg',
+    description: 'Mousse mangue-passion légère, insert confit de fruits exotiques sur biscuit coco.',
+    ingredients: [
+      { name: 'Purée mangue/passion', quantity: 500, unit: 'ml', pricePerL: 12.50 },
+      { name: 'Crème 35% MG', quantity: 400, unit: 'ml', pricePerL: 3.25 },
+      { name: 'Noix de coco râpée', quantity: 100, unit: 'g', pricePerKg: 8.50 },
+      { name: 'Sucre semoule', quantity: 150, unit: 'g', pricePerKg: 0.68 },
+      { name: 'Gélatine', quantity: 12, unit: 'g', pricePerKg: 28.00 },
+      { name: 'Blancs d\'œufs', quantity: 4, unit: 'pcs', pricePerPc: 0.11 }
+    ],
+    steps: [
+      'Réaliser un biscuit dacquoise coco et cuire 15 min.',
+      'Préparer un confit mangue-passion et couler en insert.',
+      'Réaliser la mousse bavaroise exotique.',
+      'Montage à l\'envers : mousse, insert congelé, dacquoise coco.',
+      'Bloquer au froid et glacer avec un nappage neutre coloré.',
+      'Décorer de fruits frais exotiques.'
+    ]
+  },
+  {
+    id: 'russe-noisette',
+    name: 'Le Russe (Succès Noisette)',
+    category: 'Entremets',
+    portions: 10,
+    prepTime: 90,
+    cookTime: 25,
+    image: './img/le-russe.jpg',
+    description: 'Biscuit dacquoise noisette fondant et crème pralinée intense.',
+    ingredients: [
+      { name: 'Poudre de noisette', quantity: 250, unit: 'g', pricePerKg: 13.50 },
+      { name: 'Sucre glace', quantity: 250, unit: 'g', pricePerKg: 2.10 },
+      { name: 'Blancs d\'œufs', quantity: 8, unit: 'pcs', pricePerPc: 0.11 },
+      { name: 'Beurre AOP', quantity: 250, unit: 'g', pricePerKg: 6.15 },
+      { name: 'Praliné noisette', quantity: 150, unit: 'g', pricePerKg: 10.50 },
+      { name: 'Lait entier', quantity: 100, unit: 'ml', pricePerL: 0.72 }
+    ],
+    steps: [
+      'Réaliser deux disques de biscuit dacquoise noisette.',
+      'Cuire à 170°C pendant 25 min.',
+      'Préparer une crème mousseline au praliné noisette.',
+      'Monter l\'entremet : biscuit, couche épaisse de crème, biscuit.',
+      'Lisser les bords et saupoudrer généreusement de sucre glace.',
+      'Réserver au frais avant dégustation.'
+    ]
+  },
+  {
+    id: 'salambo',
+    name: 'Salambo',
+    category: 'Pâte à choux',
+    portions: 10,
+    prepTime: 25,
+    cookTime: 35,
+    image: './img/salambo.jpg',
+    description: 'Chou allongé garni de crème pâtissière au Kirsch, glacé au fondant vert et parsemé de vermicelles chocolat.',
+    ingredients: [
+      { name: ' Farine T55', quantity: 150, unit: 'g', pricePerKg: 0.44 },
+      { name: 'Beurre AOP', quantity: 100, unit: 'g', pricePerKg: 6.15 },
+      { name: 'Œufs entiers', quantity: 4, unit: 'pcs', pricePerPc: 0.11 },
+      { name: 'Lait entier', quantity: 500, unit: 'ml', pricePerL: 0.72 },
+      { name: 'Sucre semoule', quantity: 100, unit: 'g', pricePerKg: 0.68 },
+      { name: 'Kirsch', quantity: 10, unit: 'ml', pricePerL: 25.00 },
+      { name: 'Fondant blanc', quantity: 150, unit: 'g', pricePerKg: 3.50 },
+      { name: 'Jaunes d\'œufs', quantity: 3, unit: 'pcs', pricePerPc: 0.11 }
+    ],
+    steps: [
+      'Réaliser la pâte à choux et pocher des bâtons de 8cm.',
+      'Cuire à 170°C pendant 35 min.',
+      'Préparer la crème pâtissière et l\'aromatiser au Kirsch.',
+      'Garnir les choux refroidis par le dessous.',
+      'Colorer le fondant en vert clair et glacer les choux.',
+      'Décorer les extrémités avec des vermicelles au chocolat.'
     ]
   }
 ];
@@ -627,17 +948,17 @@ const VIENNOISERIES = [
     name: 'Croissant',
     category: 'Viennoiserie',
     portions: 10,
-    prepTime: 180,
-    cookTime: 18,
+    prepTime: 20,
+    cookTime: 12,
     image: './img/croissant.jpg',
     description: 'Croissant pur beurre, feuilletage croustillant et mie alvéolée.',
     ingredients: [
       { name: 'Farine T45', quantity: 500, unit: 'g', pricePerKg: 1.30 },
-      { name: 'Beurre AOP (tourage)', quantity: 280, unit: 'g', pricePerKg: 7.50 },
-      { name: 'Lait entier', quantity: 150, unit: 'ml', pricePerL: 0.85 },
-      { name: 'Sucre semoule', quantity: 60, unit: 'g', pricePerKg: 0.85 },
+      { name: 'Beurre AOP (tourage)', quantity: 250, unit: 'g', pricePerKg: 6.15 },
+      { name: 'Lait entier', quantity: 150, unit: 'ml', pricePerL: 0.72 },
+      { name: 'Sucre semoule', quantity: 60, unit: 'g', pricePerKg: 0.68 },
       { name: 'Levure fraîche', quantity: 20, unit: 'g', pricePerKg: 10.00 },
-      { name: 'Œufs entiers', quantity: 1, unit: 'pcs', pricePerPc: 0.15 },
+      { name: 'Œufs entiers', quantity: 1, unit: 'pcs', pricePerPc: 0.11 },
       { name: 'Sel', quantity: 10, unit: 'g', pricePerKg: 0.80 }
     ],
     steps: [
@@ -660,12 +981,12 @@ const VIENNOISERIES = [
     description: 'Pâte feuilletée levée pur beurre avec deux barres de chocolat noir.',
     ingredients: [
       { name: 'Farine T45', quantity: 500, unit: 'g', pricePerKg: 1.30 },
-      { name: 'Beurre AOP (tourage)', quantity: 280, unit: 'g', pricePerKg: 7.50 },
+      { name: 'Beurre AOP (tourage)', quantity: 280, unit: 'g', pricePerKg: 6.15 },
       { name: 'Chocolat noir bâtons', quantity: 200, unit: 'g', pricePerKg: 11.50 },
-      { name: 'Lait entier', quantity: 150, unit: 'ml', pricePerL: 0.85 },
-      { name: 'Sucre semoule', quantity: 60, unit: 'g', pricePerKg: 0.85 },
+      { name: 'Lait entier', quantity: 150, unit: 'ml', pricePerL: 0.72 },
+      { name: 'Sucre semoule', quantity: 60, unit: 'g', pricePerKg: 0.68 },
       { name: 'Levure fraîche', quantity: 20, unit: 'g', pricePerKg: 10.00 },
-      { name: 'Œufs entiers', quantity: 1, unit: 'pcs', pricePerPc: 0.15 },
+      { name: 'Œufs entiers', quantity: 1, unit: 'pcs', pricePerPc: 0.11 },
       { name: 'Sel', quantity: 10, unit: 'g', pricePerKg: 0.80 }
     ],
     steps: [
@@ -754,10 +1075,10 @@ function computeFullCost(recipe, quality = 1.0, params = {}, matiereHike = 0) {
 
   const nbPortions = params.portions || recipe.portions || 10;
   const tauxPerte = params.tauxPerte ?? 0.05;
-  const tauxHoraire = params.tauxHoraire ?? 15.00;
-  const chargesFixes = params.chargesFixes ?? 2000;
-  const coutEnergieH = params.coutEnergie ?? 2.50;
-  const nbProductionsMois = params.nbProdMois ?? 100;
+  const tauxHoraire = params.tauxHoraire ?? 12.00;
+  const chargesFixes = params.chargesFixes ?? 1200;
+  const coutEnergieH = params.coutEnergie ?? 1.20;
+  const nbProductionsMois = params.nbProdMois ?? 400;
   const prixVenteManuel = params.prixVente ?? null;
   const margeSouhaitee = params.margeSouhaitee ?? 0.70;
 

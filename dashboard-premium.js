@@ -24,7 +24,7 @@ window.hydratePremiumDashboard = function () {
         ? window.APP.teamMembers
         : JSON.parse(localStorage.getItem(`gourmet_team_members_${currUser.toLowerCase()}`) || '[]');
 
-    const t = (key) => (window.i18n && typeof window.i18n.t === 'function') ? window.i18n.t(key) : key;
+    const t = (key, data) => (window.i18n && typeof window.i18n.t === 'function') ? window.i18n.t(key, data) : key;
 
     // 1. Briefing Header: Date & User
     const dateHeaderEl = document.getElementById('dashDateHeader');
@@ -76,10 +76,10 @@ window.hydratePremiumDashboard = function () {
                 <div class="priority-item urgent">
                     <div class="p-icon">🍰</div>
                     <div class="p-content">
-                        <div class="p-title">Lancer ${topR.name}</div>
-                        <div class="p-desc">Production hebdomadaire à initier</div>
+                        <div class="p-title">${t('dash.priority.launch', {name: topR.name})}</div>
+                        <div class="p-desc">${t('dash.priority.prod_desc')}</div>
                     </div>
-                    <button class="p-action-btn" onclick="document.getElementById('navMgmt').click(); switchMgmtTab('production');">Lancer</button>
+                    <button class="p-action-btn" onclick="document.getElementById('navMgmt').click(); switchMgmtTab('production');">${t('dash.priority.btn_launch')}</button>
                 </div>
             `;
         }
@@ -91,10 +91,10 @@ window.hydratePremiumDashboard = function () {
                 <div class="priority-item warning">
                     <div class="p-icon">🛒</div>
                     <div class="p-content">
-                        <div class="p-title">Commander ${alertItem.name}</div>
-                        <div class="p-desc">Stock critique: ${alertItem.stock} ${alertItem.unit || 'kg'}</div>
+                        <div class="p-title">${t('dash.priority.order', {name: alertItem.name})}</div>
+                        <div class="p-desc">${t('dash.priority.stock_desc', {qty: alertItem.stock, unit: alertItem.unit || 'kg'})}</div>
                     </div>
-                    <button class="p-action-btn" onclick="document.getElementById('navSuppliers').click();">Commander</button>
+                    <button class="p-action-btn" onclick="document.getElementById('navSuppliers').click();">${t('dash.priority.btn_order')}</button>
                 </div>
             `;
         }
@@ -107,10 +107,10 @@ window.hydratePremiumDashboard = function () {
                 <div class="priority-item info">
                     <div class="p-icon">💰</div>
                     <div class="p-content">
-                        <div class="p-title">Ajuster prix ${lowPerf.name}</div>
-                        <div class="p-desc">Marge actuelle: ${Math.round(lowPerf.costs?.marginPct)}%</div>
+                        <div class="p-title">${t('dash.priority.adjust_margin', {name: lowPerf.name})}</div>
+                        <div class="p-desc">${t('dash.priority.margin_desc', {margin: Math.round(lowPerf.costs?.marginPct)})}</div>
                     </div>
-                    <button class="p-action-btn" onclick="openRecipeEditorByName('${lowPerf.name}')">Réviser</button>
+                    <button class="p-action-btn" onclick="openRecipeEditorByName('${lowPerf.name}')">${t('dash.priority.btn_revise')}</button>
                 </div>
             `;
         } else {
@@ -118,15 +118,15 @@ window.hydratePremiumDashboard = function () {
                 <div class="priority-item info">
                     <div class="p-icon">⚖️</div>
                     <div class="p-content">
-                        <div class="p-title">Vérification Inventaire</div>
-                        <div class="p-desc">Mise à jour mensuelle recommandée</div>
+                        <div class="p-title">${t('dash.priority.inv_check')}</div>
+                        <div class="p-desc">${t('dash.priority.inv_desc')}</div>
                     </div>
-                    <button class="p-action-btn" onclick="document.getElementById('navInventaire').click();">Ouvrir</button>
+                    <button class="p-action-btn" onclick="document.getElementById('navInventaire').click();">${t('dash.priority.btn_open')}</button>
                 </div>
             `;
         }
         
-        priorityList.innerHTML = pHTML || '<p class="timeline-empty">Aucune priorité détectée.</p>';
+        priorityList.innerHTML = pHTML || `<p class="timeline-empty">${t('dash.priority.empty')}</p>`;
     }
 
     // 4. AI Expert Advice
@@ -141,10 +141,10 @@ window.hydratePremiumDashboard = function () {
             
             aiAdvice.innerHTML = `
                 <div class="ai-bubble">
-                    <p><strong>${worst.name}</strong> : Votre marge est faible (${currentM}%). L'inflation impacte vos coûts.</p>
+                    <p>${t('dash.ai.margin_low', {name: `<strong>${worst.name}</strong>`, margin: currentM})}</p>
                     <div class="ai-actions">
-                        <span class="ai-tip">💡 Suggéré: +${suggestionPrice.toFixed(2)}€ sur le prix de vente</span>
-                        <span class="ai-tip">💡 Cibler une marge de ${targetM}%</span>
+                        <span class="ai-tip">${t('dash.ai.suggestion', {price: suggestionPrice.toFixed(2)})}</span>
+                        <span class="ai-tip">${t('dash.ai.target', {target: targetM})}</span>
                     </div>
                 </div>
             `;
@@ -159,9 +159,12 @@ window.hydratePremiumDashboard = function () {
             let displayRecipes = (dateFilter === 'today') ? recipes.slice(0, 3) : recipes.slice(Math.min(recipes.length-1, 1), Math.min(recipes.length, 4));
             if (displayRecipes.length === 0) displayRecipes = recipes.slice(0,1);
 
+            const statusLabels = (dateFilter === 'today') 
+                ? [t('dash.status.ongoing'), t('dash.status.to_launch'), t('dash.status.planned')] 
+                : [t('ui.tomorrow'), t('ui.tomorrow'), t('dash.status.planned')];
+
             prodTimeline.innerHTML = displayRecipes.map((r, i) => {
                 const progresses = (dateFilter === 'today') ? [75, 40, 0] : [0, 0, 0];
-                const statusLabels = (dateFilter === 'today') ? ['En cours', 'À lancer', 'Planifié'] : ['Demain', 'Demain', 'Planifié'];
                 const prog = progresses[i % 3];
                 return `
                     <div class="prod-pill-v2">
@@ -180,7 +183,8 @@ window.hydratePremiumDashboard = function () {
                 `;
             }).join('');
         } else {
-            prodTimeline.innerHTML = `<div class="timeline-empty">Aucune production planifiée pour ${dateFilter === 'today' ? "aujourd'hui" : "demain"}.</div>`;
+            const dateLabel = dateFilter === 'today' ? t('ui.today').toLowerCase() : t('ui.tomorrow').toLowerCase();
+            prodTimeline.innerHTML = `<div class="timeline-empty">${t('dash.prod.empty', {date: dateLabel})}</div>`;
         }
     }
 
@@ -195,7 +199,7 @@ window.hydratePremiumDashboard = function () {
                 </div>
             `).join('');
         } else {
-            stockMini.innerHTML = '<p style="font-size:0.8rem; color:var(--cockpit-success)">✅ Stocks optimaux</p>';
+            stockMini.innerHTML = `<p style="font-size:0.8rem; color:var(--cockpit-success)">${t('dash.stock.optimal')}</p>`;
         }
     }
 
@@ -203,14 +207,14 @@ window.hydratePremiumDashboard = function () {
     const topPerf = document.getElementById('dashTopPerf');
     if (topPerf) {
         const best = [...recipes].sort((a,b) => (b.costs?.marginPct || 0) - (a.costs?.marginPct || 0))[0];
-        topPerf.textContent = best ? best.name : 'Veuillez ajouter des recettes';
+        topPerf.textContent = best ? best.name : t('dash.biz.no_recipes');
     }
     const avgMarginEl = document.getElementById('dashAvgMargin');
     if (avgMarginEl) avgMarginEl.textContent = Math.round(avgMargin) + '%';
 
     // 8. Team Summary
     const presenceEl = document.getElementById('dashPresenceCount');
-    if (presenceEl) presenceEl.textContent = (team.length || 3) + ' présents';
+    if (presenceEl) presenceEl.textContent = t('dash.team.present', {n: (team.length || 3)});
 
     // 9. Sparkline Chart (Mini-demo)
     renderMiniSparkline();

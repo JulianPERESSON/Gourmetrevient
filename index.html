@@ -187,9 +187,12 @@
       <div class="nav-dropdown">
         <button class="nav-dropdown-trigger"><span data-i18n="nav.category.mgmt">📈 Pilotage</span> <span class="nav-arrow">▼</span></button>
         <div class="nav-dropdown-content">
-          <button class="nav-link nav-dropdown-link" id="navMgmt">⚙️ <span data-i18n="nav.mgmt">Gestion Pro</span></button>
-          <button class="nav-link nav-dropdown-link" id="navSuppliers">🚚 <span data-i18n="nav.suppliers">Fournisseurs</span></button>
-          <button class="nav-link nav-dropdown-link" id="navInventaire">📦 <span data-i18n="nav.inventory">Inventaire</span></button>
+          <button class="nav-link nav-dropdown-link" id="navStats" onclick="showStats()">📊 <span data-i18n="nav.stats">Statistiques</span></button>
+          <button class="nav-link nav-dropdown-link" id="navMgmt" onclick="showMgmt()">⚙️ <span data-i18n="nav.mgmt">Gestion Pro</span></button>
+          <button class="nav-link nav-dropdown-link" id="navSuppliers" onclick="showSuppliers()">🚚 <span data-i18n="nav.suppliers">Fournisseurs</span></button>
+          <button class="nav-link nav-dropdown-link" id="navInventaire" onclick="showInventaire()">📦 <span data-i18n="nav.inventory">Inventaire</span></button>
+          <button class="nav-link nav-dropdown-link" onclick="showMgmt(); switchMgmtTab('boston');">📈 <span data-i18n="bcg.title">Matrice BCG</span></button>
+          <button class="nav-link nav-dropdown-link" onclick="showMgmt(); switchMgmtTab('inflation');">🔥 <span data-i18n="inflation.title">Simulateur de Crise</span></button>
         </div>
       </div>
 
@@ -291,6 +294,16 @@
         </div>
       </header>
 
+      <!-- QUICK ACTIONS -->
+      <div class="dash-quick-actions" style="display:flex; gap:1rem; margin: -1rem 0 2rem 0; padding: 0 1rem;">
+        <button class="btn btn-primary" onclick="showRecettes()" style="flex:1; justify-content:center; gap:8px; height:50px; font-weight:700; border-radius:16px; box-shadow: 0 4px 15px rgba(var(--accent-rgb), 0.3);">
+          <span style="font-size:1.4rem;">📖</span> <span data-i18n="nav.recipes">Calculateur de Recettes</span>
+        </button>
+        <button class="btn btn-secondary" onclick="showStats()" style="flex:1; justify-content:center; gap:8px; height:50px; font-weight:700; border-radius:16px;">
+          <span style="font-size:1.4rem;">📊</span> <span data-i18n="nav.stats">Statistiques</span>
+        </button>
+      </div>
+
       <!-- 2. THE COCKPIT GRID -->
       <div class="cockpit-grid-v2">
         
@@ -374,11 +387,11 @@
             
             <div class="production-timeline" id="dashProdTimeline">
               <!-- Dynamically populated -->
-              <div class="timeline-empty">Aucune production planifiée.</div>
+              <div class="timeline-empty" data-i18n="dash.prod.empty_init">Aucune production planifiée.</div>
             </div>
             
             <div class="card-footer-actions">
-              <button class="btn btn-sm btn-outline" onclick="document.getElementById('navMgmt').click(); switchMgmtTab('production');">Gérer le planning complet</button>
+            <button class="btn btn-sm btn-outline" onclick="document.getElementById('navMgmt').click(); switchMgmtTab('production');" data-i18n="dash.cockpit.manage_planning">Gérer le planning complet</button>
             </div>
           </div>
 
@@ -389,7 +402,7 @@
               <div class="card-header-premium">
                 <div class="header-main">
                   <span class="icon-p" style="color:#f59e0b;">📦</span>
-                  <h3>Alertes Stock</h3>
+                  <h3 data-i18n="dash.cockpit.stock_radar">Alertes Stock</h3>
                 </div>
               </div>
               <div class="radar-compact-list" id="dashStockAlerts">
@@ -402,16 +415,16 @@
               <div class="card-header-premium">
                 <div class="header-main">
                   <span class="icon-p" style="color:#10b981;">📈</span>
-                  <h3>Rentabilité</h3>
+                  <h3 data-i18n="dash.stat.rentability">Rentabilité</h3>
                 </div>
               </div>
               <div class="perf-stats-mini">
                  <div class="mini-kpi">
-                    <span class="k-label">Top Recette</span>
+                    <span class="k-label" data-i18n="stats.kpi.hero">Top Recette</span>
                     <span class="k-value" id="dashTopPerf">Eclair Choc</span>
                  </div>
                  <div class="mini-kpi">
-                    <span class="k-label">Marge Moyenne</span>
+                    <span class="k-label" data-i18n="mgmt.kpi.margin">Marge Moyenne</span>
                     <span class="k-value" id="dashAvgMargin">72.4%</span>
                  </div>
               </div>
@@ -423,11 +436,11 @@
                <div class="card-header-premium">
                 <div class="header-main">
                   <span class="icon-p" style="color:#6366f1;">👥</span>
-                  <h3>Équipe</h3>
+                  <h3 data-i18n="dash.kpi.team">Équipe</h3>
                 </div>
               </div>
               <div id="dashTeamSummary" class="team-summary-mini">
-                <span id="dashPresenceCount">2 présents</span> • <span id="dashHACCPStatus">HACCP OK</span>
+                <span id="dashPresenceCount" data-i18n="dash.team.present" data-i18n-data='{"n": 2}'>2 présents</span> • <span id="dashHACCPStatus" data-i18n="dash.haccp.ok">HACCP OK</span>
               </div>
             </div>
           </div>
@@ -963,16 +976,20 @@
           </button>
         </div>
 
-        <div style="text-align:left;">
-          <div class="carousel-nav-header">
-            <h3 style="font-family:var(--font-heading); font-size:1.5rem; color:var(--text); margin:0;"
-              data-i18n="hero.library">📖 Bibliothèque des Chefs</h3>
-            <div class="carousel-btns">
-              <button class="carousel-btn prev" id="carouselPrevBtn" aria-label="Recette précédente">❮</button>
-              <button class="carousel-btn next" id="carouselNextBtn" aria-label="Recette suivante">❯</button>
+        <div class="library-hub-container">
+          <div class="library-header">
+            <h3 data-i18n="hero.library">📖 Bibliothèque des Chefs</h3>
+            <div class="library-controls">
+              <div class="search-box-wrapper">
+                <input type="text" id="librarySearchInput" data-i18n-placeholder="search.placeholder" placeholder="Rechercher une recette..." oninput="filterLibrary()">
+                <span class="search-icon">🔍</span>
+              </div>
+              <div class="category-filters" id="libraryFilters">
+                <!-- Filled by JS -->
+              </div>
             </div>
           </div>
-          <div id="recipeLibraryCarousel" class="carousel-track">
+          <div id="recipeLibraryGrid" class="library-grid">
             <!-- Rendered by JS -->
           </div>
         </div>
@@ -1210,25 +1227,25 @@
             <div class="form-group">
               <label class="label-with-icon" style="white-space: nowrap; font-size: 0.72rem;"
                 data-i18n="s4.adv.labor_rate">💰 Taux horaire MO (€/h)</label>
-              <input type="number" class="form-input" id="advLaborRate" placeholder="15.00" value="15" min="0"
+              <input type="number" class="form-input" id="advLaborRate" placeholder="12.00" value="12" min="0"
                 step="0.5">
             </div>
             <div class="form-group">
               <label class="label-with-icon" style="white-space: nowrap; font-size: 0.72rem;"
                 data-i18n="s4.adv.fixed_charges">🏠 Charges fixes mensuelles (€)</label>
-              <input type="number" class="form-input" id="advFixedCharges" placeholder="2000" value="2000" min="0"
+              <input type="number" class="form-input" id="advFixedCharges" placeholder="1200" value="1200" min="0"
                 step="50">
             </div>
             <div class="form-group">
               <label class="label-with-icon" style="white-space: nowrap; font-size: 0.72rem;"
                 data-i18n="s4.adv.productions">📦 Productions / mois</label>
-              <input type="number" class="form-input" id="advProductions" placeholder="100" value="100" min="1"
+              <input type="number" class="form-input" id="advProductions" placeholder="400" value="400" min="1"
                 step="1">
             </div>
             <div class="form-group">
               <label class="label-with-icon" style="white-space: nowrap; font-size: 0.72rem;"
                 data-i18n="s4.adv.energy">⚡ Coût énergie (€/h)</label>
-              <input type="number" class="form-input" id="advEnergy" placeholder="2.50" value="2.50" min="0" step="0.1">
+              <input type="number" class="form-input" id="advEnergy" placeholder="1.00" value="1.00" min="0" step="0.1">
             </div>
             <div class="form-group">
               <label class="label-with-icon" style="white-space: nowrap; font-size: 0.72rem;"
@@ -1267,10 +1284,7 @@
 
           <div class="export-actions" style="margin-top: 1.5rem;">
             <button class="btn btn-primary" id="btnLaunchProd" data-i18n="s5.btn.production" style="background:#8b5cf6; color:white; border-color:#8b5cf6; font-weight:700;">🛒 Lancer la production</button>
-            <button class="btn btn-outline" id="btnGenerateQR" style="border-color:var(--accent); color:var(--accent);">🔲 Étiquette QR & Vitrine</button>
             <button class="btn btn-primary" id="btnExportPdf" data-i18n="s5.btn.pdf">📄 Exporter en PDF</button>
-            <button class="btn btn-outline" id="btnExportDevis" data-i18n="s5.btn.quote"
-              style="border-color:var(--accent); color:var(--accent);">🤝 Devis Client (B2B)</button>
             <button class="btn btn-success" id="btnSaveRecipe" data-i18n="s5.btn.save">✅ Sauvegarder la
               recette</button>
           </div>
@@ -3483,7 +3497,7 @@
     <div class="modal-content glass-panel" style="max-width:500px; width:95%;">
       <div class="modal-header" style="display:flex; justify-content:space-between; margin-bottom:1.2rem;">
         <h3 style="margin:0;">☁️ <span data-i18n="cloud.modal.title">Synchronisation Cloud</span></h3>
-        <button class="btn-icon" onclick="closeCloudSync()">✕</button>
+        <button id="btnCloseCloudSync" class="btn-icon" onclick="closeCloudSync()">✕</button>
       </div>
       <div id="cloudStatus" class="cloud-status-bar" style="margin-bottom:1.5rem;"></div>
       <div class="form-group">

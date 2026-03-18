@@ -52,7 +52,7 @@ const TRANSLATIONS = {
         'nav.category.org': "📋 Organisation",
         'nav.category.showcase': "✨ Vitrine",
         'nav.home': 'Accueil',
-        'nav.recipes': 'Recettes',
+        'nav.recipes': 'Calculateur de Recettes',
         'nav.lab': 'Laboratoire',
         'nav.planning': 'Planning',
         'nav.inventory': 'Inventaire',
@@ -69,6 +69,12 @@ const TRANSLATIONS = {
         'nav.suppliers': 'Fournisseurs',
         'nav.stats': 'Statistiques',
         'nav.mgmt': 'Gestion Pro',
+
+        // Library & Search
+        'search.placeholder': 'Rechercher une recette...',
+        'search.no_results': 'Aucun résultat trouvé.',
+        'filter.all': 'Tout',
+        'library.none': 'Aucune recette dans la bibliothèque.',
 
         // Gestion Pro (Management)
         'mgmt.hero.badge': '💎 Excellence Opérationnelle',
@@ -268,43 +274,6 @@ const TRANSLATIONS = {
         'dash.ai.alert': 'Alerte Rentabilité :',
         'dash.ai.stock': 'Optimisation Stock :',
         'dash.ai.adjust': 'Ajuster Prix... ',
-        'dash.demo.plateaux': 'Plateaux G1 • Progression {pct}%',
-        'dash.demo.individuels': 'Individuels • Progression {pct}%',
-        'dash.demo.bocaux': 'Bocaux • Progression {pct}%',
-        'dash.demo.grand_format': 'Grand format • Progression {pct}%',
-        'dash.demo.fonds_cuits': 'Fonds cuits, ganache dressée • Progression {pct}%',
-        'dash.demo.ai_alert_text': 'Votre <strong>Paris-Brest</strong> chute à 65% de marge suite à l\'augmentation du prix de la noisette.',
-        'dash.demo.ai_stock_text': 'Commande de beurre nécessaire d\'ici demain.',
-        'dash.demo.stock_beurre': 'Stock Beurre modifié',
-        'dash.demo.stock_beurre_by': 'par Chef Julian à 14:05',
-        'dash.demo.haccp_frigo': 'HACCP: Frigo A contrôlé',
-        'dash.demo.haccp_frigo_status': 'Conforme (+3.2°C) à 13:45',
-        'dash.demo.sucre_glace': 'Sucre glace AOP',
-        'dash.demo.framboises': 'Framboises',
-        'dash.demo.beurre_tourage': 'Beurre Tourage',
-        'dash.no_recipes': 'Aucune recette',
-        'dash.lab_active': 'Labo: Actif',
-        'dash.stock_alert': 'Stock: Alerte',
-        'dash.kpi.recipes': 'Recettes Labo',
-        'dash.kpi.margin': 'Marge du Labo',
-        'dash.kpi.cost': 'Coût/Port. (Prod)',
-        'dash.kpi.team': 'Équipe',
-        'dash.kpi.school': '1 À L\'ÉCOLE',
-        'dash.kpi.alerts': 'Alertes',
-        'dash.kpi.todo': 'À VOIR',
-        'dash.col.prod': 'Pilotage Production',
-        'dash.col.biz': 'Performance Business',
-        'dash.col.ai': 'Assistant du Chef',
-        'dash.col.logistics': 'Goulots Logistiques',
-        'dash.col.alerts': '⚠️ Alertes',
-        'dash.prod.ongoing': 'En cours',
-        'dash.prod.todo': 'À produire',
-        'dash.prod.done': 'Terminé',
-        'dash.biz.top': 'Top',
-        'dash.biz.worst': 'À Surveiller',
-        'dash.ai.alert': 'Alerte Rentabilité :',
-        'dash.ai.stock': 'Optimisation Stock :',
-        'dash.ai.adjust': 'Ajuster Prix... ',
         'dash.active_status': 'En ligne',
         'dash.btn.order': 'Commander',
         'dash.btn.inventory': 'Inventaire',
@@ -319,6 +288,35 @@ const TRANSLATIONS = {
         'dash.cockpit.activity': 'Activité & Équipe',
         'dash.cockpit.start': 'Démarrer',
         'dash.cockpit.finish': 'Terminer',
+        'dash.cockpit.manage_planning': 'Gérer le planning complet',
+        'dash.priority.launch': 'Lancer {name}',
+        'dash.priority.prod_desc': 'Production hebdomadaire à initier',
+        'dash.priority.btn_launch': 'Lancer',
+        'dash.priority.order': 'Commander {name}',
+        'dash.priority.stock_desc': 'Stock critique: {qty} {unit}',
+        'dash.priority.btn_order': 'Commander',
+        'dash.priority.adjust_margin': 'Ajuster prix {name}',
+        'dash.priority.margin_desc': 'Marge actuelle: {margin}%',
+        'dash.priority.btn_revise': 'Réviser',
+        'dash.priority.inv_check': 'Vérification Inventaire',
+        'dash.priority.inv_desc': 'Mise à jour mensuelle recommandée',
+        'dash.priority.btn_open': 'Ouvrir',
+        'dash.priority.empty': 'Aucune priorité détectée.',
+        'dash.ai.margin_low': '{name} : Votre marge est faible ({margin}%). L\'inflation impacte vos coûts.',
+        'dash.ai.suggestion': '💡 Suggéré: +{price}€ sur le prix de vente',
+        'dash.ai.target': '💡 Cibler une marge de {target}%',
+        'dash.status.ongoing': 'En cours',
+        'dash.status.to_launch': 'À lancer',
+        'dash.status.planned': 'Planifié',
+        'dash.prod.empty': 'Aucune production planifiée pour {date}.',
+        'dash.stock.optimal': '✅ Stocks optimaux',
+        'dash.biz.no_recipes': 'Veuillez ajouter des recettes',
+        'dash.team.present': '{n} présents',
+        'dash.team.no_present': 'Aucun membre présent (Congés)',
+        'dash.haccp.ok': 'HACCP OK',
+        'dash.prod.empty_init': 'Aucune production planifiée.',
+        'dash.featured.empty': 'Aucune suggestion disponible.',
+        'ui.btn.view_sheet': 'Voir la fiche',
 
         // Recipe Hero
         'hero.badge': '✨ Coût de revient',
@@ -1196,15 +1194,25 @@ const TRANSLATIONS = {
         'data.recipe.saint-honore.step.3': 'Garnir le centre avec une crème Chiboust à la vanille.',
         'data.recipe.saint-honore.step.4': 'Décorer à la poche à Saint-Honoré.',
 
-        // Recipe Data: Fraisier
-        'data.recipe.fraisier.name': 'Fraisier',
-        'data.recipe.fraisier.desc': 'Génoise imbibée, crème mousseline vanille et fraises fraîches sous pâte d\'amandes.',
-        'data.recipe.fraisier.step.0': 'Génoise : œufs et sucre blanchis au bain-marie, ajouter la farine.',
-        'data.recipe.fraisier.step.1': 'Cuire sur plaque à 180°C pendant 12 min.',
-        'data.recipe.fraisier.step.2': 'Réaliser une crème mousseline à la vanille.',
-        'data.recipe.fraisier.step.3': 'Imbiber le biscuit de sirop au Kirsch.',
-        'data.recipe.fraisier.step.4': 'Disposer les fraises contre les parois.',
-        'data.recipe.fraisier.step.5': 'Garnir de crème et fraises, recouvrir de pâte d\'amandes.',
+        // Recipe Data: Dame Blanche
+        'data.recipe.dame-blanche.name': 'Dame Blanche (Entremet)',
+        'data.recipe.dame-blanche.desc': 'Mousse vanille intense, ganache chocolat noir et éclats de meringue sur dacquoise amande.',
+        'data.recipe.dame-blanche.step.0': 'Réaliser une dacquoise amande et cuire à 180°C pendant 12 min.',
+        'data.recipe.dame-blanche.step.1': 'Préparer une crème anglaise vanillée et coller à la gélatine.',
+        'data.recipe.dame-blanche.step.2': 'Réaliser une ganache chocolat noir souple.',
+        'data.recipe.dame-blanche.step.3': 'Monter la crème et l\'incorporer à la crème anglaise refroidie.',
+        'data.recipe.dame-blanche.step.4': 'Montage à l\'envers : mousse vanille, insert ganache, dacquoise.',
+        'data.recipe.dame-blanche.step.5': 'Bloquer au froid, glacer et décorer de petites meringues.',
+
+        // Recipe Data: Pomme Tatin Vanille
+        'data.recipe.pomme-tatin-vanille.name': 'Entremet Pomme Tatin Caramel Vanille',
+        'data.recipe.pomme-tatin-vanille.desc': 'Pommes caramélisées, crémeux caramel et mousse vanille sur sablé breton.',
+        'data.recipe.pomme-tatin-vanille.step.0': 'Caraméliser les pommes coupées en dés avec beurre et sucre.',
+        'data.recipe.pomme-tatin-vanille.step.1': 'Réaliser un disque de sablé breton et cuire à 170°C.',
+        'data.recipe.pomme-tatin-vanille.step.2': 'Préparer un crémeux caramel au beurre salé.',
+        'data.recipe.pomme-tatin-vanille.step.3': 'Confectionner une mousse bavaroise à la vanille.',
+        'data.recipe.pomme-tatin-vanille.step.4': 'Montage : insert pommes tatin, crémeux caramel, mousse vanille, biscuit.',
+        'data.recipe.pomme-tatin-vanille.step.5': 'Congeler 4h avant de démouler.',
 
         // Recipe Data: Tarte Tatin
         'data.recipe.tarte-tatin.name': 'Tarte Tatin',
@@ -1215,6 +1223,29 @@ const TRANSLATIONS = {
         'data.recipe.tarte-tatin.step.3': 'Recouvrir d\'un disque de pâte brisée.',
         'data.recipe.tarte-tatin.step.4': 'Cuire à 180°C pendant 45 min.',
         'data.recipe.tarte-tatin.step.5': 'Démouler tiède en retournant d\'un geste vif.',
+
+        // Additional Classics FR
+        'data.recipe.flan-patissier.name': 'Flan Pâtissier',
+        'data.recipe.flan-patissier.desc': 'Crème onctueuse à la vanille sur pâte brisée croustillante.',
+        'data.recipe.religieuse-chocolat.name': 'Religieuse au Chocolat',
+        'data.recipe.religieuse-chocolat.desc': 'Deux choux superposés, garnis de crème pâtissière chocolat.',
+        'data.recipe.royal-chocolat.name': 'Royal Chocolat',
+        'data.recipe.royal-chocolat.desc': 'Entremet dacquoise noisette, croustillant praliné et mousse chocolat.',
+        'data.recipe.tarte-fraises.name': 'Tarte aux Fraises',
+        'data.recipe.tarte-fraises.desc': 'Pâte sablée, crème pâtissière vanille et fraises fraîches.',
+        'data.recipe.charlotte-fraises.name': 'Charlotte aux Fraises',
+        'data.recipe.charlotte-fraises.desc': 'Biscuits cuiller, mousse légère à la fraise et fruits frais.',
+        'data.recipe.trois-chocolats.name': 'Entremet Trois Chocolats',
+        'data.recipe.trois-chocolats.desc': 'Mousses chocolat noir, lait et blanc sur biscuit cacao.',
+        'data.recipe.kouign-amann.name': 'Kouign-Amann',
+        'data.recipe.kouign-amann.desc': 'Gâteau feuilleté pur beurre et sucre caramélisé.',
+        'data.recipe.tropezienne.name': 'Tarte Tropézienne',
+        'data.recipe.tropezienne.desc': 'Brioche moelleuse à la fleur d\'oranger et crème onctueuse.',
+        'data.recipe.entremet-exotique.name': 'Entremet Exotique',
+        'data.recipe.entremet-exotique.desc': 'Mousse mangue-passion et biscuit coco.',
+        'data.recipe.russe-noisette.name': 'Le Russe (Succès)',
+        'data.recipe.russe-noisette.desc': 'Biscuit dacquoise noisette et crème pralinée.',
+
 
         // Recipe Data: Éclair
         'data.recipe.eclair.name': 'Éclair au chocolat',
@@ -1532,7 +1563,7 @@ const TRANSLATIONS = {
         'auth.error.taken': 'This username is already taken.',
 
         'nav.home': 'Home',
-        'nav.recipes': 'Recipes',
+        'nav.recipes': 'Recipe Calculator',
         'nav.lab': 'Laboratory',
         'nav.planning': 'Planning',
         'nav.inventory': 'Inventory',
@@ -1549,6 +1580,12 @@ const TRANSLATIONS = {
         'nav.suppliers': 'Suppliers',
         'nav.stats': 'Statistics',
         'nav.mgmt': 'Pro Management',
+
+        // Library & Search
+        'search.placeholder': 'Search for a recipe...',
+        'search.no_results': 'No results found.',
+        'filter.all': 'All',
+        'library.none': 'No recipes in the library.',
 
         // Pro Management
         'mgmt.hero.badge': '💎 Operational Excellence',
@@ -1796,51 +1833,6 @@ const TRANSLATIONS = {
         'dash.lab_done': 'Done',
         'dash.recent': 'Recent Work',
         'dash.see_all': 'See all →',
-        'dash.no_recent': 'No recent recipes. Create one!',
-        'dash.roadmap': 'Roadmap',
-        'dash.roadmap.done': 'Done',
-        'dash.roadmap.active': 'Active',
-        'dash.roadmap.upcoming': 'Upcoming',
-        'dash.roadmap.item1': 'Profile & Security System',
-        'dash.roadmap.item2': 'Sharing & Planning Workflow',
-        'dash.roadmap.item3': 'Bakery & Pastry Module',
-        'dash.pending': '⏳ Pending Requests',
-        'dash.tip_prefix': '💡 Pro Tip:',
-        'dash.lab_active': 'Lab: Active',
-        'dash.stock_alert': 'Stock: Alert',
-        'dash.kpi.recipes': 'Lab Recipes',
-        'dash.kpi.margin': 'Lab Margin',
-        'dash.kpi.cost': 'Cost/Port. (Prod)',
-        'dash.kpi.team': 'Team',
-        'dash.kpi.school': '1 AT SCHOOL',
-        'dash.kpi.alerts': 'Alerts',
-        'dash.kpi.todo': 'TO REVIEW',
-        'dash.col.prod': 'Production Control',
-        'dash.col.biz': 'Business Performance',
-        'dash.col.ai': 'Chef Assistant',
-        'dash.col.logistics': 'Logistics Bottlenecks',
-        'dash.col.alerts': '⚠️ Alerts',
-        'dash.prod.ongoing': 'Ongoing',
-        'dash.prod.todo': 'To Produce',
-        'dash.prod.done': 'Done',
-        'dash.biz.top': 'Top',
-        'dash.biz.worst': 'To Monitor',
-        'dash.ai.adjust': 'Adjust Price... ',
-        'dash.demo.plateaux': 'Trays G1 • Progress {pct}%',
-        'dash.demo.individuels': 'Individuals • Progress {pct}%',
-        'dash.demo.bocaux': 'Jars • Progress {pct}%',
-        'dash.demo.grand_format': 'Large format • Progress {pct}%',
-        'dash.demo.fonds_cuits': 'Baked shells, ganache piped • Progress {pct}%',
-        'dash.demo.ai_alert_text': 'Your <strong>Paris-Brest</strong> drops to 65% margin due to hazelnut price increase.',
-        'dash.demo.ai_stock_text': 'Butter order needed by tomorrow.',
-        'dash.demo.stock_beurre': 'Butter Stock modified',
-        'dash.demo.stock_beurre_by': 'by Chef Julian at 14:05',
-        'dash.demo.haccp_frigo': 'HACCP: Fridge A checked',
-        'dash.demo.haccp_frigo_status': 'Compliant (+3.2°C) at 13:45',
-        'dash.demo.sucre_glace': 'Icing Sugar AOP',
-        'dash.demo.framboises': 'Raspberries',
-        'dash.demo.beurre_tourage': 'Tourage Butter',
-        'dash.no_recipes': 'No recipes',
         'dash.active_status': 'Online',
         'dash.btn.order': 'Order',
         'dash.btn.inventory': 'Inventory',
@@ -1855,6 +1847,48 @@ const TRANSLATIONS = {
         'dash.cockpit.activity': 'Activity & Team',
         'dash.cockpit.start': 'Start',
         'dash.cockpit.finish': 'Finish',
+        'dash.cockpit.manage_planning': 'Manage full planning',
+        'dash.priority.launch': 'Launch {name}',
+        'dash.priority.prod_desc': 'Weekly production to initiate',
+        'dash.priority.btn_launch': 'Launch',
+        'dash.priority.order': 'Order {name}',
+        'dash.priority.stock_desc': 'Critical stock: {qty} {unit}',
+        'dash.priority.btn_order': 'Order',
+        'dash.priority.adjust_margin': 'Adjust price {name}',
+        'dash.priority.margin_desc': 'Current margin: {margin}%',
+        'dash.priority.btn_revise': 'Revise',
+        'dash.priority.inv_check': 'Inventory Check',
+        'dash.priority.inv_desc': 'Monthly update recommended',
+        'dash.priority.btn_open': 'Open',
+        'dash.priority.empty': 'No priorities detected.',
+        'dash.ai.margin_low': '{name}: Your margin is low ({margin}%). Inflation is impacting costs.',
+        'dash.ai.suggestion': '💡 Suggested: +{price}€ on selling price',
+        'dash.ai.target': '💡 Target a margin of {target}%',
+        'dash.status.ongoing': 'In progress',
+        'dash.status.to_launch': 'To launch',
+        'dash.status.planned': 'Planned',
+        'dash.prod.empty': 'No production planned for {date}.',
+        'dash.stock.optimal': '✅ Optimal stocks',
+        'dash.biz.no_recipes': 'Please add recipes',
+        'dash.team.present': '{n} present',
+        'dash.team.no_present': 'No members present (Leave)',
+        'dash.haccp.ok': 'HACCP OK',
+        'dash.prod.empty_init': 'No production planned.',
+        'dash.featured.empty': 'No suggestions available.',
+        'ui.btn.view_sheet': 'View sheet',
+        'dash.col.prod': 'Production Control',
+        'dash.col.biz': 'Business Performance',
+        'dash.col.ai': 'Chef Assistant',
+        'dash.col.logistics': 'Logistics Bottlenecks',
+        'dash.col.alerts': '⚠️ Alerts',
+        'dash.prod.ongoing': 'Ongoing',
+        'dash.prod.todo': 'To Produce',
+        'dash.prod.done': 'Done',
+        'dash.biz.top': 'Top',
+        'dash.biz.worst': 'To Monitor',
+        'dash.ai.alert': 'Profitability Alert:',
+        'dash.ai.stock': 'Stock Optimization:',
+        'dash.ai.adjust': 'Adjust Price... ',
 
         'hero.badge': '✨ Cost analysis',
         'hero.title': '<span class="accent">Recipe</span> Calculator<br>for pastry making',
@@ -2692,15 +2726,49 @@ const TRANSLATIONS = {
         'data.recipe.saint-honore.step.3': 'Fill the center with a vanilla Chiboust cream.',
         'data.recipe.saint-honore.step.4': 'Decorate with a Saint-Honoré nozzle.',
 
-        // Recipe Data: Fraisier
-        'data.recipe.fraisier.name': 'Strawberry Cake (Fraisier)',
-        'data.recipe.fraisier.desc': 'Soaked génoise sponge, vanilla mousseline cream, and fresh strawberries under almond paste.',
-        'data.recipe.fraisier.step.0': 'Génoise sponge: whisk eggs/sugar over a bain-marie, fold in flour.',
-        'data.recipe.fraisier.step.1': 'Bake on a sheet at 180°C for 12 min.',
-        'data.recipe.fraisier.step.2': 'Make a vanilla mousseline cream.',
-        'data.recipe.fraisier.step.3': 'Soak the sponge with Kirsch syrup.',
-        'data.recipe.fraisier.step.4': 'Place sliced strawberries against the walls.',
-        'data.recipe.fraisier.step.5': 'Fill with cream and strawberries, cover with almond paste.',
+        // Recipe Data: Dame Blanche
+        'data.recipe.dame-blanche.name': 'White Lady (Entremet)',
+        'data.recipe.dame-blanche.desc': 'Intense vanilla mousse, dark chocolate ganache and meringue shards on almond dacquoise.',
+        'data.recipe.dame-blanche.step.0': 'Make an almond dacquoise and bake at 180°C for 12 min.',
+        'data.recipe.dame-blanche.step.1': 'Prepare a vanilla custard and set with gelatin.',
+        'data.recipe.dame-blanche.step.2': 'Prepare a smooth dark chocolate ganache.',
+        'data.recipe.dame-blanche.step.3': 'Whip the cream and fold into the cooled custard.',
+        'data.recipe.dame-blanche.step.4': 'Reverse assembly: vanilla mousse, ganache insert, dacquoise.',
+        'data.recipe.dame-blanche.step.5': 'Freeze, glaze and decorate with small meringues.',
+
+        // Recipe Data: Pomme Tatin Vanille
+        'data.recipe.pomme-tatin-vanille.name': 'Apple Tatin Caramel Vanilla Entremet',
+        'data.recipe.pomme-tatin-vanille.desc': 'Caramelized apples, caramel cream and vanilla mousse on Breton shortbread.',
+        'data.recipe.pomme-tatin-vanille.step.0': 'Caramelize diced apples with butter and sugar.',
+        'data.recipe.pomme-tatin-vanille.step.1': 'Make a Breton shortbread disk and bake at 170°C.',
+        'data.recipe.pomme-tatin-vanille.step.2': 'Prepare a salted butter caramel cream.',
+        'data.recipe.pomme-tatin-vanille.step.3': 'Make a light vanilla Bavarian mousse.',
+        'data.recipe.pomme-tatin-vanille.step.4': 'Assembly: tatin apple insert, caramel cream, vanilla mousse, biscuit.',
+        'data.recipe.pomme-tatin-vanille.step.5': 'Freeze 4h before unmolding.',
+
+        // Additional Classics EN
+        'data.recipe.flan-patissier.name': 'French Custard Tart (Flan)',
+        'data.recipe.flan-patissier.desc': 'Smooth vanilla custard on crispy shortcrust pastry.',
+        'data.recipe.religieuse-chocolat.name': 'Chocolate Religieuse',
+        'data.recipe.religieuse-chocolat.desc': 'Two choux buns filled with chocolate pastry cream.',
+        'data.recipe.royal-chocolat.name': 'Royal Chocolate Cake',
+        'data.recipe.royal-chocolat.desc': 'Hazelnut dacquoise, praline crunch and chocolate mousse.',
+        'data.recipe.tarte-fraises.name': 'Strawberry Tart',
+        'data.recipe.tarte-fraises.desc': 'Shortcrust pastry, vanilla pastry cream and fresh strawberries.',
+        'data.recipe.charlotte-fraises.name': 'Strawberry Charlotte',
+        'data.recipe.charlotte-fraises.desc': 'Ladyfingers, light strawberry mousse and fresh fruit.',
+        'data.recipe.trois-chocolats.name': 'Triple Chocolate Entremet',
+        'data.recipe.trois-chocolats.desc': 'Dark, milk and white chocolate mousses on cocoa sponge.',
+        'data.recipe.kouign-amann.name': 'Kouign-Amann',
+        'data.recipe.kouign-amann.desc': 'Caramelized butter and sugar puff pastry cake.',
+        'data.recipe.tropezienne.name': 'Tropezienne Tart',
+        'data.recipe.tropezienne.desc': 'Orange blossom brioche with smooth cream filling.',
+        'data.recipe.entremet-exotique.name': 'Exotic Entremet',
+        'data.recipe.entremet-exotique.desc': 'Mango-passion mousse and coconut sponge.',
+        'data.recipe.russe-noisette.name': 'Le Russe (Hazelnut Success)',
+        'data.recipe.russe-noisette.desc': 'Hazelnut dacquoise and praline cream.',
+        'data.recipe.salambo.name': 'Salambo',
+        'data.recipe.salambo.desc': 'Choux pastry with Kirsch cream and green glaze.',
 
         // Recipe Data: Tarte Tatin
         'data.recipe.tarte-tatin.name': 'Tarte Tatin',
@@ -3008,7 +3076,7 @@ const TRANSLATIONS = {
         'auth.error.taken': 'Este nombre de usuario ya está en uso.',
 
         'nav.home': 'Inicio',
-        'nav.recipes': 'Recetas',
+        'nav.recipes': 'Calculadora de Recetas',
         'nav.lab': 'Laboratorio',
         'nav.planning': 'Planificación',
         'nav.inventory': 'Inventario',
@@ -3118,6 +3186,13 @@ const TRANSLATIONS = {
         'mgmt.production.added': '¡Producción añadida!',
         'ui.btn.print': '🖨️ Imprimir',
         'nav.stats': 'Estadísticas',
+        'nav.mgmt': 'Gestión Pro',
+
+        // Library & Search
+        'search.placeholder': 'Buscar una receta...',
+        'search.no_results': 'No se encontraron resultados.',
+        'filter.all': 'Todo',
+        'library.none': 'No hay recetas en la biblioteca.',
 
         // Estadísticas
         'stats.badge': '📊 Análisis Comercial',
@@ -3332,6 +3407,35 @@ const TRANSLATIONS = {
         'dash.cockpit.activity': 'Actividad y Equipo',
         'dash.cockpit.start': 'Empezar',
         'dash.cockpit.finish': 'Terminar',
+        'dash.cockpit.manage_planning': 'Gestionar planificación completa',
+        'dash.priority.launch': 'Lanzar {name}',
+        'dash.priority.prod_desc': 'Producción semanal por iniciar',
+        'dash.priority.btn_launch': 'Lanzar',
+        'dash.priority.order': 'Pedir {name}',
+        'dash.priority.stock_desc': 'Stock crítico: {qty} {unit}',
+        'dash.priority.btn_order': 'Pedir',
+        'dash.priority.adjust_margin': 'Ajustar precio {name}',
+        'dash.priority.margin_desc': 'Margen actual: {margin}%',
+        'dash.priority.btn_revise': 'Revisar',
+        'dash.priority.inv_check': 'Verificación de Inventario',
+        'dash.priority.inv_desc': 'Se recomienda actualización mensual',
+        'dash.priority.btn_open': 'Abrir',
+        'dash.priority.empty': 'No se detectaron prioridades.',
+        'dash.ai.margin_low': '{name}: Su margen es bajo ({margin}%). La inflación afecta los costos.',
+        'dash.ai.suggestion': '💡 Sugerido: +{price}€ en el precio de venta',
+        'dash.ai.target': '💡 Objetivo: margen del {target}%',
+        'dash.status.ongoing': 'En curso',
+        'dash.status.to_launch': 'Por lanzar',
+        'dash.status.planned': 'Planificado',
+        'dash.prod.empty': 'No hay producción prevista para {date}.',
+        'dash.stock.optimal': '✅ Stocks óptimos',
+        'dash.biz.no_recipes': 'Por favor, añada recetas',
+        'dash.team.present': '{n} presentes',
+        'dash.team.no_present': 'Ningún miembro presente (Vacaciones)',
+        'dash.haccp.ok': 'HACCP OK',
+        'dash.prod.empty_init': 'Sin producción planificada.',
+        'dash.featured.empty': 'No hay sugerencias disponibles.',
+        'ui.btn.view_sheet': 'Ver ficha',
 
         'hero.badge': '✨ Análisis de costos',
         'hero.title': 'Calculadora de <span class="accent">recetas</span><br>para pastelería',
@@ -4170,18 +4274,53 @@ const TRANSLATIONS = {
         'data.recipe.saint-honore.step.3': 'Rellenar el centro con crema Chiboust de vainilla.',
         'data.recipe.saint-honore.step.4': 'Decorar con boquilla Saint-Honoré.',
 
-        // Recipe Data: Fraisier
-        'data.recipe.fraisier.name': 'Fraisier (Pastel de fresas)',
-        'data.recipe.fraisier.desc': 'Bizcocho Genovés calado, crema muselina de vainilla y fresas frescas bajo mazapán.',
-        'data.recipe.fraisier.step.0': 'Genovés: huevos y azúcar montados al baño maría, añadir harina.',
-        'data.recipe.fraisier.step.1': 'Hornear en bandeja a 180°C durante 12 min.',
-        'data.recipe.fraisier.step.2': 'Realizar una crema muselina a la vainilla.',
-        'data.recipe.fraisier.step.3': 'Calar el bizcocho con almíbar al Kirsch.',
-        'data.recipe.fraisier.step.4': 'Disponer las fresas contra los bordes.',
-        'data.recipe.fraisier.step.5': 'Rellenar con crema y fresas, cubrir con una fina capa de mazapán.',
+        // Recipe Data: Dame Blanche
+        'data.recipe.dame-blanche.name': 'Dama Blanca (Entremet)',
+        'data.recipe.dame-blanche.desc': 'Mousse de vainilla intensa, ganache de chocolate negro y trozos de merengue sobre dacquoise de almendra.',
+        'data.recipe.dame-blanche.step.0': 'Hacer una dacquoise de almendra y hornear a 180°C durante 12 min.',
+        'data.recipe.dame-blanche.step.1': 'Preparar una crema inglesa de vainilla y cuajar con gelatina.',
+        'data.recipe.dame-blanche.step.2': 'Preparar una ganache de chocolate negro suave.',
+        'data.recipe.dame-blanche.step.3': 'Montar la nata e incorporarla a la crema inglesa fría.',
+        'data.recipe.dame-blanche.step.4': 'Montaje inverso: mousse de vainilla, inserto de ganache, dacquoise.',
+        'data.recipe.dame-blanche.step.5': 'Congelar, glasear y decorar con pequeños merengues.',
+
+        // Recipe Data: Pomme Tatin Vanille
+        'data.recipe.pomme-tatin-vanille.name': 'Entremet de Manzana Tatin Caramelo Vainilla',
+        'data.recipe.pomme-tatin-vanille.desc': 'Manzanas caramelizadas, cremoso de caramelo y mousse de vainilla sobre sablé bretón.',
+        'data.recipe.pomme-tatin-vanille.step.0': 'Caramelizar manzanas en dados con mantequilla y azúcar.',
+        'data.recipe.pomme-tatin-vanille.step.1': 'Hacer un disco de sablé bretón y hornear a 170°C.',
+        'data.recipe.pomme-tatin-vanille.step.2': 'Preparar un cremoso de caramelo a la mantequilla salada.',
+        'data.recipe.pomme-tatin-vanille.step.3': 'Hacer una mousse bávara de vainilla ligera.',
+        'data.recipe.pomme-tatin-vanille.step.4': 'Montaje: inserto de manzana tatin, cremoso de caramelo, mousse de vainilla, bizcocho.',
+        'data.recipe.pomme-tatin-vanille.step.5': 'Congelar 4h antes de desmoldar.',
+
+        // Additional Classics ES
+        'data.recipe.flan-patissier.name': 'Flan Pastelero',
+        'data.recipe.flan-patissier.desc': 'Crema de vainilla suave sobre masa quebrada crujiente.',
+        'data.recipe.religieuse-chocolat.name': 'Religiosa de Chocolate',
+        'data.recipe.religieuse-chocolat.desc': 'Dos choux superpuestos rellenos de crema de chocolate.',
+        'data.recipe.royal-chocolat.name': 'Royal de Chocolate',
+        'data.recipe.royal-chocolat.desc': 'Dacquoise de avellana, crujiente de praliné y mousse de chocolate.',
+        'data.recipe.tarte-fraises.name': 'Tarta de Fresas',
+        'data.recipe.tarte-fraises.desc': 'Masa sablée, crema pastelera de vainilla y fresas frescas.',
+        'data.recipe.charlotte-fraises.name': 'Carlota de Fresas',
+        'data.recipe.charlotte-fraises.desc': 'Bizcochos de soletilla, mousse ligera de fresa y fruta fresca.',
+        'data.recipe.trois-chocolats.name': 'Entremet Tres Chocolates',
+        'data.recipe.trois-chocolats.desc': 'Mousses de chocolate negro, leche y blanco sobre bizcocho de cacao.',
+        'data.recipe.kouign-amann.name': 'Kouign-Amann',
+        'data.recipe.kouign-amann.desc': 'Pastel de hojaldre con mantequilla y azúcar caramelizado.',
+        'data.recipe.tropezienne.name': 'Tarta Tropezienne',
+        'data.recipe.tropezienne.desc': 'Brioche de azahar con relleno de crema suave.',
+        'data.recipe.entremet-exotique.name': 'Entremet Exótico',
+        'data.recipe.entremet-exotique.desc': 'Mousse de mango-pasión y bizcocho de coco.',
+        'data.recipe.russe-noisette.name': 'Le Russe (Éxito de Avellana)',
+        'data.recipe.russe-noisette.desc': 'Dacquoise de avellana y crema de praliné.',
+        'data.recipe.salambo.name': 'Salambo',
+        'data.recipe.salambo.desc': 'Choux con crema de Kirsch y glaseado verde.',
 
         // Recipe Data: Tarte Tatin
         'data.recipe.tarte-tatin.name': 'Tarta Tatin',
+
         'data.recipe.tarte-tatin.desc': 'Tarta invertida de manzanas caramelizadas sobre masa quebrada dorada.',
         'data.recipe.tarte-tatin.step.0': 'Realizar un caramelo en seco con el azúcar, verter en el molde.',
         'data.recipe.tarte-tatin.step.1': 'Pelar y cortar las manzanas, disponerlas apretadas en el molde.',
@@ -4615,7 +4754,8 @@ function buildReverseLookup() {
         'Paris-Brest': 'data.recipe.paris-brest.name',
         'Opéra': 'data.recipe.opera.name',
         'Saint-Honoré': 'data.recipe.saint-honore.name',
-        'Fraisier': 'data.recipe.fraisier.name',
+        'Dame Blanche': 'data.recipe.dame-blanche.name',
+        'Entremet Pomme Tatin Caramel Vanille': 'data.recipe.pomme-tatin-vanille.name',
         'Tarte Tatin': 'data.recipe.tarte-tatin.name',
         'Éclair': 'data.recipe.eclair.name',
         'Baba au rhum': 'data.recipe.baba-au-rhum.name',
@@ -4634,44 +4774,63 @@ function buildReverseLookup() {
         'Tarte Framboise Pistache Fleur': 'data.recipe.tarte-framboise-pistache-fleur.name',
         'Negresco': 'data.recipe.negresco.name',
         'Frangipane': 'data.recipe.frangipane.name',
+        'Flan Pâtissier': 'data.recipe.flan-patissier.name',
+        'Religieuse au Chocolat': 'data.recipe.religieuse-chocolat.name',
+        'Royal Chocolat': 'data.recipe.royal-chocolat.name',
+        'Tarte aux Fraises': 'data.recipe.tarte-fraises.name',
+        'Charlotte aux Fraises': 'data.recipe.charlotte-fraises.name',
+        'Entremet Trois Chocolats': 'data.recipe.trois-chocolats.name',
+        'Kouign-Amann': 'data.recipe.kouign-amann.name',
+        'Tarte Tropézienne': 'data.recipe.tropezienne.name',
+        'Entremet Exotique Mangue Passion': 'data.recipe.entremet-exotique.name',
+        'Le Russe (Succès Noisette)': 'data.recipe.russe-noisette.name',
+        'Salambo': 'data.recipe.salambo.name',
     };
     for (const name in frLookup) {
         REVERSE_LOOKUP[name.toLowerCase()] = frLookup[name];
     }
 }
 
-let currentLang = DEFAULT_LANG;
-
-function getLang() {
-    return currentLang;
-}
-
 function t(key, data = {}, fallback = "") {
-    let val = TRANSLATIONS[currentLang]?.[key];
+    const lang = window.currentLang || localStorage.getItem('gourmet_lang') || DEFAULT_LANG;
+    let val = TRANSLATIONS[lang]?.[key];
 
     // Auto-map French ingredient or category names to keys if input key is not found
     if (val === undefined) {
         const lowerKey = (key || "").toLowerCase().trim();
         const mappedKey = REVERSE_LOOKUP[lowerKey];
         if (mappedKey) {
-            val = TRANSLATIONS[currentLang]?.[mappedKey] || TRANSLATIONS.fr?.[mappedKey];
+            val = TRANSLATIONS[lang]?.[mappedKey] || TRANSLATIONS.fr?.[mappedKey];
         }
     }
 
-    if (val === undefined) {
+    if (val === undefined && lang !== 'fr') {
         // Fallback to French
         val = TRANSLATIONS.fr?.[key];
     }
-    if (val === undefined) return fallback || key;
+
+    // If still undefined, handle as key or literal
+    if (val === undefined) {
+        if (typeof data === 'string' && data !== "") return data; // Old usage where data was fallback
+        return fallback || key;
+    }
+
+    // Ensure val is a string
+    val = String(val);
 
     // Replace {key} with data[key]
     if (typeof data === 'object' && data !== null) {
         Object.keys(data).forEach(k => {
-            val = val.replace(`{${k}}`, data[k]);
+            const placeholder = `{${k}}`;
+            // Use split/join for global replacement if needed, 
+            // but for performance in simple strings, replace is fine if only 1 occurrence.
+            // Let's use a safe global replace for robustness.
+            val = val.split(placeholder).join(data[k]);
         });
-    } else if (typeof data === 'string' && fallback === "") {
-        // Handle old usage t(key, fallback)
-        return val || data;
+    } else if (typeof data === 'string' && data !== "") {
+        // Handle case where t(key, fallback) was used
+        // and val was found but we might want the fallback? 
+        // No, usually we want the translation if found.
     }
 
     return val;
@@ -4679,7 +4838,7 @@ function t(key, data = {}, fallback = "") {
 
 function applyLanguage(lang) {
     if (!SUPPORTED_LANGS.includes(lang)) lang = DEFAULT_LANG;
-    currentLang = lang;
+    window.currentLang = lang;
     localStorage.setItem('gourmet_lang', lang);
     document.documentElement.lang = lang;
 
@@ -4719,7 +4878,7 @@ function applyLanguage(lang) {
 
 function initI18n() {
     const saved = localStorage.getItem('gourmet_lang');
-    currentLang = (saved && SUPPORTED_LANGS.includes(saved)) ? saved : DEFAULT_LANG;
+    window.currentLang = (saved && SUPPORTED_LANGS.includes(saved)) ? saved : DEFAULT_LANG;
 
     buildReverseLookup();
 
@@ -4731,6 +4890,7 @@ window.i18n = {
     t: t,
     setLanguage: applyLanguage
 };
+window.t = t;
 
 // Global alias for compatibility with HTML onclick attributes
 window.setLanguage = function (lang) {

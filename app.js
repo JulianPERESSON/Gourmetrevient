@@ -32,6 +32,11 @@ const APP = {
 };
 window.APP = APP;
 
+// --- Global States & State Containers ---
+let v2Charts = { margin: null, performance: null, scatter: null };
+let perfMode = 'top';
+window.currentStatsCat = 'all';
+
 // ============================================================================
 // UTILS
 // ============================================================================
@@ -66,54 +71,54 @@ const STORAGE_KEYS = {
 // Default ingredient database (pre-loaded)
 const DEFAULT_INGREDIENT_DB = [
   // --- 1. FARINES, FÉCULES & CÉRÉALES ---
-  { name: 'Farine T45', unit: 'g', pricePerUnit: 0.80, priceRef: 'kg', allergens: ['Gluten'] },
-  { name: 'Farine T55', unit: 'g', pricePerUnit: 0.65, priceRef: 'kg', allergens: ['Gluten'] },
-  { name: 'Farine de Gruau T45', unit: 'g', pricePerUnit: 1.50, priceRef: 'kg', allergens: ['Gluten'] },
-  { name: 'Farine T55 Label Rouge', unit: 'g', pricePerUnit: 1.20, priceRef: 'kg', allergens: ['Gluten'] },
-  { name: 'Farine de Seigle T130', unit: 'g', pricePerUnit: 2.10, priceRef: 'kg', allergens: ['Gluten'] },
-  { name: 'Farine de Sarrasin', unit: 'g', pricePerUnit: 3.20, priceRef: 'kg', allergens: [] },
-  { name: 'Farine de Riz (S.G)', unit: 'g', pricePerUnit: 4.50, priceRef: 'kg', allergens: [] },
-  { name: 'Farine de Châtaigne', unit: 'g', pricePerUnit: 12.50, priceRef: 'kg', allergens: [] },
-  { name: 'Fécule de Pomme de Terre', unit: 'g', pricePerUnit: 3.20, priceRef: 'kg', allergens: [] },
-  { name: 'Maïzena', unit: 'g', pricePerUnit: 2.80, priceRef: 'kg', allergens: [] },
+  { name: 'Farine T45', unit: 'g', pricePerUnit: 0.48, priceRef: 'kg', allergens: ['Gluten'] },
+  { name: 'Farine T55', unit: 'g', pricePerUnit: 0.44, priceRef: 'kg', allergens: ['Gluten'] },
+  { name: 'Farine de Gruau T45', unit: 'g', pricePerUnit: 1.10, priceRef: 'kg', allergens: ['Gluten'] },
+  { name: 'Farine T55 Label Rouge', unit: 'g', pricePerUnit: 0.95, priceRef: 'kg', allergens: ['Gluten'] },
+  { name: 'Farine de Seigle T130', unit: 'g', pricePerUnit: 1.50, priceRef: 'kg', allergens: ['Gluten'] },
+  { name: 'Farine de Sarrasin', unit: 'g', pricePerUnit: 2.50, priceRef: 'kg', allergens: [] },
+  { name: 'Farine de Riz (S.G)', unit: 'g', pricePerUnit: 3.20, priceRef: 'kg', allergens: [] },
+  { name: 'Farine de Châtaigne', unit: 'g', pricePerUnit: 9.50, priceRef: 'kg', allergens: [] },
+  { name: 'Fécule de Pomme de Terre', unit: 'g', pricePerUnit: 2.20, priceRef: 'kg', allergens: [] },
+  { name: 'Maïzena', unit: 'g', pricePerUnit: 1.80, priceRef: 'kg', allergens: [] },
 
   // --- 2. BEURRES & MATIÈRES GRASSES ---
-  { name: 'Beurre AOP', unit: 'g', pricePerUnit: 7.50, priceRef: 'kg', allergens: ['Lait'] },
-  { name: 'Beurre doux', unit: 'g', pricePerUnit: 6.80, priceRef: 'kg', allergens: ['Lait'] },
-  { name: 'Beurre Tourage AOP 82%', unit: 'g', pricePerUnit: 14.50, priceRef: 'kg', allergens: ['Lait'] },
-  { name: 'Beurre de Cacao', unit: 'g', pricePerUnit: 15.50, priceRef: 'kg', allergens: [] },
-  { name: 'Beurre de Cacao Mycryo', unit: 'g', pricePerUnit: 38.00, priceRef: 'kg', allergens: [] },
-  { name: 'Huile de Coco Vierge', unit: 'ml', pricePerUnit: 16.00, priceRef: 'L', allergens: [] },
+  { name: 'Beurre AOP', unit: 'g', pricePerUnit: 6.15, priceRef: 'kg', allergens: ['Lait'] },
+  { name: 'Beurre doux', unit: 'g', pricePerUnit: 5.50, priceRef: 'kg', allergens: ['Lait'] },
+  { name: 'Beurre Tourage AOP 82%', unit: 'g', pricePerUnit: 10.50, priceRef: 'kg', allergens: ['Lait'] },
+  { name: 'Beurre de Cacao', unit: 'g', pricePerUnit: 12.50, priceRef: 'kg', allergens: [] },
+  { name: 'Beurre de Cacao Mycryo', unit: 'g', pricePerUnit: 28.00, priceRef: 'kg', allergens: [] },
+  { name: 'Huile de Coco Vierge', unit: 'ml', pricePerUnit: 12.00, priceRef: 'L', allergens: [] },
 
   // --- 3. SUCRES & PRODUITS SUCRANTS ---
-  { name: 'Sucre semoule', unit: 'g', pricePerUnit: 0.85, priceRef: 'kg', allergens: [] },
-  { name: 'Sucre glace', unit: 'g', pricePerUnit: 2.10, priceRef: 'kg', allergens: [] },
-  { name: 'Sucre Muscovado', unit: 'g', pricePerUnit: 4.50, priceRef: 'kg', allergens: [] },
-  { name: 'Vergeoise Brune', unit: 'g', pricePerUnit: 3.80, priceRef: 'kg', allergens: [] },
-  { name: 'Sucre de Fleur de Coco', unit: 'g', pricePerUnit: 14.00, priceRef: 'kg', allergens: [] },
-  { name: 'Glucose', unit: 'g', pricePerUnit: 4.80, priceRef: 'kg', allergens: [] },
-  { name: 'Sirop de Glucose', unit: 'g', pricePerUnit: 3.50, priceRef: 'kg', allergens: [] },
-  { name: 'Trimoline (Sucre Inverti)', unit: 'g', pricePerUnit: 4.80, priceRef: 'kg', allergens: [] },
-  { name: 'Miel de Fleurs', unit: 'g', pricePerUnit: 8.50, priceRef: 'kg', allergens: [] },
+  { name: 'Sucre semoule', unit: 'g', pricePerUnit: 0.68, priceRef: 'kg', allergens: [] },
+  { name: 'Sucre glace', unit: 'g', pricePerUnit: 1.60, priceRef: 'kg', allergens: [] },
+  { name: 'Sucre Muscovado', unit: 'g', pricePerUnit: 3.50, priceRef: 'kg', allergens: [] },
+  { name: 'Vergeoise Brune', unit: 'g', pricePerUnit: 2.80, priceRef: 'kg', allergens: [] },
+  { name: 'Sucre de Fleur de Coco', unit: 'g', pricePerUnit: 11.00, priceRef: 'kg', allergens: [] },
+  { name: 'Glucose', unit: 'g', pricePerUnit: 3.50, priceRef: 'kg', allergens: [] },
+  { name: 'Sirop de Glucose', unit: 'g', pricePerUnit: 2.80, priceRef: 'kg', allergens: [] },
+  { name: 'Trimoline (Sucre Inverti)', unit: 'g', pricePerUnit: 3.80, priceRef: 'kg', allergens: [] },
+  { name: 'Miel de Fleurs', unit: 'g', pricePerUnit: 6.50, priceRef: 'kg', allergens: [] },
   { name: 'Sirop d\'Erable Grade A', unit: 'ml', pricePerUnit: 28.00, priceRef: 'L', allergens: [] },
   { name: 'Isomalt', unit: 'g', pricePerUnit: 6.50, priceRef: 'kg', allergens: [] },
   { name: 'Sorbitol Poudre', unit: 'g', pricePerUnit: 18.00, priceRef: 'kg', allergens: [] },
 
   // --- 4. PRODUITS LAITIERS ---
-  { name: 'Lait entier', unit: 'ml', pricePerUnit: 0.85, priceRef: 'L', allergens: ['Lait'] },
-  { name: 'Lait d\'Amande Pro', unit: 'ml', pricePerUnit: 3.80, priceRef: 'L', allergens: ['Fruits à coque'] },
-  { name: 'Crème 35% MG Excellence', unit: 'ml', pricePerUnit: 5.80, priceRef: 'L', allergens: ['Lait'] },
-  { name: 'Crème 35% MG', unit: 'ml', pricePerUnit: 4.20, priceRef: 'L', allergens: ['Lait'] },
-  { name: 'Mascarpone', unit: 'g', pricePerUnit: 8.50, priceRef: 'kg', allergens: ['Lait'] },
+  { name: 'Lait entier', unit: 'ml', pricePerUnit: 0.72, priceRef: 'L', allergens: ['Lait'] },
+  { name: 'Lait d\'Amande Pro', unit: 'ml', pricePerUnit: 2.80, priceRef: 'L', allergens: ['Fruits à coque'] },
+  { name: 'Crème 35% MG Excellence', unit: 'ml', pricePerUnit: 4.50, priceRef: 'L', allergens: ['Lait'] },
+  { name: 'Crème 35% MG', unit: 'ml', pricePerUnit: 3.25, priceRef: 'L', allergens: ['Lait'] },
+  { name: 'Mascarpone', unit: 'g', pricePerUnit: 6.80, priceRef: 'kg', allergens: ['Lait'] },
 
   // --- 5. ŒUFS & DÉRIVÉS ---
-  { name: 'Œufs Frais (L)', unit: 'pièce', pricePerUnit: 0.25, priceRef: 'pièce', allergens: ['Œufs'] },
-  { name: 'Œufs entiers', unit: 'pièce', pricePerUnit: 0.15, priceRef: 'pièce', allergens: ['Œufs'] },
-  { name: 'Jaunes d\'œufs', unit: 'pièce', pricePerUnit: 0.15, priceRef: 'pièce', allergens: ['Œufs'] },
-  { name: 'Blancs d\'œufs', unit: 'pièce', pricePerUnit: 0.10, priceRef: 'pièce', allergens: ['Œufs'] },
-  { name: 'Blanc d\'œuf Pasteurisé', unit: 'g', pricePerUnit: 6.50, priceRef: 'kg', allergens: ['Œufs'] },
-  { name: 'Jaune d\'œuf Pasteurisé', unit: 'g', pricePerUnit: 12.00, priceRef: 'kg', allergens: ['Œufs'] },
-  { name: 'Poudre de Blanc d\'Œuf', unit: 'g', pricePerUnit: 45.00, priceRef: 'kg', allergens: ['Œufs'] },
+  { name: 'Œufs Frais (L)', unit: 'pièce', pricePerUnit: 0.18, priceRef: 'pièce', allergens: ['Œufs'] },
+  { name: 'Œufs entiers', unit: 'pièce', pricePerUnit: 0.11, priceRef: 'pièce', allergens: ['Œufs'] },
+  { name: 'Jaunes d\'œufs', unit: 'pièce', pricePerUnit: 0.11, priceRef: 'pièce', allergens: ['Œufs'] },
+  { name: 'Blancs d\'œufs', unit: 'pièce', pricePerUnit: 0.08, priceRef: 'pièce', allergens: ['Œufs'] },
+  { name: 'Blanc d\'œuf Pasteurisé', unit: 'g', pricePerUnit: 4.50, priceRef: 'kg', allergens: ['Œufs'] },
+  { name: 'Jaune d\'œuf Pasteurisé', unit: 'g', pricePerUnit: 9.00, priceRef: 'kg', allergens: ['Œufs'] },
+  { name: 'Poudre de Blanc d\'Œuf', unit: 'g', pricePerUnit: 35.00, priceRef: 'kg', allergens: ['Œufs'] },
 
   // --- 6. CHOCOLATERIE & CACAO ---
   { name: 'Chocolat noir 64%', unit: 'g', pricePerUnit: 11.50, priceRef: 'kg', allergens: ['Lait', 'Soja'] },
@@ -405,6 +410,9 @@ function calcTotalMaterialCost() {
 }
 
 function calcFullCost(margin, customRecipe = null, forcedInflation = null) {
+  // Ensure it's available globally for pro-features.js
+  if (!window.calcFullCost) window.calcFullCost = calcFullCost;
+
   const r = customRecipe || APP.recipe;
   const portions = r.portions || 10;
   const infl = (forcedInflation !== null) ? forcedInflation : (window.inflationFactor || 0);
@@ -1693,149 +1701,153 @@ function exportRecipePdfDirect(idx) {
 }
 
 // ============================================================================
-// RECIPE LIBRARY (CHEF D'OEUVRE)
+// RECIPE LIBRARY (HUB EXPLORER)
 // ============================================================================
 
-function renderLibraryRecipes() {
-  const container = $('#recipeLibraryCarousel');
-  const btnPrev = $('#carouselPrevBtn');
-  const btnNext = $('#carouselNextBtn');
+let currentLibraryFilter = 'all';
 
+// Define a professional sort order for pastry categories
+const LIBRARY_SORT_ORDER = [
+  'Entremets', 
+  'Tarte', 
+  'Tarte Signature', 
+  'Tarte Fruits', 
+  'Tarte Gourmande',
+  'Classique',
+  'Viennoiserie', 
+  'Brioche', 
+  'Feuilletage',
+  'Pâte à choux', 
+  'Choux & Feuilletage',
+  'Pâte levée',
+  'Meringue',
+  'Dessert à l\'assiette'
+];
+
+function sortLibraryByOrder(a, b) {
+  const catA = a.category;
+  const catB = b.category;
+  
+  if (catA === catB) {
+    // If same category, sort alphabetically by name
+    return a.name.localeCompare(b.name);
+  }
+  
+  const idxA = LIBRARY_SORT_ORDER.indexOf(catA);
+  const idxB = LIBRARY_SORT_ORDER.indexOf(catB);
+  
+  // If both in list, sort by list index
+  if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+  // If only one in list, it comes first
+  if (idxA !== -1) return -1;
+  if (idxB !== -1) return 1;
+  // If neither in list, sort alphabetically by category
+  return catA.localeCompare(catB);
+}
+function renderLibraryRecipes() {
+  const container = $('#recipeLibraryGrid');
+  const filtersContainer = $('#libraryFilters');
   if (!container) return;
 
   const allRecipes = typeof RECIPES !== 'undefined' ? RECIPES : [];
   if (allRecipes.length === 0) {
-    container.innerHTML = '<p style="color:var(--text-muted); padding: 2rem;">Aucune recette dans la bibliothèque.</p>';
+    container.innerHTML = `<p style="color:var(--text-muted); padding: 2rem;">${t('library.none') || 'Aucune recette dans la bibliothèque.'}</p>`;
     return;
   }
 
-  // Slice to only take the first 10 as requested
-  const top10 = allRecipes.slice(0, 10);
+  // Populate Filters
+  if (filtersContainer) {
+    const rawCategories = Array.from(new Set(allRecipes.map(r => r.category)));
+    
+    // Sort based on predefined order
+    const sortedCategories = ['all', ...rawCategories.sort((a, b) => {
+      const idxA = LIBRARY_SORT_ORDER.indexOf(a);
+      const idxB = LIBRARY_SORT_ORDER.indexOf(b);
+      if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+      if (idxA !== -1) return -1;
+      if (idxB !== -1) return 1;
+      return a.localeCompare(b);
+    })];
 
-  container.innerHTML = top10.map((r, idx) => {
-    // Determine an emoji based on category
-    let emoji = '🍰';
+    filtersContainer.innerHTML = sortedCategories.map(cat => {
+      const label = cat === 'all' ? (t('filter.all') || 'Tout') : (t(cat) || cat);
+      return `<button class="filter-chip ${cat === currentLibraryFilter ? 'active' : ''}" data-category="${cat}" onclick="setLibraryFilter('${cat}')">${label}</button>`;
+    }).join('');
+  }
+
+  filterLibrary();
+}
+
+window.setLibraryFilter = function(cat) {
+  currentLibraryFilter = cat;
+  const chips = document.querySelectorAll('.filter-chip');
+  chips.forEach(c => {
+    c.classList.toggle('active', c.getAttribute('data-category') === cat);
+  });
+  filterLibrary();
+};
+
+window.filterLibrary = function() {
+  const container = $('#recipeLibraryGrid');
+  const searchInput = $('#librarySearchInput');
+  if (!container) return;
+
+  const query = searchInput ? searchInput.value.toLowerCase() : '';
+  const allRecipes = typeof RECIPES !== 'undefined' ? RECIPES : [];
+
+  // 1. Filter
+  let filtered = allRecipes.filter(r => {
+    const tName = t(`data.recipe.${r.id}.name`).toLowerCase();
+    const name = r.name.toLowerCase();
+    const tCat = t(r.category).toLowerCase();
     const cat = r.category.toLowerCase();
-    if (cat.includes('viennoiserie')) emoji = '🥐';
-    if (cat.includes('chocolat')) emoji = '🍫';
-    if (cat.includes('fruit') || cat.includes('tarte')) emoji = '🍓';
-    if (cat.includes('base')) emoji = '🥣';
+    
+    const matchesSearch = name.includes(query) || tName.includes(query) || cat.includes(query) || tCat.includes(query);
+    const matchesFilter = currentLibraryFilter === 'all' || r.category === currentLibraryFilter;
+    
+    return matchesSearch && matchesFilter;
+  });
+
+  // 2. Sort by Order
+  filtered.sort(sortLibraryByOrder);
+
+  if (filtered.length === 0) {
+    container.innerHTML = `<p style="color:var(--text-muted); grid-column: 1/-1; text-align:center; padding: 4rem;">🔍 ${t('search.no_results') || 'Aucun résultat trouvé.'}</p>`;
+    return;
+  }
+
+  container.innerHTML = filtered.map((r) => {
+    const originalIdx = allRecipes.indexOf(r);
+    
+    let emoji = '🍰';
+    const catLo = r.category.toLowerCase();
+    if (catLo.includes('viennoiserie')) emoji = '🥐';
+    if (catLo.includes('chocolat')) emoji = '🍫';
+    if (catLo.includes('fruit') || catLo.includes('tarte')) emoji = '🍓';
+    if (catLo.includes('base')) emoji = '🥣';
+
     const tCatRaw = t(r.category);
     const tCat = tCatRaw !== r.category ? tCatRaw : r.category;
     const tNameRaw = t(`data.recipe.${r.id}.name`);
     const displayName = tNameRaw !== `data.recipe.${r.id}.name` ? tNameRaw : r.name;
 
-    const hasImage = false;
-    const imgHtml = '';
-
     return `
-      <div class="carousel-card" onclick="loadExampleRecipe(${idx})">
-        <div class="carousel-card-img-wrapper">
-          ${imgHtml}
-          <div class="carousel-card-img-placeholder" style="${hasImage ? 'display:none;' : ''}">${emoji}</div>
-        </div>
-        <span class="carousel-badge">${escapeHtml(tCat)}</span>
-        <h4 class="carousel-card-title">${escapeHtml(displayName)}</h4>
-        <div class="carousel-card-meta">
+      <div class="library-card" onclick="loadExampleRecipe(${originalIdx})">
+        <button class="library-card-pdf" onclick="event.stopPropagation(); exportRecipePdfDirect(${originalIdx})" title="${t('recipe.lib.export_pdf')}">📄 PDF</button>
+        <div class="library-card-img-placeholder">${emoji}</div>
+        <div class="library-card-category">${escapeHtml(tCat)}</div>
+        <h4 class="library-card-title">${escapeHtml(displayName)}</h4>
+        <div class="library-card-meta">
           <span>⏱ ${r.prepTime} min</span>
-          <span>⚖️ ${r.yield || r.portions || '10'} ${t('unit.portions')}</span>
+          <span>⚖️ ${r.portions || '10'} ${t('unit.portions')}</span>
         </div>
-        <button class="carousel-pdf-btn" onclick="event.stopPropagation(); exportRecipePdfDirect(${idx})" title="${t('recipe.lib.export_pdf')}">📄 PDF</button>
       </div>
     `;
   }).join('');
+};
 
-  // Add scroll logic
-  if (btnPrev && btnNext) {
-    btnPrev.onclick = () => {
-      container.scrollBy({ left: -350, behavior: 'smooth' });
-    };
-    btnNext.onclick = () => {
-      container.scrollBy({ left: 350, behavior: 'smooth' });
-    };
+    // Removed legacy carousel drag logic
 
-    // DRAG TO SCROLL LOGIC
-    let isDown = false;
-    let startX;
-    let scrollLeft;
-    let hasMoved = false;
-
-    container.addEventListener('mousedown', (e) => {
-      isDown = true;
-      hasMoved = false;
-      container.style.cursor = 'grabbing';
-      container.style.userSelect = 'none';
-      container.style.scrollSnapType = 'none'; // Disable snap while dragging
-      startX = e.pageX - container.offsetLeft;
-      scrollLeft = container.scrollLeft;
-    });
-
-    container.addEventListener('mouseleave', () => {
-      isDown = false;
-      container.style.cursor = 'grab';
-    });
-
-    container.addEventListener('mouseup', (e) => {
-      isDown = false;
-      container.style.cursor = 'grab';
-      container.style.scrollSnapType = 'x mandatory'; // Re-enable snap
-    });
-
-    container.addEventListener('mousemove', (e) => {
-      if (!isDown) return;
-      e.preventDefault();
-      const x = e.pageX - container.offsetLeft;
-      const walk = (x - startX) * 2;
-      if (Math.abs(walk) > 5) hasMoved = true;
-      container.scrollLeft = scrollLeft - walk;
-    });
-
-    // Touch Support
-    container.addEventListener('touchstart', (e) => {
-      isDown = true;
-      hasMoved = false;
-      container.style.scrollSnapType = 'none';
-      startX = e.touches[0].pageX - container.offsetLeft;
-      scrollLeft = container.scrollLeft;
-    });
-
-    container.addEventListener('touchend', () => {
-      isDown = false;
-      container.style.scrollSnapType = 'x mandatory';
-    });
-
-    container.addEventListener('touchmove', (e) => {
-      if (!isDown) return;
-      const x = e.touches[0].pageX - container.offsetLeft;
-      const walk = (x - startX) * 1.5;
-      if (Math.abs(walk) > 5) hasMoved = true;
-      container.scrollLeft = scrollLeft - walk;
-    });
-
-    // Support both click and drag: prevent navigation if dragged
-    container.addEventListener('click', (e) => {
-      if (hasMoved) {
-        e.preventDefault();
-        e.stopPropagation();
-      }
-    }, true);
-
-    // Initial state
-    container.style.cursor = 'grab';
-
-    // Optional: Hide/Show buttons based on scroll position
-    container.onscroll = () => {
-      const sL = container.scrollLeft;
-      const maxScroll = container.scrollWidth - container.clientWidth;
-      btnPrev.style.opacity = sL <= 0 ? '0.3' : '1';
-      btnPrev.style.pointerEvents = sL <= 0 ? 'none' : 'auto';
-      btnNext.style.opacity = sL >= maxScroll - 5 ? '0.3' : '1';
-      btnNext.style.pointerEvents = sL >= maxScroll - 5 ? 'none' : 'auto';
-    };
-    // Trigger scroll check once
-    setTimeout(() => container.dispatchEvent(new Event('scroll')), 100);
-  }
-}
 
 // ============================================================================
 // PORTFOLIO
@@ -2443,34 +2455,59 @@ function newRecipe() {
 // ============================================================================
 
 function bindEvents() {
-  // Hero CTAs
-  $('#btnCreateRecipe').addEventListener('click', () => {
-    newRecipe();
-    populateStep1();
-    goToStep(1);
-  });
+  const btnCreateRecipe = $('#btnCreateRecipe');
+  if (btnCreateRecipe) {
+    btnCreateRecipe.addEventListener('click', () => {
+      newRecipe();
+      populateStep1();
+      goToStep(1);
+    });
+  }
+
   // Step navigation
-  $('#btnBackToHero').addEventListener('click', () => goToStep(0));
-  $('#btnToStep2').addEventListener('click', () => {
-    // Validate step 1
-    if (!$('#recipeName').value.trim()) {
-      showToast(t('toast.recipe.name_required'), 'error');
-      $('#recipeName').focus();
-      return;
-    }
-    goToStep(2);
-  });
-  $('#btnToStep1').addEventListener('click', () => goToStep(1));
-  $('#btnToStep3').addEventListener('click', () => goToStep(3));
-  $('#btnToStep2b').addEventListener('click', () => goToStep(2));
-  $('#btnToStep4').addEventListener('click', () => goToStep(4));
-  $('#btnToStep3b').addEventListener('click', () => goToStep(3));
-  $('#btnToStep5').addEventListener('click', () => {
-    goToStep(5);
-    if (typeof renderAntiGaspi === 'function') renderAntiGaspi();
-  });
-  $('#btnToStep4b').addEventListener('click', () => goToStep(4));
-  $('#btnNewRecipe').addEventListener('click', newRecipe);
+  const btnBackToHero = $('#btnBackToHero');
+  if (btnBackToHero) btnBackToHero.addEventListener('click', () => goToStep(0));
+
+  const btnToStep2 = $('#btnToStep2');
+  if (btnToStep2) {
+    btnToStep2.addEventListener('click', () => {
+      if (!$('#recipeName').value.trim()) {
+        showToast(t('toast.recipe.name_required'), 'error');
+        $('#recipeName').focus();
+        return;
+      }
+      goToStep(2);
+    });
+  }
+
+  const btnToStep1 = $('#btnToStep1');
+  if (btnToStep1) btnToStep1.addEventListener('click', () => goToStep(1));
+
+  const btnToStep3 = $('#btnToStep3');
+  if (btnToStep3) btnToStep3.addEventListener('click', () => goToStep(3));
+
+  const btnToStep2b = $('#btnToStep2b');
+  if (btnToStep2b) btnToStep2b.addEventListener('click', () => goToStep(2));
+
+  const btnToStep4 = $('#btnToStep4');
+  if (btnToStep4) btnToStep4.addEventListener('click', () => goToStep(4));
+
+  const btnToStep3b = $('#btnToStep3b');
+  if (btnToStep3b) btnToStep3b.addEventListener('click', () => goToStep(3));
+
+  const btnToStep5 = $('#btnToStep5');
+  if (btnToStep5) {
+    btnToStep5.addEventListener('click', () => {
+      goToStep(5);
+      if (typeof renderAntiGaspi === 'function') renderAntiGaspi();
+    });
+  }
+
+  const btnToStep4b = $('#btnToStep4b');
+  if (btnToStep4b) btnToStep4b.addEventListener('click', () => goToStep(4));
+
+  const btnNewRecipeInStep = $('#btnNewRecipe');
+  if (btnNewRecipeInStep) btnNewRecipeInStep.addEventListener('click', newRecipe);
 
   // Step indicator click navigation
   $$('.step-dot').forEach(dot => {
@@ -2483,48 +2520,72 @@ function bindEvents() {
   });
 
   // Ingredients
-  $('#btnAddIngredient').addEventListener('click', () => addIngredient());
-  $('#btnAddFromDb').addEventListener('click', showIngredientDbModal);
-  $('#btnSearchOff').addEventListener('click', showOffModal);
+  const btnAddIng = $('#btnAddIngredient');
+  if (btnAddIng) btnAddIng.addEventListener('click', () => addIngredient());
 
-  $('#dbModalClose').addEventListener('click', hideIngredientDbModal);
+  const btnAddFromDb = $('#btnAddFromDb');
+  if (btnAddFromDb) btnAddFromDb.addEventListener('click', showIngredientDbModal);
 
-  // Comparator
+  const btnSearchOff = $('#btnSearchOff');
+  if (btnSearchOff) btnSearchOff.addEventListener('click', showOffModal);
+
+  const dbModalClose = $('#dbModalClose');
+  if (dbModalClose) dbModalClose.addEventListener('click', hideIngredientDbModal);
+
   const btnComp = $('#btnOpenComparator');
-  if (btnComp) btnComp.addEventListener('click', () => {
-    if (!APP.baselineCosts) APP.baselineCosts = JSON.parse(JSON.stringify(calcFullCost(APP.margin)));
-    $('#comparatorModal').style.display = 'flex';
-    updateComparator();
-  });
+  if (btnComp) {
+    btnComp.addEventListener('click', () => {
+      if (!APP.baselineCosts) APP.baselineCosts = JSON.parse(JSON.stringify(calcFullCost(APP.margin)));
+      $('#comparatorModal').style.display = 'flex';
+      updateComparator();
+    });
+  }
+
   const btnCompClose = $('#comparatorClose');
   if (btnCompClose) btnCompClose.addEventListener('click', () => $('#comparatorModal').style.display = 'none');
+
   const btnSnap = $('#btnSnapBaseline');
   if (btnSnap) btnSnap.addEventListener('click', snapBaseline);
 
-  $('#offModalClose').addEventListener('click', hideOffModal);
-  $('#btnOffSearch').addEventListener('click', searchOffProduct);
+  const offModalClose = $('#offModalClose');
+  if (offModalClose) offModalClose.addEventListener('click', hideOffModal);
+  
+  const btnOffSearch = $('#btnOffSearch');
+  if (btnOffSearch) btnOffSearch.addEventListener('click', searchOffProduct);
 
-  $('#offSearchInput').addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') searchOffProduct();
-  });
+  const offSearchInput = $('#offSearchInput');
+  if (offSearchInput) {
+    offSearchInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') searchOffProduct();
+    });
+  }
 
   // Close DB modal on backdrop click
-  $('#dbModal').addEventListener('click', (e) => {
-    if (e.target.id === 'dbModal') hideIngredientDbModal();
-  });
+  const dbModal = $('#dbModal');
+  if (dbModal) {
+    dbModal.addEventListener('click', (e) => {
+      if (e.target.id === 'dbModal') hideIngredientDbModal();
+    });
+  }
 
-  $('#offModal').addEventListener('click', (e) => {
-    if (e.target.id === 'offModal') hideOffModal();
-  });
+  const offModal = $('#offModal');
+  if (offModal) {
+    offModal.addEventListener('click', (e) => {
+      if (e.target.id === 'offModal') hideOffModal();
+    });
+  }
 
   // Procedure
-  $('#btnAddStep').addEventListener('click', addProcedureStep);
+  const btnAddStep = $('#btnAddStep');
+  if (btnAddStep) btnAddStep.addEventListener('click', addProcedureStep);
 
-  // Margin slider
-  $('#marginSlider').addEventListener('input', (e) => {
-    APP.margin = parseInt(e.target.value);
-    renderCostAnalysis();
-  });
+  const marginSlider = $('#marginSlider');
+  if (marginSlider) {
+    marginSlider.addEventListener('input', (e) => {
+      APP.margin = parseInt(e.target.value);
+      renderCostAnalysis();
+    });
+  }
 
   // Advanced cost inputs
   ['advLaborRate', 'advFixedCharges', 'advProductions', 'advEnergy', 'advAmortization'].forEach(id => {
@@ -2533,16 +2594,27 @@ function bindEvents() {
   });
 
   // Exports
-  $('#btnExportPdf').addEventListener('click', exportPdf);
-  if ($('#btnGenerateQR')) $('#btnGenerateQR').addEventListener('click', generateQRLable);
-  if ($('#btnExportDevis')) $('#btnExportDevis').addEventListener('click', exportDevisPdf);
-  $('#btnExportJson').addEventListener('click', exportJson);
-  $('#btnSaveRecipe').addEventListener('click', saveCurrentRecipe);
+  const btnExportPdf = $('#btnExportPdf');
+  if (btnExportPdf && typeof exportPdf === 'function') btnExportPdf.addEventListener('click', exportPdf);
+  
+  const btnGenQR = $('#btnGenerateQR');
+  if (btnGenQR && typeof generateQRLable === 'function') btnGenQR.addEventListener('click', generateQRLable);
+  
+  const btnExportDevis = $('#btnExportDevis');
+  if (btnExportDevis && typeof exportDevisPdf === 'function') btnExportDevis.addEventListener('click', exportDevisPdf);
+  
+  const btnExportJson = $('#btnExportJson');
+  if (btnExportJson && typeof exportJson === 'function') btnExportJson.addEventListener('click', exportJson);
+  
+  const btnSaveRecipe = $('#btnSaveRecipe');
+  if (btnSaveRecipe) btnSaveRecipe.addEventListener('click', saveCurrentRecipe);
+
   const btnLaunchProd = $('#btnLaunchProd');
   if (btnLaunchProd) btnLaunchProd.addEventListener('click', launchProductionFromRecipe);
 
   // Saved recipes
-  $('#btnSavedRecipes').addEventListener('click', toggleSavedRecipes);
+  const btnSavedRecipes = $('#btnSavedRecipes');
+  if (btnSavedRecipes) btnSavedRecipes.addEventListener('click', toggleSavedRecipes);
 
   // Logout
   const btnLogout = $('#btnLogout');
@@ -2555,80 +2627,136 @@ function bindEvents() {
   }
 
   // Profile Dropdown
-  $('#btnProfile').addEventListener('click', (e) => {
-    e.stopPropagation();
-    toggleProfileDropdown();
-  });
+  const btnProfile = $('#btnProfile');
+  if (btnProfile) {
+    btnProfile.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleProfileDropdown();
+    });
+  }
 
   document.addEventListener('click', (e) => {
-    if (!e.target.closest('.profile-dropdown')) {
-      $('#profileDropdown').classList.remove('show');
+    const dropdown = $('#profileDropdown');
+    if (dropdown && !e.target.closest('.profile-dropdown')) {
+      dropdown.classList.remove('show');
     }
   });
 
   // PIN Modal
-  $('#btnChangePin').addEventListener('click', showPinModal);
-  $('#pinModalClose').addEventListener('click', hidePinModal);
-  $('#btnSaveProfile').addEventListener('click', saveNewProfile);
-  $('#pinModal').addEventListener('click', (e) => {
-    if (e.target.id === 'pinModal') hidePinModal();
-  });
+  const btnChangePin = $('#btnChangePin');
+  if (btnChangePin) btnChangePin.addEventListener('click', showPinModal);
+
+  const pinModalClose = $('#pinModalClose');
+  if (pinModalClose) pinModalClose.addEventListener('click', hidePinModal);
+
+  const btnSaveProfile = $('#btnSaveProfile');
+  if (btnSaveProfile) btnSaveProfile.addEventListener('click', saveNewProfile);
+
+  const pinModal = $('#pinModal');
+  if (pinModal) {
+    pinModal.addEventListener('click', (e) => {
+      if (e.target.id === 'pinModal') hidePinModal();
+    });
+  }
 
   // Planning & Sharing
-  $('#btnAddMember').addEventListener('click', addTeamMember);
-  $('#btnAddLeave').addEventListener('click', addLeave);
-  $('#memberName').addEventListener('keypress', (e) => { if (e.key === 'Enter') addTeamMember(); });
-  $('#memberName').addEventListener('input', handleMemberAutocomplete);
-  $('#btnInviteUser').addEventListener('click', inviteUserToPlanning);
-  $('#inviteUser').addEventListener('input', handleInviteAutocomplete);
-  $('#inviteUser').addEventListener('keypress', (e) => { if (e.key === 'Enter') inviteUserToPlanning(); });
-  $('#teamNameInput').addEventListener('change', saveTeamMembers);
+  const btnAddMember = $('#btnAddMember');
+  if (btnAddMember) btnAddMember.addEventListener('click', addTeamMember);
+
+  const btnAddLeave = $('#btnAddLeave');
+  if (btnAddLeave) btnAddLeave.addEventListener('click', showAddLeaveModal);
+
+  const memberName = $('#memberName');
+  if (memberName) {
+    memberName.addEventListener('keypress', (e) => { if (e.key === 'Enter') addTeamMember(); });
+    memberName.addEventListener('input', typeof handleMemberAutocomplete === 'function' ? handleMemberAutocomplete : null);
+  }
+
+  const memberRole = $('#memberRole');
+  if (memberRole) memberRole.addEventListener('keypress', (e) => { if (e.key === 'Enter') addTeamMember(); });
+
+  const btnInviteMember = $('#btnInviteMember');
+  if (btnInviteMember) btnInviteMember.addEventListener('click', showInviteModal);
+
+  const inviteUser = $('#inviteUser');
+  if (inviteUser) {
+    inviteUser.addEventListener('input', typeof handleInviteAutocomplete === 'function' ? handleInviteAutocomplete : null);
+    inviteUser.addEventListener('keypress', (e) => { if (e.key === 'Enter') inviteUserToPlanning(); });
+  }
+
+  const teamNameInput = $('#teamNameInput');
+  if (teamNameInput) teamNameInput.addEventListener('change', saveTeamMembers);
+
+  const btnSyncToCloud = $('#btnSyncToCloud');
+  if (btnSyncToCloud) btnSyncToCloud.addEventListener('click', () => syncToCloud());
+
+  const btnSyncFromCloud = $('#btnSyncFromCloud');
+  if (btnSyncFromCloud) btnSyncFromCloud.addEventListener('click', () => syncFromCloud());
+
+  const btnPrintRecipe = $('#btnPrintRecipe');
+  if (btnPrintRecipe) btnPrintRecipe.addEventListener('click', () => window.print());
+
+  const btnExportFullPdf = $('#btnExportFullPdf');
+  if (btnExportFullPdf && typeof exportFullRecipePdf === 'function') {
+    btnExportFullPdf.addEventListener('click', exportFullRecipePdf);
+  }
 
   // Notifications
-  $('#notificationArea').addEventListener('click', (e) => {
-    e.stopPropagation();
-    const dropdown = $('#notifDropdown');
-    dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
-  });
+  const notifArea = $('#notificationArea');
+  if (notifArea) {
+    notifArea.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const dropdown = $('#notifDropdown');
+      if (dropdown) dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+    });
+  }
 
   document.addEventListener('click', (e) => {
     if (!e.target.closest('#notificationArea')) {
-      $('#notifDropdown').style.display = 'none';
+      const dropdown = $('#notifDropdown');
+      if (dropdown) dropdown.style.display = 'none';
     }
     if (!e.target.closest('#inviteUser')) {
-      $('#inviteAutocomplete').style.display = 'none';
+      const auto = $('#inviteAutocomplete');
+      if (auto) auto.style.display = 'none';
     }
     if (!e.target.closest('#memberName')) {
-      $('#memberAutocomplete').style.display = 'none';
+      const auto = $('#memberAutocomplete');
+      if (auto) auto.style.display = 'none';
     }
   });
 
   // Navigation context reset
-  $('#navPlanning').addEventListener('click', () => {
-    // When clicking the main planning link, we view our own
-    const currentUser = localStorage.getItem(STORAGE_KEYS.currentUser);
-    if (APP.viewOwner !== currentUser) {
-      APP.viewOwner = currentUser;
-      loadTeamMembers();
-      renderTeam();
-      renderLeaves();
-      renderAnnualCalendar();
-      renderSharedList();
-    }
-  });
+  const navPlan = $('#navPlanning');
+  if (navPlan) {
+    navPlan.addEventListener('click', () => {
+      const currentUser = localStorage.getItem(STORAGE_KEYS.currentUser);
+      if (APP.viewOwner !== currentUser) {
+        APP.viewOwner = currentUser;
+        loadTeamMembers();
+        if (typeof renderTeam === 'function') renderTeam();
+        if (typeof renderLeaves === 'function') renderLeaves();
+        if (typeof renderAnnualCalendar === 'function') renderAnnualCalendar();
+        if (typeof renderSharedList === 'function') renderSharedList();
+      }
+    });
+  }
 
   // Handle responsive navigation on resize
   window.addEventListener('resize', () => {
     if (localStorage.getItem('gourmet_auth') === 'true') {
+      const mainNav = $('#mainNav');
+      const mobNav = $('#mobileNavBar');
       if (window.innerWidth <= 768) {
-        if ($('#mainNav')) $('#mainNav').style.display = 'none';
-        if ($('#mobileNavBar')) $('#mobileNavBar').style.display = 'flex';
+        if (mainNav) mainNav.style.display = 'none';
+        if (mobNav) mobNav.style.display = 'flex';
       } else {
-        if ($('#mainNav')) $('#mainNav').style.display = 'flex';
-        if ($('#mobileNavBar')) $('#mobileNavBar').style.display = 'none';
+        if (mainNav) mainNav.style.display = 'flex';
+        if (mobNav) mobNav.style.display = 'none';
       }
     }
   });
+
   // Gender selection in profile
   $$('.gender-btn-profile').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -2641,7 +2769,10 @@ function bindEvents() {
 
   // Admin Moderation
   const adminUserModalClose = $('#adminUserModalClose');
-  if (adminUserModalClose) adminUserModalClose.addEventListener('click', () => $('#adminUserModal').style.display = 'none');
+  if (adminUserModalClose) adminUserModalClose.addEventListener('click', () => {
+    const m = $('#adminUserModal');
+    if (m) m.style.display = 'none';
+  });
 
   const btnAdminToggle = $('#btnAdminToggle');
   if (btnAdminToggle) btnAdminToggle.addEventListener('click', toggleAdminStatus);
@@ -2651,9 +2782,11 @@ function bindEvents() {
 
   const btnDeleteUserModal = $('#btnDeleteUserModal');
   if (btnDeleteUserModal) btnDeleteUserModal.addEventListener('click', () => {
-    if (selectedModerationUser) {
-      deleteUser(selectedModerationUser);
-      $('#adminUserModal').style.display = 'none';
+    const user = APP.adminSelectedUser;
+    if (user && confirm(`Voulez-vous vraiment supprimer le compte de ${user.username} ?`)) {
+      deleteUser(user.username);
+      const m = $('#adminUserModal');
+      if (m) m.style.display = 'none';
     }
   });
 
@@ -2956,7 +3089,7 @@ function renderFeaturedRecipe() {
   }
 
   if (!currentFeaturedRecipe) {
-    container.innerHTML = '<p>Aucune suggestion disponible.</p>';
+    container.innerHTML = `<p>${t('dash.featured.empty')}</p>`;
     return;
   }
 
@@ -2976,7 +3109,7 @@ function renderFeaturedRecipe() {
            ${r.portions} portions
         </span>
       </div>
-      <button class="btn btn-sm btn-outline" style="margin-top:1rem;" onclick="loadExampleRecipe(${r.libIdx}); document.getElementById('navRecettes').click();">Voir la fiche</button>
+      <button class="btn btn-sm btn-outline" style="margin-top:1rem;" onclick="loadExampleRecipe(${r.libIdx}); document.getElementById('navRecettes').click();">${t('ui.btn.view_sheet')}</button>
     </div>
   `;
 }
@@ -3001,7 +3134,7 @@ function renderTodayTeam() {
   });
 
   if (presentMembers.length === 0) {
-    container.innerHTML = `<p style="font-size:0.85rem; color:var(--danger); font-weight:700;">Aucun membre présent (Congés)</p>`;
+    container.innerHTML = `<p style="font-size:0.85rem; color:var(--danger); font-weight:700;">${t('dash.team.no_present')}</p>`;
     return;
   }
 
@@ -3883,10 +4016,6 @@ function exportShoppingList() {
 // =====================================================================
 // STATISTICS & CHARTS (V2)
 // =====================================================================
-
-let v2Charts = { margin: null, performance: null, scatter: null };
-let perfMode = 'top';
-window.currentStatsCat = 'all';
 
 function filterStatsCat(cat) {
   window.currentStatsCat = cat;
