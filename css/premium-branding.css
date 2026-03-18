@@ -1,0 +1,679 @@
+/* =============================================================
+   GOURMET REVIENT — PREMIUM BRANDING SYSTEM
+   Identité Visuelle Haut de Gamme (Or / Crème / Chocolat)
+   ============================================================= */
+
+/* ---------- Premium Fonts ---------- */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;0,900;1,400;1,700&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&display=swap');
+
+/* ---------- Premium CSS Variables Override ---------- */
+:root {
+  /* — New Luxury Palette — */
+  --gold: #C5A55A;
+  --gold-light: #D4BA7A;
+  --gold-dark: #A6883E;
+  --gold-glow: rgba(197, 165, 90, 0.25);
+  --gold-shimmer: linear-gradient(135deg, #C5A55A 0%, #E8D5A3 40%, #C5A55A 60%, #A6883E 100%);
+
+  --chocolate: #3C1F0E;
+  --chocolate-medium: #5C3A1E;
+  --chocolate-light: #8B5E3C;
+  --chocolate-milk: #A0714F;
+
+  --cream: #FDF6E3;
+  --cream-warm: #FAF0D7;
+  --cream-deep: #F5E6C8;
+  --vanilla: #FFFDF7;
+
+  --caramel: #D4840A;
+  --caramel-light: #E6A540;
+  --praline: #C47A3F;
+
+  /* — Override accent colors — */
+  --accent: var(--gold);
+  --accent-light: var(--gold-light);
+  --accent-dark: var(--gold-dark);
+  --accent-glow: var(--gold-glow);
+
+  /* — Override surfaces — */
+  --bg: var(--cream);
+  --bg-alt: var(--cream-warm);
+  --surface: #FFFFFF;
+  --surface-hover: var(--vanilla);
+  --surface-border: rgba(60, 31, 14, 0.08);
+  --surface-shadow: rgba(60, 31, 14, 0.06);
+
+  /* — Override text — */
+  --primary: var(--chocolate);
+  --primary-light: var(--chocolate-medium);
+  --primary-dark: #2A1508;
+  --text: var(--chocolate);
+  --text-secondary: var(--chocolate-light);
+  --text-muted: var(--chocolate-milk);
+
+  /* — Premium typography — */
+  --font-display: 'Playfair Display', 'Georgia', serif;
+  --font-elegant: 'Cormorant Garamond', 'Georgia', serif;
+
+  /* — Premium shadows — */
+  --shadow-gold: 0 8px 30px rgba(197, 165, 90, 0.2);
+  --shadow-chocolate: 0 8px 30px rgba(60, 31, 14, 0.12);
+  --shadow-premium: 0 20px 60px rgba(60, 31, 14, 0.08), 0 0 0 1px rgba(197, 165, 90, 0.1);
+}
+
+/* ---------- Dark Mode Premium Override ---------- */
+.dark-theme {
+  --gold: #D4BA7A;
+  --gold-light: #E8D5A3;
+  --gold-dark: #C5A55A;
+  --gold-glow: rgba(212, 186, 122, 0.15);
+  --gold-shimmer: linear-gradient(135deg, #D4BA7A 0%, #E8D5A3 40%, #D4BA7A 60%, #C5A55A 100%);
+
+  --chocolate: #F5E6C8;
+  --chocolate-medium: #D4C4A0;
+  --chocolate-light: #B8A88A;
+  --chocolate-milk: #8B7B64;
+
+  --cream: #1A1410;
+  --cream-warm: #1E1812;
+  --cream-deep: #252018;
+  --vanilla: #1C1610;
+
+  --bg: #1A1410;
+  --bg-alt: #1E1812;
+  --surface: #252018;
+  --surface-hover: #2C2520;
+  --surface-border: rgba(212, 186, 122, 0.1);
+  --surface-shadow: rgba(0, 0, 0, 0.4);
+
+  --primary: #F5E6C8;
+  --primary-light: #D4C4A0;
+  --primary-dark: #FFFDF7;
+  --text: #F5E6C8;
+  --text-secondary: #D4C4A0;
+  --text-muted: #8B7B64;
+
+  --bg-card: #252018;
+  --surface-glass: rgba(30, 24, 18, 0.85);
+  --surface-border-glass: rgba(212, 186, 122, 0.08);
+}
+
+/* ============================================================= */
+/* PREMIUM SPLASH SCREEN (Loading Animation with Whisk)          */
+/* ============================================================= */
+
+#premiumSplash {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(160deg, #2A1508 0%, #3C1F0E 35%, #4A2815 65%, #2A1508 100%);
+  transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#premiumSplash.fade-out {
+  opacity: 0;
+  transform: scale(1.05);
+  pointer-events: none;
+}
+
+/* Floating particles (cream/gold) */
+.splash-particles {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.splash-particle {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background: var(--gold);
+  border-radius: 50%;
+  opacity: 0;
+  animation: particleFloat 4s ease-in-out infinite;
+}
+
+.splash-particle:nth-child(1) { left: 10%; animation-delay: 0s; animation-duration: 3.5s; }
+.splash-particle:nth-child(2) { left: 25%; animation-delay: 0.5s; animation-duration: 4s; }
+.splash-particle:nth-child(3) { left: 40%; animation-delay: 1s; animation-duration: 3.2s; }
+.splash-particle:nth-child(4) { left: 55%; animation-delay: 0.3s; animation-duration: 4.5s; }
+.splash-particle:nth-child(5) { left: 70%; animation-delay: 0.8s; animation-duration: 3.8s; }
+.splash-particle:nth-child(6) { left: 85%; animation-delay: 1.2s; animation-duration: 3.3s; }
+.splash-particle:nth-child(7) { left: 15%; animation-delay: 0.6s; animation-duration: 4.2s; width: 4px; height: 4px; }
+.splash-particle:nth-child(8) { left: 60%; animation-delay: 1.5s; animation-duration: 3.6s; width: 8px; height: 8px; }
+
+@keyframes particleFloat {
+  0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+  10% { opacity: 0.6; }
+  90% { opacity: 0.6; }
+  100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
+}
+
+/* Whisk SVG Animation */
+.splash-whisk {
+  width: 80px;
+  height: 80px;
+  margin-bottom: 2rem;
+  animation: whiskSpin 2s ease-in-out infinite;
+  filter: drop-shadow(0 0 20px rgba(197, 165, 90, 0.4));
+}
+
+@keyframes whiskSpin {
+  0% { transform: rotate(0deg) scale(1); }
+  25% { transform: rotate(15deg) scale(1.05); }
+  50% { transform: rotate(0deg) scale(1); }
+  75% { transform: rotate(-15deg) scale(1.05); }
+  100% { transform: rotate(0deg) scale(1); }
+}
+
+/* Logo text in splash */
+.splash-logo-text {
+  font-family: var(--font-display);
+  font-size: 2.8rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  background: var(--gold-shimmer);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 0.3rem;
+  animation: splashLogoIn 1s ease-out 0.3s both;
+}
+
+.splash-tagline {
+  font-family: var(--font-elegant);
+  font-size: 1.1rem;
+  font-style: italic;
+  color: rgba(197, 165, 90, 0.6);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  animation: splashLogoIn 1s ease-out 0.6s both;
+}
+
+@keyframes splashLogoIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Progress bar */
+.splash-progress {
+  width: 200px;
+  height: 3px;
+  background: rgba(197, 165, 90, 0.15);
+  border-radius: 3px;
+  margin-top: 2.5rem;
+  overflow: hidden;
+  animation: splashLogoIn 1s ease-out 0.8s both;
+}
+
+.splash-progress-bar {
+  height: 100%;
+  width: 0%;
+  background: var(--gold-shimmer);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+  animation: splashProgressFill 2.2s cubic-bezier(0.4, 0, 0.2, 1) 0.5s both;
+}
+
+@keyframes splashProgressFill {
+  0% { width: 0%; }
+  30% { width: 40%; }
+  60% { width: 70%; }
+  85% { width: 90%; }
+  100% { width: 100%; }
+}
+
+/* ============================================================= */
+/* PREMIUM HEADER BRANDING                                       */
+/* ============================================================= */
+
+.header-brand h1 {
+  font-family: var(--font-display) !important;
+  font-weight: 800;
+  font-size: 1.4rem;
+  letter-spacing: -0.01em;
+}
+
+.header-brand h1 span {
+  background: var(--gold-shimmer);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-style: italic;
+}
+
+.header-brand .logo-icon {
+  background: linear-gradient(135deg, var(--gold), var(--gold-dark)) !important;
+  box-shadow: var(--shadow-gold) !important;
+  border: 1px solid rgba(197, 165, 90, 0.3);
+}
+
+/* Premium glow on header */
+.app-header {
+  border-bottom: 1px solid rgba(197, 165, 90, 0.12) !important;
+}
+
+.app-header::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, var(--gold) 50%, transparent 100%);
+  opacity: 0.4;
+}
+
+/* ============================================================= */
+/* PREMIUM HEADINGS                                              */
+/* ============================================================= */
+
+h1, h2, h3 {
+  font-family: var(--font-display) !important;
+}
+
+.hero h2 {
+  font-family: var(--font-display) !important;
+  font-weight: 900;
+}
+
+.hero h2 .accent {
+  background: var(--gold-shimmer);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-badge {
+  background: var(--gold-glow) !important;
+  color: var(--gold-dark) !important;
+  border: 1px solid rgba(197, 165, 90, 0.2);
+}
+
+/* ============================================================= */
+/* PREMIUM BUTTONS                                               */
+/* ============================================================= */
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--gold), var(--gold-dark)) !important;
+  box-shadow: var(--shadow-gold) !important;
+  color: var(--chocolate) !important;
+  font-weight: 700 !important;
+  border: 1px solid rgba(197, 165, 90, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.6s ease;
+}
+
+.btn-primary:hover::before {
+  left: 100%;
+}
+
+.btn-primary:hover {
+  box-shadow: 0 12px 35px rgba(197, 165, 90, 0.35) !important;
+  transform: translateY(-2px);
+}
+
+/* ============================================================= */
+/* PREMIUM CARDS                                                 */
+/* ============================================================= */
+
+.card, .cockpit-card, .mgmt-glass-card {
+  border: 1px solid rgba(197, 165, 90, 0.08) !important;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.card:hover, .cockpit-card:hover {
+  border-color: rgba(197, 165, 90, 0.15) !important;
+  box-shadow: var(--shadow-premium) !important;
+}
+
+/* Gold accent line on cards */
+.cockpit-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 3px;
+  background: var(--gold-shimmer);
+  border-radius: 0 0 3px 3px;
+  opacity: 0;
+  transition: opacity 0.4s, width 0.4s;
+}
+
+.cockpit-card:hover::before {
+  opacity: 1;
+  width: 60px;
+}
+
+/* ============================================================= */
+/* AUTH SCREEN PREMIUM                                           */
+/* ============================================================= */
+
+.auth-overlay {
+  background: linear-gradient(160deg, rgba(42, 21, 8, 0.92) 0%, rgba(60, 31, 14, 0.88) 50%, rgba(42, 21, 8, 0.92) 100%) !important;
+  backdrop-filter: blur(24px) !important;
+}
+
+.auth-card {
+  border: 1px solid rgba(197, 165, 90, 0.15) !important;
+  box-shadow: var(--shadow-premium), 0 0 80px rgba(197, 165, 90, 0.08) !important;
+}
+
+.auth-card h2 {
+  font-family: var(--font-display) !important;
+}
+
+.auth-logo {
+  filter: drop-shadow(0 4px 20px rgba(197, 165, 90, 0.3));
+}
+
+.auth-tab.active {
+  color: var(--gold) !important;
+}
+
+/* ============================================================= */
+/* STEP INDICATOR PREMIUM                                        */
+/* ============================================================= */
+
+.step-dot.active .dot {
+  background: linear-gradient(135deg, var(--gold), var(--gold-dark)) !important;
+  border-color: var(--gold) !important;
+  box-shadow: 0 4px 20px rgba(197, 165, 90, 0.35) !important;
+}
+
+.step-dot.active .step-label {
+  color: var(--gold) !important;
+}
+
+.step-line.active {
+  background: var(--gold) !important;
+}
+
+/* ============================================================= */
+/* INGREDIENT ROW HOVER — WATERCOLOR EFFECT                      */
+/* ============================================================= */
+
+.ing-row {
+  position: relative;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.ing-row::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 14px;
+  background: radial-gradient(circle at 20% 50%, 
+    rgba(197, 165, 90, 0.06) 0%, 
+    rgba(212, 132, 10, 0.04) 30%, 
+    transparent 70%);
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.ing-row:hover::before {
+  opacity: 1;
+}
+
+.ing-row:hover {
+  transform: translateX(4px);
+  border-color: rgba(197, 165, 90, 0.2) !important;
+}
+
+/* Watercolor splash on hover */
+.ing-row .ing-row-icon {
+  position: relative;
+  transition: all 0.4s ease;
+}
+
+.ing-row:hover .ing-row-icon {
+  transform: scale(1.3) rotate(-5deg);
+  filter: drop-shadow(0 3px 8px rgba(197, 165, 90, 0.25));
+}
+
+.ing-row:hover .ing-row-icon::after {
+  content: '';
+  position: absolute;
+  inset: -12px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(197, 165, 90, 0.15) 0%, transparent 70%);
+  animation: watercolorBloom 0.6s ease-out forwards;
+  z-index: -1;
+}
+
+@keyframes watercolorBloom {
+  0% { transform: scale(0); opacity: 0; }
+  50% { opacity: 1; }
+  100% { transform: scale(2.5); opacity: 0.3; }
+}
+
+/* ============================================================= */
+/* CHOCOLATE RAIN — Celebration Effect                           */
+/* ============================================================= */
+
+#chocolateRainContainer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 99998;
+  overflow: hidden;
+}
+
+.choco-piece {
+  position: absolute;
+  top: -30px;
+  font-size: 1.2rem;
+  animation: chocoFall linear forwards;
+  opacity: 0.9;
+  will-change: transform;
+}
+
+@keyframes chocoFall {
+  0% {
+    transform: translateY(0) rotate(0deg) scale(1);
+    opacity: 0.9;
+  }
+  70% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(105vh) rotate(720deg) scale(0.6);
+    opacity: 0;
+  }
+}
+
+/* ============================================================= */
+/* STEP VALIDATION — SUCCESS BURST                               */
+/* ============================================================= */
+
+.step-dot.completed .dot {
+  position: relative;
+  animation: stepCompletePulse 0.6s ease-out;
+}
+
+@keyframes stepCompletePulse {
+  0% { transform: scale(1); }
+  30% { transform: scale(1.3); }
+  50% { transform: scale(0.95); }
+  70% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+.step-completed-burst {
+  position: absolute;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(197, 165, 90, 0.4) 0%, transparent 70%);
+  animation: burstExpand 0.8s ease-out forwards;
+  pointer-events: none;
+}
+
+@keyframes burstExpand {
+  0% { transform: scale(0); opacity: 1; }
+  100% { transform: scale(3); opacity: 0; }
+}
+
+/* ============================================================= */
+/* PREMIUM TOAST                                                 */
+/* ============================================================= */
+
+.toast {
+  border-left: 4px solid var(--gold) !important;
+  font-family: var(--font) !important;
+}
+
+.toast.success {
+  border-left-color: var(--success) !important;
+}
+
+/* ============================================================= */
+/* FORM INPUTS PREMIUM                                           */
+/* ============================================================= */
+
+.form-input:focus {
+  border-color: var(--gold) !important;
+  box-shadow: 0 0 0 3px var(--gold-glow) !important;
+}
+
+/* ============================================================= */
+/* MORNING BRIEFING PREMIUM                                      */
+/* ============================================================= */
+
+.morning-briefing {
+  background: linear-gradient(135deg, 
+    rgba(60, 31, 14, 0.03) 0%,
+    rgba(197, 165, 90, 0.06) 50%,
+    rgba(60, 31, 14, 0.03) 100%) !important;
+  border: 1px solid rgba(197, 165, 90, 0.1) !important;
+}
+
+.morning-briefing h2 {
+  font-family: var(--font-display) !important;
+}
+
+/* ============================================================= */
+/* SCROLLBAR PREMIUM                                             */
+/* ============================================================= */
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--cream-warm);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--gold-light);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--gold);
+}
+
+.dark-theme ::-webkit-scrollbar-track {
+  background: #1E1812;
+}
+
+.dark-theme ::-webkit-scrollbar-thumb {
+  background: rgba(212, 186, 122, 0.3);
+}
+
+/* ============================================================= */
+/* RECIPE SAVED CARDS — Premium Hover                            */
+/* ============================================================= */
+
+.saved-card {
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.saved-card:hover {
+  transform: translateY(-6px) !important;
+  box-shadow: var(--shadow-premium), 0 0 40px rgba(197, 165, 90, 0.08) !important;
+}
+
+/* ============================================================= */
+/* NAV LINKS PREMIUM                                             */
+/* ============================================================= */
+
+.nav-link:hover,
+.nav-dropdown-link:hover {
+  color: var(--gold) !important;
+}
+
+/* ============================================================= */
+/* BADGE & TAGS PREMIUM                                          */
+/* ============================================================= */
+
+.badge-new {
+  background: var(--gold-shimmer) !important;
+  color: var(--chocolate) !important;
+  font-family: var(--font) !important;
+}
+
+/* ============================================================= */
+/* PAGE TRANSITION EFFECT                                        */
+/* ============================================================= */
+
+.page-transition-active {
+  animation: pageSlideIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+@keyframes pageSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.99);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ============================================================= */
+/* GOLDEN DIVIDER                                                */
+/* ============================================================= */
+
+.golden-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, var(--gold) 50%, transparent 100%);
+  opacity: 0.25;
+  margin: 2rem 0;
+}
+
+/* ============================================================= */
+/* SELECTION COLOR                                               */
+/* ============================================================= */
+
+::selection {
+  background: var(--gold-glow);
+  color: var(--chocolate);
+}
+
+::-moz-selection {
+  background: var(--gold-glow);
+  color: var(--chocolate);
+}

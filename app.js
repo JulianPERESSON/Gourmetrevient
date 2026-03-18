@@ -7044,3 +7044,178 @@ function launchProductionFromRecipe() {
   
   showToast(t('mgmt.production.added') || "Production lancée !", "success");
 }
+
+// ============================================================================
+// PREMIUM BRANDING — MICRO-INTERACTIONS ENGINE
+// ============================================================================
+
+/**
+ * 1. SPLASH SCREEN — Auto-dismiss with elegant fade
+ */
+(function initSplashScreen() {
+  const splash = document.getElementById('premiumSplash');
+  if (!splash) return;
+
+  // Dismiss splash after animation completes (≈ 2.8s)
+  const dismissTime = 2800;
+
+  setTimeout(() => {
+    splash.classList.add('fade-out');
+    setTimeout(() => {
+      splash.style.display = 'none';
+    }, 800); // matches CSS transition duration
+  }, dismissTime);
+})();
+
+/**
+ * 2. CHOCOLATE RAIN — Celebration effect
+ *    Triggered on step validation and recipe save
+ */
+function triggerChocolateRain(intensity = 'normal') {
+  const container = document.getElementById('chocolateRainContainer');
+  if (!container) return;
+
+  const pieces = intensity === 'epic' ? 50 : (intensity === 'light' ? 15 : 30);
+  const emojis = ['🍫', '🍪', '🧁', '🍩', '🎂', '🥐', '🍰', '✨', '⭐'];
+  const duration = intensity === 'epic' ? 3500 : 2500;
+
+  for (let i = 0; i < pieces; i++) {
+    const piece = document.createElement('div');
+    piece.className = 'choco-piece';
+    piece.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+    piece.style.left = `${Math.random() * 100}%`;
+    piece.style.fontSize = `${0.8 + Math.random() * 1.2}rem`;
+    piece.style.animationDuration = `${1.5 + Math.random() * 2}s`;
+    piece.style.animationDelay = `${Math.random() * 0.8}s`;
+    container.appendChild(piece);
+  }
+
+  // Cleanup
+  setTimeout(() => {
+    container.innerHTML = '';
+  }, duration);
+}
+
+// Make it globally available
+window.triggerChocolateRain = triggerChocolateRain;
+
+/**
+ * 3. HOOK INTO goToStep — Add celebration on step forward navigation
+ */
+const _originalGoToStep = goToStep;
+goToStep = function(step) {
+  const previousStep = APP.currentStep;
+
+  // Call original
+  _originalGoToStep(step);
+
+  // Trigger chocolate rain when advancing to next step (not going back)
+  if (step > previousStep && previousStep >= 1) {
+    triggerChocolateRain('light');
+  }
+
+  // Add page transition class
+  const stepEl = document.querySelector(`#step${step}`);
+  if (stepEl) {
+    stepEl.classList.remove('page-transition-active');
+    void stepEl.offsetWidth; // Force reflow
+    stepEl.classList.add('page-transition-active');
+  }
+};
+
+/**
+ * 4. HOOK INTO saveCurrentRecipe — Epic rain on recipe save
+ */
+if (typeof saveCurrentRecipe === 'function') {
+  const _originalSave = saveCurrentRecipe;
+  saveCurrentRecipe = function() {
+    _originalSave.apply(this, arguments);
+    triggerChocolateRain('epic');
+  };
+}
+
+/**
+ * 5. PREMIUM CURSOR TRAIL — Subtle golden sparkle on mouse move (desktop only)
+ */
+(function initCursorSparkle() {
+  if (window.matchMedia('(hover: none)').matches) return; // Skip on touch devices
+
+  let sparkleThrottle = false;
+
+  document.addEventListener('mousemove', (e) => {
+    if (sparkleThrottle) return;
+    sparkleThrottle = true;
+    setTimeout(() => sparkleThrottle = false, 80);
+
+    // Only on interactive elements
+    const target = e.target.closest('.btn, .card, .cockpit-card, .nav-link, .saved-card');
+    if (!target) return;
+
+    const sparkle = document.createElement('div');
+    sparkle.style.cssText = `
+      position: fixed;
+      left: ${e.clientX}px;
+      top: ${e.clientY}px;
+      width: 6px;
+      height: 6px;
+      background: radial-gradient(circle, rgba(197, 165, 90, 0.6) 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 99997;
+      animation: cursorSparkle 0.6s ease-out forwards;
+    `;
+    document.body.appendChild(sparkle);
+    setTimeout(() => sparkle.remove(), 600);
+  });
+
+  // Inject animation keyframes
+  if (!document.getElementById('cursorSparkleStyle')) {
+    const style = document.createElement('style');
+    style.id = 'cursorSparkleStyle';
+    style.textContent = `
+      @keyframes cursorSparkle {
+        0% { transform: scale(1); opacity: 1; }
+        100% { transform: scale(3); opacity: 0; }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+})();
+
+/**
+ * 6. GOLDEN SEPARATOR — Automatically add elegant dividers
+ */
+(function addGoldenDividers() {
+  document.addEventListener('DOMContentLoaded', () => {
+    // Add a golden line under the morning briefing
+    const briefing = document.querySelector('.morning-briefing');
+    if (briefing && !briefing.nextElementSibling?.classList.contains('golden-divider')) {
+      const divider = document.createElement('div');
+      divider.className = 'golden-divider';
+      briefing.after(divider);
+    }
+  });
+})();
+
+/**
+ * 7. PREMIUM LOGO ANIMATION — Subtle shine on header brand hover
+ */
+(function initLogoShine() {
+  const brand = document.getElementById('headerBrand');
+  if (!brand) return;
+
+  brand.addEventListener('mouseenter', () => {
+    const h1 = brand.querySelector('h1');
+    if (h1) {
+      h1.style.transition = 'transform 0.3s ease';
+      h1.style.transform = 'scale(1.03)';
+    }
+  });
+
+  brand.addEventListener('mouseleave', () => {
+    const h1 = brand.querySelector('h1');
+    if (h1) {
+      h1.style.transform = 'scale(1)';
+    }
+  });
+})();

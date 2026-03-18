@@ -46,6 +46,7 @@
   </script>
 
   <link rel="stylesheet" href="./styles.css?v=3.5.0" />
+  <link rel="stylesheet" href="./css/premium-branding.css?v=1.0.0" />
   <!-- Libraries for new features -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -53,6 +54,41 @@
 </head>
 
 <body class="auth-pending">
+  <!-- ================================================ -->
+  <!-- PREMIUM SPLASH SCREEN                            -->
+  <!-- ================================================ -->
+  <div id="premiumSplash">
+    <div class="splash-particles">
+      <div class="splash-particle"></div>
+      <div class="splash-particle"></div>
+      <div class="splash-particle"></div>
+      <div class="splash-particle"></div>
+      <div class="splash-particle"></div>
+      <div class="splash-particle"></div>
+      <div class="splash-particle"></div>
+      <div class="splash-particle"></div>
+    </div>
+    <!-- Animated Whisk SVG -->
+    <svg class="splash-whisk" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M50 85 L50 45" stroke="#C5A55A" stroke-width="4" stroke-linecap="round"/>
+      <path d="M50 45 C50 25, 30 15, 30 35 C30 42, 50 45, 50 45" stroke="#D4BA7A" stroke-width="2.5" fill="none"/>
+      <path d="M50 45 C50 25, 70 15, 70 35 C70 42, 50 45, 50 45" stroke="#D4BA7A" stroke-width="2.5" fill="none"/>
+      <path d="M50 45 C50 20, 40 10, 38 32 C37 40, 50 45, 50 45" stroke="#E8D5A3" stroke-width="2" fill="none" opacity="0.7"/>
+      <path d="M50 45 C50 20, 60 10, 62 32 C63 40, 50 45, 50 45" stroke="#E8D5A3" stroke-width="2" fill="none" opacity="0.7"/>
+      <path d="M50 45 C50 22, 35 5, 35 30 C35 38, 50 45, 50 45" stroke="#C5A55A" stroke-width="1.5" fill="none" opacity="0.5"/>
+      <path d="M50 45 C50 22, 65 5, 65 30 C65 38, 50 45, 50 45" stroke="#C5A55A" stroke-width="1.5" fill="none" opacity="0.5"/>
+      <circle cx="50" cy="45" r="4" fill="#C5A55A"/>
+      <circle cx="50" cy="87" r="3" fill="#A6883E"/>
+    </svg>
+    <div class="splash-logo-text">GourmetRevient</div>
+    <div class="splash-tagline">L'Art de la Pâtisserie</div>
+    <div class="splash-progress">
+      <div class="splash-progress-bar"></div>
+    </div>
+  </div>
+
+  <!-- Chocolate Rain Container (for celebrations) -->
+  <div id="chocolateRainContainer"></div>
   <!-- Auth Overlay -->
   <div id="authOverlay" class="auth-overlay">
     <div class="auth-card">
