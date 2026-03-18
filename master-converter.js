@@ -1,8 +1,9 @@
 /*
   =====================================================================
-  MASTER-CONVERTER.JS — GourmetRevient v5.1
+  MASTER-CONVERTER.JS — GourmetRevient v5.2
   Géométrie Culinaire — Convertisseur de Moules Premium
   Calcul de volumes 3D → Coefficient → Adaptation quantités
+  + Conversion rapide fonds de tarte par taille
   =====================================================================
 */
 
@@ -11,41 +12,54 @@
 // ============================================================================
 
 const MC_SHAPES = {
-  cercle:    { label: '⭕ Cercle',          fields: ['diameter', 'height'],              icon: '⭕' },
-  carre:     { label: '⬛ Carré',            fields: ['side', 'height'],                  icon: '⬛' },
-  rectangle: { label: '▭ Rectangle/Cadre', fields: ['length', 'width', 'height'],        icon: '▭'  },
-  buche:     { label: '🪵 Bûche',            fields: ['length', 'diameter', 'height'],    icon: '🪵' },
-  verrine:   { label: '🥃 Verrine/Demi-Sphère', fields: ['diameter', 'height'],          icon: '🥃' },
-  tarte:     { label: '🥧 Moule à tarte',   fields: ['diameter', 'height'],              icon: '🥧' },
+  cercle:    { label: '⭕ Cercle / Entremets',   fields: ['diameter', 'height'], icon: '⭕' },
+  carre:     { label: '⬛ Carré / Cadre carré',   fields: ['side', 'height'],     icon: '⬛' },
+  rectangle: { label: '▭ Rectangle / Cadre',      fields: ['length', 'width', 'height'], icon: '▭' },
+  buche:     { label: '🪵 Bûche / Gouttière',     fields: ['length', 'diameter', 'height'], icon: '🪵' },
+  verrine:   { label: '🥃 Verrine / Demi-Sphère', fields: ['diameter', 'height'], icon: '🥃' },
+  tarte:     { label: '🥧 Moule à tarte / Cercle tarte', fields: ['diameter', 'height'], icon: '🥧' },
 };
+
+// Tailles standard de cercles à tarte (diamètre cm → hauteur standard cm)
+const TART_SIZES = [
+  { d: 16, h: 2,   label: 'Ø16 cm (individuel+)' },
+  { d: 18, h: 2,   label: 'Ø18 cm (2-3 parts)' },
+  { d: 20, h: 2,   label: 'Ø20 cm (4 parts)' },
+  { d: 22, h: 2,   label: 'Ø22 cm (6 parts)' },
+  { d: 24, h: 2.5, label: 'Ø24 cm (6-8 parts)' },
+  { d: 26, h: 2.5, label: 'Ø26 cm (8 parts)' },
+  { d: 28, h: 2.5, label: 'Ø28 cm (8-10 parts)' },
+  { d: 30, h: 3,   label: 'Ø30 cm (10-12 parts)' },
+  { d: 32, h: 3,   label: 'Ø32 cm (12+ parts)' },
+];
 
 /**
  * Calculate the volume (cm³) of a mold shape
  * All dimensions in cm
  */
 function mcVolume(shape, dims) {
-  const { d = 0, h = 0, l = 0, w = 0, side = 0 } = dims;
+  const d    = dims.diameter || 0;
+  const h    = dims.height   || 0;
+  const l    = dims.length   || 0;
+  const w    = dims.width    || 0;
+  const side = dims.side     || 0;
 
   switch (shape) {
     case 'cercle':
     case 'tarte':
-      // Cylinder: π * r² * h
       return Math.PI * Math.pow(d / 2, 2) * h;
 
     case 'carre':
-      // Cube/prism: a² * h
       return side * side * h;
 
     case 'rectangle':
-      // Box: l * w * h
       return l * w * h;
 
     case 'buche':
-      // Half-cylinder log: (π * r² / 2) * l
+      // Half-cylinder: (π * r² / 2) * l
       return (Math.PI * Math.pow(d / 2, 2) / 2) * l;
 
     case 'verrine':
-      // Cylinder (treat as simple cylinder for ratio)
       return Math.PI * Math.pow(d / 2, 2) * h;
 
     default:
@@ -66,10 +80,10 @@ function mcCoefficient(volFrom, volTo) {
 // ============================================================================
 
 let mcState = {
-  fromShape: 'cercle',
-  toShape:   'cercle',
-  fromDims:  { d: 18, h: 4.5 },
-  toDims:    { d: 24, h: 5.0 },
+  fromShape: 'tarte',
+  toShape:   'tarte',
+  fromDims:  { diameter: 22, height: 2 },
+  toDims:    { diameter: 28, height: 2.5 },
   coefficient: 1,
   linkedRecipeIdx: null,
 };
@@ -103,13 +117,6 @@ function initMCShapeSelectors() {
   const toSel   = document.getElementById('mcToShape');
   if (!fromSel || !toSel) return;
 
-  const opts = Object.entries(MC_SHAPES).map(([k, s]) =>
-    `<option value="${k}">${s.label}</option>`
-  ).join('');
-
-  fromSel.innerHTML = opts;
-  toSel.innerHTML   = opts;
-
   fromSel.value = mcState.fromShape;
   toSel.value   = mcState.toShape;
 
@@ -117,11 +124,15 @@ function initMCShapeSelectors() {
   renderMCFields('to',   mcState.toShape);
 }
 
+/**
+ * Render dimension input fields for a given side (from/to
+ * Uses CLEAR key names: diameter, height, side, length, width
+ */
 function renderMCFields(side, shape) {
   const container = document.getElementById(`mc${cap(side)}Fields`);
   if (!container) return;
 
-  const dims = mcState[side === 'from' ? 'fromDims' : 'toDims'];
+  const dims = side === 'from' ? mcState.fromDims : mcState.toDims;
   const fields = MC_SHAPES[shape]?.fields || [];
   const labels = {
     diameter: 'Diamètre (cm)',
@@ -131,27 +142,45 @@ function renderMCFields(side, shape) {
     height:   'Hauteur (cm)',
   };
   const defaults = {
-    diameter: side === 'from' ? 18 : 24,
+    diameter: side === 'from' ? 22 : 28,
     side:     side === 'from' ? 16 : 22,
     length:   side === 'from' ? 30 : 40,
     width:    side === 'from' ? 10 : 12,
-    height:   side === 'from' ? 4.5 : 5.0,
+    height:   side === 'from' ? 2 : 2.5,
   };
 
-  container.innerHTML = fields.map(f => `
+  let html = fields.map(f => `
     <div class="mc-field-group">
       <label>${labels[f]}</label>
       <div class="mc-input-wrapper">
-        <input type="number" 
-               id="mc${cap(side)}_${f}" 
-               class="form-input mc-input" 
-               value="${dims[f[0]] || defaults[f]}" 
-               min="1" max="200" step="0.5"
+        <input type="number"
+               id="mc${cap(side)}_${f}"
+               class="form-input mc-input"
+               value="${dims[f] !== undefined ? dims[f] : defaults[f]}"
+               min="0.5" max="200" step="0.5"
                oninput="mcUpdateDim('${side}', '${f}', this.value)">
         <span class="mc-unit">cm</span>
       </div>
     </div>
   `).join('');
+
+  // Ajouter les boutons raccourcis pour les tartes
+  if (shape === 'tarte') {
+    html += `<div class="mc-tart-presets">
+      <div class="mc-tart-presets-label">Tailles courantes :</div>
+      <div class="mc-tart-presets-btns">
+        ${TART_SIZES.map(t => `
+          <button class="mc-tart-btn${dims.diameter === t.d ? ' active' : ''}"
+                  onclick="mcSetTartSize('${side}', ${t.d}, ${t.h})"
+                  title="${t.label}">
+            Ø${t.d}
+          </button>
+        `).join('')}
+      </div>
+    </div>`;
+  }
+
+  container.innerHTML = html;
 }
 
 function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
@@ -184,11 +213,19 @@ function mcChangeToShape(val) {
 }
 
 function mcUpdateDim(side, field, val) {
-  const key = field === 'diameter' ? 'd' : field === 'side' ? 'side' : field === 'length' ? 'l' : field === 'width' ? 'w' : 'h';
   const dimObj = side === 'from' ? mcState.fromDims : mcState.toDims;
-  dimObj[key] = parseFloat(val) || 0;
+  dimObj[field] = parseFloat(val) || 0;
   mcCalculate();
 }
+
+function mcSetTartSize(side, diameter, height) {
+  const dimObj = side === 'from' ? mcState.fromDims : mcState.toDims;
+  dimObj.diameter = diameter;
+  dimObj.height = height;
+  renderMCFields(side, 'tarte');
+  mcCalculate();
+}
+window.mcSetTartSize = mcSetTartSize;
 
 function mcSelectRecipe(idx) {
   mcState.linkedRecipeIdx = idx !== '' ? parseInt(idx) : null;
@@ -200,7 +237,6 @@ function mcSelectRecipe(idx) {
 // ============================================================================
 
 function mcCalculate() {
-  // Sync dims from inputs
   syncMCDims('from');
   syncMCDims('to');
 
@@ -210,7 +246,6 @@ function mcCalculate() {
 
   mcState.coefficient = coeff;
 
-  // Render results
   renderMCResult(vFrom, vTo, coeff);
   renderMCSVG(mcState.fromShape, mcState.fromDims, mcState.toShape, mcState.toDims);
   renderMCIngredients(coeff);
@@ -224,8 +259,7 @@ function syncMCDims(side) {
   fields.forEach(f => {
     const el = document.getElementById(`mc${cap(side)}_${f}`);
     if (el) {
-      const key = f === 'diameter' ? 'd' : f === 'side' ? 'side' : f === 'length' ? 'l' : f === 'width' ? 'w' : 'h';
-      dims[key] = parseFloat(el.value) || 0;
+      dims[f] = parseFloat(el.value) || 0;
     }
   });
 }
@@ -242,17 +276,18 @@ function renderMCResult(vFrom, vTo, coeff) {
   const arrow = coeff > 1 ? '↑' : coeff < 1 ? '↓' : '=';
   const color = coeff > 1 ? 'var(--gold)' : coeff < 1 ? '#6366f1' : 'var(--success)';
 
-  // Round to nearest "nice" portion adjustment
   const portionLabel = coeff > 1
-    ? `Multipliez les quantités par <strong>${coeff.toFixed(3)}</strong>`
-    : `Réduisez les quantités par <strong>${(1/coeff).toFixed(3)}</strong>`;
+    ? `Multipliez toutes les quantités par <strong>${coeff.toFixed(3)}</strong>`
+    : coeff < 1
+      ? `Divisez toutes les quantités par <strong>${(1/coeff).toFixed(3)}</strong>`
+      : `Les quantités restent identiques`;
 
   panel.innerHTML = `
     <div class="mc-result-grid">
-
       <div class="mc-kpi">
         <div class="mc-kpi-label">Volume Initial</div>
         <div class="mc-kpi-value">${Math.round(vFrom)} cm³</div>
+        <div class="mc-kpi-sub">${(vFrom / 1000).toFixed(2)} L</div>
       </div>
 
       <div class="mc-kpi mc-kpi-main" style="border-color:${color};">
@@ -266,8 +301,8 @@ function renderMCResult(vFrom, vTo, coeff) {
       <div class="mc-kpi">
         <div class="mc-kpi-label">Nouveau Volume</div>
         <div class="mc-kpi-value">${Math.round(vTo)} cm³</div>
+        <div class="mc-kpi-sub">${(vTo / 1000).toFixed(2)} L</div>
       </div>
-
     </div>
 
     <div class="mc-instruction-box">
@@ -285,21 +320,20 @@ function renderMCSVG(shapeFrom, dimsFrom, shapeTo, dimsTo) {
   if (!container) return;
 
   const W = 520, H = 220;
-  const MAX_W = 180, MAX_H = 150;
+  const MAX_W = 180;
 
-  // Normalize sizes for visual representation
   function normShape(shape, dims) {
     switch (shape) {
       case 'cercle':
       case 'tarte':
       case 'verrine':
-        return { type: 'ellipse', w: (dims.d || 18), h: (dims.h || 4.5) };
+        return { type: 'ellipse', w: (dims.diameter || 18), h: (dims.height || 4.5) };
       case 'carre':
-        return { type: 'rect', w: (dims.side || 18), h: (dims.h || 4.5) };
+        return { type: 'rect', w: (dims.side || 18), h: (dims.height || 4.5) };
       case 'rectangle':
-        return { type: 'rect', w: (dims.l || 30), h: (dims.h || 4.5) };
+        return { type: 'rect', w: (dims.length || 30), h: (dims.height || 4.5) };
       case 'buche':
-        return { type: 'buche', w: (dims.l || 30), h: (dims.d || 8) };
+        return { type: 'buche', w: (dims.length || 30), h: (dims.diameter || 8) };
       default:
         return { type: 'rect', w: 20, h: 5 };
     }
@@ -308,77 +342,39 @@ function renderMCSVG(shapeFrom, dimsFrom, shapeTo, dimsTo) {
   const from = normShape(shapeFrom, dimsFrom);
   const to   = normShape(shapeTo, dimsTo);
 
-  // Scale to fit within MAX_W/MAX_H
   const maxDim = Math.max(from.w, to.w, from.h * 6, to.h * 6, 1);
   function scale(v)  { return (v / maxDim) * MAX_W; }
-  function scaleH(v) { return Math.max(20, (v / maxDim) * MAX_H * 2.5); }
+  function scaleH(v) { return Math.max(20, (v / maxDim) * 150 * 2.5); }
 
-  function drawShape(shape, x, y, color, label, dims) {
+  function drawShape(shape, x, y, color, label) {
     const sw = scale(shape.w);
     const sh = scaleH(shape.h);
     let svg = '';
-    const cx = x, cy = y - sh / 2;
 
-    // Top face (ellipse cap for 3D effect on circles)
     if (shape.type === 'ellipse') {
       const rx = sw / 2, ry = rx * 0.22;
-      // Side wall (darker)
-      svg += `<ellipse cx="${cx}" cy="${y}" rx="${rx}" ry="${ry}" fill="${color}" opacity="0.7"/>`;
-      // Cylinder body
-      svg += `
-        <path d="M ${cx - rx} ${y - sh} Q ${cx} ${y - sh - ry * 2} ${cx + rx} ${y - sh}
-                 L ${cx + rx} ${y}
-                 Q ${cx} ${y + ry * 2} ${cx - rx} ${y} Z"
-              fill="${color}" opacity="0.5"/>
-      `;
-      // Top cap
-      svg += `<ellipse cx="${cx}" cy="${y - sh}" rx="${rx}" ry="${ry}" fill="${color}" opacity="0.9" stroke="white" stroke-width="1"/>`;
+      svg += `<ellipse cx="${x}" cy="${y}" rx="${rx}" ry="${ry}" fill="${color}" opacity="0.7"/>`;
+      svg += `<path d="M ${x - rx} ${y - sh} Q ${x} ${y - sh - ry * 2} ${x + rx} ${y - sh}
+                 L ${x + rx} ${y} Q ${x} ${y + ry * 2} ${x - rx} ${y} Z" fill="${color}" opacity="0.5"/>`;
+      svg += `<ellipse cx="${x}" cy="${y - sh}" rx="${rx}" ry="${ry}" fill="${color}" opacity="0.9" stroke="white" stroke-width="1"/>`;
     } else if (shape.type === 'buche') {
       const rx = sw / 2, ry = Math.max(10, sh / 2);
-      // Half-cylinder (bûche shape)
-      svg += `
-        <path d="M ${cx - rx} ${y}
-                 A ${sw} ${ry} 0 0 1 ${cx + rx} ${y}
-                 L ${cx + rx} ${y - sh * 0.6}
-                 A ${sw} ${ry * 0.4} 0 0 0 ${cx - rx} ${y - sh * 0.6} Z"
-              fill="${color}" opacity="0.65"/>
-        <ellipse cx="${cx}" cy="${y - sh * 0.6}" rx="${rx}" ry="${ry * 0.4}" fill="${color}" opacity="0.9" stroke="white" stroke-width="1"/>
-      `;
+      svg += `<path d="M ${x - rx} ${y} A ${sw} ${ry} 0 0 1 ${x + rx} ${y}
+                 L ${x + rx} ${y - sh * 0.6} A ${sw} ${ry * 0.4} 0 0 0 ${x - rx} ${y - sh * 0.6} Z" fill="${color}" opacity="0.65"/>`;
+      svg += `<ellipse cx="${x}" cy="${y - sh * 0.6}" rx="${rx}" ry="${ry * 0.4}" fill="${color}" opacity="0.9" stroke="white" stroke-width="1"/>`;
     } else {
-      // Rectangle/square prism
-      const hw = sw / 2;
-      const perspective = 12;
-      svg += `
-        <!-- Front face -->
-        <rect x="${cx - hw}" y="${y - sh}" width="${sw}" height="${sh}" fill="${color}" opacity="0.6"/>
-        <!-- Top face with perspective -->
-        <path d="M ${cx - hw} ${y - sh}
-                 L ${cx - hw + perspective} ${y - sh - perspective * 0.5}
-                 L ${cx + hw + perspective} ${y - sh - perspective * 0.5}
-                 L ${cx + hw} ${y - sh} Z"
-              fill="${color}" opacity="0.9"/>
-        <!-- Right face -->
-        <path d="M ${cx + hw} ${y - sh}
-                 L ${cx + hw + perspective} ${y - sh - perspective * 0.5}
-                 L ${cx + hw + perspective} ${y - perspective * 0.5}
-                 L ${cx + hw} ${y} Z"
-              fill="${color}" opacity="0.4"/>
-        <rect x="${cx - hw}" y="${y - sh}" width="${sw}" height="${sh}" fill="none" stroke="white" stroke-width="1" opacity="0.6"/>
-      `;
+      const hw = sw / 2, p = 12;
+      svg += `<rect x="${x - hw}" y="${y - sh}" width="${sw}" height="${sh}" fill="${color}" opacity="0.6"/>`;
+      svg += `<path d="M ${x - hw} ${y - sh} L ${x - hw + p} ${y - sh - p * 0.5} L ${x + hw + p} ${y - sh - p * 0.5} L ${x + hw} ${y - sh} Z" fill="${color}" opacity="0.9"/>`;
+      svg += `<path d="M ${x + hw} ${y - sh} L ${x + hw + p} ${y - sh - p * 0.5} L ${x + hw + p} ${y - p * 0.5} L ${x + hw} ${y} Z" fill="${color}" opacity="0.4"/>`;
+      svg += `<rect x="${x - hw}" y="${y - sh}" width="${sw}" height="${sh}" fill="none" stroke="white" stroke-width="1" opacity="0.6"/>`;
     }
 
-    // Size label below
-    svg += `
-      <text x="${cx}" y="${y + 20}" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="var(--text-muted)">${label}</text>
-    `;
+    svg += `<text x="${x}" y="${y + 20}" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="var(--text-muted)">${label}</text>`;
     return svg;
   }
 
-  // Positions
-  const yBase = H - 30;
-  const x1 = W * 0.27;
-  const x2 = W * 0.73;
-
+  const yBase = H - 30, x1 = W * 0.27, x2 = W * 0.73;
   const fromLabel = buildLabel(shapeFrom, dimsFrom);
   const toLabel   = buildLabel(shapeTo,   dimsTo);
   const coeff     = mcState.coefficient;
@@ -386,41 +382,29 @@ function renderMCSVG(shapeFrom, dimsFrom, shapeTo, dimsTo) {
 
   const svgContent = `
     <svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">
-      <!-- Background grid -->
       <defs>
         <pattern id="mcGrid" width="20" height="20" patternUnits="userSpaceOnUse">
           <path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(197,165,90,0.06)" stroke-width="1"/>
         </pattern>
-      </defs>
-      <rect width="${W}" height="${H}" fill="url(#mcGrid)" rx="12"/>
-
-      <!-- FROM label -->
-      <text x="${x1}" y="22" text-anchor="middle" font-family="Playfair Display, serif" font-size="13" font-weight="700" fill="var(--text)">Moule initial</text>
-
-      <!-- Mold FROM -->
-      ${drawShape(normShape(shapeFrom, dimsFrom), x1, yBase - 10, '#8B5E3C', fromLabel, dimsFrom)}
-
-      <!-- Arrow with coefficient -->
-      <line x1="${x1 + 40}" y1="${yBase - 50}" x2="${x2 - 40}" y2="${yBase - 50}" 
-            stroke="${arrowColor}" stroke-width="2.5" stroke-dasharray="6,3" marker-end="url(#arrowHead)"/>
-      <defs>
         <marker id="arrowHead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
           <polygon points="0 0, 10 3.5, 0 7" fill="${arrowColor}"/>
         </marker>
       </defs>
+      <rect width="${W}" height="${H}" fill="url(#mcGrid)" rx="12"/>
 
-      <!-- Coefficient badge -->
+      <text x="${x1}" y="22" text-anchor="middle" font-family="Playfair Display, serif" font-size="13" font-weight="700" fill="var(--text)">Moule initial</text>
+      ${drawShape(from, x1, yBase - 10, '#8B5E3C', fromLabel)}
+
+      <line x1="${x1 + 40}" y1="${yBase - 50}" x2="${x2 - 40}" y2="${yBase - 50}"
+            stroke="${arrowColor}" stroke-width="2.5" stroke-dasharray="6,3" marker-end="url(#arrowHead)"/>
+
       <rect x="${W/2 - 32}" y="${yBase - 72}" width="64" height="26" rx="13" fill="${arrowColor}" opacity="0.15"/>
       <text x="${W/2}" y="${yBase - 54}" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="800" fill="${arrowColor}">
         × ${coeff.toFixed(2)}
       </text>
 
-      <!-- TO label -->
       <text x="${x2}" y="22" text-anchor="middle" font-family="Playfair Display, serif" font-size="13" font-weight="700" fill="var(--text)">Nouveau moule</text>
-
-      <!-- Mold TO -->
-      ${drawShape(normShape(shapeTo, dimsTo), x2, yBase - 10, '#C5A55A', toLabel, dimsTo)}
-
+      ${drawShape(to, x2, yBase - 10, '#C5A55A', toLabel)}
     </svg>
   `;
 
@@ -431,10 +415,10 @@ function buildLabel(shape, dims) {
   switch (shape) {
     case 'cercle':
     case 'tarte':
-    case 'verrine': return `Ø${dims.d || '?'}cm × H${dims.h || '?'}cm`;
-    case 'carre':   return `${dims.side || '?'}×${dims.side || '?'}cm × H${dims.h || '?'}cm`;
-    case 'rectangle': return `${dims.l || '?'}×${dims.w || '?'}cm × H${dims.h || '?'}cm`;
-    case 'buche':   return `L${dims.l || '?'}cm × Ø${dims.d || '?'}cm`;
+    case 'verrine': return `Ø${dims.diameter || '?'}cm × H${dims.height || '?'}cm`;
+    case 'carre':   return `${dims.side || '?'}×${dims.side || '?'}cm × H${dims.height || '?'}cm`;
+    case 'rectangle': return `${dims.length || '?'}×${dims.width || '?'}cm × H${dims.height || '?'}cm`;
+    case 'buche':   return `L${dims.length || '?'}cm × Ø${dims.diameter || '?'}cm`;
     default:        return '';
   }
 }
@@ -449,7 +433,6 @@ function renderMCIngredients(coeff) {
 
   const idx = mcState.linkedRecipeIdx;
 
-  // If no recipe linked, show placeholder
   if (idx === null || idx === undefined || idx === '') {
     const savedRecipes = (typeof APP !== 'undefined' && APP.savedRecipes) ? APP.savedRecipes : [];
     if (savedRecipes.length === 0) {
@@ -479,8 +462,8 @@ function renderMCIngredients(coeff) {
     const origQty  = parseFloat(ing.quantity) || 0;
     const newQty   = origQty * coeff;
     const isUp     = newQty > origQty;
-    const diffPct  = Math.abs(((newQty - origQty) / (origQty || 1)) * 100).toFixed(0);
-    const arrow    = isUp ? '↑' : '↓';
+    const diffPct  = origQty > 0 ? Math.abs(((newQty - origQty) / origQty) * 100).toFixed(0) : '0';
+    const arrow    = isUp ? '↑' : newQty < origQty ? '↓' : '=';
     const arrowCls = isUp ? 'mc-ing-up' : 'mc-ing-down';
 
     return `
@@ -496,21 +479,15 @@ function renderMCIngredients(coeff) {
     `;
   }).join('');
 
-  // Cost impact
+  // Cost impact — use the REAL calcIngredientCost from app.js
   let oldCost = 0, newCost = 0;
-  recipe.ingredients.forEach(ing => {
-    const dbItem = (typeof APP !== 'undefined' && APP.ingredientDb)
-      ? APP.ingredientDb.find(d => d.name.toLowerCase() === ing.name.toLowerCase())
-      : null;
-    if (dbItem) {
-      const qty = parseFloat(ing.quantity) || 0;
-      const ppu = dbItem.pricePerUnit || 0;
-      const unit = (ing.unit || 'g').toLowerCase();
-      const factor = (unit === 'kg' || unit === 'l') ? 1 : 0.001;
-      oldCost += qty * factor * ppu;
-      newCost += qty * coeff * factor * ppu;
-    }
-  });
+  if (typeof calcIngredientCost === 'function') {
+    recipe.ingredients.forEach(ing => {
+      const origCost = calcIngredientCost(ing);
+      oldCost += origCost;
+      newCost += origCost * coeff;
+    });
+  }
 
   const costRow = (oldCost > 0) ? `
     <div class="mc-cost-summary">
@@ -604,6 +581,28 @@ function getIngredientIcon(name) {
   return '🥄';
 }
 window.getIngredientIcon = getIngredientIcon;
+
+// Inject tart preset button styles
+(function injectMCExtras() {
+  if (document.getElementById('mcExtrasCSS')) return;
+  const s = document.createElement('style');
+  s.id = 'mcExtrasCSS';
+  s.textContent = `
+    .mc-tart-presets { margin-top: 0.8rem; }
+    .mc-tart-presets-label { font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.4rem; }
+    .mc-tart-presets-btns { display: flex; flex-wrap: wrap; gap: 5px; }
+    .mc-tart-btn {
+      padding: 4px 10px; font-size: 0.78rem; font-weight: 700;
+      border: 1.5px solid var(--surface-border, #ddd); border-radius: 8px;
+      background: var(--surface, #fff); color: var(--text-secondary);
+      cursor: pointer; transition: all 0.15s;
+    }
+    .mc-tart-btn:hover { border-color: var(--gold, #C5A55A); color: var(--gold); background: rgba(197,165,90,0.06); }
+    .mc-tart-btn.active { border-color: var(--gold, #C5A55A); background: var(--gold, #C5A55A); color: #fff; }
+  `;
+  document.head.appendChild(s);
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => {});
+})();
 
 // Global event bindings
 window.mcChangeFromShape = mcChangeFromShape;

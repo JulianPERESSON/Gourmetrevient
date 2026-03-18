@@ -257,11 +257,15 @@ function renderBCGMatrix(isUpdate = false) {
         ? window.calcFullCost(r.margin || 70, r)
         : (r.costs || r.data);
         
-    const margin = costObj?.marginPct || 70;
+    let margin = costObj?.marginPct || 70;
     
     // Stable "random" popularity based on name to prevent jumpy animation
     const seed = r.name.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    const popularity = 10 + ((seed * 7) % 80); 
+    const popularity = 10 + ((seed * 7) % 80);
+    
+    // Nuance de la marge pour éviter que toutes les recettes s'alignent parfaitement sur un même axe horizontal
+    const marginOffset = ((seed * 11) % 120) / 10 - 6; // Oscille entre -6.0 et +6.0
+    margin += marginOffset;
     
     let quadrant = '';
     let color = '';

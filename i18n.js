@@ -48,7 +48,15 @@ const TRANSLATIONS = {
 
         // Navigation
         'nav.category.atelier': "👨‍🍳 L'Atelier",
-        'nav.category.mgmt': "📈 Pilotage",
+        'nav.category.mgmt': "🏢 Gestion & Hub",
+        'mgmt.tab.scheduler': '🎓 Ordonnanceur CAP',
+        'scheduler.title': 'Ordonnanceur Tactique CAP',
+        'scheduler.desc': 'Générez un plan de travail optimisé sans temps mort pour vos examens EP1 et EP2.',
+        'scheduler.choose_exam': '1. Choisissez votre épreuve',
+        'scheduler.choose_recipes': '2. Sélectionnez vos sujets (3 conseillés)',
+        'scheduler.btn_generate': '🚀 Générer mon Chronogramme',
+        'scheduler.ep1': 'EP1: Tour & Gâteaux de voyage',
+        'scheduler.ep2': 'EP2: Entremets & Choux',
         'nav.category.org': "📋 Organisation",
         'nav.category.showcase': "✨ Vitrine",
         'nav.home': 'Accueil',
@@ -78,7 +86,7 @@ const TRANSLATIONS = {
 
         // Gestion Pro (Management)
         'mgmt.hero.badge': '💎 Excellence Opérationnelle',
-        'mgmt.hero.title': 'Pilotage Expert & Rentabilité',
+        'mgmt.hero.title': 'Gestion Experte & Rentabilité',
         'mgmt.hero.desc': 'Optimisez vos besoins matières, surveillez vos allergènes et traquez vos pertes réelles.',
         'mgmt.tabs.shopping': '🛒 Liste de Courses',
         'mgmt.tabs.allergens': '🛡️ Matrice Allergènes',
@@ -261,7 +269,7 @@ const TRANSLATIONS = {
         'dash.kpi.school': '1 À L\'ÉCOLE',
         'dash.kpi.alerts': 'Alertes',
         'dash.kpi.todo': 'À VOIR',
-        'dash.col.prod': 'Pilotage Production',
+        'dash.col.prod': 'Suivi Production',
         'dash.col.biz': 'Performance Business',
         'dash.col.ai': 'Assistant du Chef',
         'dash.col.logistics': 'Goulots Logistiques',

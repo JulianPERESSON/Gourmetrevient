@@ -216,7 +216,7 @@
 
       <!-- Opérations Labo -->
       <div class="nav-dropdown">
-        <button class="nav-dropdown-trigger">⚙️ <span data-i18n="nav.category.mgmt">Gestion & Labo</span> <span class="nav-arrow">▼</span></button>
+        <button class="nav-dropdown-trigger"><span data-i18n="nav.category.mgmt">Gestion & Labo</span> <span class="nav-arrow">▼</span></button>
         <div class="nav-dropdown-content">
           <button class="nav-link nav-dropdown-link" onclick="showMgmt(); switchMgmtTab('production');">📅 <span data-i18n="nav.planning">Planning Prod</span></button>
           <button class="nav-link nav-dropdown-link" id="navPlanning" onclick="showPlanning()">👥 Équipe & Congés</button>
@@ -225,15 +225,16 @@
           <button class="nav-link nav-dropdown-link" onclick="showSuppliers()">🚚 <span data-i18n="nav.suppliers">Fournisseurs</span></button>
           <button class="nav-link nav-dropdown-link" onclick="showHygiene()">🧼 <span data-i18n="nav.hygiene">Hygiène (HACCP)</span></button>
           <button class="nav-link nav-dropdown-link" onclick="showMgmt(); switchMgmtTab('quality');">🛡️ Pertes & Traçabilité</button>
+          <button class="nav-link nav-dropdown-link" onclick="showMgmt(); switchMgmtTab('scheduler');">🎓 Ordonnanceur CAP (EP1/EP2)</button>
         </div>
       </div>
 
-      <!-- Pilotage Financier -->
+      <!-- Performance & Analyse -->
       <div class="nav-dropdown">
-        <button class="nav-dropdown-trigger">📈 <span>Pilotage Financier</span> <span class="nav-arrow">▼</span></button>
+        <button class="nav-dropdown-trigger">📊 <span>Analyse & Performance</span> <span class="nav-arrow">▼</span></button>
         <div class="nav-dropdown-content">
           <button class="nav-link nav-dropdown-link" onclick="showStats()">📊 <span data-i18n="nav.stats">Statistiques</span></button>
-          <button class="nav-link nav-dropdown-link" onclick="showMgmt(); switchMgmtTab('dashboard');">🎯 Pilotage & Objectifs</button>
+          <button class="nav-link nav-dropdown-link" onclick="showMgmt(); switchMgmtTab('dashboard');">🎯 Objectifs & Hub</button>
           <button class="nav-link nav-dropdown-link" onclick="showMgmt(); switchMgmtTab('boston');">⭐ <span data-i18n="bcg.title">Matrice BCG</span></button>
           <button class="nav-link nav-dropdown-link" onclick="showMgmt(); switchMgmtTab('inflation');">🔥 Simulateur Inflation</button>
         </div>
@@ -514,8 +515,8 @@
       <!-- Standard Site Hero -->
       <section class="hero" style="padding-bottom: 3.5rem;">
         <div class="hero-badge" data-i18n="mgmt.hero.badge">💎 Excellence Opérationnelle</div>
-        <h2 data-i18n="mgmt.hero.title">Pilotage <span class="accent">&amp; Rentabilité</span></h2>
-        <p data-i18n="mgmt.hero.desc">Optimisez vos besoins matières, surveillez vos allergènes, traquez vos pertes et pilotez vos objectifs de coût.</p>
+        <h2 data-i18n="mgmt.hero.title">Gestion <span class="accent">&amp; Rentabilité</span></h2>
+        <p data-i18n="mgmt.hero.desc">Optimisez vos besoins matières, surveillez vos allergènes, traquez vos pertes et suivez vos objectifs de coût.</p>
       </section>
 
       <div class="mgmt-container hero-mgmt-overlap">
@@ -547,7 +548,7 @@
         <div class="mgmt-tabs-premium">
           <button class="mgmt-tab-pill active" id="mgmtTabDashboard" onclick="switchMgmtTab('dashboard')">
             <span class="tab-pill-emoji">🎯</span>
-            <span data-i18n="mgmt.tab.dashboard">Objectifs & Pilotage</span>
+            <span data-i18n="mgmt.tab.dashboard">Objectifs & Hub</span>
           </button>
           <button class="mgmt-tab-pill" id="mgmtTabProduction" onclick="switchMgmtTab('production')">
             <span class="tab-pill-emoji">📅</span>
@@ -564,6 +565,10 @@
           <button class="mgmt-tab-pill" id="mgmtTabProTools" onclick="switchMgmtTab('protools')">
             <span class="tab-pill-emoji">🛠️</span>
             <span data-i18n="mgmt.tab.protools">Outils Pro (INCO/OCR)</span>
+          </button>
+          <button class="mgmt-tab-pill" id="mgmtTabScheduler" onclick="switchMgmtTab('scheduler')">
+            <span class="tab-pill-emoji">🎓</span>
+            <span data-i18n="mgmt.tab.scheduler">Ordonnanceur CAP</span>
           </button>
         </div>
 
@@ -659,7 +664,7 @@
                     Ce montant correspond au moment exact où votre laboratoire commence à gagner de l'argent (bénéfice net > 0). Ce calcul est basé sur la moyenne de marge de vos recettes.
                   </p>
                   
-                  <button class="btn btn-sm btn-outline btn-full" onclick="switchMgmtTab('dashboard_config')" style="margin-top: 1.5rem;">⚙️ Configurer mes charges fixes</button>
+                  <button class="btn btn-sm btn-outline btn-full" onclick="switchMgmtTab('dashboard_config')" style="margin-top: 1.5rem;">🛠️ Configurer mes charges fixes</button>
                 </div>
             </div>
           </div>
@@ -760,6 +765,53 @@
                 <div class="mgmt-export-actions">
                   <button class="btn btn-sm btn-outline" onclick="exportShoppingCSV()" data-i18n="mgmt.shopping.export_csv">📁 CSV</button>
                   <button class="btn btn-sm btn-primary" onclick="window.print()" data-i18n="ui.btn.print">🖨️ Imprimer</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB: SCHEDULER -->
+        <div id="mgmtViewScheduler" class="mgmt-view" style="display:none;">
+          <div class="mgmt-glass-card">
+            <div class="mgmt-card-header">
+              <div class="mgmt-card-title">
+                <div class="title-icon icon-gold">🎓</div>
+                <div>
+                  <h3 data-i18n="scheduler.title">Ordonnanceur Tactique CAP</h3>
+                  <p data-i18n="scheduler.desc">Générez un plan de travail optimisé pour vos examens EP1 et EP2.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="scheduler-config-grid" style="margin-top: 1.5rem;">
+              <div class="scheduler-setup">
+                <h4 data-i18n="scheduler.choose_exam">1. Choisissez votre épreuve</h4>
+                <div class="exam-type-selectors" style="display: flex; gap: 1rem; margin: 1rem 0;">
+                  <label class="stats-toggle-btn">
+                    <input type="radio" name="examType" value="EP1" onchange="switchExamType('EP1')" checked style="display:none;">
+                    <span data-i18n="scheduler.ep1">EP1: Tour & Gâteaux de voyage</span>
+                  </label>
+                  <label class="stats-toggle-btn">
+                    <input type="radio" name="examType" value="EP2" onchange="switchExamType('EP2')" style="display:none;">
+                    <span data-i18n="scheduler.ep2">EP2: Entremets & Choux</span>
+                  </label>
+                </div>
+
+                <h4 data-i18n="scheduler.choose_recipes" style="margin-top:2rem;">2. Sélectionnez vos sujets</h4>
+                <div id="schedulerRecipeList" class="scheduler-recipe-list">
+                  <!-- Populated by JS -->
+                </div>
+
+                <button class="btn btn-primary btn-full" style="margin-top: 1.5rem;" onclick="generateSchedule()" data-i18n="scheduler.btn_generate">
+                  🚀 Générer mon Chronogramme
+                </button>
+              </div>
+
+              <div id="schedulerResult" style="margin-top:2rem;">
+                <div class="empty-state" style="text-align:center; color:var(--text-muted); padding:4rem 0;">
+                  <div style="font-size:3rem; margin-bottom:1rem;">📋</div>
+                  <p>Sélectionnez vos recettes puis cliquez sur « Générer » pour voir le chronogramme Gantt.</p>
                 </div>
               </div>
             </div>
@@ -2922,6 +2974,7 @@
   </div>
 
   <!-- Scripts moved to end of body for reliability -->
+  <script src="./exam-scheduler.js"></script>
 
   <script>
     // Simple logic to switch between Hub, Recettes, and Lab
@@ -3184,6 +3237,12 @@
         if (prodBtn) prodBtn.classList.add('active');
         if (typeof renderProductionPlan === 'function') renderProductionPlan();
       }
+      else if (tab === 'scheduler') {
+        document.getElementById('mgmtViewScheduler').style.display = 'block';
+        const schedulerBtn = document.getElementById('mgmtTabScheduler');
+        if (schedulerBtn) schedulerBtn.classList.add('active');
+        if (typeof switchExamType === 'function') switchExamType('EP1');
+      }
       else if (tab === 'quality') {
         document.getElementById('mgmtViewWaste').style.display = 'block';
         document.getElementById('mgmtViewAllergens').style.display = 'block';
@@ -3349,16 +3408,16 @@
       <span class="label" data-i18n="nav.category.atelier">Atelier</span>
     </button>
     <button class="mobile-nav-item" id="mNavPilotage">
-      <span class="icon">📈</span>
-      <span class="label" data-i18n="nav.category.mgmt">Pilotage</span>
+      <span class="icon">🏢</span>
+      <span class="label" data-i18n="nav.category.mgmt">Gestion</span>
     </button>
     <button class="mobile-nav-item" id="mNavCatalogue">
       <span class="icon">🖼️</span>
       <span class="label" data-i18n="nav.portfolio">Portfolio</span>
     </button>
     <button class="mobile-nav-item" id="mNavMore">
-      <span class="icon">⚙️</span>
-      <span class="label">Réglages</span>
+      <span class="icon">🛠️</span>
+      <span class="label">Outils</span>
     </button>
   </nav>
 
@@ -3395,9 +3454,9 @@
           { id: 'mLinkPlanning', icon: '📅', label: 'nav.planning', action: showPlanning }
         ];
       } else if (category === 'pilotage') {
-        moreMenuTitle.textContent = "📈 Pilotage";
+        moreMenuTitle.textContent = "🏢 Gestion & Hub";
         items = [
-          { id: 'mLinkMgmt', icon: '⚙️', label: 'nav.mgmt', action: showMgmt },
+          { id: 'mLinkMgmt', icon: '🏢', label: 'nav.mgmt', action: showMgmt },
           { id: 'mLinkStats', icon: '📊', label: 'nav.stats', action: showStats },
           { id: 'mLinkInv', icon: '📦', label: 'nav.inventory', action: showInventaire }
         ];

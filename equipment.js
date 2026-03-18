@@ -136,7 +136,7 @@ window.EQUIPMENT_DB = [
         ]
     },
     {
-        id: 'robot-coupe', name: 'Robot Coupe / Cutter', category: 'machines', sub: 'Robots', icon: '⚙️', essential: true, tiers: [
+        id: 'robot-coupe', name: 'Robot Coupe / Cutter', category: 'machines', sub: 'Robots', icon: '🌪️', essential: true, tiers: [
             { level: 'Eco', brand: 'Moulinex', model: 'Home', price: 145 },
             { level: 'Standard', brand: 'Magimix', model: '3200XL', price: 280 },
             { level: 'Pro', brand: 'Robot Coupe', model: 'R 201 XL', price: 480 },

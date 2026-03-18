@@ -3227,7 +3227,7 @@ function renderInventory() {
         </td>
         <td style="text-align:center;"><span class="badge ${statusClass}">${statusLabel}</span></td>
         <td style="text-align:center;">
-          <button class="btn btn-sm btn-outline btn-round" onclick="editInventoryItem('${item.id}')" title="Seuil d'alerte">⚙️</button>
+          <button class="btn btn-sm btn-outline btn-round" onclick="editInventoryItem('${item.id}')" title="Seuil d'alerte">🔔</button>
         </td>
       </tr>
     `;
@@ -3600,7 +3600,7 @@ function renderTeam() {
       </div>
       <div class="member-actions-group">
         ${canRemove ? `
-          <button class="action-btn edit-btn" onclick="editMemberRole('${m.id}')" title="${t('plan.team.assign_role')}">⚙️</button>
+          <button class="action-btn edit-btn" onclick="editMemberRole('${m.id}')" title="${t('plan.team.assign_role')}">✏️</button>
           <button class="action-btn remove-btn" onclick="removeTeamMember('${m.id}')" title="${t('ui.btn.delete')}">✕</button>
         ` : ''}
       </div>
@@ -5144,7 +5144,7 @@ function renderAdminUsers() {
           </span>
         </td>
         <td style="padding:1rem; text-align:right; display:flex; gap:0.5rem; justify-content:flex-end;">
-          <button class="btn btn-sm btn-outline" onclick="openAdminModeration('${key}')">⚙️ ${t('nav.admin') === 'Admin' ? 'Moderate' : (t('nav.admin') === 'Admin' ? 'Moderar' : 'Modérer')}</button>
+          <button class="btn btn-sm btn-outline" onclick="openAdminModeration('${key}')">🛡️ ${t('nav.admin') === 'Admin' ? 'Moderate' : (t('nav.admin') === 'Admin' ? 'Moderar' : 'Modérer')}</button>
           ${key.toLowerCase() !== 'ju' ?
         `<button class="btn btn-sm btn-outline" style="color:var(--danger); border-color:var(--danger);" onclick="deleteUser('${key}')">🗑️</button>` :
         '<small style="color:var(--text-muted); padding:0 0.5rem;">Admin</small>'}
@@ -6015,7 +6015,7 @@ $('#omniSearchInput').addEventListener('input', (e) => {
     { title: t('nav.hygiene') || 'Hygiène & HACCP', desc: 'Relevés de température et traçabilité', icon: '🧼', action: () => $('#navHygiene').click() },
     { title: t('nav.inventory') || 'Inventaire', desc: 'Gérer les stocks et alertes', icon: '📦', action: () => $('#navInventaire').click() },
     { title: t('nav.suppliers') || 'Fournisseurs', desc: 'Consulter la liste des fournisseurs', icon: '🚚', action: () => $('#navSuppliers').click() },
-    { title: t('nav.mgmt') || 'Gestion Pro', desc: 'Planning de production et suivi des pertes', icon: '⚙️', action: () => $('#navMgmt').click() }
+    { title: t('nav.mgmt') || 'Gestion Pro', desc: 'Planning de production et suivi des pertes', icon: '🏢', action: () => $('#navMgmt').click() }
   ];
 
   modules.forEach(m => {
