@@ -218,10 +218,10 @@
       <div class="nav-dropdown">
         <button class="nav-dropdown-trigger">⚙️ <span data-i18n="nav.category.mgmt">Gestion & Labo</span> <span class="nav-arrow">▼</span></button>
         <div class="nav-dropdown-content">
-          <button class="nav-link nav-dropdown-link" id="navPlanning">📅 <span data-i18n="nav.planning">Planning Prod</span></button>
-          <button class="nav-link nav-dropdown-link" id="navInventaire" onclick="showInventaire()">📦 <span data-i18n="nav.inventory">Stocks & Achat</span></button>
-          <button class="nav-link nav-dropdown-link" id="navSuppliers" onclick="showSuppliers()">🚚 <span data-i18n="nav.suppliers">Fournisseurs</span></button>
-          <button class="nav-link nav-dropdown-link" id="navHygiene">🧼 <span data-i18n="nav.hygiene">Hygiène (HACCP)</span></button>
+          <button class="nav-link nav-dropdown-link" onclick="showMgmt(); switchMgmtTab('production');">📅 <span data-i18n="nav.planning">Planning Prod</span></button>
+          <button class="nav-link nav-dropdown-link" onclick="showMgmt(); switchMgmtTab('shopping');">📦 <span data-i18n="nav.inventory">Stocks & Achat</span></button>
+          <button class="nav-link nav-dropdown-link" onclick="showSuppliers()">🚚 <span data-i18n="nav.suppliers">Fournisseurs</span></button>
+          <button class="nav-link nav-dropdown-link" onclick="showHygiene()">🧼 <span data-i18n="nav.hygiene">Hygiène (HACCP)</span></button>
           <button class="nav-link nav-dropdown-link" onclick="showMgmt(); switchMgmtTab('quality');">🛡️ Pertes & Traçabilité</button>
         </div>
       </div>
@@ -230,8 +230,8 @@
       <div class="nav-dropdown">
         <button class="nav-dropdown-trigger">📈 <span>Pilotage Financier</span> <span class="nav-arrow">▼</span></button>
         <div class="nav-dropdown-content">
-          <button class="nav-link nav-dropdown-link" id="navStats" onclick="showStats()">📊 <span data-i18n="nav.stats">Statistiques</span></button>
-          <button class="nav-link nav-dropdown-link" id="navMgmt" onclick="showMgmt()">🎯 Pilotage & Objectifs</button>
+          <button class="nav-link nav-dropdown-link" onclick="showStats()">📊 <span data-i18n="nav.stats">Statistiques</span></button>
+          <button class="nav-link nav-dropdown-link" onclick="showMgmt(); switchMgmtTab('dashboard');">🎯 Pilotage & Objectifs</button>
           <button class="nav-link nav-dropdown-link" onclick="showMgmt(); switchMgmtTab('boston');">⭐ <span data-i18n="bcg.title">Matrice BCG</span></button>
           <button class="nav-link nav-dropdown-link" onclick="showMgmt(); switchMgmtTab('inflation');">🔥 Simulateur Inflation</button>
         </div>
@@ -244,8 +244,8 @@
           <button class="nav-link nav-dropdown-link" onclick="openChefsBrain()">🧠 Chef's Brain</button>
           <button class="nav-link nav-dropdown-link" onclick="openAssemblySimulator()">🏗️ Simulateur Montage</button>
           <button class="nav-link nav-dropdown-link" onclick="openMasterConverter()">📏 Master Converter</button>
-          <button class="nav-link nav-dropdown-link" id="navLabo">📐 Matériel & Outillage</button>
-          <button class="nav-link nav-dropdown-link" id="navPortfolio">🖼️ <span data-i18n="nav.portfolio">Portfolio</span></button>
+          <button class="nav-link nav-dropdown-link" onclick="showLabo()">📐 Matériel & Outillage</button>
+          <button class="nav-link nav-dropdown-link" onclick="showPortfolio()">🖼️ <span data-i18n="nav.portfolio">Portfolio</span></button>
         </div>
       </div>
 
@@ -2969,14 +2969,14 @@
       if (appSuppliers) appSuppliers.style.display = 'none';
       if (appStats) appStats.style.display = 'none';
 
-      navHub.classList.remove('active');
-      navRec.classList.remove('active');
-      navLab.classList.remove('active');
-      navAPropos.classList.remove('active');
-      navPortfolio.classList.remove('active');
-      navPlanning.classList.remove('active');
-      navAdmin.classList.remove('active');
-      navHygiene.classList.remove('active');
+      if (navHub) navHub.classList.remove('active');
+      if (navRec) navRec.classList.remove('active');
+      if (navLab) navLab.classList.remove('active');
+      if (navAPropos) navAPropos.classList.remove('active');
+      if (navPortfolio) navPortfolio.classList.remove('active');
+      if (navPlanning) navPlanning.classList.remove('active');
+      if (navAdmin) navAdmin.classList.remove('active');
+      if (navHygiene) navHygiene.classList.remove('active');
       if (navMgmt) navMgmt.classList.remove('active');
 
       const navSuppliers = document.getElementById('navSuppliers');
@@ -2999,7 +2999,7 @@
       hideAllApps();
       hubSec.style.display = 'block';
       mainNav.style.display = 'flex';
-      navHub.classList.add('active');
+      if (navHub) navHub.classList.add('active');
       if (typeof updateRandomTip === 'function') updateRandomTip();
       if (typeof updateDashStats === 'function') updateDashStats();
       if (typeof renderRecentRecipes === 'function') renderRecentRecipes();
@@ -3009,7 +3009,7 @@
       hideAllApps();
       recApp.style.display = 'block';
       mainNav.style.display = 'flex';
-      navRec.classList.add('active');
+      if (navRec) navRec.classList.add('active');
       if (typeof renderLibraryRecipes === 'function') renderLibraryRecipes();
       if (typeof updateRandomTip === 'function') updateRandomTip();
     }
@@ -3017,7 +3017,7 @@
       hideAllApps();
       labApp.style.display = 'block';
       mainNav.style.display = 'flex';
-      navLab.classList.add('active');
+      if (navLab) navLab.classList.add('active');
       setTimeout(() => { if (typeof resizePlan2D === 'function') resizePlan2D(); }, 100);
       if (typeof updateRandomTip === 'function') updateRandomTip();
     }
@@ -3025,14 +3025,14 @@
       hideAllApps();
       appAPropos.style.display = 'block';
       mainNav.style.display = 'flex';
-      navAPropos.classList.add('active');
+      if (navAPropos) navAPropos.classList.add('active');
       if (typeof updateRandomTip === 'function') updateRandomTip();
     }
     function showHygiene() {
       hideAllApps();
       appHygiene.style.display = 'block';
       mainNav.style.display = 'flex';
-      navHygiene.classList.add('active');
+      if (navHygiene) navHygiene.classList.add('active');
       if (typeof renderHygiene === 'function') renderHygiene();
       if (typeof updateRandomTip === 'function') updateRandomTip();
     }
@@ -3041,7 +3041,7 @@
       hideAllApps();
       appPortfolio.style.display = 'block';
       mainNav.style.display = 'flex';
-      navPortfolio.classList.add('active');
+      if (navPortfolio) navPortfolio.classList.add('active');
       if (typeof renderPortfolio === 'function') renderPortfolio();
       if (typeof updateRandomTip === 'function') updateRandomTip();
     }
@@ -3050,7 +3050,7 @@
       hideAllApps();
       appPlanning.style.display = 'block';
       mainNav.style.display = 'flex';
-      navPlanning.classList.add('active');
+      if (navPlanning) navPlanning.classList.add('active');
       if (typeof updateRandomTip === 'function') updateRandomTip();
       if (typeof renderTeam === 'function') renderTeam();
       if (typeof renderLeaves === 'function') renderLeaves();
@@ -3068,7 +3068,7 @@
       hideAllApps();
       appAdmin.style.display = 'block';
       mainNav.style.display = 'flex';
-      navAdmin.classList.add('active');
+      if (navAdmin) navAdmin.classList.add('active');
       if (typeof renderAdminUsers === 'function') renderAdminUsers();
       if (typeof updateRandomTip === 'function') updateRandomTip();
     }
