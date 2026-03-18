@@ -208,44 +208,48 @@
     <div class="header-nav" id="mainNav" style="display:none; align-items:center; flex: 1; gap: 0.2rem;">
       <button class="nav-link" id="navOmniSearch" title="Recherche Spotlight (Ctrl+K)"
         style="color: var(--accent); font-size: 1.1rem; padding: 0.3rem 0.6rem;">🔍</button>
-      <button class="nav-link" id="navHub"><span data-i18n="nav.home">Accueil</span></button>
+      <!-- Cockpit -->
+      <button class="nav-link" id="navHub">🏠 <span data-i18n="nav.home">Cockpit</span></button>
 
-      <!-- L'Atelier -->
+      <!-- Recettes -->
+      <button class="nav-link" id="navRecettes">📖 <span data-i18n="nav.recipes">Recettes</span></button>
+
+      <!-- Opérations Labo -->
       <div class="nav-dropdown">
-        <button class="nav-dropdown-trigger"><span data-i18n="nav.category.atelier">👨‍🍳 L'Atelier</span> <span class="nav-arrow">▼</span></button>
+        <button class="nav-dropdown-trigger">⚙️ <span data-i18n="nav.category.mgmt">Gestion & Labo</span> <span class="nav-arrow">▼</span></button>
         <div class="nav-dropdown-content">
-          <button class="nav-link nav-dropdown-link" id="navRecettes">📖 <span data-i18n="nav.recipes">Recettes</span></button>
-          <button class="nav-link nav-dropdown-link" id="navLabo">📐 <span data-i18n="nav.lab">Laboratoire</span></button>
-          <button class="nav-link nav-dropdown-link" id="navHygiene">🧼 <span data-i18n="nav.hygiene">Hygiène & HACCP</span></button>
-          <button class="nav-link nav-dropdown-link" id="navPlanning">📅 <span data-i18n="nav.planning">Planning</span></button>
+          <button class="nav-link nav-dropdown-link" id="navPlanning">📅 <span data-i18n="nav.planning">Planning Prod</span></button>
+          <button class="nav-link nav-dropdown-link" id="navInventaire" onclick="showInventaire()">📦 <span data-i18n="nav.inventory">Stocks & Achat</span></button>
+          <button class="nav-link nav-dropdown-link" id="navSuppliers" onclick="showSuppliers()">🚚 <span data-i18n="nav.suppliers">Fournisseurs</span></button>
+          <button class="nav-link nav-dropdown-link" id="navHygiene">🧼 <span data-i18n="nav.hygiene">Hygiène (HACCP)</span></button>
+          <button class="nav-link nav-dropdown-link" onclick="showMgmt(); switchMgmtTab('quality');">🛡️ Pertes & Traçabilité</button>
         </div>
       </div>
 
-      <!-- Pilotage -->
+      <!-- Pilotage Financier -->
       <div class="nav-dropdown">
-        <button class="nav-dropdown-trigger"><span data-i18n="nav.category.mgmt">📈 Pilotage</span> <span class="nav-arrow">▼</span></button>
+        <button class="nav-dropdown-trigger">📈 <span>Pilotage Financier</span> <span class="nav-arrow">▼</span></button>
         <div class="nav-dropdown-content">
           <button class="nav-link nav-dropdown-link" id="navStats" onclick="showStats()">📊 <span data-i18n="nav.stats">Statistiques</span></button>
-          <button class="nav-link nav-dropdown-link" id="navMgmt" onclick="showMgmt()">⚙️ <span data-i18n="nav.mgmt">Gestion Pro</span></button>
-          <button class="nav-link nav-dropdown-link" id="navSuppliers" onclick="showSuppliers()">🚚 <span data-i18n="nav.suppliers">Fournisseurs</span></button>
-          <button class="nav-link nav-dropdown-link" id="navInventaire" onclick="showInventaire()">📦 <span data-i18n="nav.inventory">Inventaire</span></button>
-          <button class="nav-link nav-dropdown-link" onclick="showMgmt(); switchMgmtTab('boston');">📈 <span data-i18n="bcg.title">Matrice BCG</span></button>
-          <button class="nav-link nav-dropdown-link" onclick="showMgmt(); switchMgmtTab('inflation');">🔥 <span data-i18n="inflation.title">Simulateur de Crise</span></button>
+          <button class="nav-link nav-dropdown-link" id="navMgmt" onclick="showMgmt()">🎯 Pilotage & Objectifs</button>
+          <button class="nav-link nav-dropdown-link" onclick="showMgmt(); switchMgmtTab('boston');">⭐ <span data-i18n="bcg.title">Matrice BCG</span></button>
+          <button class="nav-link nav-dropdown-link" onclick="showMgmt(); switchMgmtTab('inflation');">🔥 Simulateur Inflation</button>
         </div>
       </div>
 
-      <!-- Catalogue -->
+      <!-- Atelier Créatif -->
       <div class="nav-dropdown">
-        <button class="nav-dropdown-trigger"><span data-i18n="nav.category.showcase">✨ Catalogue</span> <span class="nav-arrow">▼</span></button>
+        <button class="nav-dropdown-trigger">💡 <span>Atelier Créatif</span> <span class="nav-arrow">▼</span></button>
         <div class="nav-dropdown-content">
-          <button class="nav-link nav-dropdown-link" id="navPortfolio">🖼️ <span data-i18n="nav.portfolio">Portfolio</span></button>
-          <button class="nav-link nav-dropdown-link" id="navAPropos">📖 <span data-i18n="nav.about">À propos</span></button>
           <button class="nav-link nav-dropdown-link" onclick="openChefsBrain()">🧠 Chef's Brain</button>
           <button class="nav-link nav-dropdown-link" onclick="openAssemblySimulator()">🏗️ Simulateur Montage</button>
           <button class="nav-link nav-dropdown-link" onclick="openMasterConverter()">📏 Master Converter</button>
+          <button class="nav-link nav-dropdown-link" id="navLabo">📐 Matériel & Outillage</button>
+          <button class="nav-link nav-dropdown-link" id="navPortfolio">🖼️ <span data-i18n="nav.portfolio">Portfolio</span></button>
         </div>
       </div>
 
+      <!-- Footer specific links in nav dropdown are now handled via modals -->
       <button class="nav-link" id="navAdmin" style="display:none;"><span data-i18n="nav.admin">Admin</span></button>
     </div>
     <div class="header-actions" id="userProfileArea" style="display:none; align-items:center; gap:12px;">
@@ -537,32 +541,27 @@
           </div>
         </div>
 
-        <!-- Premium Pill Tabs -->
+        <!-- Premium Pill Tabs for ERP Hub -->
         <div class="mgmt-tabs-premium">
           <button class="mgmt-tab-pill active" id="mgmtTabDashboard" onclick="switchMgmtTab('dashboard')">
-            <span class="tab-pill-emoji">📊</span>
-            <span data-i18n="mgmt.tab.dashboard">Tableau de Bord</span>
-          </button>
-          <button class="mgmt-tab-pill" id="mgmtTabShopping" onclick="switchMgmtTab('shopping')">
-            <span class="tab-pill-emoji">🛒</span>
-            <span data-i18n="mgmt.tab.shopping">Approvisionnement</span>
-          </button>
-          <button class="mgmt-tab-pill" id="mgmtTabAnalysis" onclick="switchMgmtTab('analysis')">
-            <span class="tab-pill-emoji">📈</span>
-            <span data-i18n="mgmt.tab.analysis">Analyses Pro</span>
-          </button>
-          <button class="mgmt-tab-pill" id="mgmtTabProTools" onclick="switchMgmtTab('protools')">
-            <span class="tab-pill-emoji">🧰</span>
-            <span data-i18n="mgmt.tab.protools">Outils Métier</span>
+            <span class="tab-pill-emoji">🎯</span>
+            <span data-i18n="mgmt.tab.dashboard">Objectifs & Pilotage</span>
           </button>
           <button class="mgmt-tab-pill" id="mgmtTabProduction" onclick="switchMgmtTab('production')">
             <span class="tab-pill-emoji">📅</span>
-            <span data-i18n="mgmt.tab.production">Planning Prod.</span>
+            <span data-i18n="mgmt.tab.production">Planning Prod</span>
           </button>
-
+          <button class="mgmt-tab-pill" id="mgmtTabShopping" onclick="switchMgmtTab('shopping')">
+            <span class="tab-pill-emoji">🛒</span>
+            <span data-i18n="mgmt.tab.shopping">Appro & Besoins</span>
+          </button>
           <button class="mgmt-tab-pill" id="mgmtTabQuality" onclick="switchMgmtTab('quality')">
-            <span class="tab-pill-emoji">📉</span>
-            <span data-i18n="mgmt.tab.quality">Qualité & Pertes</span>
+            <span class="tab-pill-emoji">🛡️</span>
+            <span data-i18n="mgmt.tab.quality">Traçabilité & Pertes</span>
+          </button>
+          <button class="mgmt-tab-pill" id="mgmtTabProTools" onclick="switchMgmtTab('protools')">
+            <span class="tab-pill-emoji">🛠️</span>
+            <span data-i18n="mgmt.tab.protools">Outils Pro (INCO/OCR)</span>
           </button>
         </div>
 
@@ -3129,6 +3128,9 @@
 
 
     function switchMgmtTab(tab) {
+      // Special redirect for old triggers (BCG/Inflation from ProTools cards)
+      if (tab === 'analysis') tab = 'dashboard';
+
       // 1. Reset all views and buttons
       const allViews = document.querySelectorAll('.mgmt-view');
       allViews.forEach(v => v.style.display = 'none');
@@ -3137,54 +3139,60 @@
       allButtons.forEach(b => b.classList.remove('active'));
 
       // 2. Map logical tab to physical views
-      if (tab === 'dashboard') {
-        document.getElementById('mgmtViewDashboard').style.display = 'block';
-        document.getElementById('mgmtTabDashboard').classList.add('active');
-        if (typeof renderStats === 'function') renderStats(); // Stats are now on dashboard
-        if (typeof renderObjectives === 'function') renderObjectives();
+      if (tab === 'dashboard' || tab === 'boston' || tab === 'inflation') {
+        const dashboardBtn = document.getElementById('mgmtTabDashboard');
+        if (dashboardBtn) dashboardBtn.classList.add('active');
+
+        if (tab === 'boston') {
+          document.getElementById('mgmtViewBoston').style.display = 'block';
+          if (typeof renderBCGMatrix === 'function') renderBCGMatrix();
+        } else if (tab === 'inflation') {
+          document.getElementById('mgmtViewInflation').style.display = 'block';
+          if (typeof renderInflationSimulation === 'function') renderInflationSimulation();
+        } else {
+          // Default Dashboard view (Charts, Breaking Point)
+          document.getElementById('mgmtViewDashboard').style.display = 'block';
+          if (typeof renderStats === 'function') renderStats(); // Stats are now on dashboard
+          if (typeof renderObjectives === 'function') renderObjectives();
+        }
       }
       else if (tab === 'dashboard_config') {
         document.getElementById('mgmtViewDashboardConfig').style.display = 'block';
-        document.getElementById('mgmtTabDashboard').classList.add('active');
+        const dashboardBtn = document.getElementById('mgmtTabDashboard');
+        if (dashboardBtn) dashboardBtn.classList.add('active');
         if (typeof bindBreakingPointEvents === 'function') bindBreakingPointEvents();
       }
       else if (tab === 'shopping') {
         document.getElementById('mgmtViewShopping').style.display = 'block';
-        document.getElementById('mgmtTabShopping').classList.add('active');
+        const shoppingBtn = document.getElementById('mgmtTabShopping');
+        if (shoppingBtn) shoppingBtn.classList.add('active');
         if (typeof addShoppingRecipeRow === 'function') {
            const container = document.getElementById('shoppingRecipeSelectors');
            if (container && container.children.length === 0) addShoppingRecipeRow();
         }
       }
-      else if (tab === 'analysis') {
-        document.getElementById('mgmtViewBoston').style.display = 'block';
-        document.getElementById('mgmtViewInflation').style.display = 'block';
-        document.getElementById('mgmtTabAnalysis').classList.add('active');
-        if (typeof renderBCGMatrix === 'function') renderBCGMatrix();
-        if (typeof renderInflationSimulation === 'function') renderInflationSimulation();
-      }
       else if (tab === 'protools') {
         document.getElementById('mgmtViewProTools').style.display = 'block';
-        document.getElementById('mgmtTabProTools').classList.add('active');
+        const protoolsBtn = document.getElementById('mgmtTabProTools');
+        if (protoolsBtn) protoolsBtn.classList.add('active');
       }
       else if (tab === 'production') {
         document.getElementById('mgmtViewProduction').style.display = 'block';
-        document.getElementById('mgmtTabProduction').classList.add('active');
+        const prodBtn = document.getElementById('mgmtTabProduction');
+        if (prodBtn) prodBtn.classList.add('active');
         if (typeof renderProductionPlan === 'function') renderProductionPlan();
       }
       else if (tab === 'quality') {
         document.getElementById('mgmtViewWaste').style.display = 'block';
         document.getElementById('mgmtViewAllergens').style.display = 'block';
-        document.getElementById('mgmtTabQuality').classList.add('active');
+        const qualityBtn = document.getElementById('mgmtTabQuality');
+        if (qualityBtn) qualityBtn.classList.add('active');
         if (typeof renderAllergenMatrix === 'function') renderAllergenMatrix();
         if (typeof populateWasteDropdown === 'function') {
           populateWasteDropdown();
           renderWasteAnalysis();
         }
       }
-
-      // Special redirect for old triggers (BCG/Inflation from ProTools cards)
-      if (tab === 'boston' || tab === 'inflation') switchMgmtTab('analysis');
     }
 
   </script>
