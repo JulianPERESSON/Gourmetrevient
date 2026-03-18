@@ -444,6 +444,7 @@ h1, h2, h3 {
 .ing-row .ing-row-icon {
   position: relative;
   transition: all 0.4s ease;
+  z-index: 2; /* Important: stack context to keep watercolor visible */
 }
 
 .ing-row:hover .ing-row-icon {
@@ -454,17 +455,19 @@ h1, h2, h3 {
 .ing-row:hover .ing-row-icon::after {
   content: '';
   position: absolute;
-  inset: -12px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(197, 165, 90, 0.15) 0%, transparent 70%);
-  animation: watercolorBloom 0.6s ease-out forwards;
+  inset: -18px;
+  border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+  background: radial-gradient(circle at 40% 40%, rgba(197, 165, 90, 0.25) 0%, rgba(212, 132, 10, 0.15) 60%, transparent 80%);
+  filter: blur(2px);
+  animation: watercolorBloom 0.8s ease-out forwards;
   z-index: -1;
+  pointer-events: none;
 }
 
 @keyframes watercolorBloom {
-  0% { transform: scale(0); opacity: 0; }
+  0% { transform: scale(0.3) rotate(0deg); opacity: 0; }
   50% { opacity: 1; }
-  100% { transform: scale(2.5); opacity: 0.3; }
+  100% { transform: scale(1.6) rotate(15deg); opacity: 0.8; }
 }
 
 /* ============================================================= */

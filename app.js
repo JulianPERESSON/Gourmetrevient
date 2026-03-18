@@ -7135,52 +7135,8 @@ if (typeof saveCurrentRecipe === 'function') {
 }
 
 /**
- * 5. PREMIUM CURSOR TRAIL — Subtle golden sparkle on mouse move (desktop only)
+ * Premium features initialized.
  */
-(function initCursorSparkle() {
-  if (window.matchMedia('(hover: none)').matches) return; // Skip on touch devices
-
-  let sparkleThrottle = false;
-
-  document.addEventListener('mousemove', (e) => {
-    if (sparkleThrottle) return;
-    sparkleThrottle = true;
-    setTimeout(() => sparkleThrottle = false, 80);
-
-    // Only on interactive elements
-    const target = e.target.closest('.btn, .card, .cockpit-card, .nav-link, .saved-card');
-    if (!target) return;
-
-    const sparkle = document.createElement('div');
-    sparkle.style.cssText = `
-      position: fixed;
-      left: ${e.clientX}px;
-      top: ${e.clientY}px;
-      width: 6px;
-      height: 6px;
-      background: radial-gradient(circle, rgba(197, 165, 90, 0.6) 0%, transparent 70%);
-      border-radius: 50%;
-      pointer-events: none;
-      z-index: 99997;
-      animation: cursorSparkle 0.6s ease-out forwards;
-    `;
-    document.body.appendChild(sparkle);
-    setTimeout(() => sparkle.remove(), 600);
-  });
-
-  // Inject animation keyframes
-  if (!document.getElementById('cursorSparkleStyle')) {
-    const style = document.createElement('style');
-    style.id = 'cursorSparkleStyle';
-    style.textContent = `
-      @keyframes cursorSparkle {
-        0% { transform: scale(1); opacity: 1; }
-        100% { transform: scale(3); opacity: 0; }
-      }
-    `;
-    document.head.appendChild(style);
-  }
-})();
 
 /**
  * 6. GOLDEN SEPARATOR — Automatically add elegant dividers
