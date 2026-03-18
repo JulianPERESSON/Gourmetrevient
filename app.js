@@ -3201,10 +3201,10 @@ function renderInventory() {
     const emoji = getIngredientEmoji(item.name);
 
     return `
-      <tr class="${isCritical ? 'row-alert' : ''}">
+      <tr class="inv-row ${isCritical ? 'row-alert' : ''}">
         <td>
           <div style="display:flex; align-items:center; gap:12px;">
-            <div style="font-size:1.8rem; background:var(--bg-body); width:50px; height:50px; display:flex; align-items:center; justify-content:center; border-radius:12px;">${emoji}</div>
+            <div class="inv-icon" style="font-size:1.8rem; background:var(--bg-body); width:50px; height:50px; display:flex; align-items:center; justify-content:center; border-radius:12px; position:relative; z-index:2;">${emoji}</div>
             <div style="flex:1;">
               <strong style="display:block; font-size:1rem;">${escapeHtml(t(item.name))}</strong>
               <div class="stock-health-container">
