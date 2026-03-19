@@ -8,35 +8,35 @@
 
 /* ---------- CSS Custom Properties ---------- */
 :root {
-  /* Colors */
-  --primary: #2c3e50;
-  --primary-light: #34495e;
-  --primary-dark: #1a252f;
-  --accent: #e67e22;
-  --accent-light: #f0a35c;
-  --accent-dark: #c0651a;
-  --accent-glow: rgba(230, 126, 34, 0.25);
+  /* Colors - Pastry Luxury Palette */
+  --primary: #1a1b1e;
+  --primary-light: #2c2d30;
+  --primary-dark: #000000;
+  --accent: #c5a55a; /* Champagne / Gold */
+  --accent-light: #d4ba7a;
+  --accent-dark: #a6883e;
+  --accent-glow: rgba(197, 165, 90, 0.2);
 
-  --success: #27ae60;
-  --success-light: rgba(39, 174, 96, 0.12);
-  --warning: #f39c12;
-  --warning-light: rgba(243, 156, 18, 0.12);
-  --danger: #e74c3c;
-  --danger-light: rgba(231, 76, 60, 0.12);
-  --info: #3498db;
+  --success: #10b981;
+  --success-light: rgba(16, 185, 129, 0.1);
+  --warning: #f59e0b;
+  --warning-light: rgba(245, 158, 11, 0.1);
+  --danger: #ef4444;
+  --danger-light: rgba(239, 68, 68, 0.1);
+  --info: #3b82f6;
 
-  /* Surfaces */
-  --bg: #f5f6fa;
-  --bg-alt: #eef0f5;
+  /* Surfaces - Elevated Glassmorphism */
+  --bg: #faf9f6; /* Soft Cream */
+  --bg-alt: #f1f0ea;
   --surface: #ffffff;
-  --surface-hover: #f9fafb;
-  --surface-border: rgba(44, 62, 80, 0.08);
-  --surface-shadow: rgba(44, 62, 80, 0.06);
+  --surface-hover: #fcfcfc;
+  --surface-border: rgba(26, 27, 30, 0.05);
+  --surface-shadow: rgba(0, 0, 0, 0.04);
 
-  /* Text */
-  --text: #2c3e50;
-  --text-secondary: #5d6d7e;
-  --text-muted: #95a5a6;
+  /* Text - High Contrast / Editorial */
+  --text: #1a1b1e;
+  --text-secondary: #4a4b4f;
+  --text-muted: #8e8f93;
   --text-inverse: #ffffff;
 
   /* Typography */
@@ -44,28 +44,29 @@
   --font-heading: 'Outfit', sans-serif;
 
   /* Spacing & Sizing */
-  --radius-xs: 6px;
-  --radius-sm: 10px;
-  --radius: 14px;
-  --radius-lg: 20px;
-  --radius-xl: 28px;
+  --radius-xs: 8px;
+  --radius-sm: 12px;
+  --radius: 18px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
 
-  --shadow-sm: 0 1px 3px rgba(44, 62, 80, 0.06), 0 1px 2px rgba(44, 62, 80, 0.04);
-  --shadow: 0 4px 16px rgba(44, 62, 80, 0.08);
-  --shadow-md: 0 8px 30px rgba(44, 62, 80, 0.1);
-  --shadow-lg: 0 16px 50px rgba(44, 62, 80, 0.14);
-  --shadow-accent: 0 8px 30px rgba(230, 126, 34, 0.2);
+  /* Advanced Shadows */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+  --shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 12px 48px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 24px 80px rgba(0, 0, 0, 0.12);
+  --shadow-accent: 0 8px 30px rgba(197, 165, 90, 0.25);
 
-  --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-slow: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 
-  --max-width: 1300px;
-  --header-h: 64px;
+  --max-width: 1360px;
+  --header-h: 70px;
 
-  /* Composite Surfaces */
+  /* Composite Glass Surfaces */
   --bg-card: #ffffff;
-  --surface-shadow-inset: rgba(255, 255, 255, 0.5);
-  --surface-glass: rgba(255, 255, 255, 0.55);
+  --surface-shadow-inset: rgba(255, 255, 255, 0.8);
+  --surface-glass: rgba(255, 255, 255, 0.75);
   --surface-border-glass: rgba(255, 255, 255, 0.4);
 }
 
@@ -137,10 +138,31 @@ body {
   font-family: var(--font);
   color: var(--text);
   background: var(--bg);
+  background-attachment: fixed;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   min-height: 100vh;
+  position: relative;
+}
+
+/* Subtle Mesh Gradient Background Layer */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: 
+    radial-gradient(circle at 10% 10%, rgba(197, 165, 90, 0.05) 0%, transparent 40%),
+    radial-gradient(circle at 90% 80%, rgba(16, 185, 129, 0.03) 0%, transparent 40%),
+    radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.02) 0%, transparent 50%);
+  animation: meshFlow 20s ease-in-out infinite alternate;
+}
+
+@keyframes meshFlow {
+  0% { transform: scale(1) translate(0, 0); }
+  50% { transform: scale(1.1) translate(20px, -20px); }
+  100% { transform: scale(1) translate(-20px, 20px); }
 }
 
 img {
@@ -10210,4 +10232,144 @@ select.form-input {
     padding: 0.4rem 0.8rem;
     font-size: 0.75rem;
   }
+}
+
+/* --- Magnetic Cursor & Glossy Effects --- */
+@media (pointer: fine) {
+  body {
+    cursor: none;
+  }
+  
+  .custom-cursor {
+    position: fixed;
+    top: 0; left: 0;
+    width: 32px; height: 32px;
+    border: 2px solid var(--accent);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 999999;
+    transform: translate(-50%, -50%);
+    transition: width 0.3s cubic-bezier(0.165, 0.84, 0.44, 1), 
+                height 0.3s cubic-bezier(0.165, 0.84, 0.44, 1), 
+                background-color 0.3s, 
+                border-width 0.3s;
+    mix-blend-mode: normal;
+  }
+  
+  .custom-cursor-dot {
+    position: fixed;
+    top: 0; left: 0;
+    width: 6px; height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 999999;
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s linear;
+  }
+  
+  .custom-cursor.hovering {
+    width: 50px; height: 50px;
+    background-color: var(--accent-glow);
+    border-width: 1px;
+    backdrop-filter: blur(2px);
+  }
+}
+
+/* Glossy Cards Hover */
+.cockpit-card, .card, .dash-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.cockpit-card::before, .card::before, .dash-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  pointer-events: none;
+  background: radial-gradient(800px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255,255,255,0.06), transparent 40%);
+  opacity: 0;
+  transition: opacity 0.5s;
+  z-index: 10;
+}
+
+.dark-theme .cockpit-card::before, .dark-theme .card::before, .dark-theme .dash-card::before {
+  background: radial-gradient(800px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255,255,255,0.03), transparent 40%);
+}
+
+.cockpit-card:hover::before, .card:hover::before, .dash-card:hover::before {
+  opacity: 1;
+}
+
+/* Ingredient Sparklines */
+.ing-sparkline {
+  width: 40px;
+  height: 20px;
+  flex-shrink: 0;
+  opacity: 0.3;
+  transition: opacity 0.3s;
+}
+
+.ing-row:hover .ing-sparkline {
+  opacity: 1;
+}
+
+.ing-sparkline .spark-path {
+  stroke: var(--text-muted);
+  stroke-width: 3px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: stroke 0.3s;
+}
+
+.ing-row:hover .ing-sparkline .spark-path {
+  stroke: var(--accent);
+}
+
+/* --- Margin Circular Chart --- */
+.margin-ring-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.margin-circle-wrap {
+  position: relative;
+  width: 55px;
+  height: 55px;
+}
+
+.circular-chart {
+  display: block;
+  margin: 0 auto;
+  max-width: 100%;
+  max-height: 250px;
+}
+
+.circle-bg {
+  fill: none;
+  stroke: var(--surface-border);
+  stroke-width: 3.5;
+}
+
+.circle {
+  fill: none;
+  stroke-width: 3.5;
+  stroke-linecap: round;
+  transition: stroke-dasharray 1s cubic-bezier(0.165, 0.84, 0.44, 1), stroke 0.5s;
+}
+
+.margin-circle-wrap .circle-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 0.9rem;
+  color: var(--text);
+  margin: 0;
+  padding: 0;
 }

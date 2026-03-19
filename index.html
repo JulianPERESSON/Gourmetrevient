@@ -476,9 +476,18 @@
                     <span class="k-label" data-i18n="stats.kpi.hero">Top Recette</span>
                     <span class="k-value" id="dashTopPerf">Eclair Choc</span>
                  </div>
-                 <div class="mini-kpi">
+                 <div class="mini-kpi margin-ring-container">
                     <span class="k-label" data-i18n="mgmt.kpi.margin">Marge Moyenne</span>
-                    <span class="k-value" id="dashAvgMargin">72.4%</span>
+                    <div class="margin-circle-wrap">
+                        <svg viewBox="0 0 36 36" class="circular-chart gold">
+                          <path class="circle-bg"
+                            d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                          <path class="circle" id="dashAvgMarginCircle"
+                            stroke-dasharray="0, 100"
+                            d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                        </svg>
+                        <div class="k-value circle-text" id="dashAvgMargin">0%</div>
+                    </div>
                  </div>
               </div>
               <canvas id="businessTrendSparkMini" style="width:100%; height:30px; margin-top:10px;"></canvas>
@@ -3262,6 +3271,9 @@
     }
 
   </script>
+
+  <div id="magnetCursor" class="custom-cursor"></div>
+  <div id="magnetCursorDot" class="custom-cursor-dot"></div>
 
   <!-- Core Scripts -->
   <script src="./data.js?v=2.2.0"></script>

@@ -210,7 +210,19 @@ window.hydratePremiumDashboard = function () {
         topPerf.textContent = best ? best.name : t('dash.biz.no_recipes');
     }
     const avgMarginEl = document.getElementById('dashAvgMargin');
-    if (avgMarginEl) avgMarginEl.textContent = Math.round(avgMargin) + '%';
+    const marginCircle = document.getElementById('dashAvgMarginCircle');
+    const displayMargin = Math.round(avgMargin);
+    if (avgMarginEl) avgMarginEl.textContent = displayMargin + '%';
+    if (marginCircle) {
+        // Trigger animation safely after DOM flush
+        setTimeout(() => {
+            marginCircle.setAttribute('stroke-dasharray', `${displayMargin}, 100`);
+            // Change color dynamically based on perf
+            if (displayMargin < 65) marginCircle.style.stroke = 'var(--danger)';
+            else if (displayMargin >= 75) marginCircle.style.stroke = 'var(--success)';
+            else marginCircle.style.stroke = 'var(--gold)';
+        }, 300);
+    }
 
     // 8. Team Summary
     const presenceEl = document.getElementById('dashPresenceCount');
