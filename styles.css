@@ -10331,3 +10331,32 @@ select.form-input {
   margin: 0;
   padding: 0;
 }
+
+/* Assistant Saisonnalité */
+.seasonality-badge {
+  position: absolute;
+  right: 10px;
+  bottom: -22px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--surface, #fff);
+  padding: 3px 6px;
+  border-radius: 4px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  z-index: 10;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  animation: fadeUpItem 0.3s ease-out;
+}
+.season-warn {
+  font-size: 0.7rem;
+  color: var(--danger, #ef4444);
+  font-weight: 700;
+}
+.seasonality-badge button {
+  background: #fef2f2;
+}
+.seasonality-badge button:hover {
+  background: var(--danger, #ef4444);
+  color: #fff !important;
+}

@@ -785,10 +785,11 @@ function createIngredientRow(ing, idx) {
   const priceRef = getPriceRef(ing.unit);
 
   row.innerHTML = `
-    <div class="ing-name autocomplete-wrap">
+    <div class="ing-name autocomplete-wrap" style="position:relative;">
       <div class="ing-row-icon">${getIngredientIcon(ing.name)}</div>
       <input type="text" class="form-input ing-input" data-field="name" value="${escapeHtml(t(ing.name))}" placeholder="${t('ui.ph.name')}" />
       <div class="autocomplete-list" id="ac-${idx}"></div>
+      <div class="seasonality-badge" id="season-${idx}"></div>
     </div>
     <div class="ing-qty">
       <input type="number" class="form-input ing-input" data-field="quantity" value="${ing.quantity}" min="0" step="any" placeholder="${t('ui.ph.qty')}" />
@@ -830,6 +831,9 @@ function createIngredientRow(ing, idx) {
     APP.recipe.ingredients.splice(idx, 1);
     renderIngredients();
   });
+  
+  // Update seasonality on render
+  updateSeasonalityBadge(row, idx, ing.name);
 
   return row;
 }
