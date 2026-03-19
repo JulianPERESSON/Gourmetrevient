@@ -1,4 +1,4 @@
-/*
+﻿/*
   =====================================================================
   APP.JS — GourmetRevient Professional Recipe Cost Calculator
   Modular Vanilla JavaScript
@@ -7207,62 +7207,19 @@ if (typeof saveCurrentRecipe === 'function') {
  * 8. MAGNETIC CURSOR & GLOSSY CARDS
  */
 document.addEventListener('DOMContentLoaded', () => {
-  const cursor = document.getElementById('magnetCursor');
-  const dot = document.getElementById('magnetCursorDot');
-  
-  if (cursor && dot) {
-    let mouseX = window.innerWidth / 2;
-    let mouseY = window.innerHeight / 2;
-    let cursorX = mouseX;
-    let cursorY = mouseY;
-    
-    // Track mouse
-    document.addEventListener('mousemove', (e) => {
-      mouseX = e.clientX;
-      mouseY = e.clientY;
-      
-      // Immediate update for dot
-      dot.style.transform = `translate(${mouseX}px, ${mouseY}px) translate(-50%, -50%)`;
-      
-      // Update CSS variables for glossy cards
-      const glossyCards = document.querySelectorAll('.cockpit-card, .card, .dash-card');
-      glossyCards.forEach(card => {
-        const rect = card.getBoundingClientRect();
-        const x = mouseX - rect.left;
-        const y = mouseY - rect.top;
-        card.style.setProperty('--mouse-x', `${x}px`);
-        card.style.setProperty('--mouse-y', `${y}px`);
-      });
+document.addEventListener("DOMContentLoaded", () => {
+  // Track mouse for glossy cards
+  document.addEventListener("mousemove", (e) => {
+    const mouseX = e.clientX;
+    const mouseY = e.clientY;
+    const glossyCards = document.querySelectorAll(".cockpit-card, .card, .dash-card");
+    glossyCards.forEach(card => {
+      const rect = card.getBoundingClientRect();
+      const x = mouseX - rect.left;
+      const y = mouseY - rect.top;
+      card.style.setProperty("--mouse-x", x + "px");
+      card.style.setProperty("--mouse-y", y + "px");
     });
-    
-    // Smooth trailing update for main cursor circle
-    const renderCursor = () => {
-      cursorX += (mouseX - cursorX) * 0.2;
-      cursorY += (mouseY - cursorY) * 0.2;
-      cursor.style.transform = `translate(${cursorX}px, ${cursorY}px) translate(-50%, -50%)`;
-      requestAnimationFrame(renderCursor);
-    };
-    requestAnimationFrame(renderCursor);
-    
-    // Hover states for magnetic effect
-    const addMagnetEffect = () => cursor.classList.add('hovering');
-    const removeMagnetEffect = () => cursor.classList.remove('hovering');
-    
-    const bindHover = () => {
-      document.querySelectorAll('button, a, .clickable, input, select, .ing-row, .card, .cockpit-card').forEach(el => {
-        el.removeEventListener('mouseenter', addMagnetEffect);
-        el.removeEventListener('mouseleave', removeMagnetEffect);
-        
-        el.addEventListener('mouseenter', addMagnetEffect);
-        el.addEventListener('mouseleave', removeMagnetEffect);
-      });
-    };
-    
-    // Bind initial
-    bindHover();
-    
-    // Re-bind when DOM changes (simplified with interval or mutations, here we hook into navigation)
-    const observer = new MutationObserver(() => bindHover());
-    observer.observe(document.body, { childList: true, subtree: true });
-  }
+  });
 });
+
