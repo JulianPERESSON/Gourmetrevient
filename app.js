@@ -7257,7 +7257,7 @@ function checkSeasonality(name, currentMonth) {
   const SEASONALITY_DB = {
     'fraise': { season: [5,6,7,8], sub: 'Pomme', subIcon: '🍎' },
     'framboise': { season: [6,7,8,9], sub: 'Poire', subIcon: '🍐' },
-    'cerise': { season: [5,6,7], sub: 'Pruneau', subIcon: 'blueberry' },
+    'cerise': { season: [5,6,7], sub: 'Pruneau', subIcon: '🍒' },
     'abricot': { season: [6,7,8], sub: 'Pomme', subIcon: '🍎' },
     'pêche': { season: [6,7,8,9], sub: 'Poire', subIcon: '🍐' },
     'figue': { season: [7,8,9,10], sub: 'Datte', subIcon: '🌴' },
