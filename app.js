@@ -1,4 +1,4 @@
-﻿/*
+/*
   =====================================================================
   APP.JS — GourmetRevient Professional Recipe Cost Calculator
   Modular Vanilla JavaScript
@@ -7204,9 +7204,8 @@ if (typeof saveCurrentRecipe === 'function') {
 })();
 
 /**
- * 8. MAGNETIC CURSOR & GLOSSY CARDS
+ * 8. GLOSSY CARDS EFFECT
  */
-document.addEventListener('DOMContentLoaded', () => {
 document.addEventListener("DOMContentLoaded", () => {
   // Track mouse for glossy cards
   document.addEventListener("mousemove", (e) => {
@@ -7222,4 +7221,3 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 });
-
