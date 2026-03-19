@@ -858,6 +858,7 @@ function onIngredientChange(row, idx) {
   priceInput.placeholder = `€/${priceRef}`;
 
   updateIngredientsTotal();
+  updateSeasonalityBadge(row, idx, ing.name);
 }
 
 function updateIngredientsTotal() {
@@ -7225,3 +7226,52 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 });
+
+// === ASSISTANT DE SAISONNALITÉ ===
+function updateSeasonalityBadge(row, idx, name) {
+  const badge = row.querySelector('.seasonality-badge');
+  if (!badge) return;
+  if (!name) { badge.innerHTML = ''; return; }
+  const currentMonth = new Date().getMonth() + 1;
+  const check = checkSeasonality(name, currentMonth);
+  if (!check) { badge.innerHTML = ''; return; }
+  badge.innerHTML = `<span class="season-warn" title="Hors saison ! Évitez l'impact écologique et économique.">⚠️ Éco-Alerte</span>
+    <button class="btn btn-sm btn-outline" style="font-size:0.65rem; padding:2px 6px; margin-left:4px; border-color:var(--danger, #ef4444); color:var(--danger, #ef4444);" onclick="applySeasonSubstitute(${idx}, '${check.sub}')">Remplacer par ${check.subIcon} ${check.sub}</button>`;
+}
+
+function applySeasonSubstitute(idx, subName) {
+  const ing = APP.recipe.ingredients[idx];
+  if (!ing) return;
+  ing.name = subName;
+  const dbItem = APP.ingredientDb.find(db => db.name.toLowerCase() === subName.toLowerCase());
+  if (dbItem) {
+    ing.pricePerUnit = dbItem.pricePerUnit;
+    ing.unit = dbItem.unit;
+  }
+  renderIngredients();
+  showToast('Ingrédient substitué pour respecter la saisonnalité !', 'success');
+  if (typeof triggerChocolateRain === 'function') triggerChocolateRain('light');
+}
+
+function checkSeasonality(name, currentMonth) {
+  const SEASONALITY_DB = {
+    'fraise': { season: [5,6,7,8], sub: 'Pomme', subIcon: '🍎' },
+    'framboise': { season: [6,7,8,9], sub: 'Poire', subIcon: '🍐' },
+    'cerise': { season: [5,6,7], sub: 'Pruneau', subIcon: 'blueberry' },
+    'abricot': { season: [6,7,8], sub: 'Pomme', subIcon: '🍎' },
+    'pêche': { season: [6,7,8,9], sub: 'Poire', subIcon: '🍐' },
+    'figue': { season: [7,8,9,10], sub: 'Datte', subIcon: '🌴' },
+    'melon': { season: [6,7,8,9], sub: 'Pomme', subIcon: '🍎' },
+    'mûre': { season: [7,8,9], sub: 'Myrtille (surgelée)', subIcon: '🫐' },
+  };
+  const n = name.toLowerCase();
+  for (let key in SEASONALITY_DB) {
+     if (n.includes(key)) {
+        if (!SEASONALITY_DB[key].season.includes(currentMonth) && !n.includes('purée') && !n.includes('confit') && !n.includes('surgelé') && !n.includes('congelé')) {
+           return SEASONALITY_DB[key];
+        }
+     }
+  }
+  return null;
+}
+// ===============================
