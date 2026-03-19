@@ -5979,10 +5979,33 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
-// PWA Registration move to window load
+// PWA Registration with update handling
 window.addEventListener('load', () => {
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW register error', err));
+    navigator.serviceWorker.register('./sw.js').then(reg => {
+      // Check for updates periodically
+      setInterval(() => {
+        reg.update();
+      }, 1000 * 60 * 60); // Check every hour
+      
+      reg.onupdatefound = () => {
+        const installingWorker = reg.installing;
+        installingWorker.onstatechange = () => {
+          if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
+            // New content is available; show notification
+            showToast("Une nouvelle version est disponible ! Elle s'installera au prochain rechargement.", "info", 5000);
+          }
+        };
+      };
+    }).catch(err => console.log('SW register error', err));
+
+    // Handle the 'controllerchange' event to reload when the new SW takes control
+    let refreshing = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (refreshing) return;
+      refreshing = true;
+      window.location.reload();
+    });
   }
 });
 
