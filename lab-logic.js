@@ -88,18 +88,14 @@ function createLabEquipmentCard(eq) {
     return card;
 }
 
-function renderLabGrid(results, category) {
+function renderLabGrid(results, category, animate = false) {
     const gridEl = document.getElementById('equipmentGrid');
     if (!gridEl) return;
 
-    // Show a quick skeleton state if switching categories
-    gridEl.innerHTML = Array(6).fill(0).map(() => `
-        <div class="card skeleton" style="height:180px; margin-top:0.5rem;"></div>
-    `).join('');
+    const filtered = category === 'all' ? results : results.filter(r => r.category === category);
 
-    setTimeout(() => {
+    const renderCards = () => {
         gridEl.innerHTML = '';
-        const filtered = category === 'all' ? results : results.filter(r => r.category === category);
         if (!filtered.length) {
             gridEl.innerHTML = `<p style="text-align:center;color:var(--text-muted);padding:3rem;grid-column:1/-1;">${t('lab.empty_cat')}</p>`;
             return;
@@ -115,7 +111,7 @@ function renderLabGrid(results, category) {
             gridEl.appendChild(card);
         });
 
-        if (window.gsap && filtered.length > 0) {
+        if (animate && window.gsap && filtered.length > 0) {
             gsap.from('#equipmentGrid .lab-card', {
                 opacity: 0,
                 y: 20,
@@ -124,7 +120,16 @@ function renderLabGrid(results, category) {
                 ease: 'power2.out'
             });
         }
-    }, 150);
+    };
+
+    if (animate) {
+        gridEl.innerHTML = Array(6).fill(0).map(() => `
+            <div class="card skeleton" style="height:180px; margin-top:0.5rem;"></div>
+        `).join('');
+        setTimeout(renderCards, 150);
+    } else {
+        renderCards();
+    }
 }
 
 function updateLabCounts(results) {
@@ -601,7 +606,7 @@ function initLabConfigurator() {
             btn.style.color = 'var(--accent)';
             btn.style.borderColor = 'var(--accent)';
             labCurrentCategory = btn.dataset.cat;
-            renderLabGrid(labCurrentResults, labCurrentCategory);
+            renderLabGrid(labCurrentResults, labCurrentCategory, true);
         });
     }
 
