@@ -897,3 +897,179 @@ h1, h2, h3 {
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
   font-weight: 800 !important;
 }
+
+/* ============================================================= */
+/* 5. MODULE CRM (Clients & Ventes)                              */
+/* ============================================================= */
+
+.crm-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2.5rem;
+}
+
+.crm-kpi-card {
+  background: var(--surface-glass);
+  border: 1px solid var(--surface-border-glass);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.crm-kpi-value {
+  font-family: var(--font-display);
+  font-size: 2.5rem;
+  color: var(--accent);
+  font-weight: 800;
+  line-height: 1.1;
+  margin: 0.5rem 0;
+}
+
+.crm-kpi-label {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-secondary);
+  font-weight: 700;
+}
+
+.order-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.5rem;
+}
+
+.order-card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--surface-border);
+  position: relative;
+  overflow: hidden;
+}
+
+.order-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; width: 6px; height: 100%;
+  background: var(--accent);
+}
+
+.order-card[data-status="paid"]::before { background: var(--success); }
+.order-card[data-status="delivered"]::before { background: var(--text-muted); }
+
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.order-id {
+  font-family: monospace;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.order-client {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--primary);
+  margin: 0.2rem 0;
+}
+
+.order-date {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--accent-dark);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.order-products {
+  background: var(--bg-alt);
+  padding: 1rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin-bottom: 1.5rem;
+  border-left: 2px solid var(--accent-light);
+}
+
+.order-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid var(--surface-border);
+  padding-top: 1rem;
+}
+
+.order-price {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--primary);
+}
+
+.vip-client-card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--surface-border-glass);
+  position: relative;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.vip-client-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--accent-light);
+}
+
+.vip-avatar {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.2rem;
+  font-family: var(--font-display);
+  margin: 0 auto 1.2rem;
+  box-shadow: var(--shadow-gold);
+}
+
+.vip-name {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--primary);
+  margin-bottom: 0.5rem;
+}
+
+.vip-contact {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
+}
+
+.vip-notes {
+  font-size: 0.85rem;
+  color: #fff;
+  background: linear-gradient(135deg, #e1a052, #b86b11);
+  padding: 0.6rem;
+  border-radius: var(--radius-sm);
+  display: inline-block;
+  box-shadow: 0 4px 10px rgba(184, 107, 17, 0.3);
+}

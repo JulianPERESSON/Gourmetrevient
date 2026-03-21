@@ -51,7 +51,7 @@
   </script>
 
   <link rel="stylesheet" href="./styles.css?v=3.5.1" />
-  <link rel="stylesheet" href="./css/premium-branding.css?v=1.0.5" />
+  <link rel="stylesheet" href="./css/premium-branding.css?v=1.0.6" />
   <link rel="stylesheet" href="./css/creative-tools.css?v=1.0.1" />
   <link rel="stylesheet" href="./css/master-converter.css?v=1.0.1" />
   <!-- Libraries for new features -->
@@ -2788,38 +2788,39 @@
 
       <!-- Commandes Tab -->
       <div id="crmViewOrders" class="crm-view">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 1.5rem;">
+        <div class="crm-kpi-grid">
+          <div class="crm-kpi-card">
+            <div class="crm-kpi-label">CA en Attente</div>
+            <div class="crm-kpi-value" id="kpiCrmRevenue">0.00 €</div>
+          </div>
+          <div class="crm-kpi-card">
+            <div class="crm-kpi-label">Commandes à Livrer</div>
+            <div class="crm-kpi-value" id="kpiCrmPending">0</div>
+          </div>
+          <div class="crm-kpi-card">
+            <div class="crm-kpi-label">Total Clients VIP</div>
+            <div class="crm-kpi-value" id="kpiCrmClients">0</div>
+          </div>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 2rem;">
           <h3 class="apropos-title" style="margin:0;">Suivi des Commandes</h3>
           <button class="btn btn-primary" onclick="showAddOrderModal()">➕ Nouvelle Commande</button>
         </div>
         
-        <div class="table-container card glass-widget">
-          <table class="data-table haccp-table">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Client</th>
-                <th>Produit(s)</th>
-                <th>Date Retrait</th>
-                <th>Statut</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody id="crmOrdersBody">
-              <!-- Rendered via JS -->
-            </tbody>
-          </table>
+        <div class="order-grid" id="crmOrdersBody">
+          <!-- Rendered via JS -->
         </div>
       </div>
 
       <!-- Clients Tab -->
       <div id="crmViewClients" class="crm-view" style="display:none;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 1.5rem;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 2rem;">
           <h3 class="apropos-title" style="margin:0;">Base Clients</h3>
           <button class="btn btn-primary" onclick="showAddClientModal()">➕ Nouveau Client</button>
         </div>
         
-        <div class="supplier-grid" id="crmClientsBody">
+        <div class="order-grid" id="crmClientsBody">
             <!-- Rendered via JS -->
         </div>
       </div>
@@ -3456,7 +3457,7 @@
   <script src="./dashboard-premium.js?v=1.0.1"></script>
   <script src="./creative-tools.js?v=1.0.1"></script>
   <script src="./master-converter.js?v=1.0.1"></script>
-  <script src="./crm.js?v=1.0.0"></script>
+  <script src="./crm.js?v=1.0.1"></script>
 
   <script>
     function switchLabTab(tab) {
