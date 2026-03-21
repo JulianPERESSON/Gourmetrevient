@@ -51,7 +51,7 @@
   </script>
 
   <link rel="stylesheet" href="./styles.css?v=3.5.1" />
-  <link rel="stylesheet" href="./css/premium-branding.css?v=1.0.1" />
+  <link rel="stylesheet" href="./css/premium-branding.css?v=1.0.5" />
   <link rel="stylesheet" href="./css/creative-tools.css?v=1.0.1" />
   <link rel="stylesheet" href="./css/master-converter.css?v=1.0.1" />
   <!-- Libraries for new features -->
@@ -2315,6 +2315,28 @@
         </div>
         <div class="modal-body" style="padding:2rem;">
           <div class="form-group" style="margin-bottom:1.5rem;">
+            <label data-i18n="haccp.temp.shift" style="display:block; margin-bottom:0.5rem;">Cycle / Horaires</label>
+            <div style="display:flex; gap:1rem;">
+              <label style="flex:1; cursor:pointer;" class="btn btn-outline" id="labelShiftMatin">
+                <input type="radio" name="haccpTempShift" value="matin" checked style="display:none;" onchange="updateShiftButtons()"> 🌅 Matin
+              </label>
+              <label style="flex:1; cursor:pointer;" class="btn btn-outline" id="labelShiftSoir">
+                <input type="radio" name="haccpTempShift" value="soir" style="display:none;" onchange="updateShiftButtons()"> 🌙 Soir
+              </label>
+            </div>
+          </div>
+          <script>
+            function updateShiftButtons() {
+              const val = document.querySelector('input[name="haccpTempShift"]:checked').value;
+              document.getElementById('labelShiftMatin').style.borderColor = val === 'matin' ? 'var(--gold)' : '';
+              document.getElementById('labelShiftMatin').style.background = val === 'matin' ? 'var(--gold-glow)' : '';
+              document.getElementById('labelShiftSoir').style.borderColor = val === 'soir' ? 'var(--gold)' : '';
+              document.getElementById('labelShiftSoir').style.background = val === 'soir' ? 'var(--gold-glow)' : '';
+            }
+            // initial call handled when modal is shown or directly
+            updateShiftButtons();
+          </script>
+          <div class="form-group" style="margin-bottom:1.5rem;">
             <label data-i18n="haccp.temp.equipment">Équipement</label>
             <select id="haccpTempEquip" class="form-select">
               <option value="Frigo 1">Frigo 1 (Vitrine)</option>
@@ -3121,6 +3143,7 @@
       appHygiene.style.display = 'block';
       mainNav.style.display = 'flex';
       if (navHygiene) navHygiene.classList.add('active');
+      if (typeof loadHaccpLogs === 'function') loadHaccpLogs();
       if (typeof renderHygiene === 'function') renderHygiene();
       if (typeof updateRandomTip === 'function') updateRandomTip();
     }
@@ -3292,15 +3315,15 @@
   </script>
 
   <!-- Core Scripts -->
-  <script src="./data.js?v=2.2.0"></script>
-  <script src="./i18n.js?v=3.5.0"></script>
-  <script src="./app.js?v=2.3.0"></script>
-  <script src="./pro-features.js?v=1.0.0"></script>
-  <script src="./equipment.js?v=2.1.0"></script>
-  <script src="./lab-logic.js?v=2.1.0"></script>
-  <script src="./dashboard-premium.js?v=1.0.0"></script>
-  <script src="./creative-tools.js?v=1.0.0"></script>
-  <script src="./master-converter.js?v=1.0.0"></script>
+  <script src="./data.js?v=2.2.1"></script>
+  <script src="./i18n.js?v=3.5.1"></script>
+  <script src="./app.js?v=2.4.2"></script>
+  <script src="./pro-features.js?v=1.0.1"></script>
+  <script src="./equipment.js?v=2.1.1"></script>
+  <script src="./lab-logic.js?v=2.1.1"></script>
+  <script src="./dashboard-premium.js?v=1.0.1"></script>
+  <script src="./creative-tools.js?v=1.0.1"></script>
+  <script src="./master-converter.js?v=1.0.1"></script>
 
   <script>
     function switchLabTab(tab) {

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'gourmet-v' + new Date().getTime(); // Auto-versioning on file change
+const CACHE_NAME = 'gourmet-v' + new Date().getTime() + '-1'; // Auto-versioning
 const ASSETS = [
     './',
     './index.html',

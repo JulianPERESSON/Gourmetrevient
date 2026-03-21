@@ -5698,41 +5698,58 @@ function saveHaccpLogs() {
 }
 
 function loadHaccpLogs() {
-  const saved = localStorage.getItem(STORAGE_KEYS.haccpLogs);
-  if (saved) {
-    try {
-      APP.haccpLogs = JSON.parse(saved);
-      if (!APP.haccpLogs.reception) APP.haccpLogs.reception = [];
-      if (!APP.haccpLogs.trace) APP.haccpLogs.trace = [];
-      if (!APP.haccpLogs.temp) APP.haccpLogs.temp = [];
-      if (!APP.haccpLogs.clean) APP.haccpLogs.clean = [];
-    } catch (e) { console.error("Error loading HACCP logs", e); }
-  }
+  try {
+    const saved = localStorage.getItem(STORAGE_KEYS.haccpLogs);
+    if (saved) {
+      try {
+        APP.haccpLogs = JSON.parse(saved);
+      } catch(e) {}
+    }
+    
+    if (typeof APP.haccpLogs !== 'object' || APP.haccpLogs === null) {
+      APP.haccpLogs = {};
+    }
+    if (!Array.isArray(APP.haccpLogs.temp)) APP.haccpLogs.temp = [];
+    if (!Array.isArray(APP.haccpLogs.trace)) APP.haccpLogs.trace = [];
+    if (!Array.isArray(APP.haccpLogs.reception)) APP.haccpLogs.reception = [];
+    if (!Array.isArray(APP.haccpLogs.clean)) APP.haccpLogs.clean = [];
 
-  if (!APP.haccpLogs.temp) APP.haccpLogs.temp = [];
-  if (!APP.haccpLogs.trace) APP.haccpLogs.trace = [];
-  if (!APP.haccpLogs.reception) APP.haccpLogs.reception = [];
-  if (!APP.haccpLogs.clean) APP.haccpLogs.clean = [];
-
-  const needsDemo = APP.haccpLogs.temp.length === 0 && APP.haccpLogs.trace.length === 0 && APP.haccpLogs.reception.length === 0;
-  if (needsDemo) {
+    let dataChanged = false;
     const now = new Date();
-    APP.haccpLogs.temp = [
-      { id: 't_demo1', date: new Date(now - 1000 * 60 * 60 * 2).toISOString(), equipKey: 'haccp.equip.frigo1', val: 3.2, user: 'Julian', action: null },
-      { id: 't_demo2', date: new Date(now - 1000 * 60 * 60 * 14).toISOString(), equipKey: 'haccp.equip.frigo2', val: 4.5, user: 'Julian', action: null },
-      { id: 't_demo3', date: new Date(now - 1000 * 60 * 60 * 26).toISOString(), equipKey: 'haccp.equip.congelateur', val: -18.5, user: 'Julian', action: null }
-    ];
-    APP.haccpLogs.reception = [
-      { id: 'r_demo1', date: new Date(now - 1000 * 60 * 60 * 3).toISOString(), supplier: 'Métro', temp: 2.5, hygiene: 'ok' },
-      { id: 'r_demo2', date: new Date(now - 1000 * 60 * 60 * 24 * 2).toISOString(), supplier: 'Pomona Passion Froid', temp: 3.1, hygiene: 'ok' },
-      { id: 'r_demo3', date: new Date(now - 1000 * 60 * 60 * 24 * 5).toISOString(), supplier: 'Transgourmet', temp: 6.8, hygiene: 'ko' }
-    ];
-    APP.haccpLogs.trace = [
-      { id: 'tr_demo1', lot: 'L260301', product: 'Éclair Chocolat', date: new Date(now - 1000 * 60 * 60 * 24).toISOString(), exp: '2026-03-06', qty: '50' },
-      { id: 'tr_demo2', lot: 'L260302', product: 'Tarte Citron Meringuée', date: new Date(now - 1000 * 60 * 60 * 12).toISOString(), exp: '2026-03-07', qty: '12' },
-      { id: 'tr_demo3', lot: 'L260303', product: 'Paris-Brest', date: new Date(now - 1000 * 60 * 60 * 48).toISOString(), exp: '2026-03-05', qty: '24' }
-    ];
-    saveHaccpLogs();
+
+    if (APP.haccpLogs.temp.length === 0 || APP.haccpLogs._demoVersion !== 3) {
+      APP.haccpLogs.temp = [
+        { id: 't_demo1', date: new Date(now - 1000 * 60 * 60 * 2).toISOString(), equipKey: 'haccp.equip.frigo1', val: 3.2, user: 'Julian', action: null, shift: 'matin' },
+        { id: 't_demo2', date: new Date(now - 1000 * 60 * 60 * 14).toISOString(), equipKey: 'haccp.equip.frigo2', val: 4.5, user: 'Julian', action: null, shift: 'soir' },
+        { id: 't_demo3', date: new Date(now - 1000 * 60 * 60 * 26).toISOString(), equipKey: 'haccp.equip.congelateur', val: -18.5, user: 'Julian', action: null, shift: 'matin' }
+      ];
+      dataChanged = true;
+    }
+
+    if (APP.haccpLogs.reception.length === 0 || APP.haccpLogs._demoVersion !== 3) {
+      APP.haccpLogs.reception = [
+        { id: 'r_demo1', date: new Date(now - 1000 * 60 * 60 * 3).toISOString(), supplier: 'Métro', temp: 2.5, hygiene: 'ok' },
+        { id: 'r_demo2', date: new Date(now - 1000 * 60 * 60 * 24 * 2).toISOString(), supplier: 'Pomona Passion Froid', temp: 3.1, hygiene: 'ok' },
+        { id: 'r_demo3', date: new Date(now - 1000 * 60 * 60 * 24 * 5).toISOString(), supplier: 'Transgourmet', temp: 6.8, hygiene: 'ko' }
+      ];
+      dataChanged = true;
+    }
+
+    if (APP.haccpLogs.trace.length === 0 || APP.haccpLogs._demoVersion !== 3) {
+      APP.haccpLogs.trace = [
+        { id: 'tr_demo1', lot: 'L260301', product: 'Éclair Chocolat', date: new Date(now - 1000 * 60 * 60 * 24).toISOString(), exp: '2026-03-06', qty: '50' },
+        { id: 'tr_demo2', lot: 'L260302', product: 'Tarte Citron Meringuée', date: new Date(now - 1000 * 60 * 60 * 12).toISOString(), exp: '2026-03-07', qty: '12' },
+        { id: 'tr_demo3', lot: 'L260303', product: 'Paris-Brest', date: new Date(now - 1000 * 60 * 60 * 48).toISOString(), exp: '2026-03-05', qty: '24' }
+      ];
+      dataChanged = true;
+    }
+
+    if (dataChanged) {
+      APP.haccpLogs._demoVersion = 4;
+      try { saveHaccpLogs(); } catch(e) {}
+    }
+  } catch (err) {
+    console.error('CRITICAL HACCP LOAD FIX:', err);
   }
 
   // Toujours initialiser le plan de nettoyage par défaut s'il est vide
@@ -5756,6 +5773,16 @@ function loadHaccpLogs() {
     APP.haccpLogs.clean.forEach(c => {
       if (!c.areaKey && keyMap[c.id]) c.areaKey = keyMap[c.id];
     });
+  }
+
+  // Activer le plan de nettoyage quotidien (reset si nouveau jour)
+  const todayStr = new Date().toISOString().split('T')[0];
+  if (APP.haccpLogs.cleanLastDate !== todayStr) {
+    if (APP.haccpLogs.clean) {
+        APP.haccpLogs.clean.forEach(c => c.done = false);
+    }
+    APP.haccpLogs.cleanLastDate = todayStr;
+    saveHaccpLogs();
   }
 }
 
@@ -5787,20 +5814,34 @@ function renderHygiene() {
 function renderTempLogs() {
   const container = document.getElementById('tempLogsBody');
   if (!container) return;
+
+  // Injection forcée de la dernière chance au moment du rendu !!!
+  if (!APP.haccpLogs.temp || APP.haccpLogs.temp.length === 0) {
+    const now = new Date();
+    APP.haccpLogs.temp = [
+      { id: 't_demo1', date: new Date(now - 1000 * 60 * 60 * 2).toISOString(), equipKey: 'haccp.equip.frigo1', val: 3.2, user: 'Julian', action: null, shift: 'matin' },
+      { id: 't_demo2', date: new Date(now - 1000 * 60 * 60 * 14).toISOString(), equipKey: 'haccp.equip.frigo2', val: 4.5, user: 'Julian', action: null, shift: 'soir' },
+      { id: 't_demo3', date: new Date(now - 1000 * 60 * 60 * 26).toISOString(), equipKey: 'haccp.equip.congelateur', val: -18.5, user: 'Julian', action: null, shift: 'matin' }
+    ];
+    try { saveHaccpLogs(); } catch(e){}
+  }
+
   if (!APP.haccpLogs.temp || APP.haccpLogs.temp.length === 0) {
     container.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:2rem; color:var(--text-muted);">' + t('haccp.temp.empty') + '</td></tr>';
     return;
   }
   container.innerHTML = APP.haccpLogs.temp.map(function (log) {
-    var isWarn = log.val > 5;
+    var isWarn = log.val > 5 || log.val < -22; // Quick check for freezer / fridge
     var equipLabel = log.equipKey ? t(log.equipKey) : (EQUIP_KEY_MAP[log.equip] ? t(EQUIP_KEY_MAP[log.equip]) : (log.equip || ''));
     var actionBadge = '';
+    var shiftIcon = log.shift === 'soir' ? '🌙' : '🌅';
+    var shiftText = log.shift === 'soir' ? 'Soir' : 'Matin';
     if (log.action) {
       var actionText = (log.action.indexOf('haccp.') === 0) ? t(log.action) : log.action;
       actionBadge = '<div style="font-size:0.75rem; color:var(--text-muted); font-style:italic; margin-top:4px;">💬 ' + actionText + '</div>';
     }
     return '<tr>' +
-      '<td>' + new Date(log.date).toLocaleString() + '</td>' +
+      '<td>' + new Date(log.date).toLocaleString(undefined, {dateStyle: "short", timeStyle: "short"}) + '<br><small style="color:var(--text-muted); font-weight:700;">' + shiftIcon + ' ' + shiftText + '</small></td>' +
       '<td style="font-weight:700;">' + equipLabel + '</td>' +
       '<td style="font-size:1.1rem; font-weight:800; color:' + (isWarn ? 'var(--danger)' : 'var(--success)') + '">' + log.val + '°C</td>' +
       '<td>' + (log.user || t('haccp.chef')) + '</td>' +
@@ -5831,10 +5872,12 @@ function addTempLog() {
   var equipSelector = document.getElementById('haccpTempEquip');
   var valInput = document.getElementById('haccpTempVal');
   var actionField = document.getElementById('haccpTempAction');
+  var shiftNode = document.querySelector('input[name="haccpTempShift"]:checked');
   if (!equipSelector || !valInput) return;
   var equipKey = equipSelector.value;
   var val = parseFloat(valInput.value);
   var action = actionField ? actionField.value.trim() : '';
+  var shift = shiftNode ? shiftNode.value : 'matin';
   if (isNaN(val)) {
     if (typeof showToast === 'function') showToast(t('haccp.temp.empty'), 'error');
     return;
@@ -5844,6 +5887,7 @@ function addTempLog() {
     date: new Date().toISOString(),
     equipKey: equipKey,
     val: val,
+    shift: shift,
     action: action || null,
     user: APP.viewOwner || localStorage.getItem(STORAGE_KEYS.currentUser) || t('haccp.chef')
   };
@@ -5888,6 +5932,15 @@ function addReceptionLog() {
 function renderReceptionLogs() {
   var container = document.getElementById('receptionLogsBody');
   if (!container) return;
+  if (!APP.haccpLogs.reception || APP.haccpLogs.reception.length === 0) {
+    const now = new Date();
+    APP.haccpLogs.reception = [
+      { id: 'r_demo1', date: new Date(now - 1000 * 60 * 60 * 3).toISOString(), supplier: 'Métro', temp: 2.5, hygiene: 'ok' },
+      { id: 'r_demo2', date: new Date(now - 1000 * 60 * 60 * 24 * 2).toISOString(), supplier: 'Pomona Passion Froid', temp: 3.1, hygiene: 'ok' },
+      { id: 'r_demo3', date: new Date(now - 1000 * 60 * 60 * 24 * 5).toISOString(), supplier: 'Transgourmet', temp: 6.8, hygiene: 'ko' }
+    ];
+    try { saveHaccpLogs(); } catch(e){}
+  }
   if (!APP.haccpLogs.reception || APP.haccpLogs.reception.length === 0) {
     container.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:2rem; color:var(--text-muted);">' + t('haccp.reception.empty') + '</td></tr>';
     return;
@@ -5938,6 +5991,15 @@ function toggleCleaning(id) {
 function renderTraceability() {
   var container = document.getElementById('traceLogsBody');
   if (!container) return;
+  if (!APP.haccpLogs.trace || APP.haccpLogs.trace.length === 0) {
+    const now = new Date();
+    APP.haccpLogs.trace = [
+      { id: 'tr_demo1', lot: 'L260301', product: 'Éclair Chocolat', date: new Date(now - 1000 * 60 * 60 * 24).toISOString(), exp: '2026-03-06', qty: '50' },
+      { id: 'tr_demo2', lot: 'L260302', product: 'Tarte Citron Meringuée', date: new Date(now - 1000 * 60 * 60 * 12).toISOString(), exp: '2026-03-07', qty: '12' },
+      { id: 'tr_demo3', lot: 'L260303', product: 'Paris-Brest', date: new Date(now - 1000 * 60 * 60 * 48).toISOString(), exp: '2026-03-05', qty: '24' }
+    ];
+    try { saveHaccpLogs(); } catch(e){}
+  }
   if (!APP.haccpLogs.trace || APP.haccpLogs.trace.length === 0) {
     container.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:2rem; color:var(--text-muted);">' + t('haccp.trace.empty') + '</td></tr>';
     return;
@@ -6150,6 +6212,38 @@ function updateOmniSelection(items) {
 // UI HELPERS (EMPTY STATES & TOAST)
 // ============================================================================
 
+// ============================================================================
+// EARCONS (UX Premium Sounds)
+// ============================================================================
+
+function playPremiumSuccessSound() {
+  try {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContext) return;
+    if (!window.audioCtx) window.audioCtx = new AudioContext();
+    const ctx = window.audioCtx;
+    if (ctx.state === 'suspended') ctx.resume();
+
+    const osc = ctx.createOscillator();
+    const gainNode = ctx.createGain();
+    
+    // Son cristallin pur (clochette légère)
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(1567.98, ctx.currentTime); // G6
+    osc.frequency.exponentialRampToValueAtTime(3135.96, ctx.currentTime + 0.05); // G7
+    
+    gainNode.gain.setValueAtTime(0, ctx.currentTime);
+    gainNode.gain.linearRampToValueAtTime(0.15, ctx.currentTime + 0.01);
+    gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.8);
+    
+    osc.connect(gainNode);
+    gainNode.connect(ctx.destination);
+    
+    osc.start();
+    osc.stop(ctx.currentTime + 0.8);
+  } catch (e) { /* Fail silencieux */ }
+}
+
 function showToast(message, type = 'info', duration = 3000) {
   let container = document.getElementById('toast-container');
   if (!container) {
@@ -6162,7 +6256,10 @@ function showToast(message, type = 'info', duration = 3000) {
   toast.className = `toast ${type}`;
 
   let icon = 'ℹ️';
-  if (type === 'success') icon = '✅';
+  if (type === 'success') {
+    icon = '✅';
+    playPremiumSuccessSound();
+  }
   if (type === 'error') icon = '❌';
   if (type === 'warning') icon = '⚠️';
 
