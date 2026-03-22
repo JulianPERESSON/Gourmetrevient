@@ -1,0 +1,551 @@
+/* =============================================================
+   PREMIUM-EFFECTS.CSS — GourmetRevient v5.5
+   ✨ Atmosphère Pâtissière + Glassmorphism 2.0 + Haptic Effects
+   ✨ Predictive Margin Alerts + Allergen Audit + Smart OCR
+   ============================================================= */
+
+/* ============================================================= */
+/* 1. ATMOSPHERE PARTICLES — Canvas layer styling                 */
+/* ============================================================= */
+
+#atmosphereCanvas {
+  transition: opacity 0.5s ease;
+}
+
+/* Reduce particles opacity when auth overlay is visible */
+body.auth-pending #atmosphereCanvas {
+  opacity: 0.15 !important;
+}
+
+/* ============================================================= */
+/* 2. GLASSMORPHISM 2.0 — Specular Refraction Effect              */
+/* ============================================================= */
+
+.cockpit-card,
+.mgmt-glass-card,
+.crm-kpi-card {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Specular light halo that follows cursor */
+.cockpit-card::after,
+.mgmt-glass-card::after {
+  content: '';
+  position: absolute;
+  top: var(--specular-y, 50%);
+  left: var(--specular-x, 50%);
+  width: 250px;
+  height: 250px;
+  background: radial-gradient(
+    circle,
+    rgba(197, 165, 90, 0.12) 0%,
+    rgba(232, 213, 163, 0.06) 30%,
+    transparent 70%
+  );
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  z-index: 1;
+  border-radius: 50%;
+  filter: blur(20px);
+}
+
+.cockpit-card.specular-active::after,
+.mgmt-glass-card.specular-active::after {
+  opacity: 1;
+}
+
+/* Specular border glow */
+.cockpit-card.specular-active {
+  border-color: rgba(197, 165, 90, 0.2) !important;
+  box-shadow:
+    var(--shadow),
+    0 0 30px rgba(197, 165, 90, 0.06),
+    inset 0 0 30px rgba(197, 165, 90, 0.03) !important;
+}
+
+/* Dark theme adjustments */
+.dark-theme .cockpit-card::after,
+.dark-theme .mgmt-glass-card::after {
+  background: radial-gradient(
+    circle,
+    rgba(212, 186, 122, 0.08) 0%,
+    rgba(232, 213, 163, 0.04) 30%,
+    transparent 70%
+  );
+}
+
+.dark-theme .cockpit-card.specular-active {
+  box-shadow:
+    var(--shadow),
+    0 0 40px rgba(212, 186, 122, 0.05),
+    inset 0 0 30px rgba(212, 186, 122, 0.02) !important;
+}
+
+
+/* ============================================================= */
+/* 3. HAPTIC MICRO-ANIMATIONS                                     */
+/* ============================================================= */
+
+/* Ripple effect on primary buttons */
+.btn-primary,
+.p-action-btn {
+  position: relative;
+  overflow: hidden;
+}
+
+.haptic-ripple {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  animation: hapticRipple 0.7s cubic-bezier(0, 0.55, 0.45, 1) forwards;
+  pointer-events: none;
+  z-index: 10;
+}
+
+@keyframes hapticRipple {
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(40);
+    opacity: 0;
+  }
+}
+
+/* Success pulse overlay — brief screen flash */
+.haptic-success-pulse {
+  position: fixed;
+  inset: 0;
+  z-index: 99990;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, rgba(16, 185, 129, 0.08) 0%, transparent 70%);
+  animation: successPulse 0.8s ease-out forwards;
+}
+
+@keyframes successPulse {
+  0% { opacity: 0; transform: scale(0.8); }
+  30% { opacity: 1; }
+  100% { opacity: 0; transform: scale(1.2); }
+}
+
+/* Button press effect — tactile feedback */
+.btn-primary:active {
+  transform: scale(0.96) !important;
+  transition: transform 0.1s ease !important;
+}
+
+.p-action-btn:active {
+  transform: scale(0.92) !important;
+}
+
+
+/* ============================================================= */
+/* 4. ALERTE DE MARGE PRÉDICTIVE                                  */
+/* ============================================================= */
+
+.ai-bubble-warning {
+  background: linear-gradient(135deg, 
+    rgba(245, 158, 11, 0.08) 0%, 
+    rgba(239, 68, 68, 0.05) 100%
+  ) !important;
+  color: var(--text-main) !important;
+  border: 1px solid rgba(245, 158, 11, 0.2) !important;
+  border-radius: var(--radius-sm) !important;
+  padding: 1rem !important;
+  box-shadow: var(--shadow-sm) !important;
+}
+
+.ai-bubble-success {
+  background: linear-gradient(135deg, 
+    rgba(16, 185, 129, 0.08) 0%, 
+    rgba(59, 130, 246, 0.05) 100%
+  ) !important;
+  color: var(--text-main) !important;
+  border: 1px solid rgba(16, 185, 129, 0.2) !important;
+  border-radius: var(--radius-sm) !important;
+  padding: 1rem !important;
+  box-shadow: var(--shadow-sm) !important;
+}
+
+.ai-alert-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.ai-alert-icon {
+  font-size: 1.4rem;
+  animation: alertPulse 2s ease-in-out infinite;
+}
+
+@keyframes alertPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+}
+
+.ai-affected-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin: 0.8rem 0;
+  padding: 0.6rem;
+  background: rgba(0, 0, 0, 0.03);
+  border-radius: 8px;
+}
+
+.dark-theme .ai-affected-list {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.ai-affected-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.3rem 0;
+  font-size: 0.82rem;
+  border-bottom: 1px dashed rgba(0, 0, 0, 0.05);
+}
+
+.ai-affected-item:last-child {
+  border-bottom: none;
+}
+
+.ai-affected-name {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.ai-affected-margin {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.ai-affected-margin .text-danger {
+  color: var(--danger) !important;
+  font-weight: 700;
+}
+
+.ai-affected-more {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-style: italic;
+  text-align: center;
+  padding-top: 0.3rem;
+}
+
+.ai-tip {
+  transition: all 0.2s ease;
+}
+
+.ai-tip:hover {
+  background: rgba(197, 165, 90, 0.15) !important;
+  transform: translateY(-1px);
+}
+
+
+/* ============================================================= */
+/* 5. AUDIT ALLERGÈNES — Cockpit Card                             */
+/* ============================================================= */
+
+.allergen-audit-card {
+  grid-column: span 1;
+}
+
+.allergen-audit-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.4rem 0;
+}
+
+.allergen-audit-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.45rem 0.6rem;
+  background: rgba(239, 68, 68, 0.04);
+  border-radius: 8px;
+  border-left: 3px solid rgba(239, 68, 68, 0.3);
+  transition: all 0.2s ease;
+}
+
+.allergen-audit-item:hover {
+  background: rgba(239, 68, 68, 0.08);
+  transform: translateX(3px);
+}
+
+.allergen-icon {
+  font-size: 1.2rem;
+  width: 28px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.allergen-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.allergen-name {
+  font-weight: 700;
+  font-size: 0.82rem;
+  color: var(--text);
+}
+
+.allergen-recipes {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.allergen-audit-footer {
+  padding: 0.5rem 0 0;
+  border-top: 1px dashed var(--surface-border);
+  margin-top: 0.4rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+
+/* ============================================================= */
+/* 6. MASTER CONVERTER BUTTON IN RECIPE CARDS                     */
+/* ============================================================= */
+
+.btn-mold-adapter {
+  font-size: 0.72rem !important;
+  padding: 4px 10px !important;
+  border-color: var(--gold) !important;
+  color: var(--gold) !important;
+  border-radius: 8px !important;
+  transition: all 0.3s ease !important;
+}
+
+.btn-mold-adapter:hover {
+  background: var(--gold) !important;
+  color: var(--chocolate) !important;
+  box-shadow: 0 4px 15px rgba(197, 165, 90, 0.3) !important;
+  transform: translateY(-2px) !important;
+}
+
+
+/* ============================================================= */
+/* 7. SMART OCR SCANNER                                           */
+/* ============================================================= */
+
+.ocr-supplier-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.8rem 1rem;
+  background: linear-gradient(135deg, rgba(197, 165, 90, 0.1), rgba(197, 165, 90, 0.05));
+  border: 1px solid rgba(197, 165, 90, 0.2);
+  border-radius: 12px;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+  animation: fadeUp 0.4s ease-out;
+}
+
+.ocr-supplier-icon {
+  font-size: 1.4rem;
+}
+
+.ocr-batch-alert {
+  border-radius: 12px;
+  padding: 1rem;
+  margin-bottom: 0.8rem;
+  animation: fadeUp 0.4s ease-out;
+}
+
+.ocr-batch-danger {
+  background: rgba(239, 68, 68, 0.05);
+  border: 1px solid rgba(239, 68, 68, 0.15);
+}
+
+.ocr-batch-success {
+  background: rgba(16, 185, 129, 0.05);
+  border: 1px solid rgba(16, 185, 129, 0.15);
+}
+
+.ocr-batch-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.8rem;
+  font-weight: 700;
+  font-size: 0.88rem;
+}
+
+.ocr-batch-items {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.ocr-smart-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.4rem 0.6rem;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 8px;
+  font-size: 0.82rem;
+}
+
+.dark-theme .ocr-smart-item {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.ocr-item-name {
+  flex: 1;
+  font-weight: 600;
+}
+
+.ocr-item-old {
+  color: var(--text-muted);
+  text-decoration: line-through;
+  font-size: 0.78rem;
+}
+
+.ocr-item-arrow {
+  color: var(--text-muted);
+  font-size: 0.7rem;
+}
+
+.ocr-item-new {
+  font-weight: 700;
+  font-size: 0.82rem;
+}
+
+.ocr-item-new.text-danger {
+  color: var(--danger);
+}
+
+.ocr-item-new.text-success {
+  color: var(--success);
+}
+
+.ocr-summary-bar {
+  padding: 0.6rem 1rem;
+  background: var(--bg-alt);
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-align: center;
+  margin-top: 0.5rem;
+}
+
+/* ============================================================= */
+/* 8. RESPONSIVE ADJUSTMENTS                                      */
+/* ============================================================= */
+
+@media (max-width: 768px) {
+  #atmosphereCanvas {
+    display: none; /* Save battery on mobile */
+  }
+
+  .cockpit-card::after,
+  .mgmt-glass-card::after {
+    display: none; /* No specular on touch devices */
+  }
+
+  .allergen-audit-card {
+    grid-column: span 1;
+  }
+
+  .ocr-batch-header {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}
+
+/* ============================================================= */
+/* 9. FADE UP ANIMATION (Shared utility)                          */
+/* ============================================================= */
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============================================================= */
+/* 10. TYPOGRAPHIE "MENU DE PALACE"                               */
+/* ============================================================= */
+
+/* Noms de recettes et grands titres en Serif élégant */
+.recipe-name, 
+.saved-card h3, 
+.card-header-premium h3, 
+.library-header h3, 
+.briefing-user h2,
+.p-title,
+.cockpit-grid h2,
+.cockpit-grid-v2 h2,
+.dash-card h3,
+.modal-header h3 {
+  font-family: var(--font-display) !important;
+  letter-spacing: 0.02em;
+}
+
+/* On s'assure que les chiffres/valeurs restent précis et lisibles (Sans-Serif) */
+.k-value, 
+.fin-value, 
+.dash-stat .value,
+.metric-value,
+.stat-value {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
+  letter-spacing: -0.02em;
+}
+
+/* ============================================================= */
+/* 11. SKELETON "SILK & SHIMMER" (Reflet de soie)                 */
+/* ============================================================= */
+
+/* Surcharge du skeleton de base pour un effet premium et soyeux */
+.skeleton {
+  background: linear-gradient(
+    110deg,
+    rgba(220, 220, 220, 0.4) 8%,
+    rgba(255, 255, 255, 0.8) 18%,
+    rgba(220, 220, 220, 0.4) 33%
+  ) !important;
+  background-size: 200% 100% !important;
+  animation: shimmerSilk 1.5s cubic-bezier(0.4, 0, 0.2, 1) infinite !important;
+  border: 1px solid rgba(255, 255, 255, 0.5) !important;
+  box-shadow: inset 0 2px 5px rgba(0,0,0,0.02) !important;
+}
+
+.dark-theme .skeleton {
+  background: linear-gradient(
+    110deg,
+    rgba(30, 41, 59, 0.6) 8%,
+    rgba(51, 65, 85, 0.6) 18%,
+    rgba(30, 41, 59, 0.6) 33%
+  ) !important;
+  border-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+@keyframes shimmerSilk {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}

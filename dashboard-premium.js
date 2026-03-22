@@ -1,10 +1,16 @@
 // dashboard-premium.js: Dedicated script for populating the Bento Premium Dashboard (V2)
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Initial hydration
-    setTimeout(hydratePremiumDashboard, 500);
-    // Refresh periodically
-    setInterval(hydratePremiumDashboard, 10000);
+    // Wait until authentication is complete and the overlay is removed before hydrating animations
+    const checkAuthAndHydrate = () => {
+        if (!document.body.classList.contains('auth-pending')) {
+            setTimeout(hydratePremiumDashboard, 300); // Small delay for smooth entry
+            setInterval(hydratePremiumDashboard, 10000); // Periodic refresh
+        } else {
+            setTimeout(checkAuthAndHydrate, 100);
+        }
+    };
+    checkAuthAndHydrate();
 });
 
 window.hydratePremiumDashboard = function () {
@@ -56,13 +62,22 @@ window.hydratePremiumDashboard = function () {
 
     // Update Briefing Stats
     const bProd = document.getElementById('briefingProdCount');
-    if (bProd) bProd.textContent = prodCountToday;
+    if (bProd) {
+        if (typeof animateTicker === 'function') animateTicker(bProd, prodCountToday);
+        else bProd.textContent = prodCountToday;
+    }
     
     const bAlert = document.getElementById('briefingAlertCount');
-    if (bAlert) bAlert.textContent = stockAlerts.length;
+    if (bAlert) {
+        if (typeof animateTicker === 'function') animateTicker(bAlert, stockAlerts.length);
+        else bAlert.textContent = stockAlerts.length;
+    }
     
     const bMargin = document.getElementById('briefingMarginValue');
-    if (bMargin) bMargin.textContent = Math.round(avgMargin) + '%';
+    if (bMargin) {
+        if (typeof animateTicker === 'function') animateTicker(bMargin, Math.round(avgMargin), 1500, '%');
+        else bMargin.textContent = Math.round(avgMargin) + '%';
+    }
 
     // 3. Priorities List
     const priorityList = document.getElementById('dashPriorityList');

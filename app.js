@@ -1097,25 +1097,35 @@ function renderCostAnalysis() {
       kpiGrid.innerHTML = `
         <div class="kpi-card">
           <div class="kpi-label">${t('ui.kpi.total_material')}</div>
-          <div class="kpi-value">${costs.totalMaterial.toFixed(2)} €</div>
+          <div class="kpi-value ticker-val" data-val="${costs.totalMaterial}" data-suffix=" €">${costs.totalMaterial.toFixed(2)} €</div>
           <div class="kpi-sub">${t('label.per_portion')} ${costs.portions} ${costs.portions > 1 ? t('unit.portions') : t('unit.portion')}</div>
         </div>
         <div class="kpi-card accent">
           <div class="kpi-label">${t('ui.kpi.per_portion')}</div>
-          <div class="kpi-value">${costs.costPerPortion.toFixed(2)} €</div>
+          <div class="kpi-value ticker-val" data-val="${costs.costPerPortion}" data-suffix=" €">${costs.costPerPortion.toFixed(2)} €</div>
           <div class="kpi-sub">${t('label.cost')} / ${t('unit.portion')}</div>
         </div>
         <div class="kpi-card success">
           <div class="kpi-label">${t('ui.kpi.suggested_price')}</div>
-          <div class="kpi-value">${costs.sellingPrice.toFixed(2)} €</div>
+          <div class="kpi-value ticker-val" data-val="${costs.sellingPrice}" data-suffix=" €">${costs.sellingPrice.toFixed(2)} €</div>
           <div class="kpi-sub">${t('s4.margin')} ${APP.margin}%</div>
         </div>
         <div class="kpi-card warning">
           <div class="kpi-label">${t('ui.kpi.margin_portion')}</div>
-          <div class="kpi-value">${costs.marginPerPortion.toFixed(2)} €</div>
+          <div class="kpi-value ticker-val" data-val="${costs.marginPerPortion}" data-suffix=" €">${costs.marginPerPortion.toFixed(2)} €</div>
           <div class="kpi-sub">${costs.marginPct.toFixed(1)}% ${t('s4.margin')}</div>
         </div>
       `;
+
+      if (typeof animateTicker === 'function') {
+        kpiGrid.querySelectorAll('.ticker-val').forEach(el => {
+          const val = el.getAttribute('data-val');
+          const suffix = el.getAttribute('data-suffix');
+          // Reset visually to 0 before animating
+          el.textContent = '0.00' + suffix; 
+          animateTicker(el, val, 1200, suffix);
+        });
+      }
 
       // Animate KPI Cards
       if (window.gsap) {
@@ -3235,7 +3245,7 @@ function renderInventory() {
         </td>
         <td style="text-align:center;"><span class="badge ${statusClass}">${statusLabel}</span></td>
         <td style="text-align:center;">
-          <button class="btn btn-sm btn-outline btn-round" onclick="editInventoryItem('${item.id}')" title="Seuil d'alerte">🔔</button>
+          <button class="btn btn-sm btn-outline btn-round" onclick="editInventoryItem('${item.id}')" title="Seuil d'alerte">⚙️</button>
         </td>
       </tr>
     `;
