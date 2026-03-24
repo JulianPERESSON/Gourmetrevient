@@ -17,15 +17,29 @@ function loadCrm() {
     console.error('Error loading CRM data', e);
   }
 
-  // Demo Data if completely empty
-  if (!APP.crm.clients || APP.crm.clients.length === 0) {
-    APP.crm.clients = [
-      { id: 'c1', name: 'Hôtel de la Cité', contact: '06 12 34 56 78', notes: 'Livraison par l\'arrière' },
-      { id: 'c2', name: 'Mme Dupont (Mariage)', contact: 'lucie@email.com', notes: 'Allergie fruits à coque' },
-      { id: 'c3', name: 'Restaurant Le Gourmet', contact: 'facturation@gourmet.fr', notes: 'Facturation fin de mois' }
-    ];
-    saveCrm();
-  }
+  // Demo Data — ensure all 4 demo contacts exist and stay up-to-date
+  if (!APP.crm.clients) APP.crm.clients = [];
+  const demoClients = [
+    { id: 'c1', name: 'Hôtel de la Cité', contact: '06 12 34 56 78', notes: 'Livraison par l\'arrière' },
+    { id: 'c2', name: 'Mme Dupont (Mariage)', contact: 'lucie@email.com', notes: 'Allergie fruits à coque' },
+    { id: 'c4', name: 'CMA Muret', contact: 'lpelletier@cm-toulouse.fr', notes: 'Un chef qui maîtrise le chocolat … et les baguettes du diabolo 🪀🍫' },
+    { id: 'c5', name: 'Mr Bouvier-Gaz', contact: '', notes: 'Un chef qui lève plus son ego que ses pâtes 🥐😤' },
+    { id: 'c3', name: 'Restaurant Le Gourmet', contact: 'facturation@gourmet.fr', notes: 'Facturation fin de mois' }
+  ];
+  let clientsChanged = false;
+  demoClients.forEach(dc => {
+    const existing = APP.crm.clients.find(c => c.id === dc.id);
+    if (!existing) {
+      APP.crm.clients.push(dc);
+      clientsChanged = true;
+    } else if (existing.name !== dc.name || existing.contact !== dc.contact || existing.notes !== dc.notes) {
+      existing.name = dc.name;
+      existing.contact = dc.contact;
+      existing.notes = dc.notes;
+      clientsChanged = true;
+    }
+  });
+  if (clientsChanged) saveCrm();
 
   if (!APP.crm.orders || APP.crm.orders.length === 0) {
     const now = new Date();

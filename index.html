@@ -55,6 +55,7 @@
   <link rel="stylesheet" href="./css/creative-tools.css?v=1.0.1" />
   <link rel="stylesheet" href="./css/master-converter.css?v=1.0.1" />
   <link rel="stylesheet" href="./css/premium-effects.css?v=1.0.1" />
+  <link rel="stylesheet" href="./css/commercial-features.css?v=1.0.1" />
   <!-- Libraries for new features -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -244,17 +245,18 @@
           <button class="nav-link nav-dropdown-link" onclick="showMgmt(); switchMgmtTab('dashboard');">🎯 Objectifs & Hub</button>
           <button class="nav-link nav-dropdown-link" onclick="showMgmt(); switchMgmtTab('boston');">⭐ <span data-i18n="bcg.title">Matrice BCG</span></button>
           <button class="nav-link nav-dropdown-link" onclick="showMgmt(); switchMgmtTab('inflation');">🔥 Simulateur Inflation</button>
+          <button class="nav-link nav-dropdown-link" onclick="generateECatalogue();">🌐 E-Catalogue Client</button>
         </div>
       </div>
 
       <!-- Atelier Créatif -->
       <div class="nav-dropdown">
-        <button class="nav-dropdown-trigger">💡 <span>Atelier Créatif</span> <span class="nav-arrow">▼</span></button>
+        <button class="nav-dropdown-trigger"><span data-i18n="nav.category.creative">💡 Atelier Créatif</span> <span class="nav-arrow">▼</span></button>
         <div class="nav-dropdown-content">
-          <button class="nav-link nav-dropdown-link" onclick="openChefsBrain()">🧠 Chef's Brain</button>
-          <button class="nav-link nav-dropdown-link" onclick="openAssemblySimulator()">🏗️ Simulateur Montage</button>
-          <button class="nav-link nav-dropdown-link" onclick="openMasterConverter()">📏 Master Converter</button>
-          <button class="nav-link nav-dropdown-link" onclick="showLabo()">📐 Matériel & Outillage</button>
+          <button class="nav-link nav-dropdown-link" onclick="openChefsBrain()"><span data-i18n="nav.creative.brain">🧠 Cerveau du Chef</span></button>
+          <button class="nav-link nav-dropdown-link" onclick="openAssemblySimulator()"><span data-i18n="nav.creative.assembly">🏗️ Simulateur Montage</span></button>
+          <button class="nav-link nav-dropdown-link" onclick="openMasterConverter()"><span data-i18n="nav.creative.converter">📏 Convertisseur de Moules</span></button>
+          <button class="nav-link nav-dropdown-link" onclick="showLabo()"><span data-i18n="nav.creative.lab">📐 Matériel & Outillage</span></button>
           <button class="nav-link nav-dropdown-link" onclick="showPortfolio()">🖼️ <span data-i18n="nav.portfolio">Portfolio</span></button>
           <button class="nav-link nav-dropdown-link" onclick="showAPropos()">📖 <span data-i18n="nav.about">À propos</span></button>
         </div>
@@ -952,6 +954,21 @@
                 </div>
               </div>
             </div>
+
+              <!-- Waste Monthly Report -->
+              <div class="mgmt-glass-card" style="margin-top:1.5rem;">
+                <div class="mgmt-card-header header-centered">
+                  <div class="mgmt-card-title">
+                    <div class="title-icon icon-purple">📊</div>
+                    <div>
+                      <h3>Rapport Mensuel de Gaspillage</h3>
+                      <p>Analyse automatique des pertes et recommandations</p>
+                    </div>
+                  </div>
+                </div>
+                <div id="wasteMonthlyReport"></div>
+              </div>
+
           </div>
         </div>
 
@@ -3443,6 +3460,7 @@
           populateWasteDropdown();
           renderWasteAnalysis();
         }
+        if (typeof renderWasteMonthlyReport === 'function') renderWasteMonthlyReport();
       }
     }
 
@@ -3459,6 +3477,7 @@
   <script src="./creative-tools.js?v=1.0.1"></script>
   <script src="./master-converter.js?v=1.0.1"></script>
   <script src="./crm.js?v=1.0.1"></script>
+  <script src="./commercial-features.js?v=1.0.1"></script>
   <script src="./premium-effects.js?v=1.0.1"></script>
 
   <script>
@@ -3879,10 +3898,10 @@
   <div id="chefsBrainModal" class="modal-overlay" style="display:none;">
     <div class="modal-content glass-panel" style="max-width:820px; width:95%;">
       <div class="modal-header" style="display:flex; justify-content:space-between; margin-bottom:1.2rem;">
-        <h3 style="margin:0;">🧠 <span>Chef's Brain — Accords de Saveurs</span></h3>
+        <h3 style="margin:0;"><span data-i18n="modal.brain.title">🧠 Cerveau du Chef — Accords de Saveurs</span></h3>
         <button class="btn-icon" onclick="closeChefsBrain()">✕</button>
       </div>
-      <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1.5rem;">Choisissez un ingrédient de base et découvrez les meilleurs accords. Le coût estimé s'affiche instantanément.</p>
+      <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1.5rem;" data-i18n="modal.brain.desc">Choisissez un ingrédient de base et découvrez les meilleurs accords. Le coût estimé s'affiche instantanément.</p>
       
       <!-- Search -->
       <div class="form-group" style="position:relative;">
@@ -3921,7 +3940,7 @@
   <div id="assemblyModal" class="modal-overlay" style="display:none;">
     <div class="modal-content glass-panel" style="max-width:960px; width:95%; max-height:90vh; overflow:hidden; display:flex; flex-direction:column;">
       <div class="modal-header" style="display:flex; justify-content:space-between; margin-bottom:1rem;">
-        <h3 style="margin:0;">🏗️ <span>Simulateur de Montage</span></h3>
+        <h3 style="margin:0;"><span data-i18n="modal.assembly.title">🏗️ Simulateur de Montage</span></h3>
         <div style="display:flex; gap:8px;">
           <button class="btn btn-sm btn-outline" onclick="clearAssembly()">🗑️ Effacer</button>
           <button class="btn btn-sm btn-primary" onclick="exportAssemblyPNG()">💾 Exporter</button>
@@ -3973,8 +3992,8 @@
       <!-- Header -->
       <div class="modal-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.2rem;">
         <div>
-          <h3 style="margin:0; font-family:var(--font-display);">📏 Master Converter <span style="background:var(--gold-shimmer); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;">Géométrie Culinaire</span></h3>
-          <p style="margin:0.2rem 0 0; font-size:0.82rem; color:var(--text-muted);">Adaptez instantanément les quantités d'une recette à un nouveau format de moule.</p>
+          <h3 style="margin:0; font-family:var(--font-display);"><span data-i18n="modal.converter.title">📏 Convertisseur de Moules</span> <span style="background:var(--gold-shimmer); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;" data-i18n="modal.converter.subtitle">Géométrie Culinaire</span></h3>
+          <p style="margin:0.2rem 0 0; font-size:0.82rem; color:var(--text-muted);" data-i18n="modal.converter.desc">Adaptez instantanément les quantités d'une recette à un nouveau format de moule.</p>
         </div>
         <button class="btn-icon" onclick="closeMasterConverter()">✕</button>
       </div>
