@@ -935,6 +935,452 @@ const RECIPES = [
       'Colorer le fondant en vert clair et glacer les choux.',
       'Décorer les extrémités avec des vermicelles au chocolat.'
     ]
+  },
+
+  // =====================================================================
+  // NOUVELLES RECETTES — Enrichissement Bibliothèque des Chefs
+  // Ajout Mars 2026 — 10 recettes de référence additionnelles
+  // =====================================================================
+
+  // --- CHOCOLATERIE ---
+  {
+    id: 'mendiants-chocolat',
+    name: 'Mendiants au Chocolat Noir',
+    category: 'Chocolaterie',
+    portions: 30,
+    prepTime: 30,
+    cookTime: 0,
+    image: './img/chocolat.jpg',
+    description: 'Palets de chocolat noir grand cru tempéré, décorés de fruits secs et d\'épices – confiserie de maison classique revisitée.',
+    ingredients: [
+      { name: 'Chocolat noir 72%', quantity: 400, unit: 'g', pricePerKg: 14.50 },
+      { name: 'Noisettes torréfiées', quantity: 60, unit: 'g', pricePerKg: 12.50 },
+      { name: 'Amandes entières', quantity: 60, unit: 'g', pricePerKg: 10.00 },
+      { name: 'Cranberries séchées', quantity: 50, unit: 'g', pricePerKg: 18.00 },
+      { name: 'Pistaches émondées', quantity: 40, unit: 'g', pricePerKg: 35.00 },
+      { name: 'Fleur de sel', quantity: 5, unit: 'g', pricePerKg: 12.00 },
+      { name: 'Zeste d\'orange confite', quantity: 30, unit: 'g', pricePerKg: 22.00 }
+    ],
+    steps: [
+      'Tempérer le chocolat noir selon la courbe : fonte à 50°C, tablage à 27°C, travail à 31°C.',
+      'Pocher des palets de 3cm de diamètre sur feuille guitare.',
+      'Avant cristallisation, déposer sur chaque palet : une noisette, une amande, une cranberry et une pistache.',
+      'Ajouter un cristal de fleur de sel et un zeste d\'orange.',
+      'Laisser cristalliser 30 min à 17°C.',
+      'Décoller délicatement et conditionner en boîte.'
+    ]
+  },
+  {
+    id: 'truffes-chocolat-cognac',
+    name: 'Truffes Chocolat & Cognac',
+    category: 'Chocolaterie',
+    portions: 20,
+    prepTime: 40,
+    cookTime: 0,
+    image: './img/chocolat.jpg',
+    description: 'Ganache fondante au cognac enrobée de chocolat noir et roulée dans le cacao pur – la truffe de Noël par excellence.',
+    ingredients: [
+      { name: 'Chocolat noir 64%', quantity: 300, unit: 'g', pricePerKg: 11.50 },
+      { name: 'Crème 35% MG', quantity: 150, unit: 'ml', pricePerL: 3.25 },
+      { name: 'Beurre AOP', quantity: 30, unit: 'g', pricePerKg: 6.15 },
+      { name: 'Cognac VSOP', quantity: 20, unit: 'ml', pricePerL: 45.00 },
+      { name: 'Cacao poudre amère', quantity: 60, unit: 'g', pricePerKg: 15.00 },
+      { name: 'Sucre inverti (Trimoline)', quantity: 20, unit: 'g', pricePerKg: 8.00 }
+    ],
+    steps: [
+      'Chauffer la crème avec le Trimoline. Verser sur le chocolat haché pour créer une ganache.',
+      'Émulsionner au mixeur plongeant, ajouter le cognac et le beurre pommade.',
+      'Couler en cadre 1cm d\'épaisseur et laisser cristalliser 12h.',
+      'Détailler des cubes de 2cm, rouler dans la ganache pour les sphériser.',
+      'Rouler abondamment dans le cacao pur.',
+      'Réfrigérer et conditionner dans caissettes dorées.'
+    ]
+  },
+
+  // --- PÂTISSERIES TOULOUSAINES ---
+  {
+    id: 'fenetra-toulouse',
+    name: 'Fénétra de Toulouse',
+    category: 'Pâtisserie Toulousaine',
+    portions: 10,
+    prepTime: 60,
+    cookTime: 40,
+    image: './img/tarte-bourdaloue.jpg',
+    description: 'Emblème de la pâtisserie toulousaine : fond de pâte sablée, crème d\'amandes aux fruits confits, couvert d\'un glaçage royal et d\'amandes effilées.',
+    ingredients: [
+      { name: 'Farine T55', quantity: 250, unit: 'g', pricePerKg: 0.44 },
+      { name: 'Beurre AOP', quantity: 200, unit: 'g', pricePerKg: 6.15 },
+      { name: 'Poudre d\'amandes', quantity: 150, unit: 'g', pricePerKg: 9.50 },
+      { name: 'Sucre semoule', quantity: 150, unit: 'g', pricePerKg: 0.68 },
+      { name: 'Œufs entiers', quantity: 3, unit: 'pcs', pricePerPc: 0.11 },
+      { name: 'Écorces d\'orange confites', quantity: 80, unit: 'g', pricePerKg: 22.00 },
+      { name: 'Cédrat confit', quantity: 60, unit: 'g', pricePerKg: 28.00 },
+      { name: 'Rhum ambré', quantity: 20, unit: 'ml', pricePerL: 20.00 },
+      { name: 'Sucre glace (glaçage)', quantity: 100, unit: 'g', pricePerKg: 2.10 },
+      { name: 'Amandes effilées', quantity: 40, unit: 'g', pricePerKg: 9.50 }
+    ],
+    steps: [
+      'Réaliser la pâte sablée toulousaine (riche en beurre), fraser et laisser reposer 1h au frais.',
+      'Foncer un moule à tarte avec la pâte. Cuire à blanc 10 min à 170°C.',
+      'Préparer la crème d\'amandes : crémer le beurre et le sucre, ajouter les œufs un à un, puis la poudre d\'amandes.',
+      'Incorporer les fruits confits (écorces d\'orange et cédrat) coupés en brunoise et le rhum.',
+      'Garnir le fond de tarte précuit et cuire 30 min à 170°C jusqu\'à légère coloration.',
+      'Refroidir complètement. Napper d\'un glaçage royal fluide et parsemer d\'amandes effilées.'
+    ]
+  },
+  {
+    id: 'gimblette-toulouse',
+    name: 'Gimblette de Toulouse',
+    category: 'Pâtisserie Toulousaine',
+    portions: 20,
+    prepTime: 45,
+    cookTime: 20,
+    image: './img/macaron.jpg',
+    description: 'Biscuit annulaire traditionnel toulousain : léger et croustillant, parfumé à la fleur d\'oranger et à l\'anis, poché dans l\'eau bouillante avant cuisson.',
+    ingredients: [
+      { name: 'Farine T55', quantity: 400, unit: 'g', pricePerKg: 0.44 },
+      { name: 'Sucre semoule', quantity: 150, unit: 'g', pricePerKg: 0.68 },
+      { name: 'Beurre AOP', quantity: 80, unit: 'g', pricePerKg: 6.15 },
+      { name: 'Œufs entiers', quantity: 3, unit: 'pcs', pricePerPc: 0.11 },
+      { name: 'Fleur d\'oranger', quantity: 20, unit: 'ml', pricePerL: 15.00 },
+      { name: 'Anis vert (graines)', quantity: 10, unit: 'g', pricePerKg: 25.00 },
+      { name: 'Levure chimique', quantity: 8, unit: 'g', pricePerKg: 5.00 },
+      { name: 'Sel', quantity: 4, unit: 'g', pricePerKg: 0.80 },
+      { name: 'Sucre glace (finition)', quantity: 50, unit: 'g', pricePerKg: 2.10 }
+    ],
+    steps: [
+      'Mélanger farine, sucre, levure, sel et graines d\'anis.',
+      'Incorporer le beurre fondu refroidi, les œufs battus et la fleur d\'oranger.',
+      'Pétrir jusqu\'à obtenir une pâte souple et homogène. Laisser reposer 20 min.',
+      'Rouler la pâte en boudins fins de 1cm et former des anneaux soudés.',
+      'Pocher les gimblettes 2 min dans l\'eau bouillante (elles remontent à la surface).',
+      'Égoutter, disposer sur plaque et cuire à 190°C pendant 18-20 min jusqu\'à coloration dorée.',
+      'Refroidir sur grille. Saupoudrer légèrement de sucre glace avant conditionnement.'
+    ]
+  },
+
+  // --- ENTREMETS MODERNES ---
+  {
+    id: 'entremet-caramel-beurre-sale',
+    name: 'Entremet Caramel Beurre Salé',
+    category: 'Entremets',
+    portions: 10,
+    prepTime: 150,
+    cookTime: 20,
+    image: './img/tatin-vanille.jpg',
+    description: 'Mousse légère au caramel beurre salé, insert fondant et biscuit breton sablé – un hommage à la Bretagne.',
+    ingredients: [
+      { name: 'Sucre semoule', quantity: 300, unit: 'g', pricePerKg: 0.68 },
+      { name: 'Beurre demi-sel', quantity: 150, unit: 'g', pricePerKg: 7.50 },
+      { name: 'Crème 35% MG', quantity: 500, unit: 'ml', pricePerL: 3.25 },
+      { name: 'Lait entier', quantity: 200, unit: 'ml', pricePerL: 0.72 },
+      { name: 'Jaunes d\'œufs', quantity: 4, unit: 'pcs', pricePerPc: 0.11 },
+      { name: 'Gélatine en feuilles', quantity: 10, unit: 'g', pricePerKg: 28.00 },
+      { name: 'Farine T55', quantity: 200, unit: 'g', pricePerKg: 0.44 },
+      { name: 'Beurre AOP', quantity: 120, unit: 'g', pricePerKg: 6.15 },
+      { name: 'Fleur de sel', quantity: 3, unit: 'g', pricePerKg: 12.00 }
+    ],
+    steps: [
+      'Cuire le caramel à sec jusqu\'à coloration ambrée, décuire avec la crème chaude et le beurre demi-sel.',
+      'Réaliser la crème anglaise vanillée avec jaunes, lait et une partie du caramel.',
+      'Coller la crème anglaise à la gélatine, laisser refroidir à 25°C puis incorporer la crème montée.',
+      'Réaliser le sablé breton : crémage beurre/sucre, ajouter farine et fleur de sel. Cuire à 160°C.',
+      'Montage : couler la mousse caramel, insérer le disque de caramel confit, sceller avec le sablé breton.',
+      'Bloquer 6h au froid, démouler, napper d\'un nappage caramel brillant.'
+    ]
+  },
+  {
+    id: 'entremet-the-matcha-yuzu',
+    name: 'Entremet Thé Matcha & Yuzu',
+    category: 'Entremets',
+    portions: 8,
+    prepTime: 180,
+    cookTime: 15,
+    image: './img/exotique.jpg',
+    description: 'Création signature franco-japonaise : mousse thé matcha, insert gélifié au yuzu et biscuit dacquoise noisette.',
+    ingredients: [
+      { name: 'Poudre de thé matcha', quantity: 20, unit: 'g', pricePerKg: 120.00 },
+      { name: 'Crème 35% MG', quantity: 450, unit: 'ml', pricePerL: 3.25 },
+      { name: 'Lait entier', quantity: 200, unit: 'ml', pricePerL: 0.72 },
+      { name: 'Jus de yuzu', quantity: 80, unit: 'ml', pricePerL: 55.00 },
+      { name: 'Sucre semoule', quantity: 200, unit: 'g', pricePerKg: 0.68 },
+      { name: 'Gélatine en feuilles', quantity: 12, unit: 'g', pricePerKg: 28.00 },
+      { name: 'Poudre de noisette', quantity: 100, unit: 'g', pricePerKg: 12.50 },
+      { name: 'Blancs d\'œufs', quantity: 4, unit: 'pcs', pricePerPc: 0.20 },
+      { name: 'Chocolat blanc 33%', quantity: 100, unit: 'g', pricePerKg: 9.80 }
+    ],
+    steps: [
+      'Préparer la dacquoise noisette et cuire 15 min à 170°C. Réserver.',
+      'Préparer l\'insert yuzu : jus de yuzu + sucre + gélatine, couler en insert et congeler.',
+      'Réaliser la mousse matcha : infuser la poudre dans le lait chaud, préparer une crème anglaise, coller à la gélatine et incorporer la crème montée.',
+      'Montage à l\'envers dans un moule silicone : mousse matcha, insert yuzu congelé, dacquoise noisette.',
+      'Bloquer au congélateur minimum 8h.',
+      'Démouler, glacer au nappage vert et décorer de poudre de matcha et zestes de yuzu.'
+    ]
+  },
+
+  // --- BOULANGERIE FINE ---
+  {
+    id: 'brioche-feuilletee',
+    name: 'Brioche Feuilletée (Suisse)',
+    category: 'Viennoiserie',
+    portions: 10,
+    prepTime: 220,
+    cookTime: 18,
+    image: './img/tropezienne.jpg',
+    description: 'Viennoiserie feuilletée d\'origine suisse : pâte briochée tourée au beurre, garnie de crème pâtissière vanille et pépites de chocolat.',
+    ingredients: [
+      { name: 'Farine T45', quantity: 500, unit: 'g', pricePerKg: 1.30 },
+      { name: 'Beurre AOP (tourage)', quantity: 250, unit: 'g', pricePerKg: 6.15 },
+      { name: 'Lait entier', quantity: 150, unit: 'ml', pricePerL: 0.72 },
+      { name: 'Sucre semoule', quantity: 80, unit: 'g', pricePerKg: 0.68 },
+      { name: 'Levure fraîche', quantity: 25, unit: 'g', pricePerKg: 10.00 },
+      { name: 'Œufs entiers', quantity: 3, unit: 'pcs', pricePerPc: 0.11 },
+      { name: 'Sel', quantity: 8, unit: 'g', pricePerKg: 0.80 },
+      { name: 'Crème pâtissière (pâton)', quantity: 200, unit: 'g', pricePerKg: 3.50 },
+      { name: 'Pépites de chocolat noir', quantity: 100, unit: 'g', pricePerKg: 10.50 }
+    ],
+    steps: [
+      'Réaliser la pâte à brioche (sans le beurre de tourage), laisser pointer au froid 1h.',
+      'Enchâsser le beurre de tourage froid et donner 3 tours simples.',
+      'Abaisser la pâte en un rectangle de 3mm.',
+      'Étaler uniformément la crème pâtissière et parsemer de pépites de chocolat.',
+      'Rouler en boudin serré et détailler des rondelles de 3cm.',
+      'Couvrir et apprêter 1h30 à 25°C, dorer puis cuire à 180°C pendant 18 min.'
+    ]
+  },
+  {
+    id: 'pain-de-genes',
+    name: 'Pain de Gênes',
+    category: 'Biscuit de Voyage',
+    portions: 12,
+    prepTime: 30,
+    cookTime: 35,
+    image: './img/frangine.jpg',
+    description: 'Gâteau moelleux à la pâte d\'amandes fondante et aux zestes de citron – le biscuit de conserve classique de la pâtisserie française.',
+    ingredients: [
+      { name: 'Pâte d\'amandes 50%', quantity: 300, unit: 'g', pricePerKg: 12.00 },
+      { name: 'Œufs entiers', quantity: 4, unit: 'pcs', pricePerPc: 0.11 },
+      { name: 'Beurre AOP', quantity: 80, unit: 'g', pricePerKg: 6.15 },
+      { name: 'Farine T55', quantity: 60, unit: 'g', pricePerKg: 0.44 },
+      { name: 'Maïzena', quantity: 20, unit: 'g', pricePerKg: 4.00 },
+      { name: 'Sucre glace', quantity: 30, unit: 'g', pricePerKg: 2.10 },
+      { name: 'Liqueur d\'amaretto', quantity: 20, unit: 'ml', pricePerL: 22.00 },
+      { name: 'Zeste de citron', quantity: 2, unit: 'pcs', pricePerPc: 0.60 }
+    ],
+    steps: [
+      'Ramollir la pâte d\'amandes au batteur, incorporer les œufs un par un en montant.',
+      'Ajouter le beurre fondu refroidi, l\'amaretto et les zestes de citron.',
+      'Tamiser et incorporer la farine et la Maïzena délicatement à la maryse.',
+      'Verser dans un moule à manqué beurré et fariné.',
+      'Cuire à 170°C pendant 35 min (lame sèche = cuit).',
+      'Démouler tiède, saupoudrer de sucre glace et servir à température ambiante.'
+    ]
+  },
+
+  // --- CONFISERIE ---
+  {
+    id: 'guimauve-framboise',
+    name: 'Guimauve Framboise',
+    category: 'Confiserie',
+    portions: 30,
+    prepTime: 40,
+    cookTime: 5,
+    image: './img/macaron.jpg',
+    description: 'Marshmallow artisanal à la framboise, léger et fondant, enrobé d\'un mélange sucre glace‑Maïzena.',
+    ingredients: [
+      { name: 'Sucre semoule', quantity: 300, unit: 'g', pricePerKg: 0.68 },
+      { name: 'Trimoline (sucre inverti)', quantity: 60, unit: 'g', pricePerKg: 8.00 },
+      { name: 'Eau', quantity: 100, unit: 'ml', pricePerL: 0.00 },
+      { name: 'Gélatine en feuilles', quantity: 20, unit: 'g', pricePerKg: 28.00 },
+      { name: 'Purée de framboise', quantity: 100, unit: 'ml', pricePerL: 14.00 },
+      { name: 'Blancs d\'œufs', quantity: 2, unit: 'pcs', pricePerPc: 0.20 },
+      { name: 'Sucre glace (enrobage)', quantity: 80, unit: 'g', pricePerKg: 2.10 },
+      { name: 'Maïzena (enrobage)', quantity: 40, unit: 'g', pricePerKg: 4.00 },
+      { name: 'Colorant rouge', quantity: 3, unit: 'ml', pricePerL: 30.00 }
+    ],
+    steps: [
+      'Hydrater la gélatine dans l\'eau froide.',
+      'Cuire l\'eau, le sucre et le Trimoline à 130°C (petit boulé).',
+      'En parallèle, monter les blancs en neige avec la purée de framboise.',
+      'Verser le sirop chaud sur les blancs montés en filet, tout en fouettant.',
+      'Essorer et incorporer la gélatine fondue. Ajouter le colorant.',
+      'Couler en cadre huilé sur 2cm, laisser figer 4h.',
+      'Détailler en cubes et rouler dans le mélange sucre glace‑Maïzena.'
+    ]
+  },
+  {
+    id: 'caramels-mous-vanille-fleur-sel',
+    name: 'Caramels Mous Vanille & Fleur de Sel',
+    category: 'Confiserie',
+    portions: 30,
+    prepTime: 20,
+    cookTime: 15,
+    image: './img/chocolat.jpg',
+    description: 'Caramels fondants à la vanille de Tahiti, au beurre d\'Isigny et fleur de sel de Guérande – confiserie de prestige.',
+    ingredients: [
+      { name: 'Sucre semoule', quantity: 300, unit: 'g', pricePerKg: 0.68 },
+      { name: 'Glucose (sirop)', quantity: 100, unit: 'g', pricePerKg: 5.00 },
+      { name: 'Crème 35% MG', quantity: 250, unit: 'ml', pricePerL: 3.25 },
+      { name: 'Beurre AOP', quantity: 80, unit: 'g', pricePerKg: 6.15 },
+      { name: 'Vanille Tahiti (gousse)', quantity: 1, unit: 'pcs', pricePerPc: 3.50 },
+      { name: 'Fleur de sel de Guérande', quantity: 5, unit: 'g', pricePerKg: 15.00 }
+    ],
+    steps: [
+      'Chauffer la crème avec la vanille fendue et grattée. Laisser infuser 15 min.',
+      'Dans une casserole large, cuire le sucre et le glucose à sec jusqu\'au caramel ambré.',
+      'Décuire hors du feu avec la crème chaude (attention aux projections).',
+      'Ajouter le beurre en dés et mélanger jusqu\'à incorporation totale.',
+      'Cuire à nouveau jusqu\'à 120°C (caramel mou) au thermomètre.',
+      'Couler dans un cadre huilé, parsemer de fleur de sel, laisser cristalliser 2h.',
+      'Détailler en rectangles de 3×1cm et emballer dans du papier cellophane.'
+    ]
+  },
+
+  // --- MACARONS ---
+  {
+    id: 'macaron-caramel-beurre-sale',
+    name: 'Macaron Caramel Beurre Salé',
+    category: 'Macaron',
+    portions: 30,
+    prepTime: 90,
+    cookTime: 14,
+    image: './img/macaron.jpg',
+    description: 'Coques amandes lisses au ton ambré, garnies d\'une ganache montée généreuse au caramel beurre salé.',
+    ingredients: [
+      { name: 'Poudre d\'amandes', quantity: 200, unit: 'g', pricePerKg: 9.50 },
+      { name: 'Sucre glace', quantity: 200, unit: 'g', pricePerKg: 2.10 },
+      { name: 'Sucre semoule', quantity: 250, unit: 'g', pricePerKg: 0.68 },
+      { name: 'Blancs d\'œufs', quantity: 6, unit: 'pcs', pricePerPc: 0.20 },
+      { name: 'Crème 35% MG', quantity: 250, unit: 'ml', pricePerL: 3.25 },
+      { name: 'Chocolat blanc 33%', quantity: 150, unit: 'g', pricePerKg: 9.80 },
+      { name: 'Beurre demi-sel', quantity: 80, unit: 'g', pricePerKg: 7.50 }
+    ],
+    steps: [
+      'Réaliser les coques : meringue italienne incorporée au tant-pour-tant.',
+      'Pocher, croûter 30 min et cuire à 150°C pendant 14 min.',
+      'Réaliser le caramel au beurre salé (sucre à sec, décuisson crème, ajout beurre).',
+      'Verser le caramel chaud sur le chocolat blanc pour créer la ganache de base.',
+      'Laisser cristalliser, puis monter légèrement au batteur.',
+      'Garnir les coques généreusement et laisser maturer 24h au frais avant vente.'
+    ]
+  },
+
+  // --- BÛCHES DE NOËL ---
+  {
+    id: 'buche-roulee-chocolat-passion',
+    name: 'Bûche Roulée Chocolat Passion',
+    category: 'Bûche de Noël',
+    portions: 1,
+    prepTime: 120,
+    cookTime: 15,
+    image: './img/trois-chocs.jpg',
+    description: 'Une bûche traditionnelle revisitée pour une production rapide. Biscuit pâte à choux très moelleux, crémeux passion et ganache montée chocolat lait.',
+    ingredients: [
+      { name: 'Chocolat au lait 35%', quantity: 200, unit: 'g', pricePerKg: 10.50 },
+      { name: 'Crème 35% MG', quantity: 450, unit: 'ml', pricePerL: 3.25 },
+      { name: 'Purée passion', quantity: 150, unit: 'ml', pricePerL: 12.50 },
+      { name: 'Œufs entiers', quantity: 4, unit: 'pcs', pricePerPc: 0.11 },
+      { name: 'Sucre semoule', quantity: 150, unit: 'g', pricePerKg: 0.68 },
+      { name: 'Farine T55', quantity: 60, unit: 'g', pricePerKg: 0.44 },
+      { name: 'Beurre AOP', quantity: 50, unit: 'g', pricePerKg: 6.15 },
+      { name: 'Gélatine en feuilles', quantity: 4, unit: 'g', pricePerKg: 28.00 }
+    ],
+    steps: [
+      'La veille, réaliser la ganache au chocolat au lait et réserver au frais.',
+      'Préparer le biscuit pâte à choux : faire chauffer lait/beurre/farine, ajouter les jaunes, puis monter les blancs. Cuire à 170°C (12 min).',
+      'Réaliser le crémeux passion (œufs, sucre, purée, cuisson 85°C, collage gélatine + beurre).',
+      'Monter la ganache chocolat lait.',
+      'Étaler le crémeux passion sur le biscuit, rouler la bûche en serrant bien.',
+      'Masquer et décorer la bûche avec la ganache montée. Ajouter des décors de Noël.'
+    ]
+  },
+  {
+    id: 'buche-contemporaine-vanille-pecan',
+    name: 'Bûche Contemporaine Vanille Pécan',
+    category: 'Bûche de Noël',
+    portions: 1,
+    prepTime: 180,
+    cookTime: 25,
+    image: './img/tatin-vanille.jpg',
+    description: 'Bûche design en moule gouttière : Mousse vanille intense, insert praliné pécan coulant, biscuit croustillant et glaçage miroir blanc.',
+    ingredients: [
+      { name: 'Noix de pécan', quantity: 150, unit: 'g', pricePerKg: 25.00 },
+      { name: 'Sucre semoule', quantity: 250, unit: 'g', pricePerKg: 0.68 },
+      { name: 'Crème 35% MG', quantity: 500, unit: 'ml', pricePerL: 3.25 },
+      { name: 'Lait entier', quantity: 200, unit: 'ml', pricePerL: 0.72 },
+      { name: 'Vanille Tahiti (gousse)', quantity: 2, unit: 'pcs', pricePerPc: 3.50 },
+      { name: 'Gélatine en feuilles', quantity: 14, unit: 'g', pricePerKg: 28.00 },
+      { name: 'Chocolat blanc 33%', quantity: 300, unit: 'g', pricePerKg: 9.80 },
+      { name: 'Feuillantine', quantity: 50, unit: 'g', pricePerKg: 15.00 }
+    ],
+    steps: [
+      'Réaliser un praliné pécan pur. Mélanger une partie avec la feuillantine pour la base croustillante. Couler le reste en moule insert à bûche.',
+      'Préparer la base du biscuit moelleux pécan et cuire 15 min. Poser sur le croustillant.',
+      'Réaliser la mousse bavaroise vanille richement infusée, coller à la gélatine et incorporer la crème montée.',
+      'Montage à l\'envers dans une gouttière : mousse vanille, insert praliné congelé, biscuit/croustillant.',
+      'Bloquer 12h à -18°C.',
+      'Préparer le glaçage miroir blanc (chocolat, lait concentré). Démouler et glacer à 32°C. Décor embout de bûche chocolat blanc.'
+    ]
+  },
+
+  // --- BISCUIT DE VOYAGE (Longue conservation, haute rentabilité) ---
+  {
+    id: 'cake-citron-menton',
+    name: 'Cake Ultime au Citron de Menton',
+    category: 'Biscuit de Voyage',
+    portions: 6,
+    prepTime: 30,
+    cookTime: 45,
+    image: './img/tarte-citron.jpg',
+    description: 'Le grand classique de la pâtisserie d\'hôtel : pâte extrêmement moelleuse, sirop d\'imbibage acidulé au citron frais et glaçage royal croquant.',
+    ingredients: [
+      { name: 'Farine T55', quantity: 200, unit: 'g', pricePerKg: 0.44 },
+      { name: 'Sucre semoule', quantity: 250, unit: 'g', pricePerKg: 0.68 },
+      { name: 'Œufs entiers', quantity: 3, unit: 'pcs', pricePerPc: 0.11 },
+      { name: 'Beurre doux', quantity: 100, unit: 'g', pricePerKg: 6.80 },
+      { name: 'Crème liquide entière', quantity: 90, unit: 'ml', pricePerL: 3.25 },
+      { name: 'Citron de Menton (zeste et jus)', quantity: 3, unit: 'pcs', pricePerPc: 0.80 },
+      { name: 'Levure chimique', quantity: 6, unit: 'g', pricePerKg: 5.00 },
+      { name: 'Sucre glace', quantity: 150, unit: 'g', pricePerKg: 2.10 }
+    ],
+    steps: [
+      'Blanchir les œufs avec le sucre et les zestes fins de citron.',
+      'Ajouter la crème liquide, puis la farine tamisée avec la levure.',
+      'Incorporer le beurre fondu chaud, puis une partie du jus de citron. Ajouter une pointe de sel.',
+      'Couler dans un moule à cake chemisé. Cuire à 160°C pendant 45 min.',
+      'Pendant ce temps, préparer le sirop d\'imbibage avec le reste de jus de citron et un peu d\'eau sucrée.',
+      'À la sortie du four, imbiber le cake chaud avec le sirop froid.',
+      'Refroidir, puis glacer avec un mélange sucre glace / jus de citron. Sécher 2 min au four pour croûter le glaçage.'
+    ]
+  },
+  {
+    id: 'financier-noisette-praline',
+    name: 'Financier Tigré Noisette & Praliné',
+    category: 'Biscuit de Voyage',
+    portions: 15,
+    prepTime: 20,
+    cookTime: 12,
+    image: './img/frangine.jpg',
+    description: 'Format individuel très rentable. Pâte à financier onctueuse à la noisette torréfiée, poché avec un cœur coulant au praliné.',
+    ingredients: [
+      { name: 'Beurre doux (Beurre Noisette)', quantity: 150, unit: 'g', pricePerKg: 6.80 },
+      { name: 'Sucre glace', quantity: 170, unit: 'g', pricePerKg: 2.10 },
+      { name: 'Poudre de noisette', quantity: 80, unit: 'g', pricePerKg: 12.50 },
+      { name: 'Poudre d\'amandes', quantity: 40, unit: 'g', pricePerKg: 9.50 },
+      { name: 'Farine T45', quantity: 50, unit: 'g', pricePerKg: 1.30 },
+      { name: 'Blancs d\'œufs', quantity: 5, unit: 'pcs', pricePerPc: 0.20 },
+      { name: 'Praliné noisette (Insert)', quantity: 100, unit: 'g', pricePerKg: 10.50 }
+    ],
+    steps: [
+      'Réaliser un beurre noisette : cuire le beurre jusqu\'à l\'obtention d\'une couleur ambrée et de l\'arôme de noisette grillée. Laisser tiédir.',
+      'Dans un cul-de-poule, mélanger toutes les poudres (sucre glace, poudres de fruits secs, farine).',
+      'Ajouter les blancs d\'œufs non montés, fouetter pour obtenir une pâte lisse.',
+      'Incorporer le beurre noisette tiède (chinoisé) et mélanger.',
+      'Pocher dans des moules à petits fours (type savarins, avec un trou central).',
+      'Cuire 12 min à 180°C.',
+      'Démouler. Une fois froids, pocher le praliné pur dans la cavité centrale du financier.'
+    ]
   }
 ];
 

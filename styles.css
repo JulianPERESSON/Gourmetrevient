@@ -79,30 +79,30 @@
   --accent-dark: #d35400;
   --accent-glow: rgba(243, 156, 18, 0.2);
 
-  --bg: #1a1a1a;
-  --bg-alt: #121212;
-  --surface: #242424;
-  --surface-hover: #2c2c2c;
-  --surface-border: rgba(255, 255, 255, 0.1);
-  --surface-shadow: rgba(0, 0, 0, 0.4);
+  --bg: #000000;
+  --bg-alt: #080808;
+  --surface: #121212;
+  --surface-hover: #1e1e1e;
+  --surface-border: rgba(255, 255, 255, 0.08);
+  --surface-shadow: rgba(0, 0, 0, 0.6);
 
-  --text: #f5f6fa;
-  --text-secondary: #dcdde1;
-  --text-muted: #7f8c8d;
-  --text-inverse: #ffffff;
+  --text: #ffffff;
+  --text-secondary: #e2e8f0;
+  --text-muted: #8b949e;
+  --text-inverse: #000000;
 
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5);
   --shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
   --shadow-md: 0 8px 30px rgba(0, 0, 0, 0.7);
   --shadow-lg: 0 16px 50px rgba(0, 0, 0, 0.8);
 
-  --bg-card: #2c2c2c;
-  --surface-shadow-inset: rgba(0, 0, 0, 0.1);
-  --surface-glass: rgba(0, 0, 0, 0.3);
-  --surface-border-glass: rgba(255, 255, 255, 0.08);
+  --bg-card: #0a0a0a;
+  --surface-shadow-inset: rgba(0, 0, 0, 0.2);
+  --surface-glass: rgba(0, 0, 0, 0.5);
+  --surface-border-glass: rgba(255, 255, 255, 0.05);
 
   /* Dash system dark mode */
-  --dash-bg: #121212;
+  --dash-bg: #000000;
   --dash-primary: #818cf8;
   --dash-success: #22c55e;
   --dash-warning: #f59e0b;
@@ -9671,11 +9671,11 @@ select.form-input {
 }
 
 .dark-theme {
-  --cockpit-bg: #0f172a;
-  --cockpit-card-bg: #1e293b;
+  --cockpit-bg: #000000;
+  --cockpit-card-bg: #0a0a0a;
   --cockpit-border: rgba(255, 255, 255, 0.08);
-  --cockpit-text-main: #f1f5f9;
-  --cockpit-text-muted: #94a3b8;
+  --cockpit-text-main: #ffffff;
+  --cockpit-text-muted: #8b949e;
 }
 
 #hubSection {
@@ -10259,17 +10259,13 @@ select.form-input {
   opacity: 1;
 }
 
-/* Ingredient Sparklines */
+/* Ingredient Sparklines — hidden */
 .ing-sparkline {
-  width: 40px;
-  height: 20px;
-  flex-shrink: 0;
-  opacity: 0.3;
-  transition: opacity 0.3s;
+  display: none !important;
 }
 
 .ing-row:hover .ing-sparkline {
-  opacity: 1;
+  opacity: 0;
 }
 
 .ing-sparkline .spark-path {
@@ -10334,10 +10330,13 @@ select.form-input {
 
 /* Assistant Saisonnalité */
 .seasonality-badge {
+  display: none;
+}
+.seasonality-badge:not(:empty) {
+  display: flex;
   position: absolute;
   right: 10px;
   bottom: -22px;
-  display: flex;
   align-items: center;
   gap: 4px;
   background: var(--surface, #fff);

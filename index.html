@@ -875,9 +875,10 @@
         <!-- TAB 3: WASTE TRACKING -->
         <div id="mgmtViewWaste" class="mgmt-view" style="display:none;">
           <div class="mgmt-waste-grid">
-            <!-- Left: Waste Declaration -->
-            <div class="mgmt-glass-card">
-              <div class="mgmt-card-header header-centered">
+            <!-- Left Column: Form & History -->
+            <div style="display:flex; flex-direction:column; gap:1.5rem;">
+              <div class="mgmt-glass-card">
+                <div class="mgmt-card-header header-centered">
                 <div class="mgmt-card-title">
                   <div class="title-icon icon-red">🚨</div>
                   <div>
@@ -911,8 +912,19 @@
                 <button class="btn btn-primary btn-full" onclick="logWaste()" data-i18n="mgmt.waste.save">🚨 Enregistrer la perte</button>
               </div>
             </div>
+            
+            <!-- History Moved Under Form -->
+            <div class="mgmt-glass-card">
+              <div class="mgmt-card-title" style="margin-bottom:1rem;">
+                <div class="title-icon icon-orange">📜</div>
+                <div><h3 data-i18n="mgmt.waste.history">Historique Récent</h3></div>
+              </div>
+              <div id="wasteHistoryList" style="max-height:260px; overflow-y:auto; border-radius:var(--radius); border:1px solid var(--surface-border); background:var(--bg-alt);">
+              </div>
+            </div>
+          </div>
 
-            <!-- Right: Analysis Panel -->
+          <!-- Right: Analysis Panel -->
             <div style="display:flex; flex-direction:column; gap:1.5rem;">
               <!-- Waste Stats KPIs -->
               <div class="waste-stats-row">
@@ -933,45 +945,34 @@
                 </div>
               </div>
 
-              <!-- Chart + History -->
-              <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.5rem;">
-                <div class="mgmt-glass-card">
+              <!-- Chart + Monthly Report Side by Side -->
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; align-items:stretch;">
+                <div class="mgmt-glass-card" style="display:flex; flex-direction:column;">
                   <div class="mgmt-card-title" style="margin-bottom:1rem;">
                     <div class="title-icon icon-purple">📊</div>
                     <div><h3 data-i18n="mgmt.waste.chart_title">Répartition par Cause</h3></div>
                   </div>
-                  <div class="waste-chart-container">
+                  <div class="waste-chart-container" style="flex:1; display:flex; align-items:center;">
                     <canvas id="wasteChartCanvas"></canvas>
                   </div>
                 </div>
-                <div class="mgmt-glass-card">
-                  <div class="mgmt-card-title" style="margin-bottom:1rem;">
-                    <div class="title-icon icon-orange">📜</div>
-                    <div><h3 data-i18n="mgmt.waste.history">Historique Récent</h3></div>
+                
+                <!-- Waste Monthly Report -->
+                <div class="mgmt-glass-card" style="display:flex; flex-direction:column;">
+                  <div class="mgmt-card-header header-centered" style="margin-bottom:0.8rem;">
+                    <div class="mgmt-card-title">
+                      <div class="title-icon icon-purple">💡</div>
+                      <div>
+                        <h3>Rapport Mensuel</h3>
+                        <p style="font-size:0.75rem;">Recommandations automatiques</p>
+                      </div>
+                    </div>
                   </div>
-                  <div id="wasteHistoryList" style="max-height:260px; overflow-y:auto; border-radius:var(--radius); border:1px solid var(--surface-border); background:var(--bg-alt);">
-                  </div>
+                  <div id="wasteMonthlyReport" style="flex:1;"></div>
                 </div>
               </div>
             </div>
-
-              <!-- Waste Monthly Report -->
-              <div class="mgmt-glass-card" style="margin-top:1.5rem;">
-                <div class="mgmt-card-header header-centered">
-                  <div class="mgmt-card-title">
-                    <div class="title-icon icon-purple">📊</div>
-                    <div>
-                      <h3>Rapport Mensuel de Gaspillage</h3>
-                      <p>Analyse automatique des pertes et recommandations</p>
-                    </div>
-                  </div>
-                </div>
-                <div id="wasteMonthlyReport"></div>
-              </div>
-
           </div>
-        </div>
-
         </div>
 
         <!-- TAB 5: PRODUCTION PLANNING -->

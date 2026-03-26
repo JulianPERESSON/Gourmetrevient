@@ -916,13 +916,14 @@ function showAutocomplete(input, listEl, idx) {
     i.name.toLowerCase().includes(val)
   ).map(i => ({...i, isRecipe: false}));
 
-  // 2. Saved Recipes (Compositions)
+  // 2. Saved Recipes & Library Recipes (Compositions)
   const savedRecipes = JSON.parse(localStorage.getItem(getUserRecipesKey()) || '[]');
+  const allAvailableRecipes = [...RECIPES, ...savedRecipes];
   
   // Filter out the *current* recipe to prevent self-reference
   const currentRecipeName = (APP.recipe.name || '').toLowerCase();
   
-  const recipeMatches = savedRecipes
+  const recipeMatches = allAvailableRecipes
     .filter(r => r.name.toLowerCase().includes(val) && r.name.toLowerCase() !== currentRecipeName)
     .map(r => {
       // Calculate sub-recipe total cost and weight to give a price per kg
@@ -932,13 +933,15 @@ function showAutocomplete(input, listEl, idx) {
         subCost += calcIngredientCost(subIng);
         let subQty = parseFloat(subIng.quantity) || 0;
         if (subIng.unit === 'kg' || subIng.unit === 'L') subQty *= 1000;
+        else if (subIng.unit === 'g' || subIng.unit === 'ml') subQty *= 1;
+        else subQty *= 50; // Approximative for units like 'pièce'
         subWeightGrams += subQty;
       });
       // Cost per kg = (Cost / Weight in g) * 1000
       let pricePerKg = subWeightGrams > 0 ? (subCost / subWeightGrams) * 1000 : 0;
       
       return {
-        name: r.name,
+        name: `(📚) ${r.name}`, // Prefix to indicate it's a sub-recipe
         unit: 'kg', // By default, we use compositions by weight
         pricePerUnit: pricePerKg,
         priceRef: 'kg',
@@ -946,7 +949,7 @@ function showAutocomplete(input, listEl, idx) {
       };
     });
 
-  matches = [...recipeMatches, ...matches].slice(0, 8);
+  matches = [...recipeMatches, ...matches].slice(0, 10);
 
   if (matches.length === 0) { listEl.classList.remove('show'); return; }
 
@@ -1658,7 +1661,7 @@ function loadExampleRecipe(idOrIdx) {
     portions: example.portions,
     prepTime: example.prepTime,
     cookTime: example.cookTime,
-    description: t(`data.recipe.${example.id}.desc`) || example.description,
+    description: (() => { const dk = `data.recipe.${example.id}.desc`; const dv = t(dk); return dv !== dk ? dv : example.description; })(),
     ingredients: example.ingredients.map(ing => {
       let unit = ing.unit;
       let pricePerUnit = 0;
@@ -1727,19 +1730,26 @@ let currentLibraryFilter = 'all';
 // Define a professional sort order for pastry categories
 const LIBRARY_SORT_ORDER = [
   'Entremets', 
-  'Tarte', 
+  'Bûche de Noël',
   'Tarte Signature', 
   'Tarte Fruits', 
   'Tarte Gourmande',
+  'Tarte', 
   'Classique',
-  'Viennoiserie', 
-  'Brioche', 
-  'Feuilletage',
+  'Pâtisserie Régionale',
+  'Pâtisserie Toulousaine',
   'Pâte à choux', 
   'Choux & Feuilletage',
-  'Pâte levée',
+  'Dessert à l\'assiette',
+  'Biscuit de Voyage',
+  'Macaron',
   'Meringue',
-  'Dessert à l\'assiette'
+  'Feuilletage',
+  'Pâte levée',
+  'Brioche', 
+  'Viennoiserie', 
+  'Chocolaterie',
+  'Confiserie'
 ];
 
 function sortLibraryByOrder(a, b) {
@@ -7382,3 +7392,55 @@ function checkSeasonality(name, currentMonth) {
   return null;
 }
 // ===============================
+
+// ============================================================================
+// AUTO-SAVE DRAFTS & RECOVERY (PREMIUM)
+// ============================================================================
+document.addEventListener('DOMContentLoaded', () => {
+  // 1. Recover Draft
+  setTimeout(() => {
+    const draftStr = localStorage.getItem('gourmet_recipe_draft');
+    if (draftStr && APP.currentStep === 0 && (!APP.recipe.name || APP.recipe.name === '')) {
+      try {
+        const draft = JSON.parse(draftStr);
+        if (draft && draft.name && draft.ingredients && draft.ingredients.length > 0) {
+          const wantRestore = confirm(t('draft.restore') || 'Un brouillon de recette non sauvegardé a été détecté. Voulez-vous restaurer votre travail ?');
+          if (wantRestore) {
+            APP.recipe = draft;
+            APP.margin = draft.margin || 70;
+            // Restore UI inputs
+            if ($('#recipeName')) $('#recipeName').value = draft.name;
+            if ($('#recipeCategory')) $('#recipeCategory').value = draft.category || '';
+            if ($('#recipePortions')) $('#recipePortions').value = draft.portions || 10;
+            if ($('#recipePrepTime')) $('#recipePrepTime').value = draft.prepTime || 60;
+            if ($('#recipeCookTime')) $('#recipeCookTime').value = draft.cookTime || 30;
+            if ($('#recipeDesc')) $('#recipeDesc').value = draft.description || '';
+            
+            showToast('Brouillon restauré avec succès.', 'success');
+            goToStep(1); // Jump to ingredients
+          } else {
+            localStorage.removeItem('gourmet_recipe_draft');
+          }
+        }
+      } catch (e) {
+        console.warn('Draft parsing failed:', e);
+      }
+    }
+  }, 500); // Slight delay to ensure translations and initial state are loaded
+
+  // 2. Background Auto-save every 15 seconds if editing
+  setInterval(() => {
+    // Only save if we are actively editing a recipe that has at least a name
+    if (APP.currentStep > 0 && APP.recipe && APP.recipe.name.trim() !== '') {
+        // Collect current state from UI just in case
+        if (APP.currentStep === 1) collectIngredients();
+        if (APP.currentStep === 2) collectProcedure();
+        
+        const draftToSave = {
+           ...APP.recipe,
+           margin: APP.margin
+        };
+        localStorage.setItem('gourmet_recipe_draft', JSON.stringify(draftToSave));
+    }
+  }, 15000);
+});
