@@ -1,0 +1,188 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+@page { size: A4; margin: 0 !important; } 
+@media print { header, footer { display: none !important; } }
+body { font-family: 'Inter', Arial, sans-serif; background:#fff; color:#1a202c; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+.header { background: linear-gradient(135deg,#0f1923 0%,#1a3040 60%,#12232e 100%); color:#fff; padding:28px 38px 22px; position:relative; overflow:hidden; }
+.header::before { content:''; position:absolute; top:-50px; right:-50px; width:200px; height:200px; border-radius:50%; background:rgba(197,165,90,0.07); }
+.header-top { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:16px; }
+.brand { display:flex; align-items:center; gap:10px; }
+.brand-name { font-size:1.15rem; font-weight:800; color:#C5A55A; letter-spacing:.04em; font-family: 'Playfair Display', serif;}
+.brand-sub { font-size:.6rem; color:rgba(255,255,255,.45); letter-spacing:.12em; text-transform:uppercase; margin-top:2px; }
+.doc-meta { text-align:right; font-size:.7rem; color:rgba(255,255,255,.5); line-height:1.7; }
+.doc-meta strong { color:rgba(255,255,255,.8); }
+.header-title-block { border-top:1px solid rgba(197,165,90,.25); padding-top:14px; }
+.doc-type-badge { display:inline-block; background:rgba(197,165,90,.15); color:#C5A55A; font-size:.6rem; font-weight:700; letter-spacing:.15em; text-transform:uppercase; padding:3px 10px; border-radius:20px; border:1px solid rgba(197,165,90,.3); margin-bottom:6px; }
+.recipe-title { font-size:2rem; font-weight:900; color:#fff; line-height:1.2; font-family: 'Playfair Display', serif;}
+.recipe-subtitle { font-size:.75rem; color:rgba(255,255,255,.45); margin-top:4px; letter-spacing:.03em;}
+.kpi-bar { display:grid; grid-template-columns:repeat(5,1fr); background:#f8f9fb; border-bottom:1px solid #eaedf2; }
+.kpi-item { padding:14px 10px; text-align:center; border-right:1px solid #eaedf2; }
+.kpi-item:last-child { border-right:none; }
+.kpi-value { font-size:1.3rem; font-weight:900; color:#0f1923; }
+.kpi-value.green { color:#10b981; }
+.kpi-value.gold { color:#C5A55A; }
+.kpi-value.blue { color:#3b82f6; }
+.kpi-value.red { color:#ef4444; }
+.kpi-label { font-size:.58rem; font-weight:700; text-transform:uppercase; letter-spacing:.1em; color:#94a3b8; margin-top:4px; }
+.body-grid { display:grid; grid-template-columns:1fr 195px; }
+.main-col { padding:22px 26px; }
+.side-col { background:#f8f9fb; border-left:1px solid #eaedf2; padding:18px 14px; }
+.section-title { display:flex; align-items:center; gap:8px; font-size:.62rem; font-weight:800; text-transform:uppercase; letter-spacing:.13em; color:#64748b; margin-bottom:10px; }
+.section-title::after { content:''; flex:1; height:1px; background:#eaedf2; }
+.ing-table { width:100%; border-collapse:collapse; font-size:.75rem; margin-bottom:18px; }
+.ing-table thead tr { background:#0f1923; color:#fff; }
+.ing-table thead th { padding:8px 9px; text-align:left; font-size:.58rem; font-weight:700; letter-spacing:.09em; text-transform:uppercase; }
+.ing-table thead th:last-child { text-align:right; }
+.ing-table tbody tr:nth-child(even) { background:#f8f9fb; }
+.ing-table td { padding:6px 9px; border-bottom:1px solid #eaedf2; vertical-align:middle; }
+.ing-table td:last-child { text-align:right; }
+.ing-name { font-weight:600; color:#1a202c; }
+.ing-note { font-size:.62rem; color:#94a3b8; }
+.cost-pill { background:#f1f5f9; color:#334155; font-weight:700; font-size:.68rem; padding:2px 7px; border-radius:5px; white-space:nowrap; }
+.ing-cat { display:inline-block; font-size:.58rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; padding:2px 7px; border-radius:10px; margin-bottom:2px; }
+.steps { margin-bottom:18px; }
+.step { display:flex; gap:12px; margin-bottom:10px; padding-bottom:10px; border-bottom:1px dashed #eaedf2; }
+.step:last-child { border-bottom:none; }
+.step-num { width:26px; height:26px; border-radius:50%; background:#0f1923; color:#C5A55A; font-size:.68rem; font-weight:800; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.step-body { flex:1; }
+.step-title { font-size:.78rem; font-weight:700; color:#0f1923; margin-bottom:3px; display:flex; justify-content:space-between; align-items:center; }
+.step-desc { font-size:.7rem; color:#475569; line-height:1.5; }
+.side-section { margin-bottom:16px; }
+.side-section-title { font-size:.58rem; font-weight:800; text-transform:uppercase; letter-spacing:.12em; color:#94a3b8; margin-bottom:8px; border-bottom:1px solid #eaedf2; padding-bottom:4px; }
+.side-row { display:flex; justify-content:space-between; align-items:center; padding:4px 0; font-size:.68rem; border-bottom:1px dotted #eaedf2; }
+.side-row:last-child { border-bottom:none; }
+.side-key { color:#64748b; }
+.side-val { font-weight:700; color:#0f1923; }
+.gauge-label { display:flex; justify-content:space-between; font-size:.65rem; margin-bottom:4px; }
+.gauge-track { background:#eaedf2; border-radius:20px; height:8px; overflow:hidden; }
+.gauge-fill { height:100%; border-radius:20px; }
+.cost-summary { background:#0f1923; border-radius:9px; padding:12px; color:#fff; margin-top:9px; }
+.cost-row-s { display:flex; justify-content:space-between; font-size:.68rem; padding:4px 0; border-bottom:1px solid rgba(255,255,255,.08); }
+.cost-row-s:last-child { border-bottom:none; }
+.cost-key-s { color:rgba(255,255,255,.55); }
+.cost-val-s { font-weight:700; }
+.cost-val-s.gold { color:#C5A55A; font-size:.82rem; }
+.allergen-badges { display:flex; flex-wrap:wrap; gap:4px; margin-top:5px; }
+.allergen-badge { background:#fee2e2; color:#991b1b; font-size:.56rem; font-weight:700; padding:2px 6px; border-radius:4px; text-transform:uppercase; letter-spacing:.06em;}
+.footer { background:#f8f9fb; border-top:1px solid #eaedf2; padding:12px 38px; display:flex; justify-content:space-between; align-items:center; font-size:.62rem; color:#94a3b8; }
+.footer-logo { color:#C5A55A; font-weight:700; font-size:.68rem; }
+.confidential { background:rgba(197,165,90,.1); color:#C5A55A; font-size:.56rem; font-weight:700; padding:2px 8px; border-radius:4px; letter-spacing:.08em; text-transform:uppercase; }
+</style>
+<script src="data.js"></script>
+<script>
+function esc(s) { return typeof s!=='string'?String(s||''):s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function getIngCategory(name) {
+   const lower = name.toLowerCase();
+   if (lower.match(/farine|beurre|levure|sel|pâte/)) return { badge: '🍪 Base & Pâte', class: 'cat-pate', color: '#92400e', bg: '#fef3c7' };
+   if (lower.match(/fruit|pomme|fraise|citron|jus|poire/)) return { badge: '🍋 Fruits & Acidité', class: 'cat-curd', color: '#1d4ed8', bg: '#dbeafe' };
+   if (lower.match(/chocolat|cacao|praliné|noisette|amande/)) return { badge: '🍫 Chocolat & Noisettes', class: 'cat-choc', color: '#7c2d12', bg: '#ffedd5' };
+   if (lower.match(/crème|lait|mascarpone|oeuf|œuf/)) return { badge: '🥛 Crèmes & Laitages', class: 'cat-lait', color: '#0369a1', bg: '#e0f2fe' };
+   if (lower.match(/sucre|blanc|gélatine/)) return { badge: '🔮 Structure & Sucres', class: 'cat-mer', color: '#6d28d9', bg: '#ede9fe' };
+   return { badge: '✨ Divers', class: 'cat-fin', color: '#065f46', bg: '#d1fae5' };
+}
+
+function getHaccp(text) {
+   const lower = text.toLowerCase();
+   if (lower.match(/cuir|cuisson|four|bouill|chauff|1[0-9]{2}°/)) return '<span style="background:#fef3c7; color:#b45309; padding:2px 6px; font-size:0.55rem; font-weight:700; border-radius:4px; text-transform:uppercase; letter-spacing:0.05em;">🔥 CC1 — Cuisson</span>';
+   if (lower.match(/froid|réfrigé|congéla|refroid|glace/)) return '<span style="background:#dbeafe; color:#1e40af; padding:2px 6px; font-size:0.55rem; font-weight:700; border-radius:4px; text-transform:uppercase; letter-spacing:0.05em;">❄️ CC2 — Froid</span>';
+   if (lower.match(/montage|poche/)) return '<span style="background:#d1fae5; color:#065f46; padding:2px 6px; font-size:0.55rem; font-weight:700; border-radius:4px; text-transform:uppercase; letter-spacing:0.05em;">🛡️ Hygiène</span>';
+   return '';
+}
+
+function render() {
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get('id');
+  const r = RECIPES.find(x => x.id === id);
+  if (!r) return;
+  
+  // Group ingredients
+  let totalMat = 0;
+  const groups = {};
+  (r.ingredients || []).forEach(ing => {
+    const cat = getIngCategory(ing.name);
+    if(!groups[cat.badge]) groups[cat.badge] = { meta: cat, items: [] };
+    
+    const qty = ing.quantity || ing.qty || 0;
+    const priceK = ing.pricePerKg || ing.pricePerL || 0;
+    const priceP = ing.pricePerPc || 0;
+    let cost = 0;
+    if (priceP > 0) cost = qty * priceP;
+    else cost = (qty / 1000) * priceK;
+    if (ing.unit === 'g' && priceK === 0 && ing.pricePerPc) cost = qty * ing.pricePerPc;
+    totalMat += cost;
+    
+    const priceU = priceP > 0 ? (priceP.toFixed(2) + ' €/pc') : (priceK.toFixed(2) + ' €/' + (ing.unit==='ml'?'L':'kg'));
+    groups[cat.badge].items.push(`<tr><td><span class="ing-name">${esc(ing.name)}</span></td><td>${qty}</td><td>${esc(ing.unit)}</td><td>${priceU}</td><td><span class="cost-pill">${cost.toFixed(2)} €</span></td></tr>`);
+  });
+  
+  let ingRows = '';
+  for(let key in groups){
+     ingRows += `<tr><td colspan="5" style="padding:6px 10px; background:${groups[key].meta.bg};"><span class="ing-cat" style="color:${groups[key].meta.color};">${key}</span></td></tr>`;
+     ingRows += groups[key].items.join('');
+  }
+  
+  const costPerP = totalMat / r.portions;
+  const sellPrice = costPerP / (1 - 0.70); // Force 70% margin
+  const margin = 70;
+  
+  const stepsHtml = (r.steps||[]).slice(0,8).map((s,i) => {
+    const title = 'Étape ' + (i+1);
+    const desc = typeof s === 'string'? s : (s.description || s.text);
+    return `<div class="step"><div class="step-num">${i+1}</div><div class="step-body"><div class="step-title"><span>${title}</span> ${getHaccp(desc)}</div><div class="step-desc">${esc(desc)}</div></div></div>`;
+  }).join('');
+  
+  let html = `
+<div class="header">
+  <div class="header-top">
+    <div class="brand"><div style="font-size:1.6rem">🍰</div><div><div class="brand-name">GourmetRevient</div><div class="brand-sub">Solution Pâtisserie Pro</div></div></div>
+    <div class="doc-meta"><div><strong>Réf :</strong> FT-${id.toUpperCase()}</div><div><strong>Date :</strong> ${new Date().toLocaleDateString('fr')}</div><div><strong>Validée par :</strong> Chef Julian</div></div>
+  </div>
+  <div class="header-title-block"><div class="doc-type-badge">📋 Fiche Technique Intégrale</div><div class="recipe-title">${esc(r.name)}</div><div class="recipe-subtitle">Production en laboratoire — ${esc(r.category)}</div></div>
+</div>
+<div class="kpi-bar">
+  <div class="kpi-item"><div class="kpi-value">${r.portions}</div><div class="kpi-label">Portions</div></div>
+  <div class="kpi-item"><div class="kpi-value green">${totalMat.toFixed(2)} €</div><div class="kpi-label">Coût Matière</div></div>
+  <div class="kpi-item"><div class="kpi-value gold">70%</div><div class="kpi-label">Marge Brute</div></div>
+  <div class="kpi-item"><div class="kpi-value blue">${sellPrice.toFixed(2)} €</div><div class="kpi-label">Prix Vente HT</div></div>
+  <div class="kpi-item"><div class="kpi-value red">${r.prepTime}m</div><div class="kpi-label">Temps T.</div></div>
+</div>
+<div class="body-grid">
+  <div class="main-col">
+    <div class="section-title">📋 Composition Harmonisée</div>
+    <table class="ing-table"><thead><tr><th>Ingrédient</th><th>Qté</th><th>Uté</th><th>Prix Réf.</th><th>Coût</th></tr></thead><tbody>
+      ${ingRows}
+      <tr style="background:#f1f5f9;font-weight:700"><td colspan="4" style="text-align:right;">TOTAL MATIÈRE PREMIÈRE</td><td><span class="cost-pill" style="background:#0f1923;color:#C5A55A">${totalMat.toFixed(2)} €</span></td></tr>
+    </tbody></table>
+    <div class="section-title">⚙️ Protocole de Production</div>
+    <div class="steps">${stepsHtml}</div>
+  </div>
+  <div class="side-col">
+    <div class="side-section"><div class="side-section-title">📦 Fiche Recette</div><div class="side-row"><span class="side-key">Préparation</span><span class="side-val">${r.prepTime} min</span></div><div class="side-row"><span class="side-key">Cuisson</span><span class="side-val">${r.cookTime} min</span></div><div class="side-row"><span class="side-key">Niveau</span><span class="side-val">★★★☆☆</span></div></div>
+    <div class="side-section"><div class="side-section-title">📊 Synthèse Rentabilité</div>
+      <div class="gauge-label"><span>Marge</span><span style="font-weight:700;color:#10b981">70%</span></div>
+      <div class="gauge-track"><div class="gauge-fill" style="width:70%;background:linear-gradient(90deg, #10b981, #34d399)"></div></div>
+      <div class="cost-summary">
+        <div class="cost-row-s"><span class="cost-key-s">Coût matière</span><span class="cost-val-s">${totalMat.toFixed(2)} €</span></div>
+        <div class="cost-row-s"><span class="cost-key-s">Prix vente HT</span><span class="cost-val-s">${sellPrice.toFixed(2)} €</span></div>
+        <div class="cost-row-s"><span class="cost-key-s">TVA (5,5%)</span><span class="cost-val-s">${(sellPrice*0.055).toFixed(2)} €</span></div>
+        <div class="cost-row-s"><span class="cost-key-s">Prix TTC</span><span class="cost-val-s gold">${(sellPrice*1.055).toFixed(2)} €</span></div>
+      </div>
+    </div>
+    <div class="side-section"><div class="side-section-title">⚠️ Allergènes</div><div class="allergen-badges"><span class="allergen-badge">Gluten</span><span class="allergen-badge">Lait</span><span class="allergen-badge">Œufs</span></div></div>
+    <div class="side-section"><div class="side-section-title">🌡️ Hygiène & HACCP</div><div class="side-row"><span class="side-key">Stockage frigo</span><span class="side-val" style="color:#3b82f6;">0–4°C</span></div><div class="side-row"><span class="side-key">DLC</span><span class="side-val" style="color:#ef4444;">48h max</span></div></div>
+  </div>
+</div>
+<div class="footer"><span class="footer-logo">GourmetRevient</span><span>Fiche Technique Premium — © ${new Date().getFullYear()}</span><span class="confidential">Strictement Confidentiel</span></div>
+  `;
+  document.body.innerHTML = html;
+}
+window.onload = render;
+</script>
+</head>
+<body></body>
+</html>
