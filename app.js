@@ -1722,27 +1722,9 @@ function exportRecipePdfDirect(idx) {
   if (allRecipes.length === 0 || idx >= allRecipes.length) return;
 
   const example = allRecipes[idx];
-
-  // Store current recipe to restore it later
-  const oldRecipe = JSON.parse(JSON.stringify(APP.recipe));
-  const oldStep = APP.currentStep;
-
-  // Temporarily load this recipe for rendering
-  loadExampleRecipe(idx);
-
-  // Render the summary (it's hidden but we need it in the DOM)
-  renderSummary();
-
-  // Call the main export function
-  exportPdf();
-
-  // Restore previous state after a delay or after PDF starts
-  setTimeout(() => {
-    APP.recipe = oldRecipe;
-    APP.currentStep = oldStep;
-    goToStep(oldStep);
-    renderSummary(); // refresh hidden summary back to original
-  }, 1000);
+  // Redirect to the static pre-generated PDF
+  window.open(`./fiches/FT_${example.id}.pdf`, '_blank');
+  showToast(`Ouverture de la fiche technique ${example.name}...`, 'info');
 }
 
 // ============================================================================
