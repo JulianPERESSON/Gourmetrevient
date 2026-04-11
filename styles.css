@@ -10359,3 +10359,40 @@ select.form-input {
   background: var(--danger, #ef4444);
   color: #fff !important;
 }
+
+/* =============================================================
+   ADVANCED MODULES — v7.0
+   ============================================================= */
+
+/* Margin Alert Banner Animation */
+@keyframes slideInRight {
+  0% { transform: translateX(120px); opacity: 0; }
+  100% { transform: translateX(0); opacity: 1; }
+}
+
+/* Inflation slider smooth impact bar */
+.inflation-impact-bar .impact-fill {
+  transition: width 0.08s linear, background 0.12s linear;
+}
+
+/* Comparator / Workload Modal enhancements */
+#recipeComparatorModal .modal-content,
+#workloadModal .modal-content {
+  animation: fadeUp 0.35s ease-out;
+}
+
+/* Catalogue Theme Picker */
+#catalogueThemePicker .btn.btn-primary {
+  background: var(--accent) !important;
+  border-color: var(--accent) !important;
+  color: white !important;
+}
+
+#catalogueThemePicker .btn {
+  transition: all 0.2s ease;
+}
+
+#catalogueThemePicker .btn:hover:not(.btn-primary) {
+  background: var(--bg-alt);
+  border-color: var(--accent);
+}

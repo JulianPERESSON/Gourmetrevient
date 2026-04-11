@@ -29,13 +29,23 @@ window.hydratePremiumDashboard = function () {
     const team = (window.APP && window.APP.teamMembers && window.APP.teamMembers.length > 0)
         ? window.APP.teamMembers
         : JSON.parse(localStorage.getItem(`gourmet_team_members_${currUser.toLowerCase()}`) || '[]');
+    const leaves = (window.APP && window.APP.staffLeaves && window.APP.staffLeaves.length > 0)
+        ? window.APP.staffLeaves
+        : JSON.parse(localStorage.getItem(`gourmet_staff_leaves_${currUser.toLowerCase()}`) || '[]');
+    const haccpLogs = (window.APP && window.APP.haccpLogs)
+        ? window.APP.haccpLogs
+        : JSON.parse(localStorage.getItem('gourmet_haccp_logs') || '{"temp":[],"trace":[],"clean":[],"reception":[]}');
+    const productionPlan = JSON.parse(localStorage.getItem('gourmet_production_plan') || '[]');
+    const wasteLogs = (window.APP && window.APP.wasteLogs)
+        ? window.APP.wasteLogs
+        : JSON.parse(localStorage.getItem('gourmet_waste_logs') || '[]');
 
     const t = (key, data) => (window.i18n && typeof window.i18n.t === 'function') ? window.i18n.t(key, data) : key;
 
     // 1. Briefing Header: Date & User
     const dateHeaderEl = document.getElementById('dashDateHeader');
+    const now = new Date();
     if (dateHeaderEl) {
-        const now = new Date();
         const opts = { weekday: 'long', day: 'numeric', month: 'long' };
         let dateStr = now.toLocaleDateString(lang === 'fr' ? 'fr-FR' : (lang === 'es' ? 'es-ES' : 'en-US'), opts);
         dateStr = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
@@ -57,8 +67,10 @@ window.hydratePremiumDashboard = function () {
 
     let stockAlerts = inv.filter(item => (item.stock || 0) <= (item.alertThreshold || 5));
     
-    // Simulate production for the demo if empty
-    let prodCountToday = recipes.length > 0 ? recipes.length : 12;
+    // REAL production count from production plan
+    const todayStr = now.toISOString().split('T')[0];
+    const todayProds = productionPlan.filter(p => p.date === todayStr);
+    let prodCountToday = todayProds.length > 0 ? todayProds.reduce((s, p) => s + (p.qty || 1), 0) : recipes.length;
 
     // Update Briefing Stats
     const bProd = document.getElementById('briefingProdCount');
@@ -79,108 +91,167 @@ window.hydratePremiumDashboard = function () {
         else bMargin.textContent = Math.round(avgMargin) + '%';
     }
 
-    // 3. Priorities List
+    // 3. DYNAMIC Priorities List (based on real data)
     const priorityList = document.getElementById('dashPriorityList');
     if (priorityList) {
-        let pHTML = '';
+        let priorities = [];
         
-        // Priority 1: Launch Production (Always high)
-        if (recipes.length > 0) {
-            const topR = recipes[0];
-            pHTML += `
-                <div class="priority-item urgent">
-                    <div class="p-icon">🍰</div>
-                    <div class="p-content">
-                        <div class="p-title">${t('dash.priority.launch', {name: topR.name})}</div>
-                        <div class="p-desc">${t('dash.priority.prod_desc')}</div>
-                    </div>
-                    <button class="p-action-btn" onclick="document.getElementById('navMgmt').click(); switchMgmtTab('production');">${t('dash.priority.btn_launch')}</button>
-                </div>
-            `;
+        // Priority: Production plan items for today
+        if (todayProds.length > 0) {
+            const prod = todayProds[0];
+            priorities.push({ urgency: 'urgent', icon: '🍰',
+                title: `${t('dash.priority.launch', {name: prod.recipe || prod.name || recipes[0]?.name || 'Production'})}`,
+                desc: `${todayProds.length} ${t('dash.priority.prod_count') || 'production(s) planifiée(s) aujourd\'hui'}`,
+                action: `showMgmt(); switchMgmtTab('production');`,
+                btn: t('dash.priority.btn_launch') || 'Lancer'
+            });
+        } else if (recipes.length > 0) {
+            // Fallback: suggest launching most recent recipe
+            const recent = [...recipes].sort((a,b) => new Date(b.savedAt||0) - new Date(a.savedAt||0))[0];
+            priorities.push({ urgency: 'info', icon: '📋',
+                title: t('dash.priority.no_prod') || 'Aucune production planifiée',
+                desc: t('dash.priority.suggest_plan') || 'Planifiez votre journée dans le module Production',
+                action: `showMgmt(); switchMgmtTab('production');`,
+                btn: t('dash.priority.btn_plan') || 'Planifier'
+            });
         }
         
-        // Priority 2: Low Stock
+        // Priority: Critical stock alerts
         if (stockAlerts.length > 0) {
-            const alertItem = stockAlerts[0];
-            pHTML += `
-                <div class="priority-item warning">
-                    <div class="p-icon">🛒</div>
-                    <div class="p-content">
-                        <div class="p-title">${t('dash.priority.order', {name: alertItem.name})}</div>
-                        <div class="p-desc">${t('dash.priority.stock_desc', {qty: alertItem.stock, unit: alertItem.unit || 'kg'})}</div>
-                    </div>
-                    <button class="p-action-btn" onclick="document.getElementById('navSuppliers').click();">${t('dash.priority.btn_order')}</button>
-                </div>
-            `;
+            const criticalItems = stockAlerts.slice(0, 2).map(i => i.name).join(', ');
+            priorities.push({ urgency: 'warning', icon: '🛒',
+                title: `${t('dash.priority.order', {name: stockAlerts[0].name})}`,
+                desc: `${stockAlerts.length} ${t('dash.priority.stock_critical') || 'ingrédient(s) en stock critique'} — ${criticalItems}`,
+                action: `showInventaire();`,
+                btn: t('dash.priority.btn_order') || 'Commander'
+            });
         }
 
-        // Priority 3: Low Margins
-        const lowMarginRecipes = recipes.filter(r => (r.costs?.marginPct || 70) < 68);
+        // Priority: Low margin recipes
+        const lowMarginRecipes = recipes.filter(r => (r.costs?.marginPct || 70) < 65);
         if (lowMarginRecipes.length > 0) {
             const lowPerf = lowMarginRecipes[0];
-            pHTML += `
-                <div class="priority-item info">
-                    <div class="p-icon">💰</div>
-                    <div class="p-content">
-                        <div class="p-title">${t('dash.priority.adjust_margin', {name: lowPerf.name})}</div>
-                        <div class="p-desc">${t('dash.priority.margin_desc', {margin: Math.round(lowPerf.costs?.marginPct)})}</div>
+            const margin = Math.round(lowPerf.costs?.marginPct || 60);
+            priorities.push({ urgency: 'warning', icon: '💰',
+                title: `${t('dash.priority.adjust_margin', {name: lowPerf.name})}`,
+                desc: `${t('dash.priority.margin_desc', {margin: margin})} — ${lowMarginRecipes.length > 1 ? '+' + (lowMarginRecipes.length-1) + ' autres' : ''}`,
+                action: `openRecipeEditorByName('${lowPerf.name.replace(/'/g, "\\'") }')`,
+                btn: t('dash.priority.btn_revise') || 'Ajuster'
+            });
+        }
+
+        // Priority: Recent waste/losses
+        const recentWaste = wasteLogs.filter(w => {
+            const d = new Date(w.date || w.timestamp);
+            return (now - d) < 7 * 24 * 60 * 60 * 1000; // Last 7 days
+        });
+        if (recentWaste.length >= 3) {
+            const totalLoss = recentWaste.reduce((s, w) => s + (w.cost || 0), 0);
+            priorities.push({ urgency: 'info', icon: '📉',
+                title: t('dash.priority.waste_alert') || `${recentWaste.length} pertes cette semaine`,
+                desc: totalLoss > 0 ? `${totalLoss.toFixed(2)} € de pertes cumulées` : `${recentWaste.length} déclarations enregistrées`,
+                action: `showMgmt(); switchMgmtTab('quality');`,
+                btn: t('dash.priority.btn_analyze') || 'Analyser'
+            });
+        }
+
+        // If nothing, show all-good message
+        if (priorities.length === 0) {
+            priorities.push({ urgency: 'info', icon: '✅',
+                title: t('dash.priority.all_good') || 'Tout est en ordre !',
+                desc: t('dash.priority.all_good_desc') || 'Aucune action urgente pour le moment.',
+                action: `showRecettes();`,
+                btn: t('dash.priority.btn_create') || 'Créer'
+            });
+        }
+
+        priorityList.innerHTML = priorities.slice(0, 3).map(p => `
+            <div class="priority-item ${p.urgency}">
+                <div class="p-icon">${p.icon}</div>
+                <div class="p-content">
+                    <div class="p-title">${p.title}</div>
+                    <div class="p-desc">${p.desc}</div>
+                </div>
+                <button class="p-action-btn" onclick="${p.action}">${p.btn}</button>
+            </div>
+        `).join('');
+    }
+
+    // 4. DYNAMIC AI Expert Advice (generates insight from real data)
+    const aiAdvice = document.getElementById('dashAIAdvice');
+    if (aiAdvice) {
+        let insights = [];
+        
+        // Insight: Worst margin recipe
+        const sortedByMargin = [...recipes].sort((a,b) => (a.costs?.marginPct || 70) - (b.costs?.marginPct || 70));
+        const worst = sortedByMargin[0];
+        if (worst && (worst.costs?.marginPct || 70) < 70) {
+            const currentM = Math.round(worst.costs?.marginPct || 65);
+            const suggestedIncrease = ((worst.costs?.sellingPrice || 5) * 0.05).toFixed(2);
+            insights.push({
+                text: `<strong>${worst.name}</strong> : marge à ${currentM}%, en dessous de la cible.`,
+                tips: [`💡 +${suggestedIncrease}€ sur le prix`, `💡 Réduire garniture 5%`]
+            });
+        }
+        
+        // Insight: Stock volatility (price changes)
+        const priceChanges = inv.filter(item => item.priceHistory && item.priceHistory.length >= 2);
+        const risingPrices = priceChanges.filter(item => {
+            const h = item.priceHistory;
+            return h[h.length-1].price > h[h.length-2].price;
+        });
+        if (risingPrices.length > 0) {
+            const topRising = risingPrices[0];
+            const h = topRising.priceHistory;
+            const pctChange = (((h[h.length-1].price - h[h.length-2].price) / h[h.length-2].price) * 100).toFixed(1);
+            insights.push({
+                text: `<strong>${topRising.name}</strong> : prix en hausse de +${pctChange}%.`,
+                tips: [`💡 Chercher un fournisseur alternatif`, `💡 Ajuster les recettes concernées`]
+            });
+        }
+
+        // Insight: Best performing recipe
+        const best = [...recipes].sort((a,b) => (b.costs?.marginPct || 0) - (a.costs?.marginPct || 0))[0];
+        if (best && insights.length === 0) {
+            insights.push({
+                text: `<strong>${best.name}</strong> est votre recette la plus rentable (${Math.round(best.costs?.marginPct || 75)}%).`,
+                tips: [`💡 Mettre en avant en vitrine`, `💡 ${recipes.length} recettes actives`]
+            });
+        }
+
+        // Render the top insight
+        const insight = insights[0];
+        if (insight) {
+            aiAdvice.innerHTML = `
+                <div class="ai-bubble">
+                    <p>${insight.text}</p>
+                    <div class="ai-actions">
+                        ${insight.tips.map(tip => `<span class="ai-tip">${tip}</span>`).join('')}
                     </div>
-                    <button class="p-action-btn" onclick="openRecipeEditorByName('${lowPerf.name}')">${t('dash.priority.btn_revise')}</button>
                 </div>
             `;
         } else {
-             pHTML += `
-                <div class="priority-item info">
-                    <div class="p-icon">⚖️</div>
-                    <div class="p-content">
-                        <div class="p-title">${t('dash.priority.inv_check')}</div>
-                        <div class="p-desc">${t('dash.priority.inv_desc')}</div>
-                    </div>
-                    <button class="p-action-btn" onclick="document.getElementById('navInventaire').click();">${t('dash.priority.btn_open')}</button>
-                </div>
-            `;
-        }
-        
-        priorityList.innerHTML = pHTML || `<p class="timeline-empty">${t('dash.priority.empty')}</p>`;
-    }
-
-    // 4. AI Expert Advice
-    const aiAdvice = document.getElementById('dashAIAdvice');
-    if (aiAdvice) {
-        const worst = [...recipes].sort((a,b) => (a.costs?.marginPct || 70) - (b.costs?.marginPct || 70))[0];
-        if (worst) {
-            const currentM = Math.round(worst.costs?.marginPct || 65);
-            const targetM = 72;
-            const diff = targetM - currentM;
-            const suggestionPrice = (worst.costs?.sellingPriceHT || 5) * (diff / 100);
-            
-            aiAdvice.innerHTML = `
-                <div class="ai-bubble">
-                    <p>${t('dash.ai.margin_low', {name: `<strong>${worst.name}</strong>`, margin: currentM})}</p>
-                    <div class="ai-actions">
-                        <span class="ai-tip">${t('dash.ai.suggestion', {price: suggestionPrice.toFixed(2)})}</span>
-                        <span class="ai-tip">${t('dash.ai.target', {target: targetM})}</span>
-                    </div>
-                </div>
-            `;
+            aiAdvice.innerHTML = `<div class="ai-bubble"><p>✅ Toutes vos recettes affichent une marge saine. Continuez !</p></div>`;
         }
     }
 
-    // 5. Production Timeline
+    // 5. REAL Production Timeline (from production plan)
     const prodTimeline = document.getElementById('dashProdTimeline');
     if (prodTimeline) {
         const dateFilter = window.dashProdDateFilter || 'today';
-        if (recipes.length > 0) {
-            let displayRecipes = (dateFilter === 'today') ? recipes.slice(0, 3) : recipes.slice(Math.min(recipes.length-1, 1), Math.min(recipes.length, 4));
-            if (displayRecipes.length === 0) displayRecipes = recipes.slice(0,1);
-
-            const statusLabels = (dateFilter === 'today') 
-                ? [t('dash.status.ongoing'), t('dash.status.to_launch'), t('dash.status.planned')] 
-                : [t('ui.tomorrow'), t('ui.tomorrow'), t('dash.status.planned')];
-
-            prodTimeline.innerHTML = displayRecipes.map((r, i) => {
-                const progresses = (dateFilter === 'today') ? [75, 40, 0] : [0, 0, 0];
-                const prog = progresses[i % 3];
+        const filterDate = new Date(now);
+        if (dateFilter === 'tomorrow') filterDate.setDate(filterDate.getDate() + 1);
+        const filterStr = filterDate.toISOString().split('T')[0];
+        
+        // Get real production plan items for the filtered date
+        const dayProds = productionPlan.filter(p => p.date === filterStr);
+        
+        if (dayProds.length > 0) {
+            prodTimeline.innerHTML = dayProds.slice(0, 4).map((p, i) => {
+                const prog = p.status === 'done' ? 100 : (p.status === 'ongoing' ? 60 : 0);
+                const statusLabel = p.status === 'done' ? (t('dash.status.done') || 'Terminé') 
+                    : p.status === 'ongoing' ? (t('dash.status.ongoing') || 'En cours') 
+                    : (t('dash.status.planned') || 'Planifié');
                 return `
                     <div class="prod-pill-v2">
                         <div class="prod-progress-circle">
@@ -191,14 +262,26 @@ window.hydratePremiumDashboard = function () {
                             <span style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:0.65rem; font-weight:800;">${prog}%</span>
                         </div>
                         <div class="prod-info-v2">
-                            <h4>${r.name}</h4>
-                            <p>${statusLabels[i % 3]}</p>
+                            <h4>${p.recipe || p.name || 'Production'}</h4>
+                            <p>${statusLabel} · ${p.qty || 1} ${t('unit.portions') || 'portions'}</p>
                         </div>
                     </div>
                 `;
             }).join('');
+        } else if (recipes.length > 0) {
+            // Fallback: show helpful message with action button
+            const dateLabel = dateFilter === 'today' ? (t('ui.today') || "aujourd'hui").toLowerCase() : (t('ui.tomorrow') || 'demain').toLowerCase();
+            prodTimeline.innerHTML = `
+                <div style="text-align:center; padding:1.2rem 0; color:var(--cockpit-muted); font-size:0.85rem;">
+                    <div style="font-size:2rem; margin-bottom:0.5rem;">📋</div>
+                    <p style="margin:0 0 0.8rem;">${t('dash.prod.no_plan') || 'Aucune production planifiée pour'} ${dateLabel}</p>
+                    <button class="btn btn-sm btn-outline" onclick="showMgmt(); switchMgmtTab('production');" style="margin-top:0.5rem;">
+                        📅 ${t('dash.prod.plan_now') || 'Planifier une production'}
+                    </button>
+                </div>
+            `;
         } else {
-            const dateLabel = dateFilter === 'today' ? t('ui.today').toLowerCase() : t('ui.tomorrow').toLowerCase();
+            const dateLabel = dateFilter === 'today' ? (t('ui.today') || "aujourd'hui").toLowerCase() : (t('ui.tomorrow') || 'demain').toLowerCase();
             prodTimeline.innerHTML = `<div class="timeline-empty">${t('dash.prod.empty', {date: dateLabel})}</div>`;
         }
     }
@@ -229,25 +312,73 @@ window.hydratePremiumDashboard = function () {
     const displayMargin = Math.round(avgMargin);
     if (avgMarginEl) avgMarginEl.textContent = displayMargin + '%';
     if (marginCircle) {
-        // Trigger animation safely after DOM flush
         setTimeout(() => {
             marginCircle.setAttribute('stroke-dasharray', `${displayMargin}, 100`);
-            // Change color dynamically based on perf
             if (displayMargin < 65) marginCircle.style.stroke = 'var(--danger)';
             else if (displayMargin >= 75) marginCircle.style.stroke = 'var(--success)';
             else marginCircle.style.stroke = 'var(--gold)';
         }, 300);
     }
 
-    // 8. Team Summary
+    // 8. REAL Team Summary (from actual team + leaves)
     const presenceEl = document.getElementById('dashPresenceCount');
-    if (presenceEl) presenceEl.textContent = t('dash.team.present', {n: (team.length || 3)});
+    const haccpEl = document.getElementById('dashHACCPStatus');
+    if (presenceEl) {
+        const totalMembers = team.length || 0;
+        // Count who is on leave TODAY
+        const todayISO = now.toISOString().split('T')[0];
+        let onLeaveCount = 0;
+        leaves.forEach(l => {
+            const start = l.start || l.from;
+            const end = l.end || l.to;
+            if (start && end && todayISO >= start && todayISO <= end) {
+                onLeaveCount++;
+            }
+        });
+        const presentCount = Math.max(0, totalMembers - onLeaveCount);
+        
+        if (totalMembers > 0) {
+            presenceEl.textContent = `${presentCount}/${totalMembers} ${t('dash.team.present_label') || 'présent(s)'}`;
+            if (onLeaveCount > 0) {
+                presenceEl.style.color = 'var(--warning, #f59e0b)';
+            } else {
+                presenceEl.style.color = '';
+            }
+        } else {
+            presenceEl.textContent = t('dash.team.no_team') || 'Aucune équipe configurée';
+            presenceEl.style.color = 'var(--text-muted)';
+        }
+    }
+    
+    // REAL HACCP status from logs
+    if (haccpEl) {
+        const tempLogs = haccpLogs.temp || [];
+        const recentTemps = tempLogs.filter(l => {
+            const d = new Date(l.date || l.timestamp);
+            return (now - d) < 24 * 60 * 60 * 1000; // Last 24h
+        });
+        const hasAnomaly = recentTemps.some(l => l.status === 'ko' || l.status === 'anomaly' || (l.temp && (l.temp > 4 || l.temp < -20)));
+        
+        if (hasAnomaly) {
+            haccpEl.textContent = '⚠️ HACCP Alerte';
+            haccpEl.style.color = 'var(--danger, #ef4444)';
+            haccpEl.style.fontWeight = '700';
+        } else if (recentTemps.length > 0) {
+            haccpEl.textContent = '✅ HACCP OK';
+            haccpEl.style.color = 'var(--success, #10b981)';
+            haccpEl.style.fontWeight = '600';
+        } else {
+            haccpEl.textContent = t('dash.haccp.no_data') || '— Pas de relevé récent';
+            haccpEl.style.color = 'var(--text-muted)';
+            haccpEl.style.fontWeight = '400';
+        }
+    }
 
-    // 9. Sparkline Chart (Mini-demo)
-    renderMiniSparkline();
+    // 9. Sparkline Chart with real margin data
+    renderMiniSparkline(recipes);
 };
 
-function renderMiniSparkline() {
+function renderMiniSparkline(recipes) {
     const canvas = document.getElementById('businessTrendSparkMini');
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
@@ -260,7 +391,18 @@ function renderMiniSparkline() {
     ctx.lineWidth = 2;
     ctx.lineJoin = 'round';
     
-    const points = [height*0.8, height*0.7, height*0.9, height*0.4, height*0.5, height*0.2, height*0.3];
+    // Use real recipe margins if available, else demo data
+    let points;
+    if (recipes && recipes.length >= 3) {
+        // Take last 7 recipes' margins, normalized to canvas height
+        const margins = recipes.slice(0, 7).map(r => r.costs?.marginPct || 70);
+        const minM = Math.min(...margins) - 5;
+        const maxM = Math.max(...margins) + 5;
+        const range = maxM - minM || 1;
+        points = margins.map(m => height - ((m - minM) / range) * (height * 0.8) - height * 0.1);
+    } else {
+        points = [height*0.8, height*0.7, height*0.9, height*0.4, height*0.5, height*0.2, height*0.3];
+    }
     const step = width / (points.length - 1);
     
     ctx.moveTo(0, points[0]);

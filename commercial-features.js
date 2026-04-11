@@ -8,6 +8,23 @@
   =====================================================================
 */
 
+/**
+ * Psychological pricing helper (ends in .00, .50, or .90)
+ * Rounds UP to the next smart threshold to protect margin while being attractive.
+ */
+function applySmartPricing(val) {
+  let p = parseFloat(val);
+  if (isNaN(p) || p <= 0) return p;
+  
+  let whole = Math.floor(p);
+  let dec = Math.round((p - whole) * 100) / 100;
+  
+  if (dec <= 0.00) return whole;
+  if (dec <= 0.50) return whole + 0.50;
+  if (dec <= 0.90) return whole + 0.90;
+  return whole + 1.00;
+}
+
 // ============================================================================
 // 1. PASSERELLE CATALOGUE ↔ COMMANDE — Smart Order Builder
 // ============================================================================
@@ -171,7 +188,7 @@ window.recalcSmartOrder = function() {
         
         if (costs) {
           const unitCost = costs.costPerPortion || 0;
-          const unitSell = costs.sellingPrice || costs.sellPriceHT || 0;
+          const unitSell = applySmartPricing(costs.sellingPrice || costs.sellPriceHT || 0);
           const lineCost = unitCost * qty;
           const lineSell = unitSell * qty;
           totalCost += lineCost;
@@ -255,7 +272,7 @@ window.saveCrmOrder = function() {
           recipeName: recipe.name,
           qty: qty,
           unitCost: costs?.costPerPortion || 0,
-          unitSell: costs?.sellingPrice || costs?.sellPriceHT || 0
+          unitSell: applySmartPricing(costs?.sellingPrice || costs?.sellPriceHT || 0)
         });
         productNames.push(`${qty}x ${recipe.name}`);
       }
@@ -733,7 +750,7 @@ window.generateECatalogue = function() {
     return {
       name: r.name,
       category: r.category || 'Pâtisserie',
-      price: costs?.sellingPrice ? costs.sellingPrice.toFixed(2) : (costs?.sellPriceHT ? costs.sellPriceHT.toFixed(2) : '—'),
+      price: costs?.sellingPrice ? applySmartPricing(costs.sellingPrice).toFixed(2) : (costs?.sellPriceHT ? applySmartPricing(costs.sellPriceHT).toFixed(2) : '—'),
       description: r.description || '',
       portions: r.portions || '—',
       allergens: [...allergens],

@@ -433,124 +433,190 @@ function updateBCGLegend(data, legendContainer) {
 }
 
 // ============================================================================
-// 5. SIMULATION INFLATION
+// 5. SIMULATION INFLATION — High-Performance Slider
 // ============================================================================
+
+// Cache: pre-computed baseline data (only changes when recipes change, not on slider move)
+let _inflationCache = { recipes: null, baselines: null, version: 0 };
+let _inflationDomBuilt = false;
+let _inflationRAF = null;
+let _inflationStorageTimeout = null;
+let _inflationCascadeTimeout = null;
+
+function _buildInflationBaselines() {
+  const savedRecs = (window.APP && window.APP.savedRecipes) || [];
+  const libraryRecs = typeof RECIPES !== 'undefined' ? RECIPES : [];
+  const recipes = [...savedRecs, ...libraryRecs];
+  
+  const baselines = recipes.map(r => {
+    try {
+      let currentCosts = null;
+      if (typeof window.calcFullCost === 'function') {
+        currentCosts = window.calcFullCost(r.margin || 70, r, 0);
+      } else {
+        currentCosts = r.costs || r.data;
+      }
+      if (!currentCosts) return null;
+      
+      const oldMargin = currentCosts.marginPct || 0;
+      const oldCost = currentCosts.costPerPortion || 0;
+      const sellPrice = currentCosts.sellPriceHT || (oldMargin < 100 ? (oldCost / (1 - (oldMargin/100))) : oldCost * 4);
+      
+      return { name: r.name, oldMargin, oldCost, sellPrice };
+    } catch(e) { return null; }
+  }).filter(Boolean);
+  
+  _inflationCache = { recipes, baselines, version: (_inflationCache.version || 0) + 1 };
+  return baselines;
+}
+
+function _buildInflationDOM(baselines) {
+  const container = document.getElementById('inflationResults');
+  if (!container) return;
+  
+  if (baselines.length === 0) {
+    container.innerHTML = `<div class="insight-box" style="margin-top:2rem;"><div class="insight-icon">🔍</div><div class="insight-text"><p>${i18n.t('inflation.no_data')}</p></div></div>`;
+    _inflationDomBuilt = false;
+    return;
+  }
+  
+  const summaryHTML = `
+    <div class="inflation-summary">
+      <div class="summary-pill safe" id="inflationPillStatus">🛡️ ${i18n.t('inflation.safe')}</div>
+      <div class="summary-pill info" id="inflationPillLoss">📉 Perte moyenne : 0.0%</div>
+    </div>`;
+
+  const cardsHTML = baselines.map((b, i) => `
+    <div class="inflation-card status-ok" id="inflCard_${i}">
+      <div class="inflation-card-header">
+        <span class="recipe-name">${b.name}</span>
+        <span class="status-icon" id="inflIcon_${i}">✅</span>
+      </div>
+      <div class="inflation-stats">
+        <div class="stat-item">
+          <span class="label">${i18n.t('inflation.col.original')}</span>
+          <span class="val">${b.oldMargin.toFixed(1)}%</span>
+        </div>
+        <div class="stat-item">
+          <span class="label">${i18n.t('inflation.col.new')}</span>
+          <span class="val highlighted" id="inflNewMargin_${i}">${b.oldMargin.toFixed(1)}%</span>
+        </div>
+      </div>
+      <div class="inflation-impact-bar">
+        <div class="impact-fill" id="inflBar_${i}" style="width:${Math.max(0, Math.min(100, b.oldMargin))}%; background:var(--cockpit-success); transition: width 0.08s linear, background 0.12s linear;"></div>
+      </div>
+      <div class="inflation-diff" id="inflDiff_${i}">${i18n.t('inflation.status.ok')}</div>
+    </div>
+  `).join('');
+
+  container.innerHTML = summaryHTML + `<div class="inflation-grid">${cardsHTML}</div>`;
+  _inflationDomBuilt = true;
+}
+
+function _updateInflationValues(pct) {
+  const baselines = _inflationCache.baselines;
+  if (!baselines || !_inflationDomBuilt) return;
+  
+  let inDanger = 0;
+  let totalMarginLoss = 0;
+  
+  for (let i = 0; i < baselines.length; i++) {
+    const b = baselines[i];
+    const newCost = b.oldCost * (1 + pct / 100);
+    const newMargin = b.sellPrice > 0 ? (((b.sellPrice - newCost) / b.sellPrice) * 100) : 0;
+    const marginImpact = b.oldMargin - newMargin;
+    totalMarginLoss += marginImpact;
+    if (newMargin < 50) inDanger++;
+    
+    // Update card class + icon (direct DOM manipulation — no innerHTML rebuild)
+    const card = document.getElementById('inflCard_' + i);
+    const icon = document.getElementById('inflIcon_' + i);
+    const newMarginEl = document.getElementById('inflNewMargin_' + i);
+    const bar = document.getElementById('inflBar_' + i);
+    const diff = document.getElementById('inflDiff_' + i);
+    
+    if (!card) continue;
+    
+    // Status class
+    let cls = 'status-ok', ico = '✅';
+    if (newMargin < 50) { cls = 'status-danger'; ico = '💀'; }
+    else if (newMargin < 65) { cls = 'status-warning'; ico = '⚠️'; }
+    
+    card.className = 'inflation-card ' + cls;
+    if (icon) icon.textContent = ico;
+    if (newMarginEl) newMarginEl.textContent = newMargin.toFixed(1) + '%';
+    if (bar) {
+      bar.style.width = Math.max(0, Math.min(100, newMargin)) + '%';
+      bar.style.background = newMargin < 50 ? 'var(--cockpit-danger)' : (newMargin < 65 ? 'var(--cockpit-accent)' : 'var(--cockpit-success)');
+    }
+    if (diff) {
+      diff.textContent = Math.abs(marginImpact) < 0.1 
+        ? i18n.t('inflation.status.ok') 
+        : `-${marginImpact.toFixed(1)} pts de marge`;
+    }
+  }
+  
+  // Update summary pills
+  const pillStatus = document.getElementById('inflationPillStatus');
+  const pillLoss = document.getElementById('inflationPillLoss');
+  if (pillStatus) {
+    if (inDanger > 0) {
+      pillStatus.className = 'summary-pill danger';
+      pillStatus.textContent = `❗ ${inDanger} ${i18n.t('inflation.critical')}`;
+    } else {
+      pillStatus.className = 'summary-pill safe';
+      pillStatus.textContent = `🛡️ ${i18n.t('inflation.safe')}`;
+    }
+  }
+  if (pillLoss) {
+    pillLoss.textContent = `📉 Perte moyenne : ${(totalMarginLoss / baselines.length).toFixed(1)}%`;
+  }
+}
 
 function renderInflationSimulation() {
   const slider = document.getElementById('inflationSlider');
   if (!slider) return;
   const pct = parseFloat(slider.value) || 0;
   
+  // Instant: update the value label (no lag)
   const valDisp = document.getElementById('inflationValue');
   if (valDisp) valDisp.textContent = pct + '%';
-  
-  // Set global factor for cross-app simulation
   window.inflationFactor = pct;
-  if (typeof localStorage !== 'undefined') localStorage.setItem('gourmet_inflation_factor', pct);
+  
+  // Debounce localStorage write (100ms) — this was causing jank
+  if (_inflationStorageTimeout) clearTimeout(_inflationStorageTimeout);
+  _inflationStorageTimeout = setTimeout(() => {
+    localStorage.setItem('gourmet_inflation_factor', pct);
+  }, 100);
 
-  const container = document.getElementById('inflationResults');
-  if (!container) return;
-
-  const savedRecs = (window.APP && window.APP.savedRecipes) || [];
-  const libraryRecs = typeof RECIPES !== 'undefined' ? RECIPES : [];
-  const recipes = [...savedRecs, ...libraryRecs];
-  if (recipes.length === 0) {
-    container.innerHTML = `<div class="insight-box" style="margin-top:2rem;"><div class="insight-icon">🔍</div><div class="insight-text"><p>${i18n.t('inflation.no_data')}</p></div></div>`;
-    return;
+  // Build baselines + DOM skeleton once, then only update values
+  if (!_inflationCache.baselines || !_inflationDomBuilt) {
+    _buildInflationBaselines();
+    _buildInflationDOM(_inflationCache.baselines);
   }
-
-  let inDanger = 0;
-  let totalMarginLoss = 0;
-  let resultsArr = [];
-
-  recipes.forEach(r => {
-    try {
-      // ALWAYS get baseline (0% inflation) for "Marge Actuelle" in simulation cards
-      let currentCosts = null;
-      if (typeof window.calcFullCost === 'function') {
-        currentCosts = window.calcFullCost(r.margin || 70, r, 0); 
-      } else {
-        currentCosts = r.costs || r.data;
-      }
-      
-      if (!currentCosts) return;
-
-      const oldMargin = currentCosts.marginPct || 0;
-      const oldCost = currentCosts.costPerPortion || 0;
-      const sellPrice = currentCosts.sellPriceHT || (oldMargin < 100 ? (oldCost / (1 - (oldMargin/100))) : oldCost * 4);
-
-      // New cost = old cost + percentage
-      const newCost = oldCost * (1 + pct / 100);
-      const newMargin = sellPrice > 0 ? (((sellPrice - newCost) / sellPrice) * 100) : 0;
-      const marginImpact = oldMargin - newMargin;
-
-      totalMarginLoss += marginImpact;
-      if (newMargin < 50) inDanger++;
-
-      let statusClass = 'status-ok';
-      let icon = '✅';
-      if (newMargin < 50) { statusClass = 'status-danger'; icon = '💀'; }
-      else if (newMargin < 65) { statusClass = 'status-warning'; icon = '⚠️'; }
-
-      resultsArr.push(`
-        <div class="inflation-card ${statusClass}">
-          <div class="inflation-card-header">
-             <span class="recipe-name">${r.name}</span>
-             <span class="status-icon">${icon}</span>
-          </div>
-          <div class="inflation-stats">
-            <div class="stat-item">
-              <span class="label">${i18n.t('inflation.col.original')}</span>
-              <span class="val">${oldMargin.toFixed(1)}%</span>
-            </div>
-            <div class="stat-item">
-              <span class="label">${i18n.t('inflation.col.new')}</span>
-              <span class="val highlighted">${newMargin.toFixed(1)}%</span>
-            </div>
-          </div>
-          <div class="inflation-impact-bar">
-            <div class="impact-fill" style="width: ${Math.max(0, Math.min(100, newMargin))}%; background: ${newMargin < 50 ? 'var(--cockpit-danger)' : (newMargin < 65 ? 'var(--cockpit-accent)' : 'var(--cockpit-success)')}"></div>
-          </div>
-          <div class="inflation-diff">
-          ${Math.abs(marginImpact) < 0.1 ? i18n.t('inflation.status.ok') : `-${marginImpact.toFixed(1)} pts de marge`}
-        </div>
-        </div>
-      `);
-    } catch (err) {
-      console.warn("Failed to simulate inflation for recipe", r.name, err);
-    }
+  
+  // Use rAF for smooth 60fps slider updates
+  if (_inflationRAF) cancelAnimationFrame(_inflationRAF);
+  _inflationRAF = requestAnimationFrame(() => {
+    _updateInflationValues(pct);
   });
 
-  if (resultsArr.length === 0) {
-     container.innerHTML = `<p style="text-align:center; padding:2rem; color:var(--text-muted);">${i18n.t('inflation.no_data')}</p>`;
-     return;
-  }
-
-  container.innerHTML = `
-    <div class="inflation-summary">
-      <div class="summary-pill ${inDanger > 0 ? 'danger' : 'safe'}">
-        ${inDanger > 0 ? `❗ ${inDanger} ${i18n.t('inflation.critical')}` : `🛡️ ${i18n.t('inflation.safe')}`}
-      </div>
-      <div class="summary-pill info">
-        📉 Perte moyenne : ${(totalMarginLoss / recipes.length).toFixed(1)}%
-      </div>
-    </div>
-    <div class="inflation-grid">
-      ${resultsArr.join('')}
-    </div>
-  `;
-
-  // Trigger UI refreshes in other parts (throttled to avoid layout thrashing)
-  if (this.simTimeout) clearTimeout(this.simTimeout);
-  this.simTimeout = setTimeout(() => {
-    // Only hydrate if the hub is potentially visible to avoid off-screen layout work
+  // Heavy cross-app updates: debounce to 300ms after last move
+  if (_inflationCascadeTimeout) clearTimeout(_inflationCascadeTimeout);
+  _inflationCascadeTimeout = setTimeout(() => {
     const hub = document.getElementById('hubSection');
     if (hub && hub.style.display !== 'none' && typeof hydratePremiumDashboard === 'function') {
-        hydratePremiumDashboard();
+      hydratePremiumDashboard();
     }
     if (typeof calculateBreakingPoint === 'function') calculateBreakingPoint();
     if (typeof renderBCGMatrix === 'function') renderBCGMatrix(true);
-  }, 32); // ~30fps for cross-app updates
+  }, 300);
+}
+
+// Force a full rebuild (call when recipes list changes)
+function invalidateInflationCache() {
+  _inflationDomBuilt = false;
+  _inflationCache.baselines = null;
 }
 
 // ============================================================================

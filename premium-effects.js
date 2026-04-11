@@ -335,15 +335,8 @@ window.renderPredictiveMarginAlert = function() {
     .sort((a, b) => b.affected.length - a.affected.length);
 
   if (alerts.length === 0) {
-    // All good - show positive message
-    container.innerHTML = `
-      <div class="ai-bubble ai-bubble-success">
-        <p>✅ <strong>Toutes vos marges sont saines.</strong> Aucune recette n'est sous les ${MARGIN_THRESHOLD}% de marge.</p>
-        <div class="ai-actions">
-          <span class="ai-tip">🎯 ${recipes.length} recettes surveillées</span>
-        </div>
-      </div>
-    `;
+    // All good - do NOT overwrite; let dashboard-premium.js keep its insight
+    // (e.g. "Eclair café est votre recette la plus rentable")
     return;
   }
 

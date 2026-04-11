@@ -36,37 +36,25 @@ self.addEventListener('activate', (e) => {
     );
 });
 
-// Fetch: Stale-While-Revalidate Strategy
-// This serves from cache but updates in the background for next time.
-// For the index.html, we prefer a Network-First strategy to ensure latest content.
+// Fetch: Network-First Strategy for all same-origin assets
+// Always try the network first to get the latest code, fall back to cache when offline.
 self.addEventListener('fetch', (e) => {
     const url = new URL(e.request.url);
     
-    // For navigation/HTML: Network First
-    if (e.request.mode === 'navigate' || (url.origin === self.origin && url.pathname.endsWith('.html'))) {
-        e.respondWith(
-            fetch(e.request).catch(() => caches.match(e.request))
-        );
-        return;
-    }
+    // Only handle same-origin requests
+    if (url.origin !== self.origin) return;
 
-    // For other assets: Stale-While-Revalidate
+    // Network First for everything
     e.respondWith(
-        caches.match(e.request).then((cachedResponse) => {
-            const fetchPromise = fetch(e.request).then((networkResponse) => {
-                // Update cache with the new version
-                if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
-                    const responseToCache = networkResponse.clone();
-                    caches.open(CACHE_NAME).then((cache) => {
-                        cache.put(e.request, responseToCache);
-                    });
-                }
-                return networkResponse;
-            }).catch(() => {
-                // If network fails, we already have the cache response if it exists
-            });
-
-            return cachedResponse || fetchPromise;
-        })
+        fetch(e.request).then((networkResponse) => {
+            // Update cache with the new version
+            if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
+                const responseToCache = networkResponse.clone();
+                caches.open(CACHE_NAME).then((cache) => {
+                    cache.put(e.request, responseToCache);
+                });
+            }
+            return networkResponse;
+        }).catch(() => caches.match(e.request))
     );
 });

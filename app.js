@@ -1,4 +1,4 @@
-/*
+﻿/*
   =====================================================================
   APP.JS — GourmetRevient Professional Recipe Cost Calculator
   Modular Vanilla JavaScript
@@ -615,6 +615,29 @@ function loadInventory() {
 
 function saveInventory() {
   localStorage.setItem(getUserInventoryKey(), JSON.stringify(APP.inventory));
+}
+
+// Price History Tracking — records each price change for trend analysis
+function recordPriceChange(item, newPrice) {
+  if (!item) return;
+  const oldPrice = item.price || 0;
+  // Don't record if price didn't actually change
+  if (Math.abs(oldPrice - newPrice) < 0.001) return;
+  
+  if (!item.priceHistory) item.priceHistory = [];
+  
+  // Add snapshot
+  item.priceHistory.push({
+    price: newPrice,
+    previousPrice: oldPrice,
+    date: new Date().toISOString(),
+    change: oldPrice > 0 ? ((newPrice - oldPrice) / oldPrice * 100).toFixed(1) : '0'
+  });
+  
+  // Keep only last 20 entries to avoid localStorage bloat
+  if (item.priceHistory.length > 20) {
+    item.priceHistory = item.priceHistory.slice(-20);
+  }
 }
 
 function initInventoryFromDb() {
@@ -1605,6 +1628,7 @@ function renderSavedRecipes() {
         <div class="sc-name">${escapeHtml(r.name)}</div>
         <div class="sc-meta">${escapeHtml(r.category || t('lab.cat.all'))} · ${r.portions} portions · ${date}</div>
         <div class="sc-cost">${costLabel}: ${costs.totalFullCost.toFixed(2)} € · ${costs.costPerPortion.toFixed(2)} €/${t('unit.portion')}</div>
+        <div class="sc-nutri" style="margin:0.4rem 0;">${typeof renderNutriScoreBadge === 'function' ? renderNutriScoreBadge(r) : ''}</div>
         <div class="sc-actions">
           <button class="btn btn-outline btn-sm" onclick="loadRecipe('${r.id}')">${t('nav.home') === 'Home' ? 'Load' : (t('nav.home') === 'Inicio' ? 'Cargar' : 'Charger')}</button>
           <button class="btn btn-danger btn-sm" onclick="deleteRecipe('${r.id}')">${t('nav.home') === 'Home' ? 'Delete' : (t('nav.home') === 'Inicio' ? 'Eliminar' : 'Supprimer')}</button>
@@ -1972,99 +1996,74 @@ function exportJson() {
 // ============================================================================
 
 function exportPdf() {
-  const summaryCard = document.getElementById('summaryCard');
-  if (!summaryCard) {
-    showToast('Erreur: Conteneur de résumé introuvable.', 'error');
-    return;
+  const r = APP.recipe;
+  if (!r || !r.name) { showToast('Erreur: Aucune recette chargée.', 'error'); return; }
+
+  const costs = calcFullCost(APP.margin);
+  const recipeName = r.name || 'Recette';
+  showToast(`Génération de la fiche technique de ${recipeName}...`, 'info');
+
+  const safeFilename = recipeName.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]/gi, '_').toLowerCase();
+  const today = new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+  const refId = 'FT-' + new Date().getFullYear() + '-' + String(new Date().getMonth()+1).padStart(2,'0') + String(new Date().getDate()).padStart(2,'0');
+  const margin = Math.round(costs.marginPct || APP.margin || 70);
+  const totalMat = (costs.totalMaterial || 0).toFixed(2);
+  const sellPrice = (costs.sellingPrice || 0).toFixed(2);
+  const tvaTTC = ((costs.sellingPrice || 0) * 1.055).toFixed(2);
+  const portions = r.portions || 10;
+  const prepTime = r.prepTime ? `${r.prepTime} min` : '—';
+  const cookTime = r.cookTime ? `${r.cookTime} min` : '—';
+  const category = r.category || r.style || 'Pâtisserie';
+  const user = localStorage.getItem('gourmet_current_user') || 'Chef Julian';
+  const gaugeColor = margin >= 70 ? '#10b981' : (margin >= 50 ? '#f59e0b' : '#ef4444');
+
+  function esc(str) {
+    if (typeof str !== 'string') return String(str || '');
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
 
-  const recipeName = APP.recipe.name || 'recette';
-  showToast(`${t('toast.pdf.preparing')} ${recipeName}...`, 'info');
+  const allergenList = r.allergens && r.allergens.length > 0
+    ? r.allergens.map(a => `<span class="allergen-badge">${esc(a)}</span>`).join('')
+    : '<span class="allergen-badge">Gluten</span><span class="allergen-badge">Oeufs</span><span class="allergen-badge">Lait</span>';
 
-  // Create a clean container for export and append to body
-  const container = document.createElement('div');
-  container.style.position = 'absolute';
-  container.style.top = '-10000px';
-  container.style.left = '0';
-  container.style.width = '800px';
-  container.style.backgroundColor = '#ffffff';
-  container.style.color = '#333333';
-  
-  const pdfClone = summaryCard.cloneNode(true);
-  pdfClone.id = "pdf-export-temp-node";
-  pdfClone.style.display = 'block';
-  pdfClone.style.padding = '40px';
-  pdfClone.style.boxShadow = 'none';
-  pdfClone.style.border = 'none';
-  pdfClone.style.width = '100%';
-  pdfClone.style.backgroundColor = '#ffffff';
+  const ingRows = (r.ingredients || []).map(ing => {
+    const qty = ing.quantity || ing.qty || 0;
+    const unit = ing.unit || 'g';
+    const ingCost = calcIngredientCost(ing).toFixed(2);
+    const priceU = ing.pricePerUnit ? `${parseFloat(ing.pricePerUnit).toFixed(2)} &euro;/${esc(ing.priceRef||'kg')}` : '—';
+    const note = ing.note || ing.description || '';
+    return `<tr><td><span class="ing-name">${esc(ing.name||'—')}</span>${note?`<div class="ing-note">${esc(note)}</div>`:''}</td><td>${qty}</td><td>${esc(unit)}</td><td>${priceU}</td><td><span class="cost-pill">${ingCost} &euro;</span></td></tr>`;
+  }).join('');
 
-  // Force all text colors and opacity
-  pdfClone.querySelectorAll('*').forEach(el => {
-    el.style.opacity = '1';
-    el.style.visibility = 'visible';
-    el.style.color = '#333333';
-    el.style.backgroundColor = 'transparent';
-    el.style.transition = 'none';
-    el.style.animation = 'none';
-    if (el.tagName === 'H1' || el.tagName === 'H2' || el.tagName === 'H3' || el.classList.contains('card-title')) {
-      el.style.color = '#10b981';
-    }
-    // Fix grid issues by converting to flex for PDF rendering
-    if (getComputedStyle(el).display === 'grid' || el.classList.contains('summary-sections-grid')) {
-       el.style.display = 'flex';
-       el.style.flexDirection = 'row';
-       el.style.flexWrap = 'wrap';
-       el.style.gap = '20px';
-    }
-  });
+  const steps = r.steps || r.instructions || [];
+  let stepsHtml = steps.length > 0
+    ? steps.slice(0,8).map((step,i) => {
+        const title = typeof step === 'string' ? `Étape ${i+1}` : (step.title||step.name||`Étape ${i+1}`);
+        const desc  = typeof step === 'string' ? step : (step.description||step.text||'');
+        const temp  = step && step.temperature ? `<div class="step-temp">🌡️ ${esc(step.temperature)}</div>` : '';
+        return `<div class="step"><div class="step-num">${i+1}</div><div class="step-body"><div class="step-title">${esc(title)}</div><div class="step-desc">${esc(typeof desc==='string'?desc:JSON.stringify(desc))}</div>${temp}</div></div>`;
+      }).join('')
+    : `<div class="step"><div class="step-num">1</div><div class="step-body"><div class="step-title">Procédé de fabrication</div><div class="step-desc">${esc(r.description||'Suivre le protocole de production défini pour cette recette.')}</div></div></div>`;
 
-  pdfClone.classList.add('pdf-export-mode');
+  const html = `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><title>Fiche Technique</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:Arial,Helvetica,sans-serif;background:#fff;color:#1a202c;-webkit-print-color-adjust:exact;print-color-adjust:exact}.header{background:linear-gradient(135deg,#0f1923 0%,#1a3040 60%,#12232e 100%);color:#fff;padding:24px 34px 20px}.header-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px}.brand{display:flex;align-items:center;gap:10px}.brand-name{font-size:1.05rem;font-weight:800;color:#C5A55A;letter-spacing:.04em}.brand-sub{font-size:.56rem;color:rgba(255,255,255,.4);letter-spacing:.1em;text-transform:uppercase}.doc-meta{text-align:right;font-size:.65rem;color:rgba(255,255,255,.44);line-height:1.75}.doc-meta strong{color:rgba(255,255,255,.8)}.header-title-block{border-top:1px solid rgba(197,165,90,.25);padding-top:11px}.doc-type-badge{display:inline-block;background:rgba(197,165,90,.15);color:#C5A55A;font-size:.56rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;padding:3px 10px;border-radius:20px;border:1px solid rgba(197,165,90,.3);margin-bottom:5px}.recipe-title{font-size:1.7rem;font-weight:900;color:#fff;line-height:1.2}.recipe-subtitle{font-size:.68rem;color:rgba(255,255,255,.4);margin-top:3px}.kpi-bar{display:grid;grid-template-columns:repeat(5,1fr);background:#f8f9fb;border-bottom:1px solid #eaedf2}.kpi-item{padding:12px 6px;text-align:center;border-right:1px solid #eaedf2}.kpi-item:last-child{border-right:none}.kpi-value{font-size:1.15rem;font-weight:900;color:#0f1923}.kpi-value.green{color:#10b981}.kpi-value.gold{color:#C5A55A}.kpi-value.blue{color:#3b82f6}.kpi-value.red{color:#ef4444}.kpi-label{font-size:.54rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#94a3b8;margin-top:3px}.body-grid{display:grid;grid-template-columns:1fr 186px}.main-col{padding:18px 24px}.side-col{background:#f8f9fb;border-left:1px solid #eaedf2;padding:14px 12px}.section-title{display:flex;align-items:center;gap:6px;font-size:.58rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#64748b;margin-bottom:7px}.section-title::after{content:'';flex:1;height:1px;background:#eaedf2}.ing-table{width:100%;border-collapse:collapse;font-size:.71rem;margin-bottom:16px}.ing-table thead tr{background:#0f1923;color:#fff}.ing-table thead th{padding:6px 7px;text-align:left;font-size:.56rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase}.ing-table thead th:last-child{text-align:right}.ing-table tbody tr:nth-child(even){background:#f8f9fb}.ing-table td{padding:5px 7px;border-bottom:1px solid #eaedf2;vertical-align:middle}.ing-table td:last-child{text-align:right}.ing-name{font-weight:600;color:#1a202c}.ing-note{font-size:.58rem;color:#94a3b8}.cost-pill{background:#f1f5f9;color:#334155;font-weight:700;font-size:.65rem;padding:2px 6px;border-radius:4px;white-space:nowrap}.steps{margin-bottom:14px}.step{display:flex;gap:9px;margin-bottom:8px;padding-bottom:8px;border-bottom:1px dashed #eaedf2}.step:last-child{border-bottom:none}.step-num{width:22px;height:22px;border-radius:50%;background:#0f1923;color:#C5A55A;font-size:.62rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}.step-body{flex:1}.step-title{font-size:.72rem;font-weight:700;color:#0f1923;margin-bottom:2px}.step-desc{font-size:.65rem;color:#475569;line-height:1.45}.step-temp{font-size:.6rem;color:#ef4444;font-weight:600;margin-top:2px}.side-section{margin-bottom:14px}.side-section-title{font-size:.54rem;font-weight:800;text-transform:uppercase;letter-spacing:.09em;color:#94a3b8;margin-bottom:6px;border-bottom:1px solid #eaedf2;padding-bottom:3px}.side-row{display:flex;justify-content:space-between;align-items:center;padding:3px 0;font-size:.63rem;border-bottom:1px dotted #eaedf2}.side-row:last-child{border-bottom:none}.side-key{color:#64748b}.side-val{font-weight:700;color:#0f1923}.gauge-label{display:flex;justify-content:space-between;font-size:.6rem;margin-bottom:3px}.gauge-track{background:#eaedf2;border-radius:20px;height:6px;overflow:hidden}.gauge-fill{height:100%;border-radius:20px;background:${gaugeColor}}.cost-summary{background:#0f1923;border-radius:7px;padding:10px;color:#fff;margin-top:7px}.cost-row-s{display:flex;justify-content:space-between;font-size:.62rem;padding:3px 0;border-bottom:1px solid rgba(255,255,255,.07)}.cost-row-s:last-child{border-bottom:none}.cost-key-s{color:rgba(255,255,255,.48)}.cost-val-s{font-weight:700}.cost-val-s.gold{color:#C5A55A;font-size:.76rem}.allergen-badges{display:flex;flex-wrap:wrap;gap:3px;margin-top:4px}.allergen-badge{background:#fee2e2;color:#991b1b;font-size:.52rem;font-weight:700;padding:2px 4px;border-radius:3px;text-transform:uppercase}.footer{background:#f8f9fb;border-top:1px solid #eaedf2;padding:9px 34px;display:flex;justify-content:space-between;align-items:center;font-size:.58rem;color:#94a3b8}.footer-logo{color:#C5A55A;font-weight:700;font-size:.63rem}.confidential{background:rgba(197,165,90,.1);color:#C5A55A;font-size:.52rem;font-weight:700;padding:2px 6px;border-radius:3px;letter-spacing:.06em;text-transform:uppercase}</style></head><body>
+<div class="header"><div class="header-top"><div class="brand"><div style="font-size:1.4rem">🍰</div><div><div class="brand-name">GourmetRevient</div><div class="brand-sub">Solution Pâtisserie Pro</div></div></div><div class="doc-meta"><div><strong>Réf :</strong> ${refId}</div><div><strong>Date :</strong> ${today}</div><div><strong>Catégorie :</strong> ${esc(category)}</div><div><strong>Validée par :</strong> ${esc(user)}</div></div></div><div class="header-title-block"><div class="doc-type-badge">📋 Fiche Technique de Production</div><div class="recipe-title">${esc(recipeName)}</div><div class="recipe-subtitle">Production en laboratoire — ${esc(category)}</div></div></div>
+<div class="kpi-bar"><div class="kpi-item"><div class="kpi-value">${portions}</div><div class="kpi-label">Portions</div></div><div class="kpi-item"><div class="kpi-value green">${totalMat} €</div><div class="kpi-label">Coût Matière</div></div><div class="kpi-item"><div class="kpi-value gold">${margin} %</div><div class="kpi-label">Marge Brute</div></div><div class="kpi-item"><div class="kpi-value blue">${sellPrice} €</div><div class="kpi-label">Prix Vente HT</div></div><div class="kpi-item"><div class="kpi-value">${prepTime}</div><div class="kpi-label">Préparation</div></div></div>
+<div class="body-grid"><div class="main-col"><div class="section-title">📋 Composition &amp; Ingrédients</div><table class="ing-table"><thead><tr><th>Ingrédient</th><th>Qtité</th><th>Unité</th><th>Prix U.</th><th>Coût</th></tr></thead><tbody>${ingRows||'<tr><td colspan="5" style="text-align:center;color:#94a3b8;padding:10px">Aucun ingrédient enregistré</td></tr>'}<tr style="background:#f1f5f9;font-weight:700"><td colspan="4" style="text-align:right;color:#64748b;font-size:.65rem;padding:6px 7px">TOTAL MATIÈRE</td><td><span class="cost-pill" style="background:#0f1923;color:#C5A55A">${totalMat} €</span></td></tr></tbody></table><div class="section-title">⚙️ Protocole de Production</div><div class="steps">${stepsHtml}</div></div><div class="side-col"><div class="side-section"><div class="side-section-title">📦 Infos Recette</div><div class="side-row"><span class="side-key">Catégorie</span><span class="side-val">${esc(category)}</span></div><div class="side-row"><span class="side-key">Portions</span><span class="side-val">${portions}</span></div><div class="side-row"><span class="side-key">Préparation</span><span class="side-val">${prepTime}</span></div><div class="side-row"><span class="side-key">Cuisson</span><span class="side-val">${cookTime}</span></div>${r.difficulty?`<div class="side-row"><span class="side-key">Niveau</span><span class="side-val">${esc(r.difficulty)}</span></div>`:''}</div><div class="side-section"><div class="side-section-title">📊 Rentabilité</div><div class="gauge-label"><span>Marge Brute</span><span style="font-weight:700;color:${gaugeColor}">${margin} %</span></div><div class="gauge-track"><div class="gauge-fill" style="width:${Math.min(margin,100)}%"></div></div><div class="cost-summary"><div class="cost-row-s"><span class="cost-key-s">Coût matière</span><span class="cost-val-s">${totalMat} €</span></div><div class="cost-row-s"><span class="cost-key-s">Prix vente HT</span><span class="cost-val-s">${sellPrice} €</span></div><div class="cost-row-s"><span class="cost-key-s">TVA (5,5%)</span><span class="cost-val-s">${((costs.sellingPrice||0)*.055).toFixed(2)} €</span></div><div class="cost-row-s"><span class="cost-key-s">Prix TTC</span><span class="cost-val-s gold">${tvaTTC} €</span></div></div></div><div class="side-section"><div class="side-section-title">⚠️ Allergènes</div><div class="allergen-badges">${allergenList}</div></div><div class="side-section"><div class="side-section-title">🌡️ Points HACCP</div><div class="side-row"><span class="side-key">Stockage</span><span class="side-val" style="color:#3b82f6">0–4 °C</span></div><div class="side-row"><span class="side-key">DLC</span><span class="side-val" style="color:#ef4444">48 h max</span></div><div class="side-row"><span class="side-key">Service</span><span class="side-val" style="color:#3b82f6">2–4 °C</span></div></div></div></div>
+<div class="footer"><span class="footer-logo">GourmetRevient</span><span>Fiche Technique — Usage Interne — &copy; ${new Date().getFullYear()}</span><span class="confidential">Document Confidentiel</span></div>
+</body></html>`;
 
-  // Clean UI elements
-  const uiElements = pdfClone.querySelectorAll('.export-actions, .step-nav, .btn, button, .close-qr');
-  uiElements.forEach(el => el.remove());
-
-  container.appendChild(pdfClone);
-  document.body.appendChild(container);
-
-  const safeFilename = recipeName.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/gi, '_').toLowerCase();
-
-  const opt = {
-    margin: [10, 10, 10, 10],
-    filename: `${safeFilename}_fiche.pdf`,
-    image: { type: 'jpeg', quality: 0.98 },
-    html2canvas: {
-      scale: 2,
-      useCORS: true,
-      backgroundColor: '#ffffff',
-      letterRendering: true,
-      logging: false,
-      scrollY: -window.scrollY // Key fix for scrolled pages
-    },
-    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-  };
-
-  setTimeout(() => {
-    html2pdf().from(container).set(opt).save().then(() => {
-      document.body.removeChild(container);
-      showToast(t('toast.pdf.done'), 'success');
-    }).catch((err) => {
-      console.error('PDF Export Error:', err);
-      if (document.body.contains(container)) document.body.removeChild(container);
-      showToast(t('toast.pdf.error'), 'error');
-    });
-  }, 800); 
+  if (typeof html2pdf === 'undefined') { showToast('Bibliothèque html2pdf non chargée', 'error'); return; }
+  html2pdf().set({ margin:0, filename:`${safeFilename}_fiche.pdf`, image:{type:'jpeg',quality:.98}, html2canvas:{scale:2,useCORS:true,logging:false}, jsPDF:{unit:'mm',format:'a4',orientation:'portrait'} }).from(html).save().then(() => showToast('Fiche technique exportée ✓','success')).catch(err => { console.error(err); showToast('Erreur PDF','error'); });
 }
-
 function exportDevisPdf() {
   const recipeName = APP.recipe.name || 'Prestation';
   const costs = calcFullCost(APP.margin);
 
   const container = document.createElement('div');
-  container.style.position = 'absolute';
-  container.style.top = '-10000px';
+  container.style.position = 'fixed';
+  container.style.top = '0';
   container.style.left = '0';
+  container.style.zIndex = '-9999';
   container.style.width = '800px';
   container.style.backgroundColor = '#ffffff';
 
@@ -2153,7 +2152,9 @@ function exportDevisPdf() {
       scale: 2, 
       useCORS: true, 
       backgroundColor: '#ffffff',
-      scrollY: -window.scrollY
+      windowWidth: 800,
+      scrollY: 0,
+      scrollX: 0
     },
     jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
   };
@@ -3228,6 +3229,23 @@ function renderInventory() {
 
     const emoji = getIngredientEmoji(item.name);
 
+    // Price trend indicator from history
+    let trendHTML = '';
+    if (item.priceHistory && item.priceHistory.length >= 2) {
+      const last = item.priceHistory[item.priceHistory.length - 1];
+      const prev = item.priceHistory[item.priceHistory.length - 2];
+      const pctChange = parseFloat(last.change) || 0;
+      if (pctChange > 1) {
+        trendHTML = `<span style="color:var(--danger); font-size:0.7rem; font-weight:700;" title="Hausse de ${pctChange}%">▲ +${pctChange}%</span>`;
+      } else if (pctChange < -1) {
+        trendHTML = `<span style="color:var(--success); font-size:0.7rem; font-weight:700;" title="Baisse de ${Math.abs(pctChange)}%">▼ ${pctChange}%</span>`;
+      } else {
+        trendHTML = `<span style="color:var(--text-muted); font-size:0.7rem;" title="Prix stable">→</span>`;
+      }
+    } else if (item.priceHistory && item.priceHistory.length === 1) {
+      trendHTML = `<span style="color:var(--text-muted); font-size:0.65rem;">1er enregistrement</span>`;
+    }
+
     return `
       <tr class="inv-row ${isCritical ? 'row-alert' : ''}">
         <td>
@@ -3251,7 +3269,8 @@ function renderInventory() {
         </td>
         <td style="font-weight:700; color:var(--text-secondary); text-align:center; font-size:0.85rem;">${item.unit}</td>
         <td style="font-weight:900; color:var(--text-main); text-align:right; font-size:1rem;">
-          ${(item.stock * (item.price || 0) / (item.unit === 'g' || item.unit === 'ml' ? 1000 : 1)).toFixed(2)} €
+          <div>${(item.stock * (item.price || 0) / (item.unit === 'g' || item.unit === 'ml' ? 1000 : 1)).toFixed(2)} €</div>
+          ${trendHTML ? `<div style="margin-top:2px;">${trendHTML}</div>` : ''}
         </td>
         <td style="text-align:center;"><span class="badge ${statusClass}">${statusLabel}</span></td>
         <td style="text-align:center;">
@@ -3315,6 +3334,9 @@ function confirmRestock() {
       } else {
         unitPrice = totalLotPrice / qty;
       }
+      
+      // Track price history before updating
+      recordPriceChange(item, unitPrice);
       item.price = unitPrice;
 
       // Also update the global ingredient DB for future recipes
@@ -4167,12 +4189,27 @@ async function exportStatsPDF() {
   clone.querySelectorAll('button, input').forEach(el => el.remove());
   clone.querySelector('.stats-filter-bar')?.remove();
 
+  // Create positioned container so html2canvas doesn't capture a void
+  const exportContainer = document.createElement('div');
+  exportContainer.style.position = 'fixed';
+  exportContainer.style.top = '0';
+  exportContainer.style.left = '0';
+  exportContainer.style.zIndex = '-9999';
+  exportContainer.style.width = '1200px';
+  exportContainer.appendChild(clone);
+  document.body.appendChild(exportContainer);
+  opt.html2canvas.windowWidth = 1200;
+  opt.html2canvas.scrollY = 0;
+  opt.html2canvas.scrollX = 0;
+
   try {
-    await html2pdf().set(opt).from(clone).save();
+    await html2pdf().set(opt).from(exportContainer).save();
     showToast(i18n.t('ui.toast.exported') || "Rapport exporté avec succès", "success");
   } catch (err) {
     console.error("PDF Export Error:", err);
     showToast("Erreur lors de l'export PDF", "error");
+  } finally {
+    if (document.body.contains(exportContainer)) document.body.removeChild(exportContainer);
   }
 }
 
@@ -5548,7 +5585,13 @@ function downloadLabelImage() {
     margin: [0, 0],
     filename: `Etiquette_${selectedLabelRecipe.name.replace(/\s+/g, '_')}.pdf`,
     image: { type: 'jpeg', quality: 0.98 },
-    html2canvas: { scale: 2, logging: false },
+    html2canvas: { 
+      scale: 2, 
+      logging: false,
+      windowWidth: 800,
+      scrollY: 0,
+      scrollX: 0
+    },
     jsPDF: { unit: 'mm', format: [100, 100], orientation: 'portrait' }
   };
 
@@ -5700,7 +5743,10 @@ function simulateInvoiceScan() {
         toUpdate.forEach(item => {
           const oldPrice = item.price || 1;
           const fluctuation = (Math.random() * 0.2) - 0.05; // -5% to +15%
-          item.price = Math.round((oldPrice * (1 + fluctuation)) * 100) / 100;
+          const newPrice = Math.round((oldPrice * (1 + fluctuation)) * 100) / 100;
+          // Track price history
+          recordPriceChange(item, newPrice);
+          item.price = newPrice;
         });
 
         saveInventory();
@@ -6419,9 +6465,10 @@ function exportQRLabelPdf() {
   const recipeName = APP.recipe.name || 'etiquette';
   
   const container = document.createElement('div');
-  container.style.position = 'absolute';
-  container.style.top = '-10000px';
+  container.style.position = 'fixed';
+  container.style.top = '0';
   container.style.left = '0';
+  container.style.zIndex = '-9999';
   container.style.width = '400px';
 
   // Clone for export
@@ -6457,7 +6504,9 @@ function exportQRLabelPdf() {
        scale: 3, 
        useCORS: true, 
        backgroundColor: '#ffffff',
-       scrollY: -window.scrollY
+       windowWidth: 800,
+       scrollY: 0,
+       scrollX: 0
     },
     jsPDF: { unit: 'mm', format: 'a5', orientation: 'portrait' }
   };

@@ -13,3 +13,13 @@ Desktop.ini
 node_modules/
 dist/
 .env
+
+# Backups & temp files
+backups/
+*_temp.js
+old_*.html
+*.resolved
+cleanup_*.py
+debug_*.py
+fix_*.py
+missing.txt
