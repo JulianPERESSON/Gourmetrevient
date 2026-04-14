@@ -714,8 +714,18 @@ window.renderWasteMonthlyReport = function() {
 // ============================================================================
 
 window.generateECatalogue = function() {
-  console.log("Generating E-Catalogue...");
-  const recipes = APP.savedRecipes || [];
+  console.log("Generating E-Catalogue for all recipes...");
+  const saved = APP.savedRecipes || [];
+  const reference = typeof RECIPES !== 'undefined' ? RECIPES : [];
+  
+  // Merge and remove duplicates by name
+  const allRecipesMap = new Map();
+  [...reference, ...saved].forEach(r => {
+    if (r.name) allRecipesMap.set(r.name.toLowerCase(), r);
+  });
+  
+  const recipes = Array.from(allRecipesMap.values());
+  
   if (recipes.length === 0) {
     showToast("Aucune recette à afficher dans le catalogue.", 'error');
     return;
