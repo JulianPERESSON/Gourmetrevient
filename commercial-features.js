@@ -16,9 +16,6 @@ function applySmartPricing(val) {
   let p = parseFloat(val);
   if (isNaN(p) || p <= 0) return p;
   
-  // High-End Pastry floor: ensure no premium creation is undervalued
-  if (p < 4.50) p = 4.50;
-
   let whole = Math.floor(p);
   let dec = p - whole;
   
@@ -757,10 +754,33 @@ window.generateECatalogue = function() {
       dbItem?.allergens?.forEach(a => allergens.add(a));
     });
     
+    const category = (r.category || 'Pâtisserie').toLowerCase();
+    const isSmallItem = category.includes('éclair') || category.includes('choux') || category.includes('viennoiserie');
+    const isLargeItem = category.includes('tarte') || category.includes('entremet') || (parseInt(r.portions) > 2);
+    
+    let finalPrice = 0;
+    if (costs?.sellingPrice) {
+      finalPrice = applySmartPricing(costs.sellingPrice);
+    } else if (costs?.sellPriceHT) {
+      finalPrice = applySmartPricing(costs.sellPriceHT);
+    }
+    
+    // Category-specific adjustments
+    if (isSmallItem && finalPrice > 4.20) {
+      // Eclairs/Choux usually capped around 3.90 unless very special
+      finalPrice = Math.min(finalPrice, 3.90);
+    } else if (isLargeItem && finalPrice < 15 && parseInt(r.portions) >= 4) {
+      // Large tarts/entremets for 4+ people should never be below 18-20€ in premium
+      finalPrice = Math.max(finalPrice, 24.90);
+    } else if (isLargeItem && finalPrice < 4.90) {
+      // Individual tarts/entremets
+      finalPrice = 5.50;
+    }
+
     return {
       name: r.name,
       category: r.category || 'Pâtisserie',
-      price: costs?.sellingPrice ? applySmartPricing(costs.sellingPrice).toFixed(2) : (costs?.sellPriceHT ? applySmartPricing(costs.sellPriceHT).toFixed(2) : '—'),
+      price: finalPrice > 0 ? finalPrice.toFixed(2) : '—',
       description: r.description || '',
       portions: r.portions || '—',
       allergens: [...allergens],
