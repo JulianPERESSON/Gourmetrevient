@@ -16,14 +16,15 @@ function applySmartPricing(val) {
   let p = parseFloat(val);
   if (isNaN(p) || p <= 0) return p;
   
+  // High-End Pastry floor: ensure no premium creation is undervalued
+  if (p < 4.50) p = 4.50;
+
   let whole = Math.floor(p);
   let dec = p - whole;
   
-  // High-End Pastry Pricing strategy: Mostly .90, .50 or .00 but biased towards .90 for perceived value
-  if (dec < 0.20) return (whole > 0 ? whole : 1) - 0.10; // e.g. 4.15 -> 3.90
+  // Luxury rounding: primarily .50 and .90
   if (dec <= 0.50) return whole + 0.50;
-  if (dec <= 1.00) return whole + 0.90;
-  return Math.ceil(p) - 0.10;
+  return whole + 0.90;
 }
 
 // ============================================================================
@@ -741,7 +742,8 @@ window.generateECatalogue = function() {
     let costs = null;
     if (typeof calcFullCost === 'function') {
       try { 
-        costs = calcFullCost(r.margin || 70, r); 
+        // Force a Premium Margin for the catalogue (82% vs standard 70%)
+        costs = calcFullCost(r.margin || 82, r); 
       } catch(e) {
         costs = r.costs || r.data;
       }
