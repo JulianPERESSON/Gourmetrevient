@@ -418,7 +418,6 @@ function updateBCGLegend(data, legendContainer) {
         return `
           <div class="bcg-quadrant-group" style="padding:0.8rem; background:var(--bg-alt); border-radius:12px; border:1px solid var(--surface-border); display:flex; flex-direction:column; gap:0.6rem;">
             <div style="display:flex; align-items:center; gap:10px;">
-               <span style="font-size:1.4rem;">${q.icon}</span>
                <span style="font-weight:800; font-size:1rem; color:var(--primary);">${i18n.t('bcg.' + q.id)}</span>
                <span style="margin-left:auto; background:${q.color}; color:white; padding:2px 10px; border-radius:12px; font-size:0.75rem; font-weight:900;">${items.length}</span>
             </div>
