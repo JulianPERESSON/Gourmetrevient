@@ -256,7 +256,6 @@
           <button class="nav-link nav-dropdown-link" id="navInventaire">📦 <span data-i18n="nav.inventory">Inventaire des Stocks</span></button>
           <button class="nav-link nav-dropdown-link" id="navSuppliers">🏢 <span data-i18n="nav.suppliers">Fournisseurs</span></button>
           <button class="nav-link nav-dropdown-link" id="navHygiene">🧼 <span data-i18n="nav.hygiene">Hygiène & HACCP Pro</span></button>
-          <button class="nav-link nav-dropdown-link" id="navTrace">📋 <span data-i18n="nav.traceability">Traçabilité des Lots</span></button>
           <button class="nav-link nav-dropdown-link" id="navLabo">📐 <span data-i18n="nav.creative.lab">Matériel & Outillage (2D)</span></button>
           <button class="nav-link nav-dropdown-link" id="navAbout">📖 <span data-i18n="nav.about">À propos</span></button>
         </div>
@@ -288,8 +287,7 @@
         </button>
 
         <!-- Theme Toggle -->
-        <button id="themeToggleBtn" class="theme-toggle-btn" aria-label="Changer de thème"
-          style="background:none; border:none; cursor:pointer; font-size:1.4rem; display:flex; align-items:center; justify-content:center; width:40px; height:40px; border-radius:12px; transition:all 0.3s; color:var(--text-secondary);">
+        <button id="themeToggleBtn" class="theme-toggle-btn" aria-label="Changer de thème">
           <span class="theme-icon-sun">☀️</span>
           <span class="theme-icon-moon" style="display:none;">🌙</span>
         </button>
@@ -316,213 +314,178 @@
     <!-- HUB / DASHBOARD SECTION (LE COCKPIT) -->
     <!-- ================================================ -->
     <section id="hubSection">
-      <!-- 1. BRIEFING DU MATIN (Morning Briefing) -->
-      <header class="morning-briefing">
-        <div class="briefing-user">
-          <div class="user-avatar-premium" id="dashAvatar">👨‍🍳</div>
-          <div class="user-info">
-            <h2 id="dashGreetingHeader"><span data-i18n="dash.greeting.chef">Bonjour Chef,</span> <span id="welcomeUserName">Ju</span> 👨‍🍳</h2>
-            <p id="dashDateHeader" class="briefing-date">Lundi 16 Mars • 08:30</p>
+      <!-- ═══ HERO BANNER ═══ -->
+      <div class="hub-hero">
+        <div class="hub-hero-left">
+          <div class="hub-hero-avatar" id="dashAvatar">👨‍🍳</div>
+          <div class="hub-hero-text">
+            <p class="hub-hero-eyebrow" id="dashDateHeader">Lundi 14 Avril • 20:34</p>
+            <h2 class="hub-hero-title"><span data-i18n="dash.greeting.chef">Bonjour Chef,</span> <span id="welcomeUserName" class="hub-hero-name">Artisan</span></h2>
+            <p class="hub-hero-sub">Votre atelier est prêt. Bonne journée de création.</p>
           </div>
         </div>
-
-        <div class="briefing-stats">
-          <div class="briefing-stat-item" title="Production planifiée aujourd'hui">
-            <span class="stat-icon">🍰</span>
-            <div class="stat-content">
-              <span class="stat-value" id="briefingProdCount">42</span>
-              <span class="stat-label" data-i18n="dash.stat.production">Production</span>
-            </div>
-          </div>
-          <div class="briefing-stat-item warning" title="Alertes stock faible">
-            <span class="stat-icon">📦</span>
-            <div class="stat-content">
-              <span class="stat-value" id="briefingAlertCount">3</span>
-              <span class="stat-label" data-i18n="dash.stat.alerts">Alertes</span>
-            </div>
-          </div>
-          <div class="briefing-stat-item success" title="Marge brute moyenne">
-            <span class="stat-icon">📈</span>
-            <div class="stat-content">
-              <span class="stat-value" id="briefingMarginValue">72%</span>
-              <span class="stat-label" data-i18n="dash.stat.rentability">Rentabilité</span>
-            </div>
-          </div>
+        <div class="hub-hero-actions">
+          <button class="hub-cta-primary" onclick="showRecettes()">
+            <span class="hub-cta-icon">📖</span>
+            <span data-i18n="nav.recipes">Nouvelle Recette</span>
+          </button>
+          <button class="hub-cta-secondary" onclick="showStats()">
+            <span class="hub-cta-icon">📊</span>
+            <span>Statistiques</span>
+          </button>
         </div>
-      </header>
-
-      <!-- QUICK ACTIONS -->
-      <div class="dash-quick-actions" style="display:flex; gap:1rem; margin: -1rem 0 2rem 0; padding: 0 1rem;">
-        <button class="btn btn-primary" onclick="showRecettes()" style="flex:1; justify-content:center; gap:8px; height:50px; font-weight:700; border-radius:16px; box-shadow: 0 4px 15px rgba(var(--accent-rgb), 0.3);">
-          <span style="font-size:1.4rem;">📖</span> <span data-i18n="nav.recipes">Calculateur de Recettes</span>
-        </button>
-        <button class="btn btn-secondary" onclick="showStats()" style="flex:1; justify-content:center; gap:8px; height:50px; font-weight:700; border-radius:16px;">
-          <span style="font-size:1.4rem;">📊</span> <span data-i18n="nav.stats">Statistiques</span>
-        </button>
       </div>
 
-      <!-- 2. THE COCKPIT GRID -->
-      <div class="cockpit-grid-v2">
-        
-        <!-- LEFT COLUMN: ACTION CENTER -->
-        <div class="col-actions">
-          <!-- PRIORITES DU JOUR -->
-          <div class="cockpit-card priority-card">
-            <div class="card-header-premium">
-              <div class="header-main">
-                <span class="icon-p">🔥</span>
-                <h3 data-i18n="dash.priority.title">Priorités du Jour</h3>
-              </div>
+      <!-- ═══ KPI STRIP ═══ -->
+      <div class="hub-kpi-strip">
+        <div class="hub-kpi-card">
+          <div class="hub-kpi-icon" style="background: rgba(197,165,90,0.12); color: var(--gold);">🍰</div>
+          <div class="hub-kpi-body">
+            <span class="hub-kpi-value" id="briefingProdCount">—</span>
+            <span class="hub-kpi-label" data-i18n="dash.stat.production">Production aujourd'hui</span>
+          </div>
+          <div class="hub-kpi-trend up">↑</div>
+        </div>
+        <div class="hub-kpi-card">
+          <div class="hub-kpi-icon" style="background: rgba(245,158,11,0.12); color: #f59e0b;">📦</div>
+          <div class="hub-kpi-body">
+            <span class="hub-kpi-value" id="briefingAlertCount">—</span>
+            <span class="hub-kpi-label" data-i18n="dash.stat.alerts">Alertes Stock</span>
+          </div>
+          <div class="hub-kpi-trend neutral">→</div>
+        </div>
+        <div class="hub-kpi-card">
+          <div class="hub-kpi-icon" style="background: rgba(16,185,129,0.12); color: #10b981;">📈</div>
+          <div class="hub-kpi-body">
+            <span class="hub-kpi-value" id="briefingMarginValue">—</span>
+            <span class="hub-kpi-label" data-i18n="dash.stat.rentability">Marge Moyenne</span>
+          </div>
+          <div class="hub-kpi-trend up">↑</div>
+        </div>
+        <div class="hub-kpi-card hub-kpi-card-cta" onclick="showMgmt(); switchMgmtTab('production');">
+          <div class="hub-kpi-icon" style="background: rgba(197,165,90,0.12); color: var(--gold);">📅</div>
+          <div class="hub-kpi-body">
+            <span class="hub-kpi-value">Planifier</span>
+            <span class="hub-kpi-label">Gérer ma production</span>
+          </div>
+          <div class="hub-kpi-trend" style="color: var(--gold);">→</div>
+        </div>
+      </div>
+
+      <!-- ═══ BENTO GRID ═══ -->
+      <div class="hub-bento-grid">
+
+        <!-- CARD 1: Production (wide) -->
+        <div class="hub-bento-card hub-card-production">
+          <div class="hub-card-header">
+            <div class="hub-card-title-group">
+              <span class="hub-card-icon" style="color:#ec4899;">👨‍🍳</span>
+              <h3 data-i18n="dash.cockpit.prod_hub">Planning de Production</h3>
             </div>
-            <div class="priority-list" id="dashPriorityList">
-              <!-- Item 1: Production -->
-              <div class="priority-item urgent">
-                <div class="p-icon">🍰</div>
-                <div class="p-content">
-                  <div class="p-title">Lancer Paris-Brest</div>
-                  <div class="p-desc">12 pièces attendues</div>
-                </div>
-                <button class="p-action-btn" onclick="showMgmt(); switchMgmtTab('production');">Lancer</button>
-              </div>
-              <!-- Item 2: Ordering -->
-              <div class="priority-item warning">
-                <div class="p-icon">🛒</div>
-                <div class="p-content">
-                  <div class="p-title">Commander Framboises</div>
-                  <div class="p-desc">Stock critique (0.5kg)</div>
-                </div>
-                <button class="p-action-btn" onclick="showInventaire();">Commander</button>
-              </div>
-              <!-- Item 3: Pricing -->
-              <div class="priority-item info">
-                <div class="p-icon">💰</div>
-                <div class="p-content">
-                  <div class="p-title">Prix Saint-Honoré</div>
-                  <div class="p-desc">Marge faible: +0.35€ suggéré</div>
-                </div>
-                <button class="p-action-btn" onclick="openRecipeEditorByName('Saint-Honoré')">Ajuster</button>
-              </div>
+            <div class="hub-card-tabs">
+              <button class="hub-tab active" id="btnProdToday" data-i18n="ui.today">Aujourd'hui</button>
+              <button class="hub-tab" id="btnProdTomorrow" data-i18n="ui.tomorrow">Demain</button>
             </div>
           </div>
+          <div class="production-timeline" id="dashProdTimeline">
+            <div class="timeline-empty" data-i18n="dash.prod.empty_init">Aucune production planifiée.</div>
+          </div>
+          <div class="hub-card-footer">
+            <button class="hub-link-btn" onclick="showMgmt(); switchMgmtTab('production');" data-i18n="dash.cockpit.manage_planning">Gérer le planning complet →</button>
+          </div>
+        </div>
 
-          <!-- ASSISTANT IA (METIER) -->
-          <div class="cockpit-card ai-expert-card">
-             <div class="card-header-premium">
-              <div class="header-main">
-                <span class="icon-p" style="color:#8b5cf6;">🤖</span>
-                <h3 data-i18n="dash.ai.expert.title">Assistant Expert</h3>
-              </div>
-              <span class="badge-new">PRO</span>
+        <!-- CARD 2: Priorités -->
+        <div class="hub-bento-card hub-card-priorities">
+          <div class="hub-card-header">
+            <div class="hub-card-title-group">
+              <span class="hub-card-icon" style="color:#ef4444;">🔥</span>
+              <h3 data-i18n="dash.priority.title">Priorités du Jour</h3>
             </div>
-            <div class="ai-suggestion-box" id="dashAIAdvice">
-              <div class="ai-bubble">
-                <p><strong>Paris-Brest</strong> : Votre marge est descendue à 65% suite à la hausse du beurre.</p>
-                <div class="ai-actions">
-                  <span class="ai-tip">💡 +0.30€ sur le prix</span>
-                  <span class="ai-tip">💡 Réduire garniture 5%</span>
-                </div>
+          </div>
+          <div class="priority-list" id="dashPriorityList">
+            <div class="priority-item info">
+              <div class="p-icon">⏳</div>
+              <div class="p-content">
+                <div class="p-title">Chargement…</div>
+                <div class="p-desc">Analyse de vos données en cours</div>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- RIGHT COLUMN: MONITORING -->
-        <div class="col-main">
-          
-          <!-- PRODUCTION HUB (THE HEART) -->
-          <div class="cockpit-card production-main-card">
-            <div class="card-header-premium">
-              <div class="header-main">
-                <span class="icon-p" style="color:#ec4899;">👨‍🍳</span>
-                <h3 data-i18n="dash.cockpit.prod_hub">Planning de Production</h3>
-              </div>
-              <div class="header-tabs">
-                <button class="h-tab active" id="btnProdToday" data-i18n="ui.today">Aujourd'hui</button>
-                <button class="h-tab" id="btnProdTomorrow" data-i18n="ui.tomorrow">Demain</button>
-              </div>
+        <!-- CARD 3: Assistant IA -->
+        <div class="hub-bento-card hub-card-ai">
+          <div class="hub-card-header">
+            <div class="hub-card-title-group">
+              <span class="hub-card-icon" style="color:#8b5cf6;">🤖</span>
+              <h3 data-i18n="dash.ai.expert.title">Assistant Expert</h3>
             </div>
-            
-            <div class="production-timeline" id="dashProdTimeline">
-              <!-- Dynamically populated -->
-              <div class="timeline-empty" data-i18n="dash.prod.empty_init">Aucune production planifiée.</div>
-            </div>
-            
-            <div class="card-footer-actions">
-            <button class="btn btn-sm btn-outline" onclick="showMgmt(); switchMgmtTab('production');" data-i18n="dash.cockpit.manage_planning">Gérer le planning complet</button>
+            <span class="hub-badge-pro">PRO</span>
+          </div>
+          <div class="ai-suggestion-box" id="dashAIAdvice">
+            <div class="ai-bubble">
+              <p>Analyse de vos recettes en cours…</p>
             </div>
           </div>
+        </div>
 
-          <!-- BOTTOM GRID: STOCK & PERFORMANCE -->
-          <div class="bottom-stats-grid">
-            <!-- STOCK RADAR -->
-            <div class="cockpit-card stock-compact-card">
-              <div class="card-header-premium">
-                <div class="header-main">
-                  <span class="icon-p" style="color:#f59e0b;">📦</span>
-                  <h3 data-i18n="dash.cockpit.stock_radar">Alertes Stock</h3>
-                </div>
-              </div>
-              <div class="radar-compact-list" id="dashStockAlerts">
-                <!-- Short list of alerts -->
-              </div>
+        <!-- CARD 4: Alertes Stock -->
+        <div class="hub-bento-card hub-card-stock">
+          <div class="hub-card-header">
+            <div class="hub-card-title-group">
+              <span class="hub-card-icon" style="color:#f59e0b;">📦</span>
+              <h3 data-i18n="dash.cockpit.stock_radar">Alertes Stock</h3>
             </div>
+            <button class="hub-link-btn-sm" onclick="showInventaire()">Voir tout →</button>
+          </div>
+          <div class="radar-compact-list" id="dashStockAlerts">
+            <p style="font-size:0.8rem; color:var(--cockpit-text-muted);">Chargement…</p>
+          </div>
+        </div>
 
-            <!-- PERFORMANCE BUSINESS -->
-            <div class="cockpit-card business-compact-card">
-              <div class="card-header-premium">
-                <div class="header-main">
-                  <span class="icon-p" style="color:#10b981;">📈</span>
-                  <h3 data-i18n="dash.stat.rentability">Rentabilité</h3>
-                </div>
-              </div>
-              <div class="perf-stats-mini">
-                 <div class="mini-kpi">
-                    <span class="k-label" data-i18n="stats.kpi.hero">Top Recette</span>
-                    <span class="k-value" id="dashTopPerf">Eclair Choc</span>
-                 </div>
-                 <div class="mini-kpi margin-ring-container">
-                    <span class="k-label" data-i18n="mgmt.kpi.margin">Marge Moyenne</span>
-                    <div class="margin-circle-wrap">
-                        <svg viewBox="0 0 36 36" class="circular-chart gold">
-                          <path class="circle-bg"
-                            d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                          <path class="circle" id="dashAvgMarginCircle"
-                            stroke-dasharray="0, 100"
-                            d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                        </svg>
-                        <div class="k-value circle-text" id="dashAvgMargin">0%</div>
-                    </div>
-                 </div>
-              </div>
-              <canvas id="businessTrendSparkMini" style="width:100%; height:30px; margin-top:10px;"></canvas>
+        <!-- CARD 5: Météo des Prix -->
+        <div class="hub-bento-card hub-card-pricewatch">
+          <div class="hub-card-header">
+            <div class="hub-card-title-group">
+              <span class="hub-card-icon" style="color:#f59e0b;">🌡️</span>
+              <h3>Météo des Prix</h3>
             </div>
+            <button class="hub-link-btn-sm" onclick="showInventaire()">Inventaire →</button>
+          </div>
+          <div class="hub-pricewatch-list" id="dashPriceWatch">
+            <p style="font-size:0.8rem; color:var(--cockpit-text-muted);">Chargement…</p>
+          </div>
+        </div>
 
-            <!-- ACTIVITY -->
-            <div class="cockpit-card activity-compact-card">
-               <div class="card-header-premium">
-                <div class="header-main">
-                  <span class="icon-p" style="color:#6366f1;">👥</span>
-                  <h3 data-i18n="dash.kpi.team">Équipe</h3>
-                </div>
-              </div>
-              <div id="dashTeamSummary" class="team-summary-mini">
-                <span id="dashPresenceCount" data-i18n="dash.team.present" data-i18n-data='{"n": 2}'>2 présents</span> • <span id="dashHACCPStatus" data-i18n="dash.haccp.ok">HACCP OK</span>
-              </div>
+        <!-- CARD 6: Équipe & HACCP -->
+        <div class="hub-bento-card hub-card-team">
+          <div class="hub-card-header">
+            <div class="hub-card-title-group">
+              <span class="hub-card-icon" style="color:#6366f1;">👥</span>
+              <h3 data-i18n="dash.kpi.team">Équipe & Sécurité</h3>
+            </div>
+            <button class="hub-link-btn-sm" onclick="showPlanning()">Planning →</button>
+          </div>
+          <div class="hub-team-body" id="dashTeamSummary">
+            <div class="hub-team-stat">
+              <span class="hub-team-label">Présence</span>
+              <span class="hub-team-value" id="dashPresenceCount">—</span>
+            </div>
+            <div class="hub-team-divider"></div>
+            <div class="hub-team-stat">
+              <span class="hub-team-label">HACCP</span>
+              <span class="hub-team-value" id="dashHACCPStatus">—</span>
             </div>
           </div>
-
         </div>
 
       </div>
 
-      <!-- FOOTER TIP -->
-      <div class="dash-footer-tips">
-        <div class="tip-card-interactive">
-          <div class="tip-content">
-            <span class="tip-label">💡 <span data-i18n="dash.tip_prefix">Conseil de Pro</span></span>
-            <p id="dashTipBody" class="tip-text">Utilisez le scanner OCR pour mettre à jour vos prix d'achat en 2 secondes.</p>
-          </div>
-        </div>
+      <!-- ═══ PRO TIP ═══ -->
+      <div class="hub-pro-tip">
+        <span class="hub-tip-icon">💡</span>
+        <p id="dashTipBody" class="hub-tip-text"><strong data-i18n="dash.tip_prefix">Conseil de Pro</strong> — Utilisez le scanner OCR pour mettre à jour vos prix d'achat en 2 secondes.</p>
       </div>
     </section>
 

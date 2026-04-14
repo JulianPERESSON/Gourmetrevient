@@ -9,19 +9,7 @@
   =====================================================================
 */
 
-// ============================================================================
-// 1. E-CATALOGUE ENHANCEMENTS (Legacy themes removed for premium experience)
-// ============================================================================
-
-// Themes removed to maintain unique premium brand identity as requested.
-// Logic shifted back to commercial-features.js for core stability.
-
-window.switchCatalogueTheme = function(themeKey) {
-  _catalogueTheme = themeKey;
-  // Re-generate with new theme
-  if (typeof generateECatalogue === 'function') generateECatalogue();
-  if (typeof showToast === 'function') showToast(`Thème "${CATALOGUE_THEMES[themeKey].name}" appliqué`, 'success');
-};
+// Legacy theme logic removed.
 
 
 // ============================================================================

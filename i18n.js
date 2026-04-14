@@ -48,7 +48,7 @@ const TRANSLATIONS = {
 
         // Navigation
         'nav.category.atelier': "L'Atelier",
-        'nav.category.mgmt': "⚙️ Pilotage & Labo",
+        'nav.category.mgmt': "Labo & Sécurité",
         'mgmt.tab.scheduler': '🎓 Ordonnanceur CAP',
         'scheduler.title': 'Ordonnanceur Tactique CAP',
         'scheduler.desc': 'Générez un plan de travail optimisé sans temps mort pour vos examens EP1 et EP2.',
@@ -103,7 +103,7 @@ const TRANSLATIONS = {
         'nav.comparator': 'Comparateur Multi-Périodes',
         'nav.catalogue': 'E-Catalogue Client',
         'nav.crm': 'Clients & Ventes (CRM)',
-        'nav.category.analysis': "📈 Croissance & Analyse",
+        'nav.category.analysis': "Croissance & Analyse",
 
         // Library & Search
         'search.placeholder': 'Rechercher une recette...',
@@ -1631,7 +1631,7 @@ const TRANSLATIONS = {
         'auth.error.banned': 'This account has been suspended by an administrator.',
         'auth.error.taken': 'This username is already taken.',
 
-        'nav.category.creative': "💡 Creative Workshop",
+        'nav.category.atelier': "The Atelier",
         'nav.creative.brain': "Chef's Brain",
         'nav.creative.assembly': "Assembly Simulator",
         'nav.creative.converter': "Master Converter",
@@ -1675,8 +1675,8 @@ const TRANSLATIONS = {
         'nav.comparator': 'Multi-Period Comparator',
         'nav.catalogue': 'Client E-Catalogue',
         'nav.crm': 'Clients & Sales (CRM)',
-        'nav.category.mgmt': "⚙️ Steering & Lab",
-        'nav.category.analysis': "📈 Growth & Analysis",
+        'nav.category.mgmt': "Steering & Lab",
+        'nav.category.analysis': "Growth & Analysis",
 
         // Library & Search
         'search.placeholder': 'Search for a recipe...',
@@ -3204,7 +3204,6 @@ const TRANSLATIONS = {
 
         'nav.catalogue': 'E-Catálogo de Clientes',
         'nav.crm': 'Clientes y Ventas (CRM)',
-        'nav.category.analysis': 'Análisis y Rendimiento',
         'nav.home': 'Inicio',
         'nav.recipes': 'Calculadora de Recetas',
         'nav.lab': 'Laboratorio',

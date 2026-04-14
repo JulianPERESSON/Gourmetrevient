@@ -1,6 +1,9 @@
-﻿// dashboard-premium.js: Dedicated script for populating the Bento Premium Dashboard (V2)
+// dashboard-premium.js: Dedicated script for populating the Bento Premium Dashboard (V2)
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Seed demo data once (only if localStorage is empty)
+    seedDemoData();
+
     // Wait until authentication is complete and the overlay is removed before hydrating animations
     const checkAuthAndHydrate = () => {
         if (!document.body.classList.contains('auth-pending')) {
@@ -12,6 +15,80 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     checkAuthAndHydrate();
 });
+
+function seedDemoData() {
+    const today = new Date().toISOString().split('T')[0];
+    // Use the same user-scoped keys as hydratePremiumDashboard
+    const currUser = (localStorage.getItem('gourmet_current_user') || 'chef').toLowerCase();
+
+    // ── Production Plan ─────────────────────────────────────────────────
+    const existingPlan = JSON.parse(localStorage.getItem('gourmet_production_plan') || '[]');
+    const hasTodayPlan = existingPlan.some(p => p.date === today);
+    if (!hasTodayPlan) {
+        const demoPlan = [
+            { id: 1, date: today, recipe: 'Paris-Brest', name: 'Paris-Brest', qty: 5, status: 'ongoing' },
+            { id: 2, date: today, recipe: 'Éclair Chocolat', name: 'Éclair Chocolat', qty: 5, status: 'planned' },
+            { id: 3, date: today, recipe: 'Tarte Citron Meringuée', name: 'Tarte Citron Meringuée', qty: 5, status: 'planned' },
+            { id: 4, date: today, recipe: 'Millefeuille Vanille', name: 'Millefeuille Vanille', qty: 5, status: 'planned' },
+            { id: 5, date: today, recipe: 'Saint-Honoré', name: 'Saint-Honoré', qty: 5, status: 'done' },
+        ];
+        localStorage.setItem('gourmet_production_plan', JSON.stringify([...existingPlan, ...demoPlan]));
+    }
+
+    // ── Ingredient Price Watch (user-scoped key) ─────────────────────────
+    const invKey = `gourmet_inventory_${currUser}`;
+    const inv = JSON.parse(localStorage.getItem(invKey) || '[]');
+    if (inv.length === 0) {
+        const demoInv = [
+            { id: 1, name: 'Beurre AOP', unit: 'kg', pricePerUnit: 9.80, priceHistory: [
+                { date: '2026-03-01', price: 8.40 }, { date: '2026-04-01', price: 9.80 }
+            ]},
+            { id: 2, name: 'Farine T55', unit: 'kg', pricePerUnit: 1.10, priceHistory: [
+                { date: '2026-03-01', price: 1.25 }, { date: '2026-04-01', price: 1.10 }
+            ]},
+            { id: 3, name: 'Œufs fermiers', unit: 'dz', pricePerUnit: 3.60, priceHistory: [
+                { date: '2026-03-01', price: 3.40 }, { date: '2026-04-01', price: 3.60 }
+            ]},
+            { id: 4, name: 'Crème liquide 35%', unit: 'L', pricePerUnit: 4.20, priceHistory: [
+                { date: '2026-03-01', price: 4.50 }, { date: '2026-04-01', price: 4.20 }
+            ]},
+        ];
+        localStorage.setItem(invKey, JSON.stringify(demoInv));
+        // Also set generic key for Price Watch widget fallback
+        localStorage.setItem('gourmet_inventory', JSON.stringify(demoInv));
+    }
+
+    // ── Team (user-scoped key) ────────────────────────────────────────
+    const teamKey = `gourmet_team_members_${currUser}`;
+    const leavesKey = `gourmet_staff_leaves_${currUser}`;
+    const team = JSON.parse(localStorage.getItem(teamKey) || '[]');
+    if (team.length === 0) {
+        const demoTeam = [
+            { id: 1, name: 'Chef Larroque', role: 'Chef Pâtissier', avatar: '👨‍🍳' },
+            { id: 2, name: 'M. Dupont', role: 'Pâtissier', avatar: '🧑‍🍳' },
+            { id: 3, name: 'Mme. Martin', role: 'Pâtissière', avatar: '👩‍🍳' },
+            { id: 4, name: 'J. Petit', role: 'Apprenti', avatar: '🧑‍🍳' },
+            { id: 5, name: 'C. Bernard', role: 'Apprentie', avatar: '👩‍🍳' },
+            { id: 6, name: 'R. Moreau', role: 'Aide-Pâtissier', avatar: '🧑‍🍳' },
+        ];
+        const demoLeaves = [
+            { memberId: 6, memberName: 'R. Moreau', start: today, end: today, reason: 'Maladie' }
+        ];
+        localStorage.setItem(teamKey, JSON.stringify(demoTeam));
+        localStorage.setItem(leavesKey, JSON.stringify(demoLeaves));
+    }
+
+    // ── HACCP Temperature Log (2h ago) ─────────────────────────────
+    const haccpRaw = JSON.parse(localStorage.getItem('gourmet_haccp_logs') || '{"temp":[]}');
+    if (!haccpRaw.temp || haccpRaw.temp.length === 0) {
+        const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString();
+        haccpRaw.temp = [
+            { date: twoHoursAgo, timestamp: twoHoursAgo, zone: 'Chambre froide 1', temp: 3.2, status: 'ok', by: 'Chef Larroque' },
+            { date: twoHoursAgo, timestamp: twoHoursAgo, zone: 'Vitrine desserts', temp: 5.8, status: 'ok', by: 'Chef Larroque' },
+        ];
+        localStorage.setItem('gourmet_haccp_logs', JSON.stringify(haccpRaw));
+    }
+}
 
 window.hydratePremiumDashboard = function () {
     const hub = document.getElementById('hubSection');
@@ -219,19 +296,13 @@ window.hydratePremiumDashboard = function () {
             });
         }
 
-        // Render the top insight
+        // Render only if content changed — prevents 10s interval flicker
         const insight = insights[0];
-        if (insight) {
-            aiAdvice.innerHTML = `
-                <div class="ai-bubble">
-                    <p>${insight.text}</p>
-                    <div class="ai-actions">
-                        ${insight.tips.map(tip => `<span class="ai-tip">${tip}</span>`).join('')}
-                    </div>
-                </div>
-            `;
-        } else {
-            aiAdvice.innerHTML = `<div class="ai-bubble"><p>✅ Toutes vos recettes affichent une marge saine. Continuez !</p></div>`;
+        const newHTML = insight
+            ? `<div class="ai-bubble"><p>${insight.text}</p><div class="ai-actions">${insight.tips.map(tip => `<span class="ai-tip">${tip}</span>`).join('')}</div></div>`
+            : `<div class="ai-bubble"><p>✅ Toutes vos recettes affichent une marge saine. Continuez !</p></div>`;
+        if (aiAdvice.innerHTML.trim() !== newHTML.trim()) {
+            aiAdvice.innerHTML = newHTML;
         }
     }
 
@@ -272,11 +343,11 @@ window.hydratePremiumDashboard = function () {
             // Fallback: show helpful message with action button
             const dateLabel = dateFilter === 'today' ? (t('ui.today') || "aujourd'hui").toLowerCase() : (t('ui.tomorrow') || 'demain').toLowerCase();
             prodTimeline.innerHTML = `
-                <div style="text-align:center; padding:1.2rem 0; color:var(--cockpit-muted); font-size:0.85rem;">
-                    <div style="font-size:2rem; margin-bottom:0.5rem;">📋</div>
-                    <p style="margin:0 0 0.8rem;">${t('dash.prod.no_plan') || 'Aucune production planifiée pour'} ${dateLabel}</p>
-                    <button class="btn btn-sm btn-outline" onclick="showMgmt(); switchMgmtTab('production');" style="margin-top:0.5rem;">
-                        📅 ${t('dash.prod.plan_now') || 'Planifier une production'}
+                <div class="hub-empty-state">
+                    <div class="hub-empty-icon">📋</div>
+                    <p class="hub-empty-text">Aucune production planifiée pour <strong>${dateLabel}</strong></p>
+                    <button class="hub-empty-cta" onclick="showMgmt(); switchMgmtTab('production');">
+                        📅 Planifier une production
                     </button>
                 </div>
             `;
@@ -301,23 +372,54 @@ window.hydratePremiumDashboard = function () {
         }
     }
 
-    // 7. Business Mini
-    const topPerf = document.getElementById('dashTopPerf');
-    if (topPerf) {
-        const best = [...recipes].sort((a,b) => (b.costs?.marginPct || 0) - (a.costs?.marginPct || 0))[0];
-        topPerf.textContent = best ? best.name : t('dash.biz.no_recipes');
-    }
-    const avgMarginEl = document.getElementById('dashAvgMargin');
-    const marginCircle = document.getElementById('dashAvgMarginCircle');
-    const displayMargin = Math.round(avgMargin);
-    if (avgMarginEl) avgMarginEl.textContent = displayMargin + '%';
-    if (marginCircle) {
-        setTimeout(() => {
-            marginCircle.setAttribute('stroke-dasharray', `${displayMargin}, 100`);
-            if (displayMargin < 65) marginCircle.style.stroke = 'var(--danger)';
-            else if (displayMargin >= 75) marginCircle.style.stroke = 'var(--success)';
-            else marginCircle.style.stroke = 'var(--gold)';
-        }, 300);
+    // 7. Météo des Prix — Price Watch Widget
+    const priceWatchEl = document.getElementById('dashPriceWatch');
+    if (priceWatchEl) {
+        const inventory = JSON.parse(localStorage.getItem('gourmet_inventory') || '[]');
+        // Find items with price history (priceHistory array with at least 2 entries)
+        const withHistory = inventory.filter(item => item.priceHistory && item.priceHistory.length >= 2);
+        
+        if (withHistory.length > 0) {
+            const items = withHistory.slice(0, 4).map(item => {
+                const hist = item.priceHistory;
+                const latest = hist[hist.length - 1].price;
+                const prev = hist[hist.length - 2].price;
+                const delta = latest - prev;
+                const pct = prev > 0 ? ((delta / prev) * 100).toFixed(1) : 0;
+                const isUp = delta > 0;
+                const isDown = delta < 0;
+                const arrow = isUp ? '↑' : isDown ? '↓' : '→';
+                const color = isUp ? 'var(--cockpit-danger)' : isDown ? 'var(--cockpit-success)' : 'var(--cockpit-text-muted)';
+                const sign = isUp ? '+' : '';
+                return `
+                    <div class="hub-price-row">
+                        <span class="hub-price-name">${item.name}</span>
+                        <div class="hub-price-meta">
+                            <span class="hub-price-val">${parseFloat(latest).toFixed(2)}€/${item.unit || 'kg'}</span>
+                            <span class="hub-price-trend" style="color:${color}">${arrow} ${sign}${pct}%</span>
+                        </div>
+                    </div>`;
+            }).join('');
+            priceWatchEl.innerHTML = items;
+        } else if (inventory.length > 0) {
+            // Inventory exists but no history — show latest prices
+            const items = inventory.slice(0, 4).map(item => `
+                <div class="hub-price-row">
+                    <span class="hub-price-name">${item.name}</span>
+                    <div class="hub-price-meta">
+                        <span class="hub-price-val">${parseFloat(item.pricePerUnit || item.price || 0).toFixed(2)}€/${item.unit || 'kg'}</span>
+                        <span class="hub-price-trend" style="color:var(--cockpit-text-muted)">→ stable</span>
+                    </div>
+                </div>`).join('');
+            priceWatchEl.innerHTML = items;
+        } else {
+            priceWatchEl.innerHTML = `
+                <div class="hub-empty-state">
+                    <div class="hub-empty-icon">📦</div>
+                    <p class="hub-empty-text">Ajoutez des ingrédients à votre inventaire pour suivre l'évolution des prix</p>
+                    <button class="hub-empty-cta" onclick="showInventaire()">📦 Gérer l'inventaire</button>
+                </div>`;
+        }
     }
 
     // 8. REAL Team Summary (from actual team + leaves)
@@ -336,14 +438,16 @@ window.hydratePremiumDashboard = function () {
             }
         });
         const presentCount = Math.max(0, totalMembers - onLeaveCount);
+        // Derive team name from first member's name (e.g. "Chef Larroque" → "Larroque")
+        const firstMember = team[0];
+        const demoTeamName = firstMember
+            ? firstMember.name.replace(/^(chef|chef\s)/i, '').trim().split(' ').pop()
+            : 'Brigade';
         
         if (totalMembers > 0) {
-            presenceEl.textContent = `${presentCount}/${totalMembers} ${t('dash.team.present_label') || 'présent(s)'}`;
-            if (onLeaveCount > 0) {
-                presenceEl.style.color = 'var(--warning, #f59e0b)';
-            } else {
-                presenceEl.style.color = '';
-            }
+            const teamName = demoTeamName || 'Brigade';
+            presenceEl.textContent = `${presentCount}/${totalMembers} — Équipe ${teamName}`;
+            presenceEl.style.color = onLeaveCount > 0 ? 'var(--warning, #f59e0b)' : '';
         } else {
             presenceEl.textContent = t('dash.team.no_team') || 'Aucune équipe configurée';
             presenceEl.style.color = 'var(--text-muted)';
@@ -364,8 +468,17 @@ window.hydratePremiumDashboard = function () {
             haccpEl.style.color = 'var(--danger, #ef4444)';
             haccpEl.style.fontWeight = '700';
         } else if (recentTemps.length > 0) {
-            haccpEl.textContent = '✅ HACCP OK';
-            haccpEl.style.color = 'var(--success, #10b981)';
+            // Show how long ago the last reading was
+            const lastLog = recentTemps[recentTemps.length - 1];
+            const lastDate = new Date(lastLog.date || lastLog.timestamp);
+            const diffMs = now - lastDate;
+            const diffMin = Math.floor(diffMs / 60000);
+            const diffH = Math.floor(diffMin / 60);
+            let timeAgo = diffMin < 1 ? 'il y a moins d’une minute'
+                : diffMin < 60 ? `il y a ${diffMin} min`
+                : `il y a ${diffH}h${diffMin % 60 ? (diffMin % 60) + 'min' : ''}`;
+            haccpEl.innerHTML = `✅&nbsp;<span style="font-weight:600;">HACCP OK</span> <span style="font-size:0.75rem; color:var(--cockpit-text-muted); font-weight:400;">(${timeAgo})</span>`;
+            haccpEl.style.color = '';
             haccpEl.style.fontWeight = '600';
         } else {
             haccpEl.textContent = t('dash.haccp.no_data') || '— Pas de relevé récent';
@@ -435,10 +548,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const themeBtn = document.getElementById('themeToggleBtn');
     if (themeBtn) {
         themeBtn.addEventListener('click', () => {
-            document.body.classList.toggle('dark-theme');
-            const isDark = document.body.classList.contains('dark-theme');
-            localStorage.setItem('gourmet_theme', isDark ? 'dark' : 'light');
-            updateThemeIcons(isDark);
+             document.body.classList.toggle('dark-theme');
+             const isDark = document.body.classList.contains('dark-theme');
+             localStorage.setItem('gourmet_theme', isDark ? 'dark' : 'light');
+             updateThemeIcons(isDark);
         });
 
         // Initialize theme from localStorage

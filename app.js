@@ -7522,22 +7522,10 @@ if (typeof saveCurrentRecipe === 'function') {
 })();
 
 /**
- * 8. GLOSSY CARDS EFFECT
+ * 8. GLOSSY CARDS EFFECT - DISABLED FOR PERFORMANCE
  */
 document.addEventListener("DOMContentLoaded", () => {
-  // Track mouse for glossy cards
-  document.addEventListener("mousemove", (e) => {
-    const mouseX = e.clientX;
-    const mouseY = e.clientY;
-    const glossyCards = document.querySelectorAll(".cockpit-card, .card, .dash-card");
-    glossyCards.forEach(card => {
-      const rect = card.getBoundingClientRect();
-      const x = mouseX - rect.left;
-      const y = mouseY - rect.top;
-      card.style.setProperty("--mouse-x", x + "px");
-      card.style.setProperty("--mouse-y", y + "px");
-    });
-  });
+  // Effect disabled to optimize performance and remove lag
 });
 
 // === ASSISTANT DE SAISONNALITÉ ===
