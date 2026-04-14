@@ -1,4 +1,4 @@
-﻿/*
+/*
   =====================================================================
   ADVANCED-MODULES.JS — GourmetRevient v7.0
   1. 🎨 E-Catalogue Templates (Luxe, Rustique, Ardoise)
@@ -10,141 +10,11 @@
 */
 
 // ============================================================================
-// 1. E-CATALOGUE TEMPLATES
+// 1. E-CATALOGUE ENHANCEMENTS (Legacy themes removed for premium experience)
 // ============================================================================
 
-const CATALOGUE_THEMES = {
-  luxe: {
-    name: 'Minimaliste Luxe',
-    icon: '✨',
-    bg: '#0a0a0a',
-    card: '#141414',
-    text: '#f5f5f5',
-    accent: '#c5a55a',
-    font: "'Playfair Display', serif",
-    bodyFont: "'Inter', sans-serif",
-    radius: '0px',
-    cardBorder: '1px solid rgba(197,165,90,0.15)',
-    headerBg: 'linear-gradient(180deg, #0a0a0a 0%, #1a1a1a 100%)',
-    priceStyle: 'font-size:2rem; font-weight:200; letter-spacing:0.15em;',
-    categoryStyle: 'letter-spacing:0.25em; font-size:0.6rem; color:#c5a55a; border-bottom:1px solid #c5a55a; display:inline-block; padding-bottom:4px;'
-  },
-  rustique: {
-    name: 'Artisanal Rustique',
-    icon: '🌾',
-    bg: '#faf6f1',
-    card: '#ffffff',
-    text: '#3d2c1e',
-    accent: '#a0522d',
-    font: "'Georgia', serif",
-    bodyFont: "'Georgia', serif",
-    radius: '12px',
-    cardBorder: '2px solid #e8ddd0',
-    headerBg: 'linear-gradient(135deg, #d4a76a 0%, #a0522d 100%)',
-    priceStyle: 'font-size:1.5rem; font-weight:700; color:#a0522d;',
-    categoryStyle: 'font-style:italic; color:#8b6f47; font-size:0.8rem;'
-  },
-  ardoise: {
-    name: 'Ardoise Bistro',
-    icon: '🖤',
-    bg: '#2c2c2c',
-    card: '#383838',
-    text: '#f0f0f0',
-    accent: '#ff6b6b',
-    font: "'Caveat', cursive",
-    bodyFont: "'Inter', sans-serif",
-    radius: '8px',
-    cardBorder: '1px dashed rgba(255,255,255,0.15)',
-    headerBg: 'linear-gradient(135deg, #2c2c2c 0%, #1a1a1a 100%)',
-    priceStyle: "font-family:'Caveat',cursive; font-size:2.2rem; font-weight:700; color:#ff6b6b;",
-    categoryStyle: "font-family:'Caveat',cursive; color:#aaa; font-size:1rem;"
-  }
-};
-
-// Currently selected theme
-let _catalogueTheme = 'luxe';
-
-// Override the original generateCatalogueHTML to support themes
-const _origGenerateCatalogueHTML = window.generateCatalogueHTML || (typeof generateCatalogueHTML === 'function' ? generateCatalogueHTML : null);
-
-window.generateCatalogueHTML = function(items, shopName, userName) {
-  const theme = CATALOGUE_THEMES[_catalogueTheme] || CATALOGUE_THEMES.luxe;
-  
-  const fontImport = _catalogueTheme === 'ardoise'
-    ? "https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&family=Inter:wght@300;400;600&display=swap"
-    : "https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap";
-  
-  return `<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${shopName} — Catalogue</title>
-  <link href="${fontImport}" rel="stylesheet">
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: ${theme.bodyFont}; background: ${theme.bg}; color: ${theme.text}; line-height: 1.6; }
-    .catalog-header { text-align: center; padding: 3rem 1rem 2rem; background: ${theme.headerBg}; color: white; }
-    .catalog-header h1 { font-family: ${theme.font}; font-size: 2.5rem; margin-bottom: 0.3rem; color: ${theme.accent}; }
-    .catalog-header p { opacity: 0.7; font-size: 0.9rem; }
-    .catalog-grid { max-width: 1200px; margin: 2rem auto; padding: 0 1rem; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; }
-    .catalog-card { background: ${theme.card}; border-radius: ${theme.radius}; padding: 1.8rem; border: ${theme.cardBorder}; transition: transform 0.3s ease, box-shadow 0.3s ease; }
-    .catalog-card:hover { transform: translateY(-6px); box-shadow: 0 12px 35px rgba(0,0,0,${_catalogueTheme === 'luxe' ? '0.4' : '0.1'}); }
-    .catalog-card h3 { font-family: ${theme.font}; font-size: 1.3rem; margin-bottom: 0.5rem; color: ${theme.text}; }
-    .catalog-price { ${theme.priceStyle} margin: 0.8rem 0; }
-    .catalog-category { ${theme.categoryStyle} margin-bottom: 0.8rem; text-transform: uppercase; }
-    .catalog-desc { font-size: 0.85rem; color: ${_catalogueTheme === 'luxe' ? '#888' : (_catalogueTheme === 'ardoise' ? '#bbb' : '#666')}; margin-bottom: 0.8rem; line-height: 1.5; }
-    .catalog-allergens { font-size: 0.75rem; color: #ef4444; font-weight: 600; padding: 0.5rem; background: rgba(239,68,68,0.08); border-radius: 8px; margin-top: 0.5rem; }
-    .catalog-footer { text-align: center; padding: 2rem; color: ${_catalogueTheme === 'luxe' ? '#555' : (_catalogueTheme === 'ardoise' ? '#777' : '#999')}; font-size: 0.8rem; border-top: 1px solid ${_catalogueTheme === 'luxe' ? '#222' : (_catalogueTheme === 'ardoise' ? '#444' : '#f0ebe3')}; margin-top: 2rem; }
-    @media (max-width: 600px) { .catalog-grid { grid-template-columns: 1fr; } .catalog-header h1 { font-size: 1.8rem; } }
-  </style>
-</head>
-<body>
-  <div class="catalog-header">
-    <p>✨ Catalogue des Créations</p>
-    <h1>${shopName}</h1>
-    <p>Artisan Pâtissier</p>
-  </div>
-  <div class="catalog-grid">
-    ${items.map(item => `
-      <div class="catalog-card">
-        <div class="catalog-category">${item.category}</div>
-        <h3>${item.name}</h3>
-        <div class="catalog-price">${item.price} €</div>
-        ${item.description ? `<div class="catalog-desc">${item.description}</div>` : ''}
-        ${item.allergens.length > 0 ? `<div class="catalog-allergens">⚠️ Allergènes : ${item.allergens.join(', ')}</div>` : ''}
-      </div>
-    `).join('')}
-  </div>
-  <div class="catalog-footer">
-    <p>Catalogue généré par GourmetRevient</p>
-    <p>Mis à jour le ${new Date().toLocaleDateString('fr-FR')}</p>
-  </div>
-</body>
-</html>`;
-};
-
-// Override showCataloguePreview to add theme switcher
-const _origShowCataloguePreview = window.showCataloguePreview;
-window.showCataloguePreview = function(html, items, shopName) {
-  // Call original to build modal
-  if (_origShowCataloguePreview) _origShowCataloguePreview(html, items, shopName);
-  
-  // Inject theme picker into the actions bar
-  const actions = document.getElementById('eCatalogueActions');
-  if (actions && !document.getElementById('catalogueThemePicker')) {
-    const picker = document.createElement('div');
-    picker.id = 'catalogueThemePicker';
-    picker.style.cssText = 'display:flex; gap:0.4rem; align-items:center; margin-right:auto;';
-    picker.innerHTML = Object.entries(CATALOGUE_THEMES).map(([key, t]) => 
-      `<button class="btn btn-sm ${key === _catalogueTheme ? 'btn-primary' : 'btn-outline'}" 
-        onclick="switchCatalogueTheme('${key}')" 
-        title="${t.name}" 
-        style="padding:6px 12px; font-size:0.8rem;">${t.icon} ${t.name}</button>`
-    ).join('');
-    actions.prepend(picker);
-  }
-};
+// Themes removed to maintain unique premium brand identity as requested.
+// Logic shifted back to commercial-features.js for core stability.
 
 window.switchCatalogueTheme = function(themeKey) {
   _catalogueTheme = themeKey;
