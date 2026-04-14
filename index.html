@@ -245,7 +245,6 @@
         <button class="nav-dropdown-trigger"><span data-i18n="nav.category.analysis">📈 Croissance & Analyse</span> <span class="nav-arrow">▼</span></button>
         <div class="nav-dropdown-content">
           <button class="nav-link nav-dropdown-link" id="navStats">📊 <span data-i18n="nav.stats">Statistiques</span></button>
-          <button class="nav-link nav-dropdown-link" id="navBoston">⭐ <span data-i18n="nav.boston">Matrice de Boston (BCG)</span></button>
           <button class="nav-link nav-dropdown-link" id="navInflation">🔥 <span data-i18n="nav.inflation">Simulateur Inflation</span></button>
           <button class="nav-link nav-dropdown-link" id="navCatalogue">🌐 <span data-i18n="nav.catalogue">E-Catalogue Client</span></button>
           <button class="nav-link nav-dropdown-link" id="navComparator">⚖️ <span data-i18n="nav.comparator">Comparateur de Prix</span></button>
@@ -1076,35 +1075,6 @@
           </div>
         </div>
 
-        <!-- TAB: BOSTON MATRIX -->
-        <div id="mgmtViewBoston" class="mgmt-view" style="display:none;">
-            <div class="stats-header" style="margin-bottom:2rem;">
-               <h2 style="margin:0; font-family:var(--font-display); font-size:1.8rem; color:var(--primary);" data-i18n="bcg.title">🌀 Matrice de Positionnement Stratégique</h2>
-               <p style="color:var(--text-muted); margin:0; font-size:0.9rem;" data-i18n="bcg.desc">Croisement entre Profitabilité et Popularité (analyse BCG).</p>
-            </div>
-            
-            <div class="bcg-workspace" style="display:flex; flex-direction:column; gap:2rem;">
-               <div class="bcg-chart-pane">
-                  <div class="mgmt-glass-card" style="padding:1.5rem; position:relative;">
-                     <div style="height:500px; position:relative;">
-                        <canvas id="bcgChartCanvas"></canvas>
-                     </div>
-                  </div>
-               </div>
-               
-               <div class="bcg-info-pane">
-                  <div class="mgmt-glass-card" style="padding:1.5rem;">
-                     <h4 style="margin:0 0 1.5rem 0; font-size:1rem; border-bottom:1px solid var(--surface-border); padding-bottom:0.8rem;" data-i18n="ui.summary.insights">🚀 Recommandations Stratégiques</h4>
-                     <div id="bcgLegend" style="overflow-x:auto;">
-                        <!-- JS Populated into a grid -->
-                        <div style="text-align:center; padding:2rem; color:var(--text-muted);">
-                           <p>Charge en cours...</p>
-                        </div>
-                     </div>
-                  </div>
-               </div>
-            </div>
-        </div>
 
         <!-- TAB: INFLATION SIMULATOR -->
         <div id="mgmtViewInflation" class="mgmt-view" style="display:none;">
@@ -3778,7 +3748,6 @@
           'navPlanningProd': () => showMgmt('production'),
           'navShopping': () => showMgmt('shopping'),
           'navScheduler': () => showMgmt('scheduler'),
-          'navBoston': () => showMgmt('boston'),
           'navInflation': () => showMgmt('inflation'),
           'navCatalogue': generateECatalogue,
           'navChefsBrain': openChefsBrain,
