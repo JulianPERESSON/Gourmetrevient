@@ -766,10 +766,20 @@ window.generateECatalogue = function() {
     }
 };
 
+window.groupByCategory = function(items) {
+  const g = {};
+  items.forEach(it => {
+    const cat = it.category || 'Pâtisserie';
+    if (!g[cat]) g[cat] = [];
+    g[cat].push(it);
+  });
+  return g;
+};
+
 window.generateCatalogueHTML = function(items, shopName, userName) {
   console.log("Building HTML for", items.length, "items");
-  const sName = shopName || 'Mon Atelier';
-  const uName = userName || 'Chef';
+  const sName = String(shopName || 'Mon Atelier');
+  const uName = String(userName || 'Chef');
   // Select a theme color based on shop name or random
   const hue = Math.abs(sName.split('').reduce((a,b) => a + b.charCodeAt(0), 0) % 360);
   const primaryColor = `hsl(${hue}, 80%, 60%)`;
