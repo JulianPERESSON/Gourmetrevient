@@ -768,202 +768,201 @@ function generateCatalogueHTML(items, shopName, userName) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${shopName} — Carte Gourmande</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <title>${shopName} — L'Expérience Sucrée</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --gold: #c5a55a;
-      --bg: #fffdf9;
-      --text: #1a1a1a;
-      --muted: #6e6e6e;
-      --border: #e8e2d6;
+      --primary: #ff4d8d;      /* Vibrant Pink */
+      --secondary: #6c5ce7;    /* Modern Purple */
+      --accent: #ffbe76;       /* Soft Orange */
+      --bg: #f8f9ff;
+      --card-bg: rgba(255, 255, 255, 0.9);
     }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body { 
-      font-family: 'Montserrat', sans-serif; 
-      background-color: var(--bg); 
-      color: var(--text); 
+      font-family: 'Outfit', sans-serif; 
+      background: linear-gradient(135deg, #f8f9ff 0%, #ffeef8 100%);
+      color: #2d3436; 
       line-height: 1.6;
-      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+      padding: 2rem 1rem;
+    }
+    .hero {
+      text-align: center;
+      padding: 4rem 1rem;
+      position: relative;
+    }
+    .hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(3rem, 8vw, 5rem);
+      font-style: italic;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 1rem;
+    }
+    .hero p {
+      font-size: 1.2rem;
+      color: #636e72;
+      font-weight: 500;
+      letter-spacing: 0.1rem;
+      text-transform: uppercase;
     }
     .container {
-      max-width: 800px;
+      max-width: 1100px;
       margin: 0 auto;
-      padding: 4rem 2rem;
     }
-    header {
-      text-align: center;
+    .category-group {
       margin-bottom: 5rem;
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 3rem;
     }
-    header span {
-      text-transform: uppercase;
-      letter-spacing: 0.3em;
-      font-size: 0.75rem;
-      color: var(--gold);
-      font-weight: 600;
-      display: block;
-      margin-bottom: 1rem;
-    }
-    h1 {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 3.5rem;
-      font-weight: 500;
-      line-height: 1;
-      margin-bottom: 1rem;
-    }
-    header p {
-      font-family: 'Cormorant Garamond', serif;
-      font-style: italic;
-      font-size: 1.3rem;
-      color: var(--muted);
-    }
-    .menu-section {
-      margin-bottom: 4rem;
-    }
-    .section-title {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 2rem;
-      text-align: center;
-      margin-bottom: 3rem;
-      position: relative;
-    }
-    .section-title::after {
-      content: "";
-      position: absolute;
-      bottom: -10px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 40px;
-      height: 1px;
-      background: var(--gold);
-    }
-    .menu-item {
+    .category-header {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
       margin-bottom: 2.5rem;
+    }
+    .category-header h2 {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #2d3436;
+      white-space: nowrap;
+    }
+    .category-line {
+      height: 4px;
+      flex: 1;
+      background: linear-gradient(90deg, var(--accent), transparent);
+      border-radius: 2px;
+    }
+    .catalog-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 2.5rem;
+    }
+    .card {
+      background: var(--card-bg);
+      border-radius: 24px;
+      padding: 2rem;
+      box-shadow: 0 10px 40px rgba(255, 77, 141, 0.1);
+      border: 1px solid rgba(255,255,255,0.5);
+      backdrop-filter: blur(10px);
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
       display: flex;
       flex-direction: column;
-      animation: fadeIn 0.8s ease forwards;
-      opacity: 0;
+      position: relative;
+      overflow: hidden;
     }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
+    .card::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; width: 6px; height: 100%;
+      background: var(--primary);
     }
-    .item-header {
+    .card:hover {
+      transform: translateY(-10px) scale(1.02);
+      box-shadow: 0 20px 60px rgba(108, 92, 231, 0.15);
+      border-color: var(--primary);
+    }
+    .card-header {
       display: flex;
       justify-content: space-between;
-      align-items: baseline;
-      margin-bottom: 0.5rem;
+      align-items: flex-start;
+      margin-bottom: 1.5rem;
     }
-    .item-name {
-      font-family: 'Cormorant Garamond', serif;
+    .name {
       font-size: 1.5rem;
-      font-weight: 700;
-      color: var(--text);
+      font-weight: 800;
+      line-height: 1.2;
+      color: #2d3436;
     }
-    .item-dots {
-      flex: 1;
-      border-bottom: 1px dotted var(--border);
-      margin: 0 1rem;
-      position: relative;
-      top: -5px;
-    }
-    .item-price {
+    .price {
+      background: var(--primary);
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 100px;
+      font-weight: 800;
       font-size: 1.1rem;
-      font-weight: 600;
-      color: var(--gold);
+      box-shadow: 0 4px 15px rgba(255, 77, 141, 0.3);
     }
-    .item-description {
-      font-size: 0.9rem;
-      color: var(--muted);
-      max-width: 85%;
-      font-style: italic;
-      line-height: 1.4;
+    .description {
+      font-size: 1rem;
+      color: #636e72;
+      margin-bottom: 2rem;
+      flex: 1;
+      line-height: 1.5;
     }
-    .item-allergens {
-      font-size: 0.7rem;
-      color: #9c9c9c;
-      margin-top: 0.4rem;
+    .footer-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 1.5rem;
+      border-top: 1px dashed #dfe6e9;
+    }
+    .allergens {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #ff7675;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
+    }
+    .portions {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #b2bec3;
     }
     footer {
       text-align: center;
-      margin-top: 6rem;
-      padding-top: 3rem;
-      border-top: 1px solid var(--border);
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.1rem;
-      color: var(--muted);
+      margin-top: 10rem;
+      padding-bottom: 4rem;
     }
-    .luxury-badge {
-      display: inline-block;
-      border: 1px solid var(--gold);
-      padding: 1rem 2rem;
-      margin-top: 2rem;
-      font-family: 'Montserrat', sans-serif;
-      text-transform: uppercase;
-      letter-spacing: 0.2em;
-      font-size: 0.7rem;
-      color: var(--gold);
+    .copyright {
+      font-size: 0.9rem;
+      color: #b2bec3;
+      margin-top: 1rem;
     }
     @media (max-width: 600px) {
-      h1 { font-size: 2.5rem; }
-      .container { padding: 2rem 1rem; }
-      .item-header { flex-direction: column; align-items: flex-start; }
-      .item-dots { display: none; }
-      .item-price { margin-top: 0.2rem; }
-      .item-description { max-width: 100%; }
+      .catalog-grid { grid-template-columns: 1fr; }
+      .hero h1 { font-size: 3rem; }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <header>
-      <span>PÂTISSERIE HAUTE COUTURE</span>
-      <h1>${shopName}</h1>
-      <p>La passion du goût, l'excellence du geste.</p>
-    </header>
+  <div class="hero">
+    <p>Collection Exclusive</p>
+    <h1>${shopName}</h1>
+    <p>Par ${userName}</p>
+  </div>
 
-    <div class="menu-content">
-      ${Object.entries(groupByCategory(items)).map(([cat, catItems]) => `
-        <div class="menu-section">
-          <h2 class="section-title">${cat}</h2>
+  <div class="container">
+    ${Object.entries(groupByCategory(items)).map(([cat, catItems]) => `
+      <div class="category-group">
+        <div class="category-header">
+          <h2>${cat}</h2>
+          <div class="category-line"></div>
+        </div>
+        <div class="catalog-grid">
           ${catItems.map((item, i) => `
-            <div class="menu-item" style="animation-delay: ${i * 0.1}s">
-              <div class="item-header">
-                <div class="item-name">${item.name}</div>
-                <div class="item-dots"></div>
-                <div class="item-price">${item.price}€</div>
+            <div class="card">
+              <div class="card-header">
+                <div class="name">${item.name}</div>
+                <div class="price">${item.price}€</div>
               </div>
-              <div class="item-description">
+              <div class="description">
                 ${item.description || "Une création artisanale d'exception alliant finesse et gourmandise."}
               </div>
-              ${item.allergens.length > 0 ? `<div class="item-allergens">Allergènes : ${item.allergens.join(', ')}</div>` : ''}
+              <div class="footer-info">
+                <div class="allergens">${item.allergens.length > 0 ? '⚠️ ' + item.allergens.join(', ') : '✨ Sans allergènes majeurs'}</div>
+                <div class="portions">${item.portions} pers.</div>
+              </div>
             </div>
           `).join('')}
         </div>
-      `).join('')}
-    </div>
-
-    <footer>
-      <p>— Carte disponible sous réserve de production journalière —</p>
-      <div class="luxury-badge">Signé ${userName}</div>
-      <p style="margin-top:1.5rem; font-size:0.8rem; opacity:0.5;">Généré avec élégance par GourmetRevient</p>
-    </footer>
+      </div>
+    `).join('')}
   </div>
 
-  <script>
-    function groupByCategory(items) {
-      const g = {};
-      items.forEach(it => {
-        if (!g[it.category]) g[it.category] = [];
-        g[it.category].push(it);
-      });
-      return g;
-    }
-  </script>
+  <footer>
+    <div style="font-size:1.5rem;">🧁🍰🍩</div>
+    <p class="copyright">© ${new Date().getFullYear()} ${shopName} — Créé avec Passion</p>
+  </footer>
 </body>
 </html>`;
 }
@@ -976,7 +975,7 @@ function showCataloguePreview(html, items, shopName) {
     modal.className = 'modal-overlay';
     modal.style.display = 'none';
     modal.innerHTML = `
-      <div class="modal-content glass-panel" style="max-width:900px; width:95%; max-height:90vh; display:flex; flex-direction:column;">
+      <div class="modal-content glass-panel" style="max-width:1200px; width:95%; max-height:95vh; display:flex; flex-direction:column;">
         <div class="modal-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
           <h3 style="margin:0;">🌐 E-Catalogue Client</h3>
           <button class="btn-icon" onclick="document.getElementById('eCatalogueModal').style.display='none';">✕</button>
@@ -993,7 +992,7 @@ function showCataloguePreview(html, items, shopName) {
   previewArea.innerHTML = '';
   const iframe = document.createElement('iframe');
   iframe.id = 'eCatIframePreview_' + Date.now();
-  iframe.style.cssText = 'width:100%; height:550px; border:none; border-radius:var(--radius);';
+  iframe.style.cssText = 'width:100%; height:750px; border:none; border-radius:var(--radius);';
   previewArea.appendChild(iframe);
   iframe.contentDocument.open();
   iframe.contentDocument.write(html);
