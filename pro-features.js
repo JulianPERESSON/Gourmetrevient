@@ -410,13 +410,13 @@ function updateBCGLegend(data, legendContainer) {
   ];
 
   legendContainer.innerHTML = `
-    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:1.5rem;">
+    <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:1rem;">
       ${quadrants.map(q => {
         const items = data.filter(d => d.quadrant === q.id);
         if (items.length === 0) return '';
         
         return `
-          <div class="bcg-quadrant-group" style="padding:1.2rem; background:var(--bg-alt); border-radius:12px; border:1px solid var(--surface-border); display:flex; flex-direction:column; gap:0.8rem;">
+          <div class="bcg-quadrant-group" style="padding:0.8rem; background:var(--bg-alt); border-radius:12px; border:1px solid var(--surface-border); display:flex; flex-direction:column; gap:0.6rem;">
             <div style="display:flex; align-items:center; gap:10px;">
                <span style="font-size:1.4rem;">${q.icon}</span>
                <span style="font-weight:800; font-size:1rem; color:var(--primary);">${i18n.t('bcg.' + q.id)}</span>
