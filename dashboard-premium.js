@@ -1,4 +1,4 @@
-// dashboard-premium.js: Dedicated script for populating the Bento Premium Dashboard (V2)
+﻿// dashboard-premium.js: Dedicated script for populating the Bento Premium Dashboard (V2)
 
 document.addEventListener('DOMContentLoaded', () => {
     // Wait until authentication is complete and the overlay is removed before hydrating animations

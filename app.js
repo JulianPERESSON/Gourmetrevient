@@ -1,4 +1,4 @@
-﻿/*
+/*
   =====================================================================
   APP.JS — GourmetRevient Professional Recipe Cost Calculator
   Modular Vanilla JavaScript
@@ -1281,13 +1281,13 @@ function renderAdvancedCostKPI(costs) {
     </div>
     <div class="kpi-card accent">
       <div class="kpi-label">${t('s4.adv.kpi.full_cost')}</div>
-      <div class="kpi-value" style="font-size:1.3rem">${costs.totalFullCost.toFixed(2)} €</div>
-      <div class="kpi-sub">${t('ui.kpi.total_material')}: ${costs.totalMaterial.toFixed(2)} € + ${additionalSum.toFixed(2)} €</div>
+      <div class="kpi-value" style="font-size:1.3rem">${APP.recipe && APP.recipe.id === 'crabe-art-boulanger' ? '🦀🎀' : costs.totalFullCost.toFixed(2) + ' €'}</div>
+      <div class="kpi-sub">${t('ui.kpi.total_material')}: ${APP.recipe && APP.recipe.id === 'crabe-art-boulanger' ? '🦀🎀' : costs.totalMaterial.toFixed(2) + ' €'} + ${APP.recipe && APP.recipe.id === 'crabe-art-boulanger' ? '🦀🎀' : additionalSum.toFixed(2) + ' €'}</div>
     </div>
     <div class="kpi-card success">
       <div class="kpi-label">${t('s4.adv.kpi.full_portion')}</div>
-      <div class="kpi-value" style="font-size:1.3rem">${costs.costPerPortion.toFixed(2)} €</div>
-      <div class="kpi-sub">${costs.totalFullCost.toFixed(2)} € / ${costs.portions} ${costs.portions > 1 ? t('unit.portions') : t('unit.portion')}</div>
+      <div class="kpi-value" style="font-size:1.3rem">${APP.recipe && APP.recipe.id === 'crabe-art-boulanger' ? '🦀🎀' : costs.costPerPortion.toFixed(2) + ' €'}</div>
+      <div class="kpi-sub">${APP.recipe && APP.recipe.id === 'crabe-art-boulanger' ? '🦀🎀' : costs.totalFullCost.toFixed(2) + ' €'} / ${costs.portions} ${costs.portions > 1 ? t('unit.portions') : t('unit.portion')}</div>
     </div>
   `;
 }
@@ -1896,6 +1896,7 @@ function renderPortfolio() {
 
   // Filter to show only specific portfolio items requested by user
   const portfolioFilter = [
+    'crabe-art-boulanger',
     'saint-honore',
     'negresco',
     'frangipane',
@@ -1926,10 +1927,15 @@ function renderPortfolio() {
     const hue = (idx * 137.5) % 360;
     const fallBackColor = `hsl(${hue}, 70%, 85%)`;
 
-    // Specific styling for certain images (dezoom or position)
+    // Specific styling for certain images (dezoom, zoom or position)
     const dezoomIds = [];
-    const extraClass = dezoomIds.includes(r.id) ? ' dezoom' : '';
-    const extraStyle = r.id === 'saint-honore' ? ' style="object-position: top;"' : '';
+    const zoomIds = ['crabe-art-boulanger'];
+    let extraClass = dezoomIds.includes(r.id) ? ' dezoom' : '';
+    if (zoomIds.includes(r.id)) extraClass += ' zoom-in';
+    
+    let extraStyle = '';
+    if (r.id === 'saint-honore') extraStyle = ' style="object-position: top;"';
+    if (r.id === 'crabe-art-boulanger') extraStyle = ' style="object-position: center 35%;"';
 
     // Translation logic
     const tCatRaw = t(r.category);
@@ -4393,29 +4399,35 @@ function renderV2ScatterPlot(results) {
 }
 
 function renderV2Alerts(results) {
-  const container = $('#v2AlertsContainer');
+  const container = document.getElementById('statsVigilanceList');
   if (!container) return;
 
-  const problematic = results.filter(r => r.data.marginPct < 55).sort((a, b) => a.data.marginPct - b.data.marginPct).slice(0, 3);
+  const threshold = (APP.config?.criticalMargin || 65);
+  const problematic = results.filter(r => r.data.marginPct < threshold).sort((a, b) => a.data.marginPct - b.data.marginPct);
 
   if (problematic.length === 0) {
-    container.innerHTML = `<div style="text-align:center; padding:2rem; color:var(--text-secondary);">${i18n.t('stats.alerts.none')}</div>`;
+    container.innerHTML = `
+      <div style="text-align:center; padding:2rem; color:var(--text-muted); font-size:0.85rem;">
+        ✅ Toutes vos marges sont au-dessus de ${threshold}%.
+      </div>`;
     return;
   }
 
   container.innerHTML = problematic.map(r => {
-    const isCritical = r.data.marginPct < 35;
+    const isCritical = r.data.marginPct < (threshold - 10);
     const suggestion = isCritical
-      ? i18n.t('stats.alerts.critical_suggestion', { amount: (r.data.sellingPrice * 0.15).toFixed(2) })
-      : i18n.t('stats.alerts.standard_suggestion');
+      ? `Augmentez le prix de ~${(r.data.sellingPrice * 0.15).toFixed(2)}€`
+      : `Optimisez les coûts matières`;
+    
     return `
-      <div class="alert-recipe-card ${isCritical ? 'danger' : ''}">
-        <div class="alert-title">⚠️ ${escapeHtml(r.name)}</div>
-        <div class="alert-desc">
-          ${i18n.t('stats.alerts.margin_at', { margin: r.data.marginPct.toFixed(1) })} 
-          ${i18n.t('stats.alerts.material_cost', { cost: r.data.totalMaterial.toFixed(2) })}
+      <div class="vigilance-item">
+        <div class="vigilance-icon ${isCritical ? 'critical' : 'warn'}">
+          ${isCritical ? '🚨' : '⚠️'}
         </div>
-        <div class="alert-suggestion">${suggestion}</div>
+        <div class="vigilance-content">
+          <span class="vigilance-title">${escapeHtml(r.name)} : ${r.data.marginPct.toFixed(1)}%</span>
+          <span class="vigilance-desc">${suggestion}</span>
+        </div>
       </div>
     `;
   }).join('');
@@ -5867,21 +5879,63 @@ const EQUIP_KEY_MAP = {
 };
 
 function switchHaccpTab(tab) {
-  const views = ['Temp', 'Clean', 'Trace', 'Reception'];
+  const views = ['Temp', 'Clean', 'Trace', 'Reception', 'Allergens'];
   views.forEach(v => {
     const el = document.getElementById('haccpView' + v);
     const btn = document.getElementById('tabHaccp' + v);
     if (el) el.style.display = v.toLowerCase() === tab ? 'block' : 'none';
     if (btn) btn.classList.toggle('active', v.toLowerCase() === tab);
   });
-  renderHygiene();
+  if (tab === 'allergens') renderAllergenMatrix();
+  else renderHygiene();
 }
 
 function renderHygiene() {
+  renderHygieneDashboard();
   renderTempLogs();
   renderCleaningChecklist();
   renderTraceability();
   renderReceptionLogs();
+}
+
+function renderHygieneDashboard() {
+  const lastTempEl = document.getElementById('kpiHaccpLastTemp');
+  const lastTempDateEl = document.getElementById('kpiHaccpLastTempDate');
+  const cleanPctEl = document.getElementById('kpiHaccpCleanPct');
+  const activeLotsEl = document.getElementById('kpiHaccpActiveLots');
+  const shortExpEl = document.getElementById('kpiHaccpShortExp');
+
+  if (!lastTempEl) return;
+
+  // 1. Last Temp
+  const temps = APP.haccpLogs.temp || [];
+  if (temps.length > 0) {
+    const last = temps[0];
+    lastTempEl.textContent = last.val.toFixed(1) + ' °C';
+    lastTempDateEl.textContent = new Date(last.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    lastTempEl.style.color = (last.val > 5 || last.val < -22) ? 'var(--danger)' : 'var(--success)';
+  }
+
+  // 2. Cleaning Pct
+  const cleaning = APP.haccpLogs.cleaning || [];
+  const today = new Date().toISOString().split('T')[0];
+  const todaysTasks = cleaning.filter(t => t.date === today);
+  const completed = todaysTasks.filter(t => t.status === 'ok').length;
+  const pct = todaysTasks.length > 0 ? Math.round((completed / todaysTasks.length) * 100) : 0;
+  if (cleanPctEl) cleanPctEl.textContent = pct + '%';
+
+  // 3. Active Lots
+  const trace = APP.haccpLogs.trace || [];
+  if (activeLotsEl) activeLotsEl.textContent = trace.length;
+
+  // 4. Short Expiry
+  const now = new Date();
+  const shortExp = trace.filter(t => {
+     const expDate = new Date(t.exp);
+     const diffHours = (expDate - now) / (1000 * 60 * 60);
+     return diffHours > 0 && diffHours < 48;
+  }).length;
+  if (shortExpEl) shortExpEl.textContent = shortExp;
 }
 
 function renderTempLogs() {
@@ -6036,19 +6090,50 @@ function deleteReceptionLog(id) {
 }
 
 function renderCleaningChecklist() {
-  var container = document.getElementById('cleaningChecklistArea');
+  const container = document.getElementById('cleaningChecklistArea');
   if (!container) return;
-  if (!APP.haccpLogs.clean) return;
+
+  // Initialize defaults if empty
+  if (!APP.haccpLogs.clean || APP.haccpLogs.clean.length === 0) {
+    APP.haccpLogs.clean = [
+      { id: 'cl_1', areaKey: 'haccp.clean.area1', area: 'Postes de Travail', icon: '🔪', done: false },
+      { id: 'cl_2', areaKey: 'haccp.clean.area2', area: 'Sols & Caniveaux', icon: '🧼', done: true },
+      { id: 'cl_3', areaKey: 'haccp.clean.area3', area: 'Enceintes Froides', icon: '❄️', done: false },
+      { id: 'cl_4', areaKey: 'haccp.clean.area4', area: 'Plongerie', icon: '🚿', done: false },
+      { id: 'cl_5', areaKey: 'haccp.clean.area5', area: 'Sanitaires', icon: '🚽', done: true },
+      { id: 'cl_6', areaKey: 'haccp.clean.area6', area: 'Réserve Sèche', icon: '📦', done: false }
+    ];
+    try { saveHaccpLogs(); } catch(e){}
+  }
+
   container.innerHTML = APP.haccpLogs.clean.map(function (task) {
-    var areaName = task.areaKey ? t(task.areaKey) : (task.area || '');
-    return '<div class="card glass-widget ' + (task.done ? 'cleaned' : '') + '" onclick="toggleCleaning(\'' + task.id + '\')">' +
-      '<div style="font-size:2rem;">' + task.icon + '</div>' +
-      '<div style="flex:1;">' +
-      '<h4 style="margin:0; font-size:1.1rem; color:var(--primary);">' + areaName + '</h4>' +
-      '<small style="color:var(--text-muted);">' + (task.done ? t('haccp.clean.stat_done') : t('haccp.clean.stat_todo')) + '</small>' +
-      '</div>' +
-      '<div style="font-size:1.5rem;">' + (task.done ? '✅' : '⭕') + '</div>' +
-      '</div>';
+    var areaName = task.areaKey ? (typeof t === 'function' ? t(task.areaKey) : task.area) : (task.area || '');
+    return `
+      <div class="mgmt-glass-card ${task.done ? 'cleaned' : ''}" 
+           onclick="toggleCleaning('${task.id}')" 
+           style="display:flex; align-items:center; gap:1.2rem; cursor:pointer; padding:1.5rem; transition:all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); position:relative; overflow:hidden;">
+        
+        <div style="font-size:2rem; background:${task.done ? 'rgba(16, 185, 129, 0.1)' : 'rgba(197, 165, 90, 0.08)'}; 
+                    width:60px; height:60px; display:flex; align-items:center; justify-content:center; border-radius:18px; 
+                    border: 1px solid ${task.done ? 'rgba(16, 185, 129, 0.2)' : 'rgba(197, 165, 90, 0.15)'};">
+          ${task.icon}
+        </div>
+
+        <div style="flex:1;">
+          <h4 style="margin:0; font-size:1.1rem; color:var(--primary); font-family:var(--font-display);">${areaName}</h4>
+          <div style="display:flex; align-items:center; gap:0.5rem; margin-top:2px;">
+             <span style="font-size:0.7rem; font-weight:800; letter-spacing:0.5px; color:${task.done ? '#10b981' : 'var(--text-muted)'};">
+               ${task.done ? 'CONFORME' : 'À TRAITER'}
+             </span>
+          </div>
+        </div>
+
+        <div style="font-size:1.5rem; filter: ${task.done ? 'none' : 'grayscale(1) opacity(0.3)'};">
+          ${task.done ? '✅' : '⭕'}
+        </div>
+
+        ${task.done ? '<div style="position:absolute; top:0; left:0; width:4px; height:100%; background:#10b981;"></div>' : ''}
+      </div>`;
   }).join('');
 }
 
@@ -6721,40 +6806,42 @@ function renderAllergenMatrix() {
   const table = document.getElementById('allergenMatrixTable');
   if (!table) return;
 
-  const recipes = APP.savedRecipes;
+  // Aggregate saved and reference recipes
+  const recipes = [...(APP.savedRecipes || []), ...(typeof RECIPES !== 'undefined' ? RECIPES : [])];
+  
   if (recipes.length === 0) {
     table.innerHTML = `<tr><td colspan="15" style="text-align:center; padding:3rem;">
       <div class="mgmt-empty-state">
-        <div class="empty-icon">🛡️</div>
-        <h4>${t('mgmt.allergens.empty_title') || 'Aucune recette enregistrée'}</h4>
-        <p>${t('mgmt.allergens.empty_desc') || 'Créez et sauvegardez des recettes pour générer la matrice des allergènes automatiquement.'}</p>
+        <div class="empty-icon">\ud83d\udee1\ufe0f</div>
+        <h4>Aucune recette d\u00e9tect\u00e9e</h4>
+        <p>Enregistrez des recettes pour g\u00e9n\u00e9rer la matrice.</p>
       </div>
     </td></tr>`;
     return;
   }
 
   const allAllergens = [
-    { key: "Lait", emoji: "🥛" },
-    { key: "Œufs", emoji: "🥚" },
-    { key: "Gluten", emoji: "🌾" },
-    { key: "Fruits à coque", emoji: "🥜" },
-    { key: "Soja", emoji: "🫘" },
-    { key: "Arachides", emoji: "🥜" },
-    { key: "Sésame", emoji: "🌰" },
-    { key: "Moutarde", emoji: "🟡" },
-    { key: "Lupin", emoji: "🌿" },
-    { key: "Sulfites", emoji: "🧪" },
-    { key: "Poisson", emoji: "🐟" },
-    { key: "Crustacés", emoji: "🦐" },
-    { key: "Mollusques", emoji: "🐚" },
-    { key: "Céleri", emoji: "🥬" }
+    { key: "Lait", emoji: "\ud83e\udd5b" },
+    { key: "\u0152ufs", emoji: "\ud83e\udd5a" },
+    { key: "Gluten", emoji: "\ud83c\udf3e" },
+    { key: "Fruits \u00e0 coque", emoji: "\ud83e\udd5c" },
+    { key: "Soja", emoji: "\ud83e\uddab" },
+    { key: "Arachides", emoji: "\ud83e\udd5c" },
+    { key: "S\u00e9same", emoji: "\ud83e\udd6f" },
+    { key: "Moutarde", emoji: "\ud83d\udfe1" },
+    { key: "Lupin", emoji: "\ud83c\udf3f" },
+    { key: "Sulfites", emoji: "\ud83e\uddea" },
+    { key: "Poisson", emoji: "\ud83d\udc1f" },
+    { key: "Crustac\u00e9s", emoji: "\ud83e\udd90" },
+    { key: "Mollusques", emoji: "\ud83d\udc1a" },
+    { key: "C\u00e9leri", emoji: "\ud83e\udd6c" }
   ];
   
   let html = `
     <thead>
       <tr>
-        <th>${t('mgmt.allergens.col_recipe') || 'Recette'}</th>
-        ${allAllergens.map(a => `<th><span title="${a.key}">${a.emoji}</span><br><span style="font-size:0.55rem;">${a.key}</span></th>`).join('')}
+        <th style="padding: 1rem; background: rgba(0,0,0,0.05); text-align: left;">Recette</th>
+        ${allAllergens.map(a => `<th style="padding: 1rem; background: rgba(0,0,0,0.05);"><span title="${a.key}">${a.emoji}</span><br><span style="font-size:0.55rem;">${a.key}</span></th>`).join('')}
       </tr>
     </thead>
     <tbody>
@@ -6762,27 +6849,31 @@ function renderAllergenMatrix() {
 
   recipes.forEach(r => {
     const foundAllergens = new Set();
-    r.ingredients.forEach(ing => {
-      const dbItem = APP.ingredientDb.find(db => db.name.toLowerCase() === ing.name.toLowerCase());
-      if (dbItem && dbItem.allergens) {
-        dbItem.allergens.forEach(a => foundAllergens.add(a));
-      }
-      const n = ing.name.toLowerCase();
-      if (n.includes('lait') || n.includes('beurre') || n.includes('crème')) foundAllergens.add('Lait');
-      if (n.includes('œuf') || n.includes('oeuf')) foundAllergens.add('Œufs');
-      if (n.includes('farine') || n.includes('blé')) foundAllergens.add('Gluten');
-      if (n.includes('amande') || n.includes('noisette') || n.includes('noix') || n.includes('pistache')) foundAllergens.add('Fruits à coque');
+    const ings = r.ingredients || [];
+    
+    ings.forEach(ing => {
+      const n = (ing.name || '').toLowerCase();
+      // Manual detection rules
+      if (n.includes('lait') || n.includes('beurre') || n.includes('cr\u00e8me') || n.includes('cream') || n.includes('mascarpone')) foundAllergens.add('Lait');
+      if (n.includes('\u0153uf') || n.includes('oeuf') || n.includes('jaune') || n.includes('blanc')) foundAllergens.add('\u0152ufs');
+      if (n.includes('farine') || n.includes('bl\u00e9') || n.includes('gluten')) foundAllergens.add('Gluten');
+      if (n.includes('amande') || n.includes('noisette') || n.includes('noix') || n.includes('pistache')) foundAllergens.add('Fruits \u00e0 coque');
       if (n.includes('soja')) foundAllergens.add('Soja');
       if (n.includes('arachide') || n.includes('cacahu')) foundAllergens.add('Arachides');
-      if (n.includes('sésame')) foundAllergens.add('Sésame');
+      if (n.includes('s\u00e9same')) foundAllergens.add('S\u00e9same');
       if (n.includes('moutarde')) foundAllergens.add('Moutarde');
+      if (n.includes('sulfite') || n.includes('vin')) foundAllergens.add('Sulfites');
     });
 
     html += `
       <tr>
-        <td>${escapeHtml(r.name)}</td>
+        <td style="text-align:left; font-weight:600; padding: 0.8rem; border-bottom: 1px solid rgba(0,0,0,0.05);">${r.name}</td>
         ${allAllergens.map(a => `
-          <td><span class="allergen-badge ${foundAllergens.has(a.key) ? 'present' : 'absent'}">${foundAllergens.has(a.key) ? '●' : '—'}</span></td>
+          <td style="padding: 0.8rem; border-bottom: 1px solid rgba(0,0,0,0.05);">
+            <span class="allergen-badge ${foundAllergens.has(a.key) ? 'present' : 'absent'}">
+              ${foundAllergens.has(a.key) ? '\u25cf' : '\u2014'}
+            </span>
+          </td>
         `).join('')}
       </tr>
     `;
@@ -6915,11 +7006,37 @@ function renderWasteChart(logs) {
 
   const labels = Object.keys(reasonCounts).map(k => reasonLabels[k] || k);
   const data = Object.values(reasonCounts);
-  const colors = ['#f59e0b', '#ef4444', '#6366f1', '#6b7280'];
+
+  const colors = ['#f59e0b', '#ef4444', '#8b5cf6', '#64748b'];
 
   if (wasteChart) {
     wasteChart.destroy();
     wasteChart = null;
+  }
+
+  // Monthly Report
+  const reportEl = document.getElementById('wasteMonthlyReport');
+  if (reportEl && logs.length > 0) {
+    const wasteByReason = {};
+    let maxReason = '';
+    let maxVal = 0;
+    logs.forEach(l => {
+      wasteByReason[l.reason] = (wasteByReason[l.reason] || 0) + (l.lossValue || 0);
+      if (wasteByReason[l.reason] > maxVal) { maxVal = wasteByReason[l.reason]; maxReason = l.reason; }
+    });
+    const totalLoss = Object.values(wasteByReason).reduce((a, b) => a + b, 0);
+    const reasonLabel = reasonLabels[maxReason] || maxReason;
+    reportEl.innerHTML = `
+      <div style="background:rgba(239, 68, 68, 0.05); padding:1rem; border-radius:12px; border:1px dashed rgba(239, 68, 68, 0.2); text-align:center; margin-bottom:1rem;">
+        <div style="font-size:1.8rem; font-weight:800; color:#ef4444;">${totalLoss.toFixed(2)} €</div>
+        <div style="font-size:0.65rem; text-transform:uppercase; color:var(--text-muted);">Perte ce mois-ci</div>
+      </div>
+      <div style="display:flex; justify-content:space-between; padding:0.6rem; background:rgba(197, 165, 90, 0.03); border-radius:8px; margin-bottom:0.5rem;">
+        <span style="font-size:0.75rem;">Cause n°1 :</span>
+        <span style="font-size:0.75rem; font-weight:700;">${reasonLabel}</span>
+      </div>
+      <p style="font-size:0.7rem; color:var(--text-muted); font-style:italic;">ℹ️ Les ${reasonLabel.toLowerCase()} sont votre premier levier d'optimisation.</p>
+    `;
   }
 
   if (data.length === 0) {
@@ -6962,6 +7079,29 @@ function renderWasteChart(logs) {
 function loadWasteLogs() {
   const saved = localStorage.getItem(STORAGE_KEYS.wasteLogs);
   APP.wasteLogs = saved ? JSON.parse(saved) : [];
+}
+
+function exportWasteHistory() {
+  const logs = APP.wasteLogs || [];
+  if (logs.length === 0) {
+    showToast("Aucune donnée à exporter", "error");
+    return;
+  }
+  
+  let csv = 'Date,Recette,Quantite,Motif,Notes,ValeurLoss_EUR\n';
+  logs.forEach(l => {
+    csv += `${l.date},"${l.recipeName}",${l.qty},${l.reason},"${l.notes || ''}",${l.lossValue.toFixed(2)}\n`;
+  });
+  
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.setAttribute('hidden', '');
+  a.setAttribute('href', url);
+  a.setAttribute('download', `pertes_gourmet_revient_${new Date().toISOString().split('T')[0]}.csv`);
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
 }
 
 // --- Cost Objectives ---
@@ -7500,3 +7640,88 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }, 15000);
 });
+
+// ============================================================================
+// STREAMLINED MANAGEMENT NAVIGATION
+// ============================================================================
+// Navigation and management functions are handled in index.html to avoid conflicts
+
+
+// --- Allergen Matrix (Character Safe) ---
+function renderAllergenMatrix() {
+  const table = document.getElementById('allergenMatrixTable');
+  if (!table) return;
+
+  const recipes = [...(APP.savedRecipes || []), ...(typeof RECIPES !== 'undefined' ? RECIPES : [])];
+  
+  if (recipes.length === 0) {
+    table.innerHTML = `<tr><td colspan="15" style="text-align:center; padding:3rem;">
+      <div class="mgmt-empty-state">
+        <div class="empty-icon">\ud83d\udee1\ufe0f</div>
+        <h4>Aucune recette d\u00e9tect\u00e9e</h4>
+        <p>Enregistrez des recettes pour g\u00e9n\u00e9rer la matrice.</p>
+      </div>
+    </td></tr>`;
+    return;
+  }
+
+  const allAllergens = [
+    { key: "Lait", emoji: "\ud83e\udd5b" },
+    { key: "\u0152ufs", emoji: "\ud83e\udd5a" },
+    { key: "Gluten", emoji: "\ud83c\udf3e" },
+    { key: "Fruits \u00e0 coque", emoji: "\ud83e\udd5c" },
+    { key: "Soja", emoji: "\ud83e\uddab" },
+    { key: "Arachides", emoji: "\ud83e\udd5c" },
+    { key: "S\u00e9same", emoji: "\ud83e\udd6f" },
+    { key: "Moutarde", emoji: "\ud83d\udfe1" },
+    { key: "Lupin", emoji: "\ud83c\udf3f" },
+    { key: "Sulfites", emoji: "\ud83e\uddea" },
+    { key: "Poisson", emoji: "\ud83d\udc1f" },
+    { key: "Crustac\u00e9s", emoji: "\ud83e\udd90" },
+    { key: "Mollusques", emoji: "\ud83d\udc1a" },
+    { key: "C\u00e9leri", emoji: "\ud83e\udd6c" }
+  ];
+  
+  let html = `
+    <thead>
+      <tr>
+        <th style="padding: 1rem; background: rgba(0,0,0,0.05); text-align: left;">Recette</th>
+        ${allAllergens.map(a => `<th style="padding: 1rem; background: rgba(0,0,0,0.05);"><span title="${a.key}">${a.emoji}</span><br><span style="font-size:0.55rem;">${a.key}</span></th>`).join('')}
+      </tr>
+    </thead>
+    <tbody>
+  `;
+
+  recipes.forEach(r => {
+    const foundAllergens = new Set();
+    const ings = r.ingredients || [];
+    ings.forEach(ing => {
+      const n = (ing.name || '').toLowerCase();
+      if (n.includes('lait') || n.includes('beurre') || n.includes('cr\u00e8me') || n.includes('cream')) foundAllergens.add('Lait');
+      if (n.includes('\u0153uf') || n.includes('oeuf') || n.includes('jaune') || n.includes('blanc')) foundAllergens.add('\u0152ufs');
+      if (n.includes('farine') || n.includes('bl\u00e9') || n.includes('gluten')) foundAllergens.add('Gluten');
+      if (n.includes('amande') || n.includes('noisette') || n.includes('noix') || n.includes('pistache')) foundAllergens.add('Fruits \u00e0 coque');
+      if (n.includes('soja')) foundAllergens.add('Soja');
+      if (n.includes('arachide') || n.includes('cacahu')) foundAllergens.add('Arachides');
+      if (n.includes('s\u00e9same')) foundAllergens.add('S\u00e9same');
+      if (n.includes('moutarde')) foundAllergens.add('Moutarde');
+      if (n.includes('sulfite') || n.includes('vin')) foundAllergens.add('Sulfites');
+    });
+
+    html += `
+      <tr>
+        <td style="text-align:left; font-weight:600; padding: 0.8rem; border-bottom: 1px solid rgba(0,0,0,0.05);">${r.name}</td>
+        ${allAllergens.map(a => `
+          <td style="padding: 0.8rem; border-bottom: 1px solid rgba(0,0,0,0.05);">
+            <span class="allergen-badge ${foundAllergens.has(a.key) ? 'present' : 'absent'}">
+              ${foundAllergens.has(a.key) ? '\u25cf' : '\u2014'}
+            </span>
+          </td>
+        `).join('')}
+      </tr>
+    `;
+  });
+
+  html += `</tbody>`;
+  table.innerHTML = html;
+}

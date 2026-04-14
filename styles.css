@@ -2268,6 +2268,14 @@ select.form-input {
   filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.08));
 }
 
+.portfolio-img.zoom-in {
+  transform: scale(1.6);
+}
+
+.portfolio-item:hover .portfolio-img.zoom-in {
+  transform: scale(1.75);
+}
+
 .portfolio-item:hover .portfolio-img {
   transform: scale(1.08);
 }
@@ -8446,6 +8454,8 @@ select.form-input {
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 1100;
   margin-top: 0;
+  max-height: calc(100vh - 80px);
+  overflow-y: auto;
 }
 
 /* Invisible bridge */

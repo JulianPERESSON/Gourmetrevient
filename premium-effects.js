@@ -1,4 +1,4 @@
-/*
+﻿/*
   =====================================================================
   PREMIUM-EFFECTS.JS — GourmetRevient v5.5
   ✨ Atmosphère Pâtissière (Particules Interactives)

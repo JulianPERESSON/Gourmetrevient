@@ -1,4 +1,4 @@
-/* ============================================================
+﻿/* ============================================================
    EXAM-SCHEDULER.JS — Ordonnancement CAP Pâtissier
    Gantt | 4h30 = 18 créneaux de 15 min — Durées CONFORTABLES
    L'apprenti ne court pas : on utilise TOUT le temps disponible

@@ -1,4 +1,4 @@
-/*
+﻿/*
   =====================================================================
   MASTER-CONVERTER.JS — GourmetRevient v5.2
   Géométrie Culinaire — Convertisseur de Moules Premium

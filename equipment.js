@@ -1,4 +1,4 @@
-/* Equipment Database — LabPâtiss' Configurateur */
+﻿/* Equipment Database — LabPâtiss' Configurateur */
 window.EQUIPMENT_DB = [
     // ── USTENSILES & PETIT ÉQUIPEMENT ──
     {

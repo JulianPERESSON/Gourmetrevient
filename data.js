@@ -1417,6 +1417,30 @@ const VIENNOISERIES = [
     ]
   },
   {
+    id: 'crabe-art-boulanger',
+    name: 'Mister Crabe 🦀🎀',
+    category: 'Pâte à pain',
+    portions: 1,
+    prepTime: 120,
+    cookTime: 25,
+    image: './img/crab_bread.jpg',
+    description: 'Une création artistique boulangère en forme de crabe sculptée dans une pâte à baguette de tradition française.',
+    ingredients: [
+      { name: 'Farine de Tradition T65', quantity: 500, unit: 'g', pricePerKg: 0.01 },
+      { name: 'Eau pure', quantity: 350, unit: 'ml', pricePerL: 0.00 },
+      { name: 'Sel fin de mer', quantity: 9, unit: 'g', pricePerKg: 0.01 },
+      { name: 'Levure fraîche', quantity: 4, unit: 'g', pricePerKg: 0.01 }
+    ],
+    steps: [
+      'Frasage : mélange farine et eau pour l\'autolyse.',
+      'Pétrissage lent au crochet jusqu\'au décollage.',
+      'Pointage en masse de 2h avec rabats pour structurer la pâte.',
+      'Détaillage et façonnage artistique : corps, 8 pattes et 2 pinces.',
+      'Installation de la pièce sur tapis de cuisson.',
+      'Cuisson sur sole à 235°C avec injection de buée pour le brillant.'
+    ]
+  },
+  {
     id: 'pain-au-chocolat',
     name: 'Chocolatine',
     category: 'Viennoiserie',

@@ -47,8 +47,8 @@ const TRANSLATIONS = {
         'auth.error.taken': "Ce nom d'utilisateur est déjà pris.",
 
         // Navigation
-        'nav.category.atelier': "👨‍🍳 L'Atelier",
-        'nav.category.mgmt': "🏢 Gestion & Hub",
+        'nav.category.atelier': "L'Atelier",
+        'nav.category.mgmt': "⚙️ Pilotage & Labo",
         'mgmt.tab.scheduler': '🎓 Ordonnanceur CAP',
         'scheduler.title': 'Ordonnanceur Tactique CAP',
         'scheduler.desc': 'Générez un plan de travail optimisé sans temps mort pour vos examens EP1 et EP2.',
@@ -57,13 +57,13 @@ const TRANSLATIONS = {
         'scheduler.btn_generate': '🚀 Générer mon Chronogramme',
         'scheduler.ep1': 'EP1: Tour & Gâteaux de voyage',
         'scheduler.ep2': 'EP2: Entremets & Choux',
-        'nav.category.org': "📋 Organisation",
-        'nav.category.showcase': "✨ Vitrine",
+        'nav.category.org': "Organisation",
+        'nav.category.showcase': "Vitrine",
         'nav.category.creative': "💡 Atelier Créatif",
-        'nav.creative.brain': "🧠 Cerveau du Chef",
-        'nav.creative.assembly': "🏗️ Simulateur Montage",
-        'nav.creative.converter': "📏 Convertisseur de Moules",
-        'nav.creative.lab': "📐 Matériel & Outillage",
+        'nav.creative.brain': "Cerveau du Chef",
+        'nav.creative.assembly': "Simulateur Montage",
+        'nav.creative.converter': "Convertisseur de Moules",
+        'nav.creative.lab': "Matériel & Outillage",
         
         'modal.brain.title': "🧠 Cerveau du Chef — Accords de Saveurs",
         'modal.brain.desc': "Choisissez un ingrédient de base et découvrez les meilleurs accords. Le coût estimé s'affiche instantanément.",
@@ -87,9 +87,23 @@ const TRANSLATIONS = {
         'nav.logout': 'Déconnexion',
         'nav.notifications': 'Notifications',
         'nav.no_notif': 'Aucune nouvelle notification',
+        'nav.shopping': "Calculateur d'Achats",
+        'nav.team': "Équipe & Congés",
         'nav.suppliers': 'Fournisseurs',
         'nav.stats': 'Statistiques',
         'nav.mgmt': 'Gestion Pro',
+        'nav.orders': 'Devis & Factures',
+        'nav.planning_prod': 'Planning',
+        'nav.traceability': 'Traçabilité des Lots',
+        'nav.waste': 'Pertes & Traçabilité',
+        'nav.scheduler': 'Ordonnanceur CAP (EP1/EP2)',
+        'nav.hub': 'Objectifs & Hub',
+        'nav.boston': 'Matrice de Boston (BCG)',
+        'nav.inflation': 'Simulateur Inflation',
+        'nav.comparator': 'Comparateur Multi-Périodes',
+        'nav.catalogue': 'E-Catalogue Client',
+        'nav.crm': 'Clients & Ventes (CRM)',
+        'nav.category.analysis': "📈 Croissance & Analyse",
 
         // Library & Search
         'search.placeholder': 'Rechercher une recette...',
@@ -126,6 +140,21 @@ const TRANSLATIONS = {
         'mgmt.reason.degustation': 'Dégustation / Promo',
         'mgmt.reason.peremption': 'Date dépassée',
         'mgmt.toast.loss': 'Perte enregistrée avec succès',
+
+        // Statistics Dashboard
+        'stats.dashboard.title': 'Cockpit de Pilotage Pro',
+        'stats.dashboard.subtitle': 'Intelligence commerciale & optimisation des marges en temps réel.',
+        'stats.chart.margin_dist': 'Répartition des Marges',
+        'stats.chart.performance': 'Top 5 Performance',
+        'stats.chart.scatter': 'Matrice de Rentabilité Stratégique',
+        'stats.kpi.avg_margin': 'Marge Moyenne',
+        'stats.kpi.best_recipe': 'Star Performeur',
+        'stats.kpi.avg_cost': 'Coût Moyen',
+        'stats.kpi.avg_price': 'Prix Moyen',
+        'stats.vigilance.title': 'Points de Vigilance',
+        'stats.vigilance.none': 'Aucune alerte détectée.',
+        'stats.btn.pdf': 'Rapport PDF',
+        'stats.btn.config': 'Paramètres',
 
         // Gestion Pro - Extended
         'mgmt.kpi.recipes': 'Recettes Actives',
@@ -1455,7 +1484,7 @@ const TRANSLATIONS = {
 
         // === PRO FEATURES v4.0 ===
         // Navigation
-        'nav.category.protools': '🧰 Outils Pro',
+        'nav.category.protools': 'Outils Pro',
         'nav.protools': 'Boîte à Outils',
 
         // Pro Tools Hub
@@ -1612,10 +1641,10 @@ const TRANSLATIONS = {
         'auth.error.taken': 'This username is already taken.',
 
         'nav.category.creative': "💡 Creative Workshop",
-        'nav.creative.brain': "🧠 Chef's Brain",
-        'nav.creative.assembly': "🏗️ Assembly Simulator",
-        'nav.creative.converter': "📏 Master Converter",
-        'nav.creative.lab': "📐 Tools & Equipment",
+        'nav.creative.brain': "Chef's Brain",
+        'nav.creative.assembly': "Assembly Simulator",
+        'nav.creative.converter': "Master Converter",
+        'nav.creative.lab': "Tools & Equipment",
 
         'modal.brain.title': "🧠 Chef's Brain — Flavor Pairings",
         'modal.brain.desc': "Choose a base ingredient and discover the best pairings. Estimated costs are displayed instantly.",
@@ -1634,14 +1663,29 @@ const TRANSLATIONS = {
         'nav.portfolio': 'Portfolio',
         'nav.about': 'About',
         'nav.admin': 'Admin',
-        'nav.my_recipes': '📂 My Recipes',
-        'nav.my_profile': '👤 My Profile',
-        'nav.logout': '🚪 Log out',
+        'nav.my_recipes': 'My Recipes',
+        'nav.my_profile': 'My Profile',
+        'nav.logout': 'Log out',
         'nav.notifications': 'Notifications',
         'nav.no_notif': 'No new notifications',
+        'nav.shopping': 'Shopping Calculator',
+        'nav.team': 'Team & Leave',
         'nav.suppliers': 'Suppliers',
         'nav.stats': 'Statistics',
         'nav.mgmt': 'Pro Management',
+        'nav.orders': 'Quotes & Invoices',
+        'nav.planning_prod': 'Planning',
+        'nav.traceability': 'Lot Traceability',
+        'nav.waste': 'Waste & Traceability',
+        'nav.scheduler': 'CAP Scheduler (EP1/EP2)',
+        'nav.hub': 'Goals & Hub',
+        'nav.boston': 'Boston Matrix (BCG)',
+        'nav.inflation': 'Inflation Simulator',
+        'nav.comparator': 'Multi-Period Comparator',
+        'nav.catalogue': 'Client E-Catalogue',
+        'nav.crm': 'Clients & Sales (CRM)',
+        'nav.category.mgmt': "⚙️ Steering & Lab",
+        'nav.category.analysis': "📈 Growth & Analysis",
 
         // Library & Search
         'search.placeholder': 'Search for a recipe...',
@@ -1678,6 +1722,21 @@ const TRANSLATIONS = {
         'mgmt.reason.degustation': 'Tasting / Promo',
         'mgmt.reason.peremption': 'Expired Date',
         'mgmt.toast.loss': 'Loss recorded successfully',
+
+        // Statistics Dashboard
+        'stats.dashboard.title': 'Pro Pilot Cockpit',
+        'stats.dashboard.subtitle': 'Business intelligence & real-time margin optimization.',
+        'stats.chart.margin_dist': 'Margin Distribution',
+        'stats.chart.performance': 'Top 5 Performance',
+        'stats.chart.scatter': 'Strategic Profitability Matrix',
+        'stats.kpi.avg_margin': 'Average Margin',
+        'stats.kpi.best_recipe': 'Star Performer',
+        'stats.kpi.avg_cost': 'Average Cost',
+        'stats.kpi.avg_price': 'Average Price',
+        'stats.vigilance.title': 'Vigilance Points',
+        'stats.vigilance.none': 'No alerts detected.',
+        'stats.btn.pdf': 'PDF Report',
+        'stats.btn.config': 'Settings',
 
         // Pro Management - Extended
         'mgmt.kpi.recipes': 'Active Recipes',
@@ -2992,7 +3051,7 @@ const TRANSLATIONS = {
 
         // === PRO FEATURES v4.0 ===
         // Navigation
-        'nav.category.protools': '🧰 Pro Tools',
+        'nav.category.protools': 'Pro Tools',
         'nav.protools': 'Toolbox',
 
         // Pro Tools Hub
@@ -3149,10 +3208,10 @@ const TRANSLATIONS = {
         'auth.error.taken': 'Este nombre de usuario ya está en uso.',
 
         'nav.category.creative': "💡 Taller Creativo",
-        'nav.creative.brain': "🧠 Cerebro del Chef",
-        'nav.creative.assembly': "🏗️ Simulador de Montaje",
-        'nav.creative.converter': "📏 Master Converter",
-        'nav.creative.lab': "📐 Herramientas y Equipo",
+        'nav.creative.brain': "Cerebro del Chef",
+        'nav.creative.assembly': "Simulador de Montaje",
+        'nav.creative.converter': "Master Converter",
+        'nav.creative.lab': "Herramientas y Equipo",
 
         'modal.brain.title': "🧠 Cerebro del Chef — Maridaje de Sabores",
         'modal.brain.desc': "Elija un ingrediente base y descubra las mejores combinaciones. El costo estimado se muestra al instante.",
@@ -3161,6 +3220,9 @@ const TRANSLATIONS = {
         'modal.converter.subtitle': "Geometría Culinaria",
         'modal.converter.desc': "Adapte instantáneamente las cantidades de una receta a un nuevo formato de molde.",
 
+        'nav.catalogue': 'E-Catálogo de Clientes',
+        'nav.crm': 'Clientes y Ventas (CRM)',
+        'nav.category.analysis': 'Análisis y Rendimiento',
         'nav.home': 'Inicio',
         'nav.recipes': 'Calculadora de Recetas',
         'nav.lab': 'Laboratorio',
@@ -3171,13 +3233,25 @@ const TRANSLATIONS = {
         'nav.portfolio': 'Portafolio',
         'nav.about': 'Acerca de',
         'nav.admin': 'Admin',
-        'nav.my_recipes': '📂 Mis Recetas',
-        'nav.my_profile': '👤 Mi Perfil',
-        'nav.logout': '🚪 Cerrar sesión',
+        'nav.my_recipes': 'Mis Recetas',
+        'nav.my_profile': 'Mi Perfil',
+        'nav.logout': 'Cerrar sesión',
         'nav.notifications': 'Notificaciones',
         'nav.no_notif': 'No hay nuevas notificaciones',
         'nav.suppliers': 'Proveedores',
         'nav.mgmt': 'Gestión Pro',
+        'nav.stats': 'Estadísticas',
+        'nav.orders': 'Presupuestos y Facturas',
+        'nav.planning_prod': 'Planificación',
+        'nav.traceability': 'Trazabilidad de Lotes',
+        'nav.waste': 'Pérdidas y Trazabilidad',
+        'nav.scheduler': 'Programador CAP (EP1/EP2)',
+        'nav.hub': 'Objetivos y Hub',
+        'nav.boston': 'Matriz de Boston (BCG)',
+        'nav.inflation': 'Simulador de Inflación',
+        'nav.comparator': 'Comparador Multi-Período',
+        'nav.catalogue': 'E-Catálogo de Clientes',
+        'nav.category.analysis': 'Análisis y Rendimiento',
 
         // Gestión Pro
         'mgmt.hero.badge': '💎 Excelencia Operativa',
@@ -3208,6 +3282,21 @@ const TRANSLATIONS = {
         'mgmt.reason.degustation': 'Degustación / Promo',
         'mgmt.reason.peremption': 'Fecha Caducada',
         'mgmt.toast.loss': 'Pérdida registrada con éxito',
+
+        // Statistics Dashboard
+        'stats.dashboard.title': 'Cabina de Pilotaje Pro',
+        'stats.dashboard.subtitle': 'Inteligencia comercial y optimización de márgenes en tiempo real.',
+        'stats.chart.margin_dist': 'Distribución de Márgenes',
+        'stats.chart.performance': 'Top 5 Rendimiento',
+        'stats.chart.scatter': 'Matriz de Rentabilidad Estratégica',
+        'stats.kpi.avg_margin': 'Margen Promedio',
+        'stats.kpi.best_recipe': 'Protagonista',
+        'stats.kpi.avg_cost': 'Coste Promedio',
+        'stats.kpi.avg_price': 'Precio Promedio',
+        'stats.vigilance.title': 'Puntos de Vigilancia',
+        'stats.vigilance.none': 'No se detectaron alertas.',
+        'stats.btn.pdf': 'Informe PDF',
+        'stats.btn.config': 'Ajustes',
 
         // Gestión Pro - Extendido
         'mgmt.kpi.recipes': 'Recetas Activas',
@@ -4566,7 +4655,7 @@ const TRANSLATIONS = {
 
         // === PRO FEATURES v4.0 ===
         // Navigation
-        'nav.category.protools': '🧰 Herramientas Pro',
+        'nav.category.protools': 'Herramientas Pro',
         'nav.protools': 'Caja de Herramientas',
 
         // Pro Tools Hub

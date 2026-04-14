@@ -1,4 +1,4 @@
-/*
+﻿/*
   =====================================================================
   ADVANCED-MODULES.JS — GourmetRevient v7.0
   1. 🎨 E-Catalogue Templates (Luxe, Rustique, Ardoise)

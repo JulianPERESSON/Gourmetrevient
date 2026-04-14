@@ -23,7 +23,7 @@ function loadCrm() {
     { id: 'c1', name: 'Hôtel de la Cité', contact: '06 12 34 56 78', notes: 'Livraison par l\'arrière' },
     { id: 'c2', name: 'Mme Dupont (Mariage)', contact: 'lucie@email.com', notes: 'Allergie fruits à coque' },
     { id: 'c4', name: 'CMA Muret', contact: 'lpelletier@cm-toulouse.fr', notes: 'Un chef qui maîtrise le chocolat … et les baguettes du diabolo 🪀🍫' },
-    { id: 'c5', name: 'Mr Bouvier-Gaz', contact: '', notes: 'Un chef qui lève plus son ego que ses pâtes 🥐😤' },
+    { id: 'c5', name: 'Mr Bouvier-Gaz', contact: '', notes: 'Un chef qui soigne plus son image que ses productions ✌️😎' },
     { id: 'c3', name: 'Restaurant Le Gourmet', contact: 'facturation@gourmet.fr', notes: 'Facturation fin de mois' }
   ];
   let clientsChanged = false;

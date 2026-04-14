@@ -1,4 +1,4 @@
-/*
+﻿/*
   =====================================================================
   CREATIVE-TOOLS.JS — GourmetRevient v5.0
   - Chef's Brain: Flavor Pairing Generator with Cost Analysis

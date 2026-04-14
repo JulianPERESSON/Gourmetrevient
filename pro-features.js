@@ -559,17 +559,20 @@ function _updateInflationValues(pct) {
   // Update summary pills
   const pillStatus = document.getElementById('inflationPillStatus');
   const pillLoss = document.getElementById('inflationPillLoss');
+  const avgLoss = baselines.length > 0 ? (totalMarginLoss / baselines.length) : 0;
+
   if (pillStatus) {
     if (inDanger > 0) {
       pillStatus.className = 'summary-pill danger';
-      pillStatus.textContent = `❗ ${inDanger} ${i18n.t('inflation.critical')}`;
+      pillStatus.textContent = `❗ ${inDanger} ${i18n.t('inflation.critical') || 'Recettes en danger'}`;
     } else {
       pillStatus.className = 'summary-pill safe';
-      pillStatus.textContent = `🛡️ ${i18n.t('inflation.safe')}`;
+      pillStatus.textContent = `🛡️ ${i18n.t('inflation.safe') || 'Catalogue résilient'}`;
     }
   }
   if (pillLoss) {
-    pillLoss.textContent = `📉 Perte moyenne : ${(totalMarginLoss / baselines.length).toFixed(1)}%`;
+    pillLoss.className = 'summary-pill ' + (avgLoss > 5 ? 'danger' : 'info');
+    pillLoss.textContent = `📉 Perte Moyenne : -${avgLoss.toFixed(1)} pts`;
   }
 }
 

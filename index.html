@@ -50,8 +50,8 @@
   }
   </script>
 
-  <link rel="stylesheet" href="./styles.css?v=3.5.1" />
-  <link rel="stylesheet" href="./css/premium-branding.css?v=1.0.6" />
+  <link rel="stylesheet" href="./styles.css?v=3.5.2" />
+  <link rel="stylesheet" href="./css/premium-branding.css?v=1.0.7" />
   <link rel="stylesheet" href="./css/creative-tools.css?v=1.0.1" />
   <link rel="stylesheet" href="./css/master-converter.css?v=1.0.1" />
   <link rel="stylesheet" href="./css/premium-effects.css?v=1.0.1" />
@@ -224,32 +224,32 @@
 
       <!-- Opérations Labo -->
       <div class="nav-dropdown">
-        <button class="nav-dropdown-trigger"><span data-i18n="nav.category.mgmt">Gestion & Labo</span> <span class="nav-arrow">▼</span></button>
+        <button class="nav-dropdown-trigger"><span data-i18n="nav.category.mgmt">⚙️ Pilotage & Labo</span> <span class="nav-arrow">▼</span></button>
         <div class="nav-dropdown-content">
-          <button class="nav-link nav-dropdown-link" onclick="showCRM()">🤝 Clients & Ventes (CRM)</button>
-          <button class="nav-link nav-dropdown-link" onclick="openInvoiceGenerator()">📄 Devis & Factures</button>
-          <button class="nav-link nav-dropdown-link" onclick="showMgmt(); switchMgmtTab('production');">📅 <span data-i18n="nav.planning">Planning Prod</span></button>
-          <button class="nav-link nav-dropdown-link" id="navPlanning" onclick="showPlanning()">🏝️ Équipe & Congés</button>
-          <button class="nav-link nav-dropdown-link" onclick="showInventaire()">📦 <span data-i18n="nav.inventory">Inventaire (Base Ingrédients)</span></button>
-          <button class="nav-link nav-dropdown-link" onclick="showMgmt(); switchMgmtTab('shopping');">🛒 Calculateur d'Achats</button>
-          <button class="nav-link nav-dropdown-link" onclick="showSuppliers()">🏢 <span data-i18n="nav.suppliers">Fournisseurs</span></button>
-          <button class="nav-link nav-dropdown-link" onclick="showHygiene()">🧼 <span data-i18n="nav.hygiene">Hygiène (HACCP)</span></button>
-          <button class="nav-link nav-dropdown-link" onclick="openLotTraceability()">🔬 Traçabilité des Lots</button>
-          <button class="nav-link nav-dropdown-link" onclick="showMgmt(); switchMgmtTab('quality');">📉 Pertes & Traçabilité</button>
-          <button class="nav-link nav-dropdown-link" onclick="showMgmt(); switchMgmtTab('scheduler');">🎓 Ordonnanceur CAP (EP1/EP2)</button>
+          <button class="nav-link nav-dropdown-link" id="navCrmClients">🤝 <span data-i18n="nav.crm">Clients & Ventes (CRM)</span></button>
+          <button class="nav-link nav-dropdown-link" id="navCrmOrders">📄 <span data-i18n="nav.orders">Devis & Factures</span></button>
+          <button class="nav-link nav-dropdown-link" id="navPlanningProd">📅 <span data-i18n="nav.planning_prod">Planning</span></button>
+          <button class="nav-link nav-dropdown-link" id="navPlanning">🌴 <span data-i18n="nav.team">Équipe & Congés</span></button>
+          <button class="nav-link nav-dropdown-link" id="navInventaire">📦 <span data-i18n="nav.inventory">Inventaire</span></button>
+          <button class="nav-link nav-dropdown-link" id="navShopping">🛒 <span data-i18n="nav.shopping">Calculateur d'Achats</span></button>
+          <button class="nav-link nav-dropdown-link" id="navSuppliers">🏢 <span data-i18n="nav.suppliers">Fournisseurs</span></button>
+          <button class="nav-link nav-dropdown-link" id="navHygiene">🧼 <span data-i18n="nav.hygiene">Hygiène & HACCP</span></button>
+          <button class="nav-link nav-dropdown-link" id="navScheduler">🎓 <span data-i18n="nav.scheduler">Ordonnanceur CAP (EP1/EP2)</span></button>
+          <button class="nav-link nav-dropdown-link" id="navWaste">📉 <span data-i18n="nav.waste">Pertes & Gaspillage</span></button>
+          <button class="nav-link nav-dropdown-link" id="navTrace">📋 <span data-i18n="nav.traceability">Traçabilité des Lots</span></button>
         </div>
       </div>
 
       <!-- Performance & Analyse -->
       <div class="nav-dropdown">
-        <button class="nav-dropdown-trigger">📊 <span>Analyse & Performance</span> <span class="nav-arrow">▼</span></button>
+        <button class="nav-dropdown-trigger"><span data-i18n="nav.category.analysis">📈 Croissance & Analyse</span> <span class="nav-arrow">▼</span></button>
         <div class="nav-dropdown-content">
-          <button class="nav-link nav-dropdown-link" onclick="showStats()">📊 <span data-i18n="nav.stats">Statistiques</span></button>
-          <button class="nav-link nav-dropdown-link" onclick="showMgmt(); switchMgmtTab('dashboard');">🎯 Objectifs & Hub</button>
-          <button class="nav-link nav-dropdown-link" onclick="showMgmt(); switchMgmtTab('boston');">⭐ <span data-i18n="bcg.title">Matrice BCG</span></button>
-          <button class="nav-link nav-dropdown-link" onclick="showMgmt(); switchMgmtTab('inflation');">🔥 Simulateur Inflation</button>
-          <button class="nav-link nav-dropdown-link" onclick="openInflationComparator()">📈 Comparateur Multi-Périodes</button>
-          <button class="nav-link nav-dropdown-link" onclick="generateECatalogue();">🌐 E-Catalogue Client</button>
+          <button class="nav-link nav-dropdown-link" id="navStats">📊 <span data-i18n="nav.stats">Statistiques</span></button>
+          <button class="nav-link nav-dropdown-link" id="navHubObj">🎯 <span data-i18n="nav.hub">Objectifs & Hub</span></button>
+          <button class="nav-link nav-dropdown-link" id="navBoston">⭐ <span data-i18n="nav.boston">Matrice de Boston (BCG)</span></button>
+          <button class="nav-link nav-dropdown-link" id="navInflation">🔥 <span data-i18n="nav.inflation">Simulateur Inflation</span></button>
+          <button class="nav-link nav-dropdown-link" id="navCatalogue">🌐 <span data-i18n="nav.catalogue">E-Catalogue Client</span></button>
+          <button class="nav-link nav-dropdown-link" id="navComparator">⚖️ <span data-i18n="nav.comparator">Comparateur de Prix</span></button>
         </div>
       </div>
 
@@ -257,12 +257,12 @@
       <div class="nav-dropdown">
         <button class="nav-dropdown-trigger"><span data-i18n="nav.category.creative">💡 Atelier Créatif</span> <span class="nav-arrow">▼</span></button>
         <div class="nav-dropdown-content">
-          <button class="nav-link nav-dropdown-link" onclick="openChefsBrain()"><span data-i18n="nav.creative.brain">🧠 Cerveau du Chef</span></button>
-          <button class="nav-link nav-dropdown-link" onclick="openAssemblySimulator()"><span data-i18n="nav.creative.assembly">🏗️ Simulateur Montage</span></button>
-          <button class="nav-link nav-dropdown-link" onclick="openMasterConverter()"><span data-i18n="nav.creative.converter">📏 Convertisseur de Moules</span></button>
-          <button class="nav-link nav-dropdown-link" onclick="showLabo()"><span data-i18n="nav.creative.lab">📐 Matériel & Outillage</span></button>
-          <button class="nav-link nav-dropdown-link" onclick="showPortfolio()">🖼️ <span data-i18n="nav.portfolio">Portfolio</span></button>
-          <button class="nav-link nav-dropdown-link" onclick="showAPropos()">📖 <span data-i18n="nav.about">À propos</span></button>
+          <button class="nav-link nav-dropdown-link" id="navChefsBrain">🧠 <span data-i18n="nav.creative.brain">Cerveau du Chef</span></button>
+          <button class="nav-link nav-dropdown-link" id="navAssembly">🏗️ <span data-i18n="nav.creative.assembly">Simulateur Montage</span></button>
+          <button class="nav-link nav-dropdown-link" id="navConverter">📏 <span data-i18n="nav.creative.converter">Convertisseur de Moules</span></button>
+          <button class="nav-link nav-dropdown-link" id="navLabo">📐 <span data-i18n="nav.creative.lab">Matériel & Outillage</span></button>
+          <button class="nav-link nav-dropdown-link" id="navPortfolio">🖼️ <span data-i18n="nav.portfolio">Portfolio</span></button>
+          <button class="nav-link nav-dropdown-link" id="navAbout">📖 <span data-i18n="nav.about">À propos</span></button>
         </div>
       </div>
 
@@ -538,8 +538,8 @@
       <!-- Standard Site Hero -->
       <section class="hero" style="padding-bottom: 3.5rem;">
         <div class="hero-badge" data-i18n="mgmt.hero.badge">💎 Excellence Opérationnelle</div>
-        <h2 data-i18n="mgmt.hero.title">Gestion <span class="accent">&amp; Rentabilité</span></h2>
-        <p data-i18n="mgmt.hero.desc">Optimisez vos besoins matières, surveillez vos allergènes, traquez vos pertes et suivez vos objectifs de coût.</p>
+        <h2 data-i18n="mgmt.hero.title">Gestion de <span class="accent">Production</span></h2>
+        <p data-i18n="mgmt.hero.desc">Planifiez vos fournées, gérez vos stocks et suivez vos allergènes réglementaires.</p>
       </section>
 
       <div class="mgmt-container hero-mgmt-overlap">
@@ -570,8 +570,8 @@
         <!-- Premium Pill Tabs for ERP Hub -->
         <div class="mgmt-tabs-premium">
           <button class="mgmt-tab-pill active" id="mgmtTabDashboard" onclick="switchMgmtTab('dashboard')">
-            <span class="tab-pill-emoji">🎯</span>
-            <span data-i18n="mgmt.tab.dashboard">Objectifs & Hub</span>
+            <span class="tab-pill-emoji">📊</span>
+            <span data-i18n="nav.stats">Tableau de Bord</span>
           </button>
           <button class="mgmt-tab-pill" id="mgmtTabProduction" onclick="switchMgmtTab('production')">
             <span class="tab-pill-emoji">📅</span>
@@ -582,148 +582,17 @@
             <span data-i18n="mgmt.tab.shopping">Appro & Besoins</span>
           </button>
           <button class="mgmt-tab-pill" id="mgmtTabQuality" onclick="switchMgmtTab('quality')">
-            <span class="tab-pill-emoji">🛡️</span>
-            <span data-i18n="mgmt.tab.quality">Traçabilité & Pertes</span>
+            <span class="tab-pill-emoji">🧼</span>
+            <span data-i18n="mgmt.tab.quality">Qualité & Pertes</span>
+          </button>
+          <button class="mgmt-tab-pill" id="mgmtTabScheduler" onclick="switchMgmtTab('scheduler')">
+            <span class="tab-pill-emoji">🎓</span>
+            <span data-i18n="mgmt.tab.scheduler">Simulateur Examen</span>
           </button>
           <button class="mgmt-tab-pill" id="mgmtTabProTools" onclick="switchMgmtTab('protools')">
             <span class="tab-pill-emoji">🛠️</span>
             <span data-i18n="mgmt.tab.protools">Outils Pro (INCO/OCR)</span>
           </button>
-          <button class="mgmt-tab-pill" id="mgmtTabScheduler" onclick="switchMgmtTab('scheduler')">
-            <span class="tab-pill-emoji">🎓</span>
-            <span data-i18n="mgmt.tab.scheduler">Ordonnanceur CAP</span>
-          </button>
-        </div>
-
-        <!-- TAB: DASHBOARD (Merged Stats + Objectives) -->
-        <div id="mgmtViewDashboard" class="mgmt-view" style="display:none;">
-          <!-- Section: Filters & Actions -->
-          <div class="stats-filter-bar" style="margin-bottom: 2rem;">
-            <div class="stats-filter-card">
-              <span class="stats-filter-label" data-i18n="stats.filter_by" style="white-space: nowrap;">Filtrer par catégorie :</span>
-              <div id="statsCategoryFilters" style="display: flex; gap: 10px; flex-wrap: wrap;">
-                <button class="stats-toggle-btn active" onclick="filterStatsCat('all')" data-cat="all" data-i18n="ui.all">Toutes</button>
-              </div>
-            </div>
-            <button class="btn btn-primary" onclick="exportStatsPDF()" style="flex-shrink: 0;">
-              <span style="font-size: 1.2rem;">📄</span> <span data-i18n="stats.btn.export">Exporter le Rapport</span>
-            </button>
-          </div>
-
-          <!-- Automatic Insights -->
-          <div class="insight-box" style="margin-bottom: 2rem;">
-            <div class="insight-icon">📊</div>
-            <div class="insight-text">
-              <h4 data-i18n="stats.insight.title">Analyse Stratégique Automatique</h4>
-              <p id="statsInsightText" data-i18n="stats.insight.loading">Calcul en cours...</p>
-            </div>
-          </div>
-
-          <!-- Charts Grid -->
-          <div class="stats-main-grid" style="margin-bottom: 2rem;">
-            <div class="dash-card col-span-4">
-              <div class="dash-card-header">
-                <h3 class="dash-card-title" data-i18n="stats.margin_dist">Répartition des Marges</h3>
-              </div>
-              <div style="height: 300px; display: flex; align-items: center; justify-content: center;">
-                <canvas id="v2MarginChart"></canvas>
-              </div>
-            </div>
-            <div class="dash-card col-span-8">
-              <div class="dash-card-header">
-                <h3 class="dash-card-title" data-i18n="stats.top_profitable">Performance des Recettes</h3>
-                <div class="stats-toggle-group">
-                  <button class="stats-toggle-btn active" id="toggleTopProfitable" data-i18n="stats.toggle.top">Top 5 Rentables</button>
-                  <button class="stats-toggle-btn" id="toggleWorstProfitable" data-i18n="stats.toggle.worst">Top 5 à améliorer</button>
-                </div>
-              </div>
-              <div style="height: 300px;">
-                <canvas id="v2PerformanceChart"></canvas>
-              </div>
-            </div>
-          </div>
-
-          <!-- Objectives & Breaking Point -->
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
-            <div class="mgmt-glass-card">
-              <div class="mgmt-card-header">
-                <div class="mgmt-card-title">
-                  <div class="title-icon icon-blue">🎯</div>
-                  <h3 data-i18n="mgmt.objectives.title" style="margin:0;">Objectifs de Rentabilité</h3>
-                </div>
-              </div>
-              <div class="mgmt-objectives-grid" id="objectivesGrid"></div>
-            </div>
-
-            <div class="mgmt-glass-card">
-              <div class="mgmt-card-header">
-                <div class="mgmt-card-title">
-                  <div class="title-icon icon-yellow">🧀</div>
-                  <h3 data-i18n="mgmt.bp.title" style="margin:0;">Seuil de Rentabilité</h3>
-                </div>
-              </div>
-                <div style="padding: 1.5rem;">
-                  <div style="text-align: center; margin-bottom: 1.5rem;">
-                    <div id="bpTargetRevenue" style="font-size: 2.5rem; font-weight: 900; color: var(--success);">-- €</div>
-                    <div style="font-size: 0.8rem; color: var(--text-muted); text-transform:uppercase; font-weight:700;" data-i18n="mgmt.bp.target_revenue">Chiffre d'Affaires Cible</div>
-                  </div>
-                  
-                  <div style="background: var(--bg-alt); padding: 1.2rem; border-radius: var(--radius); font-size: 0.9rem; margin-bottom: 1rem;">
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.8rem; border-bottom: 1px dashed var(--surface-border); padding-bottom: 0.5rem;">
-                      <span data-i18n="mgmt.bp.fixed_costs">Total Charges Fixes :</span>
-                      <strong id="bpTotalFixed">-- €</strong>
-                    </div>
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.8rem;">
-                      <span data-i18n="mgmt.bp.avg_margin">Taux de Marge Moyen :</span>
-                      <strong id="bpAvgMargin">-- %</strong>
-                    </div>
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-                      <span data-i18n="mgmt.bp.daily">Soit par jour (sur 24j) :</span>
-                      <strong id="bpDailyRevenue">-- €</strong>
-                    </div>
-                  </div>
-
-                  <p style="color: var(--text-muted); margin: 0; line-height: 1.4; font-size: 0.85rem; padding: 0 0.5rem;" data-i18n="mgmt.bp.explanation">
-                    Ce montant correspond au moment exact où votre laboratoire commence à gagner de l'argent (bénéfice net > 0). Ce calcul est basé sur la moyenne de marge de vos recettes.
-                  </p>
-                  
-                  <button class="btn btn-sm btn-outline btn-full" onclick="switchMgmtTab('dashboard_config')" style="margin-top: 1.5rem;">🛠️ Configurer mes charges fixes</button>
-                </div>
-            </div>
-          </div>
-
-
-        </div>
-
-        <!-- TAB: DASHBOARD CONFIG (Hidden sub-tab) -->
-        <div id="mgmtViewDashboardConfig" class="mgmt-view" style="display:none;">
-           <div class="mgmt-glass-card">
-              <div class="mgmt-card-header">
-                <button class="btn btn-sm btn-outline" style="border-radius:20px; padding:6px 15px;" onclick="switchMgmtTab('dashboard')">← Retour</button>
-                <h3 data-i18n="mgmt.bp.fixed_costs" style="margin:0; flex:1; text-align:center;">Configuration des Charges Fixes</h3>
-              </div>
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; padding: 2rem;">
-                <div class="form-group">
-                  <label class="form-label" data-i18n="mgmt.bp.rent">Loyer & Assurances (€)</label>
-                  <input type="number" id="bpRent" class="form-input" value="1500" oninput="calculateBreakingPoint()">
-                </div>
-                <div class="form-group">
-                  <label class="form-label" data-i18n="mgmt.bp.salaries">Salaires & Charges (€)</label>
-                  <input type="number" id="bpSalaries" class="form-input" value="5000" oninput="calculateBreakingPoint()">
-                </div>
-                <div class="form-group">
-                  <label class="form-label" data-i18n="mgmt.bp.energy">Énergie & Eau (€)</label>
-                  <input type="number" id="bpEnergy" class="form-input" value="800" oninput="calculateBreakingPoint()">
-                </div>
-                <div class="form-group">
-                  <label class="form-label" data-i18n="mgmt.bp.other">Autres frais fixes (€)</label>
-                  <input type="number" id="bpOther" class="form-input" value="400" oninput="calculateBreakingPoint()">
-                </div>
-              </div>
-              <div style="padding: 1.5rem; text-align: center; border-top: 1px solid var(--surface-border);">
-                <button class="btn btn-primary" style="padding: 10px 30px;" onclick="switchMgmtTab('dashboard')">Enregistrer et fermer</button>
-              </div>
-           </div>
         </div>
 
         <!-- TAB 1: SHOPPING LIST -->
@@ -794,188 +663,238 @@
           </div>
         </div>
 
-        <!-- TAB: SCHEDULER -->
-        <div id="mgmtViewScheduler" class="mgmt-view" style="display:none;">
-          <div class="mgmt-glass-card">
-            <div class="mgmt-card-header">
-              <div class="mgmt-card-title">
-                <div class="title-icon icon-gold">🎓</div>
-                <div>
-                  <h3 data-i18n="scheduler.title">Ordonnanceur Tactique CAP</h3>
-                  <p data-i18n="scheduler.desc">Générez un plan de travail optimisé pour vos examens EP1 et EP2.</p>
-                </div>
-              </div>
+        <!-- TAB 3: WASTE TRACKING -->
+         <div id="mgmtViewQuality" class="mgmt-view" style="display:none;">
+            <div class="premium-app-layout" style="display:grid; grid-template-columns: 280px 1fr; min-height: 700px; background: rgba(255,255,255,0.4); backdrop-filter: blur(20px); border-radius: 30px; border: 1px solid rgba(255,255,255,0.5); overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.1);">
+               
+               <!-- Sidebar Sidebar -->
+               <aside class="premium-sidebar" style="background: rgba(255,255,255,0.3); border-right: 1px solid rgba(197, 165, 90, 0.1); padding: 2rem 1.5rem;">
+                  <div style="margin-bottom: 2.5rem; padding: 0 0.5rem;">
+                     <h3 style="margin:0; font-family:var(--font-display); font-size:1.2rem; color:var(--primary);">🛡️ Qualité Pro</h3>
+                     <p style="font-size:0.75rem; color:var(--text-muted); margin:5px 0 0 0;">Maîtrise des pertes & INCO</p>
+                  </div>
+                  
+                  <nav style="display:flex; flex-direction:column; gap:0.5rem;">
+                     <button class="sidebar-pill active" onclick="switchQualitySubTab('waste-dash')" style="display:flex; align-items:center; gap:12px; width:100%; padding:1rem; border:none; background:none; border-radius:15px; cursor:pointer; transition:all 0.3s;">
+                        <span style="font-size:1.2rem;">📊</span>
+                        <span style="font-weight:700; font-size:0.9rem; color:var(--text-main);">Cockpit Pertes</span>
+                     </button>
+                     <button class="sidebar-pill" onclick="switchQualitySubTab('waste-log')" style="display:flex; align-items:center; gap:12px; width:100%; padding:1rem; border:none; background:none; border-radius:15px; cursor:pointer; transition:all 0.3s;">
+                        <span style="font-size:1.2rem;">🖍️</span>
+                        <span style="font-weight:700; font-size:0.9rem; color:var(--text-main);">Saisie Signalement</span>
+                     </button>
+                     <button class="sidebar-pill" onclick="switchQualitySubTab('allergens')" style="display:flex; align-items:center; gap:12px; width:100%; padding:1rem; border:none; background:none; border-radius:15px; cursor:pointer; transition:all 0.3s;">
+                        <span style="font-size:1.2rem;">⚖️</span>
+                        <span style="font-weight:700; font-size:0.9rem; color:var(--text-main);">Matrice Allergènes</span>
+                     </button>
+                     <button class="sidebar-pill" onclick="switchQualitySubTab('history')" style="display:flex; align-items:center; gap:12px; width:100%; padding:1rem; border:none; background:none; border-radius:15px; cursor:pointer; transition:all 0.3s;">
+                        <span style="font-size:1.2rem;">📜</span>
+                        <span style="font-weight:700; font-size:0.9rem; color:var(--text-main);">Historique Complet</span>
+                     </button>
+                  </nav>
+
+                  <div style="margin-top:auto; padding:1.5rem; background:linear-gradient(135deg, rgba(197, 165, 90, 0.1), rgba(197, 165, 90, 0.05)); border-radius:20px; border:1px solid rgba(197, 165, 90, 0.1);">
+                     <div style="font-size:0.85rem; font-weight:800; color:var(--primary); margin-bottom:8px;">💡 Conseil du Chef</div>
+                     <p style="font-size:0.75rem; color:var(--text-muted); line-height:1.5; margin:0;">"Une perte déclarée est une marge retrouvée. Analysez vos motifs pour ajuster vos commandes."</p>
+                  </div>
+               </aside>
+
+               <!-- Main Content Area -->
+               <main style="padding: 2.5rem; overflow-y: auto; max-height: 800px;">
+                  
+                  <!-- Sub-View: Dashboard -->
+                  <div id="qualityViewWasteDash" class="quality-subview">
+                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2.5rem;">
+                        <div>
+                           <h2 style="margin:0; font-family:var(--font-display); font-size:1.8rem; background: linear-gradient(90deg, var(--primary), var(--gold-dark)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Poste de Pilotage Qualité</h2>
+                           <p style="color:var(--text-muted); margin:5px 0 0 0;">Analyse financière et performance anti-gaspi.</p>
+                        </div>
+                        <div style="display:flex; gap:10px;">
+                           <button class="btn btn-primary" onclick="switchQualitySubTab('waste-log')" style="border-radius:12px; padding:0.8rem 1.5rem; font-weight:700;">+ Nouvelle Perte</button>
+                        </div>
+                     </div>
+
+                     <!-- KPI Row -->
+                     <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:1.5rem; margin-bottom:2.5rem;">
+                        <div class="v2-kpi-card danger" style="background: white; padding: 1.8rem; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.03);">
+                           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+                              <span style="font-size:0.75rem; font-weight:800; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px;">Valeur des Pertes</span>
+                              <span style="font-size:1.5rem;">💸</span>
+                           </div>
+                           <div style="font-size:2rem; font-weight:900; color:var(--danger);" id="totalWasteValue">0.00 €</div>
+                           <div style="font-size:0.75rem; color:var(--text-muted); margin-top:8px;">Cumul mensuel brut</div>
+                        </div>
+                        <div class="v2-kpi-card warning" style="background: white; padding: 1.8rem; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.03);">
+                           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+                              <span style="font-size:0.75rem; font-weight:800; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px;">Érosion Marge</span>
+                              <span style="font-size:1.5rem;">🎯</span>
+                           </div>
+                           <div style="font-size:2rem; font-weight:900; color:var(--secondary);" id="impactMarginValue">-0.00%</div>
+                           <div style="font-size:0.75rem; color:var(--text-muted); margin-top:8px;">Impact sur bénéfice réel</div>
+                        </div>
+                        <div class="v2-kpi-card info" style="background: white; padding: 1.8rem; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.03);">
+                           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+                              <span style="font-size:0.75rem; font-weight:800; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px;">Volume Alertes</span>
+                              <span style="font-size:1.5rem;">📋</span>
+                           </div>
+                           <div style="font-size:2rem; font-weight:900; color:var(--primary);" id="totalWasteCount">0</div>
+                           <div style="font-size:0.75rem; color:var(--text-muted); margin-top:8px;">Nombre de déclarations</div>
+                        </div>
+                     </div>
+
+                     <div style="display:grid; grid-template-columns: 1fr 1fr; gap:2rem;">
+                        <div class="mgmt-glass-card" style="padding: 2rem; background: white; border-radius:24px;">
+                           <h3 style="margin:0 0 1.5rem 0; font-family:var(--font-display); font-size:1.2rem; color:var(--primary);">📊 Répartition par Cause</h3>
+                           <div style="height:280px; position:relative;">
+                              <canvas id="wasteChartCanvas"></canvas>
+                           </div>
+                        </div>
+                        <div class="mgmt-glass-card" style="padding: 2rem; background: white; border-radius:24px;">
+                           <h3 style="margin:0 0 1.5rem 0; font-family:var(--font-display); font-size:1.2rem; color:var(--primary);">📋 Rapport d'Analyse</h3>
+                           <div id="wasteMonthlyReport">
+                              <!-- JS Populated -->
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+
+                  <!-- Sub-View: Log Entry -->
+                  <div id="qualityViewWasteLog" class="quality-subview" style="display:none;">
+                     <div style="margin-bottom:2.5rem;">
+                        <h2 style="margin:0; font-family:var(--font-display); font-size:1.8rem; color:var(--primary);">🖍️ Saisie de Signalement</h2>
+                        <p style="color:var(--text-muted); margin:5px 0 0 0;">Enregistrez une perte, une casse ou une dégustation technique.</p>
+                     </div>
+                     <div class="mgmt-glass-card" style="max-width: 600px; padding: 2.5rem; background: white; border-radius: 30px; margin: 0 auto; box-shadow: 0 20px 40px rgba(0,0,0,0.05);">
+                        <div class="form-group" style="margin-bottom:1.5rem;">
+                           <label style="font-size:0.8rem; font-weight:800; color:var(--text-muted); text-transform:uppercase; margin-bottom:0.8rem; display:block;">Produit / Recette concerné</label>
+                           <select id="wasteRecipeSelect" class="form-input" style="width:100%; height:50px; border-radius:15px; border:2px solid rgba(197,165,90,0.1); font-size:1rem; font-weight:600;"></select>
+                        </div>
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1.5rem; margin-bottom:1.5rem;">
+                           <div class="form-group">
+                              <label style="font-size:0.8rem; font-weight:800; color:var(--text-muted); text-transform:uppercase; margin-bottom:0.8rem; display:block;">Quantité (Portions)</label>
+                              <input type="number" id="wasteQty" class="form-input" value="1" min="1" style="width:100%; height:50px; border-radius:15px; border:2px solid rgba(197,165,90,0.1); font-size:1.1rem; font-weight:800;">
+                           </div>
+                           <div class="form-group">
+                              <label style="font-size:0.8rem; font-weight:800; color:var(--text-muted); text-transform:uppercase; margin-bottom:0.8rem; display:block;">Motif du signalement</label>
+                              <select id="wasteReason" class="form-input" style="width:100%; height:50px; border-radius:15px; border:2px solid rgba(197,165,90,0.1); font-weight:700;">
+                                 <option value="invendu">🥐 Invendu (Surproduction)</option>
+                                 <option value="casse">💥 Casse / Erreur technique</option>
+                                 <option value="degustation">🥄 Dégustation / Client</option>
+                                 <option value="peremption">⏰ Périmé / Stock</option>
+                              </select>
+                           </div>
+                        </div>
+                        <div class="form-group" style="margin-bottom:2.5rem;">
+                           <label style="font-size:0.8rem; font-weight:800; color:var(--text-muted); text-transform:uppercase; margin-bottom:0.8rem; display:block;">Notes additionnelles</label>
+                           <input type="text" id="wasteNotes" class="form-input" placeholder="Détails (ex: Panne four, lot n°12...)" style="width:100%; height:50px; border-radius:15px; border:2px solid rgba(197,165,90,0.1);">
+                        </div>
+                        <button class="btn btn-primary btn-full" onclick="logWaste()" style="padding:1.2rem; font-weight:900; font-size:1.1rem; border-radius:20px; box-shadow: 0 10px 30px rgba(197, 165, 90, 0.4);">
+                           🚀 Enregistrer le Signalement
+                        </button>
+                     </div>
+                  </div>
+
+                  <!-- Sub-View: Allergens -->
+                  <div id="qualityViewAllergens" class="quality-subview" style="display:none;">
+                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2.5rem;">
+                        <div>
+                           <h2 style="margin:0; font-family:var(--font-display); font-size:1.8rem; color:var(--primary);">⚖️ Matrice des Allergènes</h2>
+                           <p style="color:var(--text-muted); margin:5px 0 0 0;">Conformité règlement INCO - 14 allergènes majeurs.</p>
+                        </div>
+                        <button class="btn btn-outline" onclick="window.print()">🖨️ Imprimer Registre</button>
+                     </div>
+                     <div class="mgmt-glass-card" style="padding:2rem; background:white; border-radius:24px; overflow-x:auto;">
+                        <table id="allergenMatrixTable" class="mgmt-table" style="width:100%; border-collapse: collapse;">
+                           <!-- JS populated -->
+                        </table>
+                     </div>
+                  </div>
+
+                  <!-- Sub-View: History -->
+                  <div id="qualityViewHistory" class="quality-subview" style="display:none;">
+                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2.5rem;">
+                        <div>
+                           <h2 style="margin:0; font-family:var(--font-display); font-size:1.8rem; color:var(--primary);">📜 Historique des Événements</h2>
+                           <p style="color:var(--text-muted); margin:5px 0 0 0;">Traçabilité complète des pertes et incidents qualité.</p>
+                        </div>
+                        <button class="btn btn-outline" onclick="exportWasteHistory()">📂 Exporter CSV</button>
+                     </div>
+                     <div id="wasteHistoryList" style="display:flex; flex-direction:column; gap:1rem;">
+                        <!-- JS populated -->
+                     </div>
+                  </div>
+
+               </main>
             </div>
+         </div>
 
-            <div class="scheduler-config-grid" style="margin-top: 1.5rem;">
-              <div class="scheduler-setup">
-                <h4 data-i18n="scheduler.choose_exam">1. Choisissez votre épreuve</h4>
-                <div class="exam-type-selectors" style="display: flex; gap: 1rem; margin: 1rem 0;">
-                  <label class="stats-toggle-btn">
-                    <input type="radio" name="examType" value="EP1" onchange="switchExamType('EP1')" checked style="display:none;">
-                    <span data-i18n="scheduler.ep1">EP1: Tour & Gâteaux de voyage</span>
-                  </label>
-                  <label class="stats-toggle-btn">
-                    <input type="radio" name="examType" value="EP2" onchange="switchExamType('EP2')" style="display:none;">
-                    <span data-i18n="scheduler.ep2">EP2: Entremets & Choux</span>
-                  </label>
-                </div>
-
-                <h4 data-i18n="scheduler.choose_recipes" style="margin-top:2rem;">2. Sélectionnez vos sujets</h4>
-                <div id="schedulerRecipeList" class="scheduler-recipe-list">
-                  <!-- Populated by JS -->
-                </div>
-
-                <button class="btn btn-primary btn-full" style="margin-top: 1.5rem;" onclick="generateSchedule()" data-i18n="scheduler.btn_generate">
-                  🚀 Générer mon Chronogramme
-                </button>
-              </div>
-
-              <div id="schedulerResult" style="margin-top:2rem;">
-                <div class="empty-state" style="text-align:center; color:var(--text-muted); padding:4rem 0;">
-                  <div style="font-size:3rem; margin-bottom:1rem;">📋</div>
-                  <p>Sélectionnez vos recettes puis cliquez sur « Générer » pour voir le chronogramme Gantt.</p>
-                </div>
-              </div>
+        <!-- TAB: ALLERGENS MATRIX -->
+        <div id="mgmtViewAllergens" class="mgmt-view" style="display:none;">
+          <div class="mgmt-glass-card" style="padding:2rem;">
+            <div class="mgmt-card-header header-centered">
+               <div class="mgmt-card-title">
+                  <div class="title-icon icon-green">🛡️</div>
+                  <div>
+                    <h3 data-i18n="mgmt.allergens.title">Matrice des Allergènes (Règlement INCO)</h3>
+                    <p data-i18n="mgmt.allergens.desc">Suivi automatique des 14 allergènes majeurs pour l'affichage obligatoire.</p>
+                  </div>
+               </div>
+               <button class="btn btn-outline" onclick="window.print()">🖨️ Imprimer le registre</button>
+            </div>
+            
+            <div class="allergen-matrix-scroller" style="overflow-x:auto; margin-top:1.5rem; border-radius:12px; border:1px solid var(--surface-border);">
+               <table id="allergenMatrixTable" class="mgmt-table" style="width:100%; font-size:0.8rem;">
+                  <!-- JS Generates this -->
+               </table>
+            </div>
+            
+            <div style="margin-top:1.5rem; padding:1rem; background:rgba(16,185,129,0.05); border-radius:10px; font-size:0.85rem; color:#065f46;">
+               <strong>💡 Note réglementaire :</strong> Cette matrice est générée à partir des ingrédients déclarés dans vos recettes. Assurez-vous de la conformité de vos fiches techniques.
             </div>
           </div>
         </div>
 
-        <!-- TAB 2: ALLERGEN MATRIX -->
-        <div id="mgmtViewAllergens" class="mgmt-view" style="display:none;">
-          <div class="mgmt-glass-card">
+        <!-- TAB: EXAM SCHEDULER (Ordonnanceur) -->
+        <div id="mgmtViewScheduler" class="mgmt-view" style="display:none;">
+          <div class="mgmt-glass-card scheduler-setup">
             <div class="mgmt-card-header header-centered">
               <div class="mgmt-card-title">
-                <div class="title-icon icon-red">🛡️</div>
+                <div class="title-icon icon-purple">🎓</div>
                 <div>
-                  <h3 data-i18n="mgmt.allergens.title">Matrice Réglementaire des Allergènes</h3>
-                  <p data-i18n="mgmt.allergens.subtitle">Mise à jour automatique selon vos recettes — Conforme INCO (UE) n°1169/2011</p>
+                  <h3 data-i18n="mgmt.scheduler.title">Simulateur d'Examen CAP</h3>
+                  <p data-i18n="mgmt.scheduler.desc">Élaborez votre chronogramme d'examen (4h30) en combinant les épreuves de votre choix.</p>
                 </div>
-              </div>
-              <button class="btn btn-sm btn-outline" onclick="window.print()" data-i18n="ui.btn.print">🖨️ Imprimer</button>
-            </div>
-            <div class="table-responsive">
-              <table class="allergen-matrix-premium" id="allergenMatrixTable">
-                <!-- Generated by JS -->
-              </table>
-            </div>
-            <div class="allergen-legend" id="allergenLegend">
-              <div class="allergen-legend-item">
-                <span class="allergen-badge present" style="width:20px;height:20px;font-size:0.7rem;">●</span>
-                <span data-i18n="mgmt.allergens.present">Présent dans la recette</span>
-              </div>
-              <div class="allergen-legend-item">
-                <span class="allergen-badge absent" style="width:20px;height:20px;font-size:0.7rem;">—</span>
-                <span data-i18n="mgmt.allergens.absent">Non détecté</span>
-              </div>
-              <div class="allergen-legend-item">
-                <span style="font-size:0.85rem;">ℹ️</span>
-                <span data-i18n="mgmt.allergens.disclaimer">Vérifiez auprès de vos fournisseurs pour les traces éventuelles</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- TAB 3: WASTE TRACKING -->
-        <div id="mgmtViewWaste" class="mgmt-view" style="display:none;">
-          <div class="mgmt-waste-grid">
-            <!-- Left Column: Form & History -->
-            <div style="display:flex; flex-direction:column; gap:1.5rem;">
-              <div class="mgmt-glass-card">
-                <div class="mgmt-card-header header-centered">
-                <div class="mgmt-card-title">
-                  <div class="title-icon icon-red">🚨</div>
-                  <div>
-                    <h3 data-i18n="mgmt.waste.title">Déclarer une Perte</h3>
-                    <p data-i18n="mgmt.waste.title_desc">Enregistrez chaque perte pour un suivi précis</p>
-                  </div>
-                </div>
-              </div>
-              <div class="waste-declare-form">
-                <div class="form-group">
-                  <label data-i18n="mgmt.waste.recipe">Recette concernée</label>
-                  <select id="wasteRecipeSelect" class="form-select"></select>
-                </div>
-                <div class="form-group">
-                  <label data-i18n="mgmt.waste.qty">Quantité perdue (Portions)</label>
-                  <input type="number" id="wasteQty" class="form-input" value="1" min="1">
-                </div>
-                <div class="form-group">
-                  <label data-i18n="mgmt.waste.reason">Cause</label>
-                  <select id="wasteReason" class="form-select">
-                    <option value="invendu" data-i18n="mgmt.reason.invendu">Invendu</option>
-                    <option value="casse" data-i18n="mgmt.reason.casse">Casse / Erreur technique</option>
-                    <option value="degustation" data-i18n="mgmt.reason.degustation">Dégustation / Promo</option>
-                    <option value="peremption" data-i18n="mgmt.reason.peremption">Date dépassée</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label data-i18n="mgmt.waste.notes">Notes (optionnel)</label>
-                  <input type="text" id="wasteNotes" class="form-input" placeholder="Ex: lot n°245">
-                </div>
-                <button class="btn btn-primary btn-full" onclick="logWaste()" data-i18n="mgmt.waste.save">🚨 Enregistrer la perte</button>
               </div>
             </div>
             
-            <!-- History Moved Under Form -->
-            <div class="mgmt-glass-card">
-              <div class="mgmt-card-title" style="margin-bottom:1rem;">
-                <div class="title-icon icon-orange">📜</div>
-                <div><h3 data-i18n="mgmt.waste.history">Historique Récent</h3></div>
+            <div style="padding:1.5rem; background:var(--bg-alt); border-radius:12px; margin:1rem 0;">
+              <h4 style="margin-top:0; font-size:1rem;">1. Choisissez votre sujet d'examen</h4>
+              <div class="exam-type-selectors">
+                 <label class="stats-toggle-btn">
+                   <input type="radio" name="examType" value="EP1" checked onclick="switchExamType('EP1')">
+                   <span>EP1 : Entremets & Petits Fours</span>
+                 </label>
+                 <label class="stats-toggle-btn">
+                   <input type="radio" name="examType" value="EP2" onclick="switchExamType('EP2')">
+                   <span>EP2 : Tartes, Choux & Feuilletage</span>
+                 </label>
               </div>
-              <div id="wasteHistoryList" style="max-height:260px; overflow-y:auto; border-radius:var(--radius); border:1px solid var(--surface-border); background:var(--bg-alt);">
+              
+              <h4 style="margin:1.5rem 0 0.8rem 0; font-size:1rem;">2. Sélectionnez les recettes du sujet</h4>
+              <div id="schedulerRecipeList">
+                <!-- JS Populated -->
+              </div>
+              
+              <div style="margin-top:2rem; text-align:center;">
+                <button class="btn btn-primary" style="padding:1rem 3rem; font-size:1rem; border-radius:12px;" onclick="generateSchedule()">
+                  ⚡ Générer l'Ordonnancement Optimisé
+                </button>
               </div>
             </div>
           </div>
 
-          <!-- Right: Analysis Panel -->
-            <div style="display:flex; flex-direction:column; gap:1.5rem;">
-              <!-- Waste Stats KPIs -->
-              <div class="waste-stats-row">
-                <div class="waste-stat-card" style="background:rgba(239,68,68,0.04); border-color:rgba(239,68,68,0.12);">
-                  <div class="ws-icon">💸</div>
-                  <div class="ws-value" id="totalWasteValue" style="color:#ef4444;">0.00 €</div>
-                  <div class="ws-label" data-i18n="mgmt.waste.total">Valeur Totale</div>
-                </div>
-                <div class="waste-stat-card" style="background:rgba(245,158,11,0.04); border-color:rgba(245,158,11,0.12);">
-                  <div class="ws-icon">📊</div>
-                  <div class="ws-value" id="impactMarginValue" style="color:#f59e0b;">-0.00%</div>
-                  <div class="ws-label" data-i18n="mgmt.waste.impact">Impact Marge</div>
-                </div>
-                <div class="waste-stat-card" style="background:rgba(99,102,241,0.04); border-color:rgba(99,102,241,0.12);">
-                  <div class="ws-icon">📋</div>
-                  <div class="ws-value" id="totalWasteCount" style="color:#6366f1;">0</div>
-                  <div class="ws-label" data-i18n="mgmt.waste.count">Total Déclarations</div>
-                </div>
-              </div>
-
-              <!-- Chart + Monthly Report Side by Side -->
-              <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; align-items:stretch;">
-                <div class="mgmt-glass-card" style="display:flex; flex-direction:column;">
-                  <div class="mgmt-card-title" style="margin-bottom:1rem;">
-                    <div class="title-icon icon-purple">📊</div>
-                    <div><h3 data-i18n="mgmt.waste.chart_title">Répartition par Cause</h3></div>
-                  </div>
-                  <div class="waste-chart-container" style="flex:1; display:flex; align-items:center;">
-                    <canvas id="wasteChartCanvas"></canvas>
-                  </div>
-                </div>
-                
-                <!-- Waste Monthly Report -->
-                <div class="mgmt-glass-card" style="display:flex; flex-direction:column;">
-                  <div class="mgmt-card-header header-centered" style="margin-bottom:0.8rem;">
-                    <div class="mgmt-card-title">
-                      <div class="title-icon icon-purple">💡</div>
-                      <div>
-                        <h3>Rapport Mensuel</h3>
-                        <p style="font-size:0.75rem;">Recommandations automatiques</p>
-                      </div>
-                    </div>
-                  </div>
-                  <div id="wasteMonthlyReport" style="flex:1;"></div>
-                </div>
-              </div>
-            </div>
+          <div id="schedulerResult" style="margin-top:2rem;">
+            <!-- Gantt Chart Rendered here -->
           </div>
         </div>
 
@@ -1058,49 +977,174 @@
 
 
 
-        <!-- TAB 6: BCG MATRIX -->
-        <div id="mgmtViewBoston" class="mgmt-view" style="display:none;">
-          <div class="mgmt-glass-card">
-            <div class="mgmt-card-header header-centered">
-              <div class="mgmt-card-title">
-                <div class="title-icon icon-purple">📊</div>
-                <div>
-                  <h3 data-i18n="bcg.title">Matrice de Boston (BCG)</h3>
-                  <p data-i18n="bcg.desc">Classez vos recettes en Stars, Vaches à Lait, Dilemmes et Poids Morts</p>
-                </div>
+
+
+        <!-- TAB: DASHBOARD V2 -->
+        <div id="mgmtViewDashboard" class="mgmt-view">
+          <div class="stats-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2rem; flex-wrap:wrap; gap:1rem;">
+            <div>
+              <h2 style="margin:0; font-family:var(--font-display); font-size:1.8rem; color:var(--primary);" data-i18n="stats.dashboard.title">📊 Cockpit de Pilotage Pro</h2>
+              <p style="color:var(--text-muted); margin:0; font-size:0.9rem;" data-i18n="stats.dashboard.subtitle">Intelligence commerciale & optimisation des marges en temps réel.</p>
+            </div>
+            <div style="display:flex; gap:0.8rem; align-items:center;">
+              <div id="statsCategoryFilters" class="stats-toggle-group">
+                 <!-- JS Populated -->
               </div>
+              <button class="btn btn-sm btn-outline" onclick="switchMgmtTab('dashboard_config')" title="Paramètres">⚙️</button>
+              <button class="btn btn-sm btn-primary" onclick="exportStatsPDF()">📄 Rapport PDF</button>
             </div>
-            <div style="height:400px; position:relative; margin-bottom:1.5rem;">
-              <canvas id="bcgChartCanvas"></canvas>
+          </div>
+
+          <!-- KPI Row -->
+          <div class="stats-kpi-grid-v2" style="display:grid; grid-template-columns: repeat(4, 1fr); gap:1rem; margin-bottom:2rem;">
+             <div class="v2-kpi-card">
+               <span class="v2-kpi-label">📈 <span data-i18n="stats.kpi.avg_margin">Marge Moyenne</span></span>
+               <span class="v2-kpi-value" id="v2KpiAvgMargin">0%</span>
+               <div class="v2-kpi-footer">Cible: > 70%</div>
+             </div>
+             <div class="v2-kpi-card success">
+               <span class="v2-kpi-label">💎 <span data-i18n="stats.kpi.best_recipe">Star Performeur</span></span>
+               <span class="v2-kpi-value" id="v2KpiBestRecipe" style="font-size:1.4rem;">...</span>
+               <div class="v2-kpi-footer">Top rentabilité</div>
+             </div>
+             <div class="v2-kpi-card info">
+               <span class="v2-kpi-label">⚖️ <span data-i18n="stats.kpi.avg_cost">Coût Moyen</span></span>
+               <span class="v2-kpi-value" id="v2KpiAvgCost" style="font-size:1.8rem;">0.00 €</span>
+               <div class="v2-kpi-footer">Par portion</div>
+             </div>
+             <div class="v2-kpi-card">
+               <span class="v2-kpi-label">🏷️ <span data-i18n="stats.kpi.avg_price">Prix Moyen</span></span>
+               <span class="v2-kpi-value" id="v2KpiAvgPrice" style="font-size:1.8rem;">0.00 €</span>
+               <div class="v2-kpi-footer">Vente HT</div>
+             </div>
+          </div>
+
+          <div class="stats-main-grid" style="display:grid; grid-template-columns: 1fr 340px; gap:2rem;">
+            <div class="stats-col-left" style="display:flex; flex-direction:column; gap:2rem;">
+               
+               <!-- Top Charts Row -->
+               <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1.5rem;">
+                  <div class="mgmt-glass-card" style="padding:1.5rem;">
+                     <h3 style="font-size:1rem; margin:0 0 1rem 0; font-family:var(--font-display);">📉 Répartition des Marges</h3>
+                     <div style="height:200px;"><canvas id="v2MarginChart"></canvas></div>
+                     <p id="v2MarginAnalysis" style="font-size:0.75rem; color:var(--text-muted); margin-top:1rem; text-align:center;"></p>
+                  </div>
+                  <div class="mgmt-glass-card" style="padding:1.5rem;">
+                     <h3 style="font-size:1rem; margin:0 0 1rem 0; font-family:var(--font-display);">🏆 Top 5 Performance</h3>
+                     <div style="height:220px;"><canvas id="v2PerformanceChart"></canvas></div>
+                  </div>
+               </div>
+
+               <!-- Main Large Chart -->
+               <div class="mgmt-glass-card" style="padding:2rem;">
+                  <h3 style="font-size:1.2rem; margin:0 0 1.5rem 0; font-family:var(--font-display);">🌌 Matrice de Rentabilité Stratégique</h3>
+                  <div style="height:350px;"><canvas id="v2ScatterChart"></canvas></div>
+                  <div style="display:flex; justify-content:center; gap:1.5rem; margin-top:1rem; font-size:0.7rem; font-weight:700;">
+                     <span style="color:var(--success);">● Stars (Haut Marge, Bas Coût)</span>
+                     <span style="color:var(--accent);">● Premium (Haut Marge, Haut Coût)</span>
+                     <span style="color:var(--warning);">● Volume (Bas Marge, Bas Coût)</span>
+                     <span style="color:var(--danger);">● Critique (Bas Marge, Haut Coût)</span>
+                  </div>
+               </div>
             </div>
-            <div id="bcgLegend" class="bcg-legend-container"></div>
+
+            <div class="stats-col-right" style="display:flex; flex-direction:column; gap:2rem;">
+               <div class="mgmt-glass-card" style="padding:1.5rem; background:rgba(197, 165, 90, 0.05); border:1px solid rgba(197, 165, 90, 0.3) !important;">
+                  <h3 style="font-size:1.1rem; margin:0 0 1rem 0; display:flex; align-items:center; gap:0.5rem;"><span data-i18n="stats.insight.title">💡 Insight Business</span></h3>
+                  <p id="statsInsightText" style="font-size:0.85rem; line-height:1.6; color:var(--text-secondary);">
+                    Analysez vos données pour obtenir des recommandations personnalisées.
+                  </p>
+               </div>
+               
+               <div class="mgmt-glass-card" style="padding:1.5rem;">
+                  <h3 style="font-size:1.1rem; margin:0 0 1.2rem 0; display:flex; align-items:center; gap:0.5rem;"><span data-i18n="stats.vigilance.title">🚨 Points de Vigilance</span></h3>
+                  <div id="statsVigilanceList" style="display:flex; flex-direction:column; gap:1rem;">
+                     <!-- JS Populated -->
+                  </div>
+               </div>
+
+               <div style="display:grid; grid-template-columns:1fr; gap:1rem;">
+                  <button class="mgmt-glass-card" style="padding:1.2rem; text-align:left; cursor:pointer;" onclick="switchMgmtTab('boston')">
+                     <h3 style="font-size:0.95rem; margin:0 0 0.3rem 0;">🌀 Matrice BCG</h3>
+                     <p style="font-size:0.75rem; color:var(--text-muted); margin:0;">Équilibre du catalogue.</p>
+                  </button>
+                  <button class="mgmt-glass-card" style="padding:1.2rem; text-align:left; cursor:pointer;" onclick="switchMgmtTab('inflation')">
+                     <h3 style="font-size:0.95rem; margin:0 0 0.3rem 0;">🔥 Simulateur Inflation</h3>
+                     <p style="font-size:0.75rem; color:var(--text-muted); margin:0;">Impact hausse matières.</p>
+                  </button>
+               </div>
+            </div>
           </div>
         </div>
 
-        <!-- TAB 7: INFLATION SIMULATION -->
+        <!-- TAB: BOSTON MATRIX -->
+        <div id="mgmtViewBoston" class="mgmt-view" style="display:none;">
+           <div class="mgmt-glass-card" style="padding:2rem;">
+              <h3 style="margin:0 0 0.5rem 0; font-size:1.4rem;">🌀 Matrice de Positionnement Stratégique</h3>
+              <p style="color:var(--text-muted); margin-bottom:2rem;">Croisement entre la Marge et la Complexité (Charge de travail/Prix de revient).</p>
+              
+              <div class="bcg-container" style="position:relative; width:100%; height:500px; background:var(--bg-alt); border:2px solid var(--surface-border); border-radius:16px; margin-top:1rem;">
+                 <canvas id="bcgChart"></canvas>
+              </div>
+           </div>
+        </div>
+
+        <!-- TAB: INFLATION SIMULATOR -->
         <div id="mgmtViewInflation" class="mgmt-view" style="display:none;">
-          <div class="mgmt-glass-card">
-            <div class="mgmt-card-header header-centered">
-              <div class="mgmt-card-title">
-                <div class="title-icon icon-red">🔥</div>
-                <div>
-                  <h3 data-i18n="inflation.title">Simulation de Crise</h3>
-                  <p data-i18n="inflation.desc">Simulez l'impact d'une hausse des matières premières et de l'énergie</p>
-                </div>
-              </div>
+            <div class="stats-header" style="margin-bottom:2rem;">
+               <h2 style="margin:0; font-family:var(--font-display); font-size:1.8rem; color:var(--primary);" data-i18n="nav.inflation">🔥 Simulateur de Crise & Inflation</h2>
+               <p style="color:var(--text-muted); margin:0; font-size:0.9rem;">Simulez l'impact d'une hausse des prix sur l'ensemble de votre catalogue.</p>
             </div>
-            <div class="inflation-slider-container">
-              <label class="inflation-slider-label">
-                <span data-i18n="inflation.slider.label">Hausse des prix :</span>
-                <span id="inflationValue" class="inflation-slider-value">20%</span>
-              </label>
-              <input type="range" id="inflationSlider" class="inflation-slider" min="0" max="100" value="0" step="1" oninput="renderInflationSimulation()">
-              <div class="inflation-slider-marks">
-                <span>0%</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span>
-              </div>
+
+            <div class="inflation-workspace" style="display:grid; grid-template-columns: 340px 1fr; gap:2rem;">
+               <div class="inflation-sidebar">
+                  <div class="inflation-slider-container">
+                     <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span style="font-weight:800; font-size:0.9rem; color:var(--primary);">Hausse Globale</span>
+                        <span id="inflationValue" style="font-weight:900; font-size:1.4rem; color:var(--accent);">0%</span>
+                     </div>
+                     <input type="range" id="inflationSlider" min="0" max="100" value="0" class="premium-slider" oninput="renderInflationSimulation()">
+                     <div style="display:flex; justify-content:space-between; font-size:0.7rem; font-weight:700; color:var(--text-muted);">
+                        <span>Sain (0%)</span>
+                        <span>Moyen (+50%)</span>
+                        <span>Crise (+100%)</span>
+                     </div>
+                  </div>
+
+                  <div class="mgmt-glass-card" style="padding:1.5rem; background:rgba(220, 38, 38, 0.05); border:1px solid rgba(220, 38, 38, 0.2) !important;">
+                     <h3 style="font-size:1rem; margin:0 0 0.8rem 0; color:#dc2626;">🛡️ Stratégie de Résilience</h3>
+                     <p style="font-size:0.8rem; line-height:1.5; color:var(--text-secondary); margin:0;">
+                        En cas d'inflation supérieure à 15%, nous recommandons de réviser vos fiches techniques "Stars" en utilisant des ingrédients de substitution ou en ajustant vos portions.
+                     </p>
+                  </div>
+               </div>
+
+               <div class="inflation-main" id="inflationResults">
+                  <!-- JS Populated: Summary + Cards Grid -->
+                  <div style="text-align:center; padding:4rem; color:var(--text-muted);">
+                     <div style="font-size:3rem; margin-bottom:1rem;">🕯️</div>
+                     <p>Ajustez le curseur pour simuler l'impact sur vos recettes.</p>
+                  </div>
+               </div>
             </div>
-            <div id="inflationResults"></div>
-          </div>
+        </div>
+
+        <!-- TAB: DASHBOARD CONFIG -->
+        <div id="mgmtViewDashboardConfig" class="mgmt-view" style="display:none;">
+           <div class="mgmt-glass-card" style="padding:2rem;">
+              <h3 style="margin-bottom:1.5rem;">⚙️ Paramètres de Rentabilité</h3>
+              <div class="form-group">
+                 <label>Seuil de Marge Critique (%)</label>
+                 <input type="number" id="configCriticalMargin" class="form-input" value="65">
+                 <small>Les recettes en dessous de ce seuil seront signalées en rouge.</small>
+              </div>
+              <div class="form-group">
+                 <label>Seuil de Marge Cible (%)</label>
+                 <input type="number" id="configTargetMargin" class="form-input" value="75">
+                 <small>Objectif de rentabilité pour vos "Stars".</small>
+              </div>
+              <button class="btn btn-primary" onclick="saveDashboardConfig()">Enregistrer les paramètres</button>
+           </div>
         </div>
 
       </div>
@@ -2158,22 +2202,17 @@
         </aside>
 
         <main class="planning-main">
-          <div class="calendar-header"
-            style="margin-bottom:2rem; display:flex; justify-content:space-between; align-items:center; background: var(--surface); padding: 1.5rem 2rem; border-radius: var(--radius-lg); border: 1px solid var(--surface-border); box-shadow: var(--shadow-sm);">
+          <div class="calendar-header" style="margin-bottom:2rem; display:flex; justify-content:space-between; align-items:center; background: var(--surface); padding: 1.5rem 2rem; border-radius: var(--radius-lg); border: 1px solid var(--surface-border); box-shadow: var(--shadow-sm);">
             <div>
               <h2 style="font-family: var(--font-heading); font-size: 1.4rem; color: var(--primary); margin: 0;">
                 <span id="planningCalendarTitle" data-i18n="plan.calendar.title">Planning d'Activité</span>
                 <span class="accent" style="font-weight: 800;">2026</span>
               </h2>
             </div>
-            <button class="btn btn-outline btn-sm" id="btnClearPlanning" onclick="clearPlanning()"
-              style="color:var(--danger); border-color:var(--danger);" data-i18n="plan.btn.clear">🗑️ Vider le
-              planning</button>
+            <button class="btn btn-outline btn-sm" id="btnClearPlanning" onclick="clearPlanning()" style="color:var(--danger); border-color:var(--danger);" data-i18n="plan.btn.clear">🗑️ Vider le planning</button>
           </div>
 
-          <div class="annual-grid" id="annualCalendarView">
-            <!-- 12 months generated here -->
-          </div>
+          <div class="annual-grid" id="annualCalendarView"></div>
         </main>
       </div>
     </section>
@@ -2182,122 +2221,192 @@
     <!-- HYGIÈNE & HACCP APP -->
     <!-- ================================================ -->
     <section class="haccp-container" id="appHygiene" style="display:none; margin: 0 auto; padding: 0;">
-      <section class="hero" style="padding-bottom: 3.5rem;">
-        <div class="hero-badge" data-i18n="haccp.badge">🛡️ Sécurité Sanitaire</div>
-        <h2 data-i18n="haccp.title">Module <span class="accent">Hygiène & HACCP</span></h2>
-        <p data-i18n="haccp.desc">Suivi des températures, plan de nettoyage et traçabilité des lots.</p>
-      </section>
+        <div class="premium-app-layout" style="display:grid; grid-template-columns: 280px 1fr; min-height:85vh; background:rgba(255,255,255,0.02);">
+           
+           <!-- Sidebar Navigation -->
+           <div class="app-sidebar" style="padding: 2rem; border-right: 1px solid rgba(197, 165, 90, 0.1); background: rgba(255,255,255,0.01);">
+              <div style="margin-bottom:2.5rem;">
+                 <h2 style="margin:0; font-family:var(--font-display); font-size:1.4rem; color:var(--primary);">🛡️ HACCP Pro</h2>
+                 <p style="font-size:0.75rem; color:var(--text-muted); margin:4px 0 0 0;">Sécurité & Traçabilité</p>
+              </div>
 
-      <div class="container-premium">
-        <!-- HACCP Tabs -->
-        <div class="haccp-tabs" style="display:flex; gap:1rem; margin-bottom:2.5rem; justify-content:center;">
-          <button class="tab-btn active" id="tabHaccpTemp" onclick="switchHaccpTab('temp')"
-            data-i18n="haccp.tab.temp">📉 Températures</button>
-          <button class="tab-btn" id="tabHaccpClean" onclick="switchHaccpTab('clean')" data-i18n="haccp.tab.clean">🧹
-            Nettoyage</button>
-          <button class="tab-btn" id="tabHaccpTrace" onclick="switchHaccpTab('trace')" data-i18n="haccp.tab.trace">🏷️
-            Traçabilité</button>
-          <button class="tab-btn" id="tabHaccpReception" onclick="switchHaccpTab('reception')"
-            data-i18n="haccp.tab.reception">🚚 Réception</button>
-        </div>
+              <div class="sidebar-nav-group" style="display:flex; flex-direction:column; gap:0.5rem;">
+                 <button class="sidebar-pill active" id="tabHaccpTemp" onclick="switchHaccpTab('temp')">
+                    <span class="icon">❄️</span> <span>Températures</span>
+                 </button>
+                 <button class="sidebar-pill" id="tabHaccpClean" onclick="switchHaccpTab('clean')">
+                    <span class="icon">🧹</span> <span>Nettoyage</span>
+                 </button>
+                 <button class="sidebar-pill" id="tabHaccpTrace" onclick="switchHaccpTab('trace')">
+                    <span class="icon">🏷️</span> <span>Traçabilité</span>
+                 </button>
+                 <button class="sidebar-pill" id="tabHaccpReception" onclick="switchHaccpTab('reception')">
+                    <span class="icon">🚚</span> <span>Réception</span>
+                 </button>
+                 <button class="sidebar-pill" id="tabHaccpAllergens" onclick="switchHaccpTab('allergens')">
+                    <span class="icon">🛡️</span> <span>Allergènes</span>
+                 </button>
+              </div>
 
-        <!-- Temp View -->
-        <div id="haccpViewTemp" class="haccp-view">
-          <div class="card glass-widget" style="padding: 2.5rem;">
-            <div class="flex-title"
-              style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2rem;">
-              <h3 class="widget-title-modern" data-i18n="haccp.temp.title">Relevés de Température</h3>
-              <button class="btn btn-primary btn-sm" onclick="showAddTempModal()">✚ Nouveau Relevé</button>
-            </div>
-            <div class="table-responsive">
-              <table class="premium-table">
-                <thead>
-                  <tr>
-                    <th data-i18n="haccp.temp.date">Date</th>
-                    <th data-i18n="haccp.temp.equipment">Équipement</th>
-                    <th data-i18n="haccp.temp.val">Température</th>
-                    <th data-i18n="haccp.temp.user">Par</th>
-                    <th data-i18n="haccp.temp.status">Statut</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
-                <tbody id="tempLogsBody">
-                  <!-- JS populated -->
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
+              <div style="margin-top:auto; padding:1.5rem; background:rgba(197, 165, 90, 0.05); border-radius:15px; border:1px solid rgba(197, 165, 90, 0.1); position:absolute; bottom:2rem; width:220px;">
+                 <h4 style="font-size:0.8rem; margin:0 0 0.5rem 0; color:var(--primary);">💡 Conseil Pro</h4>
+                 <p style="font-size:0.7rem; line-height:1.4; color:var(--text-muted); margin:0;">
+                    Un suivi rigoureux réduit vos primes d'assurance et garantit la confiance de vos clients.
+                 </p>
+              </div>
+           </div>
 
-        <!-- Cleaning View -->
-        <div id="haccpViewClean" class="haccp-view" style="display:none;">
-          <div class="card glass-widget" style="padding: 2.5rem;">
-            <div class="flex-title"
-              style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2rem;">
-              <h3 class="widget-title-modern" data-i18n="haccp.clean.title">Plan de Nettoyage</h3>
-            </div>
-            <div id="cleaningChecklistArea" class="cleaning-grid"
-              style="display:grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap:1.5rem;">
-              <!-- JS populated -->
-            </div>
-          </div>
-        </div>
+           <!-- Main Content Area -->
+           <div class="app-content-area" style="padding: 2.5rem; overflow-y:auto;">
+              
+              <!-- Dashboard Header inside content -->
+              <div class="hygiene-kpi-grid" style="display:grid; grid-template-columns: repeat(4, 1fr); gap:1.2rem; margin-bottom:2.5rem;">
+                 <div class="v2-kpi-card info">
+                   <span class="v2-kpi-label">❄️ Dernier Relevé</span>
+                   <span class="v2-kpi-value" id="kpiHaccpLastTemp">-- °C</span>
+                   <div class="v2-kpi-footer" id="kpiHaccpLastTempDate">Aucun relevé</div>
+                 </div>
+                 <div class="v2-kpi-card success">
+                   <span class="v2-kpi-label">🧹 Nettoyage</span>
+                   <span class="v2-kpi-value" id="kpiHaccpCleanPct">0%</span>
+                   <div class="v2-kpi-footer">Tâches du jour</div>
+                 </div>
+                 <div class="v2-kpi-card">
+                   <span class="v2-kpi-label">🏷️ Lots Actifs</span>
+                   <span class="v2-kpi-value" id="kpiHaccpActiveLots">0</span>
+                   <div class="v2-kpi-footer">Traçabilité</div>
+                 </div>
+                 <div class="v2-kpi-card warning">
+                   <span class="v2-kpi-label">⏰ DLC Alertes</span>
+                   <span class="v2-kpi-value" id="kpiHaccpShortExp">0</span>
+                   <div class="v2-kpi-footer">Sous 48h</div>
+                 </div>
+              </div>
 
-        <!-- Traceability View -->
-        <div id="haccpViewTrace" class="haccp-view" style="display:none;">
-          <div class="card glass-widget" style="padding: 2.5rem;">
-            <div class="flex-title"
-              style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2rem;">
-              <h3 class="widget-title-modern" data-i18n="haccp.trace.title">Traçabilité des Productions</h3>
-            </div>
-            <div class="table-responsive">
-              <table class="premium-table">
-                <thead>
-                  <tr>
-                    <th data-i18n="haccp.trace.lot">Numéro de Lot</th>
-                    <th data-i18n="haccp.trace.product">Produit</th>
-                    <th data-i18n="haccp.trace.date">Date Prod.</th>
-                    <th data-i18n="haccp.trace.exp">DLC/DLUO</th>
-                    <th data-i18n="haccp.trace.qty">Quantité</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
-                <tbody id="traceLogsBody">
-                  <!-- JS populated -->
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
+              <!-- Views Container -->
+              <div id="haccpViewsContainer">
+                 <!-- Temp View -->
+                 <div id="haccpViewTemp" class="haccp-view">
+                    <div class="card glass-widget" style="padding: 2.5rem;">
+                       <div class="flex-title" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2rem;">
+                          <h3 class="widget-title-modern">📉 Relevés de Température</h3>
+                          <button class="btn btn-primary btn-sm" onclick="showAddTempModal()">✚ Nouveau Relevé</button>
+                       </div>
+                       <div class="table-responsive">
+                          <table class="premium-table">
+                             <thead>
+                                <tr>
+                                   <th>Date</th>
+                                   <th>Équipement</th>
+                                   <th>Température</th>
+                                   <th>Par</th>
+                                   <th>Statut</th>
+                                   <th>Action</th>
+                                </tr>
+                             </thead>
+                             <tbody id="tempLogsBody"></tbody>
+                          </table>
+                       </div>
+                    </div>
+                 </div>
 
-        <!-- Reception View -->
-        <div id="haccpViewReception" class="haccp-view" style="display:none;">
-          <div class="card glass-widget" style="padding: 2.5rem;">
-            <div class="flex-title"
-              style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2rem;">
-              <h3 class="widget-title-modern" data-i18n="haccp.reception.title">Contrôle à la Réception</h3>
-              <button class="btn btn-primary btn-sm" onclick="showAddReceptionModal()">✚ Nouveau Contrôle</button>
-            </div>
-            <div class="table-responsive">
-              <table class="premium-table">
-                <thead>
-                  <tr>
-                    <th data-i18n="haccp.temp.date">Date</th>
-                    <th data-i18n="haccp.reception.supplier">Fournisseur</th>
-                    <th data-i18n="haccp.reception.temp">Temp. Camion</th>
-                    <th data-i18n="haccp.reception.hygiene">Hygiène</th>
-                    <th data-i18n="haccp.temp.status">Statut</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
-                <tbody id="receptionLogsBody">
-                  <!-- JS populated -->
-                </tbody>
-              </table>
-            </div>
-          </div>
+                 <!-- Cleaning View -->
+                 <div id="haccpViewClean" class="haccp-view" style="display:none;">
+                    <div class="mgmt-glass-card" style="padding: 2.5rem;">
+                       <div style="margin-bottom:2rem;">
+                          <h3 style="margin:0; font-family:var(--font-display); font-size:1.4rem; color:var(--primary);">🧹 Plan de Nettoyage & Désinfection</h3>
+                          <p style="font-size:0.85rem; color:var(--text-muted); margin:5px 0 0 0;">Checklist quotidienne des zones critiques de la cuisine.</p>
+                       </div>
+                       <div id="cleaningChecklistArea" class="cleaning-grid" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap:1.2rem;">
+                          <!-- JS populated -->
+                       </div>
+                    </div>
+                 </div>
+
+                 <!-- Traceability View (Requested by user) -->
+                 <div id="haccpViewTrace" class="haccp-view" style="display:none;">
+                    <div class="card glass-widget" style="padding: 2.5rem;">
+                       <div class="flex-title" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2rem;">
+                          <h3 class="widget-title-modern">🏷️ Traçabilité des Productions</h3>
+                          <div style="display:flex; gap:0.5rem;">
+                             <button class="btn btn-sm btn-outline" onclick="openProductionLogger()">✚ Tracer une sortie</button>
+                             <button class="btn btn-sm btn-primary" onclick="exportTraceability()">Exporter Registre</button>
+                          </div>
+                       </div>
+                       <div class="table-responsive">
+                          <table class="premium-table">
+                             <thead>
+                                <tr>
+                                   <th>Lot</th>
+                                   <th>Produit</th>
+                                   <th>Date Prod.</th>
+                                   <th>DLC/DLUO</th>
+                                   <th>Quantité</th>
+                                   <th>Action</th>
+                                </tr>
+                             </thead>
+                             <tbody id="traceLogsBody"></tbody>
+                          </table>
+                       </div>
+                    </div>
+                 </div>
+
+                 <!-- Reception View -->
+                 <div id="haccpViewReception" class="haccp-view" style="display:none;">
+                    <div class="mgmt-glass-card" style="padding: 2.5rem;">
+                       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2rem;">
+                          <div>
+                             <h3 style="margin:0; font-family:var(--font-display); font-size:1.4rem; color:var(--primary);">🚚 Contrôles à la Réception</h3>
+                             <p style="font-size:0.85rem; color:var(--text-muted); margin:5px 0 0 0;">Vérification des marchandises à l'arrivée (température, hygiène).</p>
+                          </div>
+                          <button class="btn btn-primary" onclick="showAddReceptionModal()" style="border-radius:12px; padding:0.8rem 1.6rem; font-weight:700;">✚ Nouveau Contrôle</button>
+                       </div>
+                       <div class="table-responsive">
+                          <table class="premium-table">
+                             <thead>
+                                <tr>
+                                   <th>Date</th>
+                                   <th>Fournisseur</th>
+                                   <th>Temp. Camion</th>
+                                   <th>État Hygiène</th>
+                                   <th>Statut</th>
+                                   <th style="text-align:right;">Action</th>
+                                </tr>
+                             </thead>
+                             <tbody id="receptionLogsBody"></tbody>
+                          </table>
+                       </div>
+                    </div>
+                 </div>
+
+                 <!-- Allergens View -->
+                 <div id="haccpViewAllergens" class="haccp-view" style="display:none;">
+                    <div class="mgmt-glass-card" style="padding: 2.5rem;">
+                       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2rem;">
+                          <div>
+                             <h3 style="margin:0; font-family:var(--font-display); font-size:1.4rem; color:var(--primary);">⚖️ Registre des Allergènes</h3>
+                             <p style="font-size:0.85rem; color:var(--text-muted); margin:5px 0 0 0;">Conformité INCO - Informations obligatoires pour les consommateurs.</p>
+                          </div>
+                          <button class="btn btn-primary" onclick="window.print()" style="border-radius:12px; padding:0.8rem 1.6rem; font-weight:700;">🖨️ Imprimer Registre</button>
+                       </div>
+                       <div class="table-responsive">
+                          <table class="allergen-matrix-premium" id="allergenMatrixTable" style="width:100%; border-collapse:collapse;">
+                             <!-- Generated by JS -->
+                          </table>
+                       </div>
+                       <div style="margin-top:2.5rem; display:flex; gap:2rem; justify-content:center; padding:1.5rem; background:rgba(197, 165, 90, 0.03); border-radius:15px; border:1px solid rgba(197, 165, 90, 0.05);">
+                          <div style="display:flex; align-items:center; gap:0.6rem; font-size:0.85rem; color:var(--text-muted); font-weight:600;">
+                             <span style="width:10px; height:10px; background:#ef4444; border-radius:50%;"></span> Présent
+                          </div>
+                          <div style="display:flex; align-items:center; gap:0.6rem; font-size:0.85rem; color:var(--text-muted); font-weight:600;">
+                             <span style="width:10px; height:10px; background:rgba(197,165,90,0.1); border-radius:50%;"></span> Absent
+                          </div>
+                       </div>
+                    </div>
+                 </div>
+              </div>
+           </div>
         </div>
-      </div>
     </section>
 
     <!-- Modal HACCP Reception -->
@@ -3244,14 +3353,14 @@
     const navMgmt = document.getElementById('navMgmt');
 
       function hideAllApps() {
-      hubSec.style.display = 'none';
-      recApp.style.display = 'none';
-      labApp.style.display = 'none';
-      appAPropos.style.display = 'none';
-      appPortfolio.style.display = 'none';
-      appPlanning.style.display = 'none';
-      appAdmin.style.display = 'none';
-      appHygiene.style.display = 'none';
+      if (hubSec) hubSec.style.display = 'none';
+      if (recApp) recApp.style.display = 'none';
+      if (labApp) labApp.style.display = 'none';
+      if (appAPropos) appAPropos.style.display = 'none';
+      if (appPortfolio) appPortfolio.style.display = 'none';
+      if (appPlanning) appPlanning.style.display = 'none';
+      if (appAdmin) appAdmin.style.display = 'none';
+      if (appHygiene) appHygiene.style.display = 'none';
       const appCRM = document.getElementById('appCRM');
       if (appCRM) appCRM.style.display = 'none';
       if (appMgmt) appMgmt.style.display = 'none';
@@ -3323,7 +3432,7 @@
       if (navAPropos) navAPropos.classList.add('active');
       if (typeof updateRandomTip === 'function') updateRandomTip();
     }
-    function showHygiene() {
+    function showHygiene(tab) {
       hideAllApps();
       appHygiene.style.display = 'block';
       mainNav.style.display = 'flex';
@@ -3331,14 +3440,16 @@
       if (typeof loadHaccpLogs === 'function') loadHaccpLogs();
       if (typeof renderHygiene === 'function') renderHygiene();
       if (typeof updateRandomTip === 'function') updateRandomTip();
+      if (typeof switchHaccpTab === 'function') switchHaccpTab(tab || 'temp');
     }
 
-    function showCRM() {
+    function showCRM(tab) {
       hideAllApps();
       const appCRM = document.getElementById('appCRM');
       if (appCRM) appCRM.style.display = 'block';
       mainNav.style.display = 'flex';
       if (typeof renderCRM === 'function') renderCRM();
+      if (tab && typeof switchCrmTab === 'function') switchCrmTab(tab);
       if (typeof updateRandomTip === 'function') updateRandomTip();
     }
 
@@ -3417,11 +3528,11 @@
     const headerBrand = document.getElementById('headerBrand');
     if (headerBrand) headerBrand.addEventListener('click', showHub);
 
-    function showMgmt() {
+    function showMgmt(tab) {
       hideAllApps();
       if (appMgmt) appMgmt.style.display = 'block';
       if (navMgmt) navMgmt.classList.add('active');
-      switchMgmtTab('dashboard');
+      if (typeof switchMgmtTab === 'function') switchMgmtTab(tab || 'dashboard');
       if (typeof updateMgmtKpis === 'function') updateMgmtKpis();
       if (typeof updateRandomTip === 'function') updateRandomTip();
     }
@@ -3431,6 +3542,22 @@
       switchMgmtTab('protools');
     }
 
+
+    function switchHaccpTab(tab) {
+      const views = ['Temp', 'Clean', 'Trace', 'Reception', 'Allergens'];
+      views.forEach(v => {
+        const el = document.getElementById('haccpView' + v);
+        const btn = document.getElementById('tabHaccp' + v);
+        if (el) el.style.display = v.toLowerCase() === tab ? 'block' : 'none';
+        if (btn) btn.classList.toggle('active', v.toLowerCase() === tab);
+      });
+      if (tab === 'allergens') {
+        if (typeof renderAllergenMatrix === 'function') renderAllergenMatrix();
+      } else {
+        if (typeof renderHygiene === 'function') renderHygiene();
+      }
+    }
+    window.switchHaccpTab = switchHaccpTab;
 
     function switchMgmtTab(tab) {
       // Special redirect for old triggers (BCG/Inflation from ProTools cards)
@@ -3494,25 +3621,56 @@
         if (typeof switchExamType === 'function') switchExamType('EP1');
       }
       else if (tab === 'quality') {
-        document.getElementById('mgmtViewWaste').style.display = 'block';
-        document.getElementById('mgmtViewAllergens').style.display = 'block';
+        const wasteView = document.getElementById('mgmtViewQuality') || document.getElementById('mgmtViewWaste');
+        if (wasteView) wasteView.style.display = 'block';
+        
         const qualityBtn = document.getElementById('mgmtTabQuality');
         if (qualityBtn) qualityBtn.classList.add('active');
-        if (typeof renderAllergenMatrix === 'function') renderAllergenMatrix();
-        if (typeof populateWasteDropdown === 'function') {
-          populateWasteDropdown();
-          renderWasteAnalysis();
-        }
-        if (typeof renderWasteMonthlyReport === 'function') renderWasteMonthlyReport();
+        
+        // Premium Cockpit Entry
+        if (typeof switchQualitySubTab === 'function') switchQualitySubTab('waste-dash');
       }
     }
+
+    function switchQualitySubTab(sub) {
+      // Hide all quality subviews
+      const subs = document.querySelectorAll('.quality-subview');
+      subs.forEach(s => s.style.display = 'none');
+      
+      // Map logical sub to DIV ID
+      const target = {
+        'waste-dash': 'qualityViewWasteDash',
+        'waste-log': 'qualityViewWasteLog',
+        'allergens': 'qualityViewAllergens',
+        'history': 'qualityViewHistory'
+      }[sub];
+      
+      if (document.getElementById(target)) document.getElementById(target).style.display = 'block';
+      
+      // Update sidebar state
+      const aside = document.querySelector('#mgmtViewQuality .premium-sidebar');
+      if (aside) {
+        aside.querySelectorAll('.sidebar-pill').forEach(b => b.classList.remove('active'));
+        const activeBtn = Array.from(aside.querySelectorAll('.sidebar-pill')).find(b => {
+          const attr = b.getAttribute('onclick');
+          return attr && attr.includes(sub);
+        });
+        if (activeBtn) activeBtn.classList.add('active');
+      }
+      
+      // Component Initializations
+      if (sub === 'waste-dash') { if (typeof renderWasteAnalysis === 'function') renderWasteAnalysis(); }
+      else if (sub === 'waste-log') { if (typeof populateWasteDropdown === 'function') populateWasteDropdown(); }
+      else if (sub === 'allergens') { if (typeof renderAllergenMatrix === 'function') renderAllergenMatrix(); }
+    }
+    window.switchQualitySubTab = switchQualitySubTab;
 
   </script>
 
   <!-- Core Scripts -->
-  <script src="./data.js?v=2.2.1"></script>
-  <script src="./i18n.js?v=3.5.1"></script>
-  <script src="./app.js?v=2.4.3"></script>
+  <script src="./data.js?v=2.2.5"></script>
+  <script src="./i18n.js?v=3.5.2"></script>
+  <script src="./app.js?v=2.5.0"></script>
   <script src="./pro-features.js?v=1.0.1"></script>
   <script src="./equipment.js?v=2.1.1"></script>
   <script src="./lab-logic.js?v=2.1.1"></script>
@@ -3522,6 +3680,8 @@
   <script src="./crm.js?v=1.0.1"></script>
   <script src="./commercial-features.js?v=1.0.1"></script>
   <script src="./advanced-modules.js?v=1.0.0"></script>
+  <script src="./exam-scheduler.js?v=2.1.0"></script>
+  <script src="./crm-enhanced-v2.js?v=2.2.0"></script>
   <script src="./premium-effects.js?v=1.0.2"></script>
 
   <script>
@@ -3572,7 +3732,7 @@
           'navRecettes': showRecettes, 'mLinkRecettes': showRecettes,
           'navLabo': showLabo, 'mLinkLabo': showLabo,
           'navPlanning': showPlanning, 'mLinkPlanning': showPlanning,
-          'navAPropos': showAPropos, 'mLinkAbout': showAPropos,
+          'navAPropos': showAPropos, 'mLinkAbout': showAPropos, 'navAbout': showAPropos,
           'navPortfolio': showPortfolio, 'mLinkPortfolio': showPortfolio,
           'navAdmin': showAdmin,
           'navInventaire': showInventaire, 'mLinkInv': showInventaire,
@@ -3581,7 +3741,33 @@
           'navSuppliers': showSuppliers, 'mLinkSuppliers': showSuppliers,
           'navStats': showStats, 'mLinkStats': showStats,
           'navMgmt': showMgmt, 'mLinkMgmt': showMgmt,
+          'navPlanningProd': () => showMgmt('production'),
+          'navShopping': () => showMgmt('shopping'),
+          'navHubObj': () => showMgmt('dashboard'),
+          'navWaste': () => showMgmt('quality'),
+          'navTrace': () => showHygiene('trace'),
+          'navComparator': () => {
+            if (typeof APP !== 'undefined' && !APP.baselineCosts && typeof calcFullCost === 'function') {
+                APP.baselineCosts = JSON.parse(JSON.stringify(calcFullCost(APP.margin)));
+            }
+            const modal = document.getElementById('comparatorModal');
+            if (modal) {
+                modal.style.display = 'flex';
+                if (typeof updateComparator === 'function') updateComparator();
+            }
+          },
           'navProTools': showProTools, 'mLinkProTools': showProTools,
+          'navCrmClients': () => showCRM('clients'),
+          'navCrmOrders': () => showCRM('orders'),
+          'navPlanningProd': () => showMgmt('production'),
+          'navShopping': () => showMgmt('shopping'),
+          'navScheduler': () => showMgmt('scheduler'),
+          'navBoston': () => showMgmt('boston'),
+          'navInflation': () => showMgmt('inflation'),
+          'navCatalogue': generateECatalogue,
+          'navChefsBrain': openChefsBrain,
+          'navAssembly': openAssemblySimulator,
+          'navConverter': openMasterConverter,
           'navOmniSearch': () => { if (typeof showOmniSearch === 'function') showOmniSearch(); }
         };
 
@@ -3701,22 +3887,22 @@
       let items = [];
       
       if (category === 'atelier') {
-        moreMenuTitle.textContent = "👨‍🍳 L'Atelier";
+        moreMenuTitle.textContent = i18n.t('nav.category.atelier');
         items = [
           { id: 'mLinkRecettes', icon: '📖', label: 'nav.recipes', action: showRecettes },
           { id: 'mLinkLabo', icon: '📐', label: 'nav.lab', action: showLabo },
           { id: 'mLinkHygiene', icon: '🧼', label: 'nav.hygiene', action: showHygiene },
-          { id: 'mLinkPlanning', icon: '📅', label: 'nav.planning', action: showPlanning }
+          { id: 'mLinkPlanning', icon: '📅', label: 'nav.team', action: showPlanning }
         ];
       } else if (category === 'pilotage') {
-        moreMenuTitle.textContent = "🏢 Gestion & Hub";
+        moreMenuTitle.textContent = i18n.t('nav.category.mgmt');
         items = [
           { id: 'mLinkMgmt', icon: '🏢', label: 'nav.mgmt', action: showMgmt },
           { id: 'mLinkStats', icon: '📊', label: 'nav.stats', action: showStats },
           { id: 'mLinkInv', icon: '📦', label: 'nav.inventory', action: showInventaire }
         ];
       } else if (category === 'catalogue') {
-        moreMenuTitle.textContent = "✨ Catalogue";
+        moreMenuTitle.textContent = i18n.t('nav.category.analysis');
         items = [
           { id: 'mLinkSuppliers', icon: '🚚', label: 'nav.suppliers', action: showSuppliers },
           { id: 'mLinkPortfolio', icon: '🖼️', label: 'nav.portfolio', action: showPortfolio },

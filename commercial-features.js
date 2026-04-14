@@ -666,10 +666,6 @@ window.renderWasteMonthlyReport = function() {
         </div>
       ` : ''}
       
-      <div class="waste-report-quote">
-        <span class="waste-quote-icon">🪀🍫</span>
-        <p><em>Un chef qui maîtrise le chocolat … et les baguettes du diabolo</em></p>
-      </div>
       
       <div class="waste-report-breakdown">
         <h5>Répartition par cause</h5>
