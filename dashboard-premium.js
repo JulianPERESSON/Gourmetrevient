@@ -37,25 +37,28 @@ function seedDemoData() {
 
     // ── Ingredient Price Watch (user-scoped key) ─────────────────────────
     const invKey = `gourmet_inventory_${currUser}`;
-    const inv = JSON.parse(localStorage.getItem(invKey) || '[]');
-    if (inv.length === 0) {
+    let inv = JSON.parse(localStorage.getItem(invKey) || '[]');
+    const hasHistory = inv.some(item => item.priceHistory && item.priceHistory.length > 1);
+    
+    if (!hasHistory) {
         const demoInv = [
-            { id: 1, name: 'Beurre AOP', unit: 'kg', pricePerUnit: 9.80, priceHistory: [
+            { id: 901, name: 'Beurre AOP', unit: 'kg', pricePerUnit: 9.80, priceHistory: [
                 { date: '2026-03-01', price: 8.40 }, { date: '2026-04-01', price: 9.80 }
             ]},
-            { id: 2, name: 'Farine T55', unit: 'kg', pricePerUnit: 1.10, priceHistory: [
+            { id: 902, name: 'Farine T55', unit: 'kg', pricePerUnit: 1.10, priceHistory: [
                 { date: '2026-03-01', price: 1.25 }, { date: '2026-04-01', price: 1.10 }
             ]},
-            { id: 3, name: 'Œufs fermiers', unit: 'dz', pricePerUnit: 3.60, priceHistory: [
+            { id: 903, name: 'Œufs fermiers', unit: 'dz', pricePerUnit: 3.60, priceHistory: [
                 { date: '2026-03-01', price: 3.40 }, { date: '2026-04-01', price: 3.60 }
             ]},
-            { id: 4, name: 'Crème liquide 35%', unit: 'L', pricePerUnit: 4.20, priceHistory: [
+            { id: 904, name: 'Crème liquide 35%', unit: 'L', pricePerUnit: 4.20, priceHistory: [
                 { date: '2026-03-01', price: 4.50 }, { date: '2026-04-01', price: 4.20 }
             ]},
         ];
-        localStorage.setItem(invKey, JSON.stringify(demoInv));
-        // Also set generic key for Price Watch widget fallback
-        localStorage.setItem('gourmet_inventory', JSON.stringify(demoInv));
+        // Merge demo to front of existing
+        inv = [...demoInv, ...inv];
+        localStorage.setItem(invKey, JSON.stringify(inv));
+        localStorage.setItem('gourmet_inventory', JSON.stringify(inv));
     }
 
     // ── Team (user-scoped key) ────────────────────────────────────────
@@ -80,19 +83,26 @@ function seedDemoData() {
 
     // ── HACCP Temperature Log (2h ago) ─────────────────────────────
     const haccpRaw = JSON.parse(localStorage.getItem('gourmet_haccp_logs') || '{"temp":[]}');
-    if (!haccpRaw.temp || haccpRaw.temp.length === 0) {
+    const recentLogs = (haccpRaw.temp || []).filter(l => (Date.now() - new Date(l.date || l.timestamp)) < 24 * 60 * 60 * 1000);
+    
+    if (recentLogs.length === 0) {
         const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString();
-        haccpRaw.temp = [
+        const demoTemp = [
             { date: twoHoursAgo, timestamp: twoHoursAgo, zone: 'Chambre froide 1', temp: 3.2, status: 'ok', by: 'Chef Larroque' },
             { date: twoHoursAgo, timestamp: twoHoursAgo, zone: 'Vitrine desserts', temp: 5.8, status: 'ok', by: 'Chef Larroque' },
         ];
+        haccpRaw.temp = [...demoTemp, ...(haccpRaw.temp || [])];
         localStorage.setItem('gourmet_haccp_logs', JSON.stringify(haccpRaw));
     }
 }
 
 window.hydratePremiumDashboard = function () {
+    // Force-seed demo data if missing every time hydrate runs, so soft reloads get the data
+    seedDemoData();
+
     const hub = document.getElementById('hubSection');
     if (!hub || hub.style.display === 'none') return;
+
 
     // 0. Context & Utils
     const lang = window.currentLang || localStorage.getItem('gourmet_lang') || 'fr';
@@ -176,9 +186,10 @@ window.hydratePremiumDashboard = function () {
         // Priority: Production plan items for today
         if (todayProds.length > 0) {
             const prod = todayProds[0];
+            const fallbackProdCount = `${todayProds.length} production(s) planifiée(s) aujourd'hui`;
             priorities.push({ urgency: 'urgent', icon: '🍰',
                 title: `${t('dash.priority.launch', {name: prod.recipe || prod.name || recipes[0]?.name || 'Production'})}`,
-                desc: `${todayProds.length} ${t('dash.priority.prod_count') || 'production(s) planifiée(s) aujourd\'hui'}`,
+                desc: t('dash.priority.prod_count', { count: todayProds.length }) || fallbackProdCount,
                 action: `showMgmt(); switchMgmtTab('production');`,
                 btn: t('dash.priority.btn_launch') || 'Lancer'
             });
@@ -196,9 +207,10 @@ window.hydratePremiumDashboard = function () {
         // Priority: Critical stock alerts
         if (stockAlerts.length > 0) {
             const criticalItems = stockAlerts.slice(0, 2).map(i => i.name).join(', ');
+            const fallbackStockCount = `${stockAlerts.length} ingrédient(s) en stock critique : ${criticalItems}`;
             priorities.push({ urgency: 'warning', icon: '🛒',
                 title: `${t('dash.priority.order', {name: stockAlerts[0].name})}`,
-                desc: `${stockAlerts.length} ${t('dash.priority.stock_critical') || 'ingrédient(s) en stock critique'} — ${criticalItems}`,
+                desc: t('dash.priority.stock_critical', { count: stockAlerts.length, items: criticalItems }) || fallbackStockCount,
                 action: `showInventaire();`,
                 btn: t('dash.priority.btn_order') || 'Commander'
             });
@@ -211,7 +223,7 @@ window.hydratePremiumDashboard = function () {
             const margin = Math.round(lowPerf.costs?.marginPct || 60);
             priorities.push({ urgency: 'warning', icon: '💰',
                 title: `${t('dash.priority.adjust_margin', {name: lowPerf.name})}`,
-                desc: `${t('dash.priority.margin_desc', {margin: margin})} — ${lowMarginRecipes.length > 1 ? '+' + (lowMarginRecipes.length-1) + ' autres' : ''}`,
+                desc: t('dash.priority.margin_desc', { margin: margin, count: lowMarginRecipes.length }),
                 action: `openRecipeEditorByName('${lowPerf.name.replace(/'/g, "\\'") }')`,
                 btn: t('dash.priority.btn_revise') || 'Ajuster'
             });
@@ -225,8 +237,8 @@ window.hydratePremiumDashboard = function () {
         if (recentWaste.length >= 3) {
             const totalLoss = recentWaste.reduce((s, w) => s + (w.cost || 0), 0);
             priorities.push({ urgency: 'info', icon: '📉',
-                title: t('dash.priority.waste_alert') || `${recentWaste.length} pertes cette semaine`,
-                desc: totalLoss > 0 ? `${totalLoss.toFixed(2)} € de pertes cumulées` : `${recentWaste.length} déclarations enregistrées`,
+                title: t('dash.priority.waste_alert', { count: recentWaste.length }),
+                desc: t('dash.priority.waste_desc', { total: totalLoss.toFixed(2), count: recentWaste.length }),
                 action: `showMgmt(); switchMgmtTab('quality');`,
                 btn: t('dash.priority.btn_analyze') || 'Analyser'
             });
@@ -301,8 +313,11 @@ window.hydratePremiumDashboard = function () {
         const newHTML = insight
             ? `<div class="ai-bubble"><p>${insight.text}</p><div class="ai-actions">${insight.tips.map(tip => `<span class="ai-tip">${tip}</span>`).join('')}</div></div>`
             : `<div class="ai-bubble"><p>✅ Toutes vos recettes affichent une marge saine. Continuez !</p></div>`;
-        if (aiAdvice.innerHTML.trim() !== newHTML.trim()) {
+            
+        const contentHash = insight ? insight.text : 'all_good';
+        if (aiAdvice.dataset.insight !== contentHash) {
             aiAdvice.innerHTML = newHTML;
+            aiAdvice.dataset.insight = contentHash;
         }
     }
 
@@ -361,12 +376,15 @@ window.hydratePremiumDashboard = function () {
     const stockMini = document.getElementById('dashStockAlerts');
     if (stockMini) {
         if (stockAlerts.length > 0) {
-            stockMini.innerHTML = stockAlerts.slice(0, 3).map(item => `
+            stockMini.innerHTML = stockAlerts.slice(0, 3).map(item => {
+                const stockVal = item.stock !== undefined ? item.stock : 0;
+                const unitStr = (item.unit && item.unit !== 'undefined') ? item.unit : 'kg';
+                return `
                 <div class="radar-item-mini">
                     <span>${item.name}</span>
-                    <span style="color:var(--cockpit-danger)">${item.stock} ${item.unit || 'u'}</span>
-                </div>
-            `).join('');
+                    <span style="color:var(--cockpit-danger)">${stockVal} ${unitStr}</span>
+                </div>`;
+            }).join('');
         } else {
             stockMini.innerHTML = `<p style="font-size:0.8rem; color:var(--cockpit-success)">${t('dash.stock.optimal')}</p>`;
         }
@@ -391,11 +409,12 @@ window.hydratePremiumDashboard = function () {
                 const arrow = isUp ? '↑' : isDown ? '↓' : '→';
                 const color = isUp ? 'var(--cockpit-danger)' : isDown ? 'var(--cockpit-success)' : 'var(--cockpit-text-muted)';
                 const sign = isUp ? '+' : '';
+                const unitStr = (item.unit && item.unit !== 'undefined') ? item.unit : 'kg';
                 return `
                     <div class="hub-price-row">
                         <span class="hub-price-name">${item.name}</span>
                         <div class="hub-price-meta">
-                            <span class="hub-price-val">${parseFloat(latest).toFixed(2)}€/${item.unit || 'kg'}</span>
+                            <span class="hub-price-val">${parseFloat(latest).toFixed(2)}€/${unitStr}</span>
                             <span class="hub-price-trend" style="color:${color}">${arrow} ${sign}${pct}%</span>
                         </div>
                     </div>`;
@@ -403,14 +422,17 @@ window.hydratePremiumDashboard = function () {
             priceWatchEl.innerHTML = items;
         } else if (inventory.length > 0) {
             // Inventory exists but no history — show latest prices
-            const items = inventory.slice(0, 4).map(item => `
+            const items = inventory.slice(0, 4).map(item => {
+                const unitStr = (item.unit && item.unit !== 'undefined') ? item.unit : 'kg';
+                return `
                 <div class="hub-price-row">
                     <span class="hub-price-name">${item.name}</span>
                     <div class="hub-price-meta">
-                        <span class="hub-price-val">${parseFloat(item.pricePerUnit || item.price || 0).toFixed(2)}€/${item.unit || 'kg'}</span>
+                        <span class="hub-price-val">${parseFloat(item.pricePerUnit || item.price || 0).toFixed(2)}€/${unitStr}</span>
                         <span class="hub-price-trend" style="color:var(--cockpit-text-muted)">→ stable</span>
                     </div>
-                </div>`).join('');
+                </div>`;
+            }).join('');
             priceWatchEl.innerHTML = items;
         } else {
             priceWatchEl.innerHTML = `

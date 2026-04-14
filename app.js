@@ -5130,7 +5130,7 @@ function closeRoleModal() {
 
 function renderAnnualCalendar() {
   const container = $('#annualCalendarView');
-  if (!container || container.offsetParent === null) return; // Lazy render
+  if (!container) return; 
 
   const currentZone = localStorage.getItem(STORAGE_KEYS.vacationZone) || 'C';
   const holidays = HOLIDAYS_2026[currentZone] || HOLIDAYS_2026.C;

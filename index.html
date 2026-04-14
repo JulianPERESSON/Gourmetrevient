@@ -228,6 +228,7 @@
           <button class="nav-link nav-dropdown-link" id="navAssembly">🏗️ <span data-i18n="nav.creative.assembly">Simulateur Montage</span></button>
           <button class="nav-link nav-dropdown-link" id="navConverter">📏 <span data-i18n="nav.creative.converter">Convertisseur de Moules</span></button>
           <button class="nav-link nav-dropdown-link" id="navPortfolio">🖼️ <span data-i18n="nav.portfolio">Portfolio</span></button>
+          <button class="nav-link nav-dropdown-link" id="navScheduler">🎓 <span data-i18n="nav.scheduler">Ordonnancement</span></button>
         </div>
       </div>
 
@@ -236,13 +237,6 @@
         <button class="nav-dropdown-trigger">📈 <span data-i18n="nav.category.analysis">Gestion & Rentabilité</span> <span class="nav-arrow">▼</span></button>
         <div class="nav-dropdown-content">
           <button class="nav-link nav-dropdown-link" id="navStats">📊 <span data-i18n="nav.stats">Dashboard & Statistiques</span></button>
-          <button class="nav-link nav-dropdown-link" id="navPlanningProd">📅 <span data-i18n="nav.planning_prod">Planning Production</span></button>
-          <button class="nav-link nav-dropdown-link" id="navShopping">🛒 <span data-i18n="nav.shopping">Calculateur d'Achats</span></button>
-          <button class="nav-link nav-dropdown-link" id="navCrmClients">🤝 <span data-i18n="nav.crm">Clients & Ventes (CRM)</span></button>
-          <button class="nav-link nav-dropdown-link" id="navCrmOrders">📄 <span data-i18n="nav.orders">Devis & Factures</span></button>
-          <button class="nav-link nav-dropdown-link" id="navWaste">📉 <span data-i18n="nav.waste">Pertes & Gaspillage</span></button>
-          <button class="nav-link nav-dropdown-link" id="navInflation">🔥 <span data-i18n="nav.inflation">Simulateur Inflation</span></button>
-          <button class="nav-link nav-dropdown-link" id="navScheduler">🎓 <span data-i18n="nav.scheduler">Ordonnanceur CAP (EP1/EP2)</span></button>
           <button class="nav-link nav-dropdown-link" id="navCatalogue">🌐 <span data-i18n="nav.catalogue">E-Catalogue Client</span></button>
           <button class="nav-link nav-dropdown-link" id="navComparator">⚖️ <span data-i18n="nav.comparator">Comparateur de Prix</span></button>
         </div>
@@ -543,10 +537,6 @@
             <span class="tab-pill-emoji">🧼</span>
             <span data-i18n="mgmt.tab.quality">Qualité & Pertes</span>
           </button>
-          <button class="mgmt-tab-pill" id="mgmtTabScheduler" onclick="switchMgmtTab('scheduler')">
-            <span class="tab-pill-emoji">🎓</span>
-            <span data-i18n="mgmt.tab.scheduler">Simulateur Examen</span>
-          </button>
           <button class="mgmt-tab-pill" id="mgmtTabProTools" onclick="switchMgmtTab('protools')">
             <span class="tab-pill-emoji">🛠️</span>
             <span data-i18n="mgmt.tab.protools">Outils Pro (INCO/OCR)</span>
@@ -812,50 +802,6 @@
           </div>
         </div>
 
-        <!-- TAB: EXAM SCHEDULER (Ordonnanceur) -->
-        <div id="mgmtViewScheduler" class="mgmt-view" style="display:none;">
-          <div class="mgmt-glass-card scheduler-setup">
-            <div class="mgmt-card-header header-centered">
-              <div class="mgmt-card-title">
-                <div class="title-icon icon-purple">🎓</div>
-                <div>
-                  <h3 data-i18n="mgmt.scheduler.title">Simulateur d'Examen CAP</h3>
-                  <p data-i18n="mgmt.scheduler.desc">Élaborez votre chronogramme d'examen (4h30) en combinant les épreuves de votre choix.</p>
-                </div>
-              </div>
-            </div>
-            
-            <div style="padding:1.5rem; background:var(--bg-alt); border-radius:12px; margin:1rem 0;">
-              <h4 style="margin-top:0; font-size:1rem;">1. Choisissez votre sujet d'examen</h4>
-              <div class="exam-type-selectors">
-                 <label class="stats-toggle-btn">
-                   <input type="radio" name="examType" value="EP1" checked onclick="switchExamType('EP1')">
-                   <span>EP1 : Entremets & Petits Fours</span>
-                 </label>
-                 <label class="stats-toggle-btn">
-                   <input type="radio" name="examType" value="EP2" onclick="switchExamType('EP2')">
-                   <span>EP2 : Tartes, Choux & Feuilletage</span>
-                 </label>
-              </div>
-              
-              <h4 style="margin:1.5rem 0 0.8rem 0; font-size:1rem;">2. Sélectionnez les recettes du sujet</h4>
-              <div id="schedulerRecipeList">
-                <!-- JS Populated -->
-              </div>
-              
-              <div style="margin-top:2rem; text-align:center;">
-                <button class="btn btn-primary" style="padding:1rem 3rem; font-size:1rem; border-radius:12px;" onclick="generateSchedule()">
-                  ⚡ Générer l'Ordonnancement Optimisé
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <div id="schedulerResult" style="margin-top:2rem;">
-            <!-- Gantt Chart Rendered here -->
-          </div>
-        </div>
-
         <!-- TAB 5: PRODUCTION PLANNING -->
         <div id="mgmtViewProduction" class="mgmt-view" style="display:none;">
           <div class="mgmt-glass-card">
@@ -1094,6 +1040,61 @@
            </div>
         </div>
 
+      </div>
+    </section>
+    
+    <!-- ================================================ -->
+    <!-- MODULE ORDONNANCEMENT                            -->
+    <!-- ================================================ -->
+    <section id="appScheduler" style="display:none; padding-bottom: 3rem;">
+      <!-- Expert Hero Header -->
+      <section class="hero" style="padding-bottom: 2.5rem; padding-top: 3rem;">
+        <div class="hero-badge" style="background: rgba(139, 92, 246, 0.1); color: #8b5cf6;" data-i18n="scheduler.hero.badge">🎓 Excellence Académique</div>
+        <h2 style="font-family: var(--font-display); font-size: 2.5rem; color: var(--primary); margin: 1rem 0;" data-i18n="scheduler.hero.title">Stratégie & <span class="accent">Ordonnanceur CAP</span></h2>
+        <p style="color: var(--text-muted); max-width: 700px; margin: 0 auto;" data-i18n="scheduler.hero.desc">Maîtrisez votre temps et vos marges. Générez un plan de travail tactique optimisé pour vos épreuves EP1 et EP2.</p>
+      </section>
+
+      <div class="mgmt-container hero-mgmt-overlap">
+          <div class="mgmt-glass-card scheduler-setup">
+            <div class="mgmt-card-header header-centered">
+              <div class="mgmt-card-title">
+                <div class="title-icon icon-purple">📋</div>
+                <div>
+                  <h3 data-i18n="mgmt.scheduler.title">Configuration du Chronogramme</h3>
+                  <p data-i18n="mgmt.scheduler.desc">Sélectionnez vos recettes pour construire votre matrice de production (5h00).</p>
+                </div>
+              </div>
+            </div>
+            
+            <div style="padding:1.5rem; background:var(--bg-alt); border-radius:12px; margin:1rem 0;">
+              <h4 style="margin-top:0; font-size:1rem;" data-i18n="scheduler.choose_exam">1. Choisissez votre épreuve</h4>
+              <div class="exam-type-selectors">
+                 <label class="stats-toggle-btn">
+                   <input type="radio" name="examType" value="EP1" checked onclick="switchExamType('EP1')">
+                   <span data-i18n="scheduler.ep1">EP1 : Tour, petits fours secs et moelleux, gâteaux de voyage</span>
+                 </label>
+                 <label class="stats-toggle-btn">
+                   <input type="radio" name="examType" value="EP2" onclick="switchExamType('EP2')">
+                   <span data-i18n="scheduler.ep2">EP2 : Entremets et petits gâteaux</span>
+                 </label>
+              </div>
+              
+              <h4 style="margin:1.5rem 0 0.8rem 0; font-size:1rem;" data-i18n="scheduler.choose_recipes">2. Sélectionnez les recettes du sujet</h4>
+              <div id="schedulerRecipeList">
+                <!-- JS Populated -->
+              </div>
+              
+              <div style="margin-top:2rem; text-align:center;">
+                <button class="btn btn-primary" style="padding:1rem 3rem; font-size:1rem; border-radius:12px;" onclick="generateSchedule()" data-i18n="scheduler.btn_generate">
+                  ⚡ Générer l'Ordonnancement Optimisé
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div id="schedulerResult" style="margin-top:2rem;">
+            <!-- Gantt Chart Rendered here -->
+          </div>
       </div>
     </section>
 
@@ -2705,7 +2706,7 @@
           <div style="position:relative; margin-bottom:1.5rem; padding-left:1rem;">
             <div style="position:absolute; left:-1.75rem; top:0.25rem; width:12px; height:12px; border-radius:50%; background:var(--accent); border:2px solid var(--bg-body);"></div>
             <div style="font-weight:700; font-size:0.85rem; color:var(--accent); text-transform:uppercase;" data-i18n="about.phase6.title">Phase 6 — ✅ Terminée</div>
-            <div style="font-size:0.9rem; color:var(--text-secondary); margin-top:0.3rem;" data-i18n="about.phase6.desc">Multi-langue (FR/EN/ES) & Simulateur d'Examen CAP (Ordonnanceur).</div>
+            <div style="font-size:0.9rem; color:var(--text-secondary); margin-top:0.3rem;" data-i18n="about.phase6.desc">Multi-langue (FR/EN/ES) & Ordonnancement d'Examen CAP.</div>
           </div>
         </div>
 
@@ -3275,7 +3276,6 @@
   </div>
 
   <!-- Scripts moved to end of body for reliability -->
-  <script src="./exam-scheduler.js"></script>
 
   <script>
     // Simple logic to switch between Hub, Recettes, and Lab
@@ -3305,6 +3305,8 @@
     const navPortfolio = document.getElementById('navPortfolio');
     const appMgmt = document.getElementById('appMgmt');
     const navMgmt = document.getElementById('navMgmt');
+    const appScheduler = document.getElementById('appScheduler');
+    const navScheduler = document.getElementById('navScheduler');
 
       function hideAllApps() {
       if (hubSec) hubSec.style.display = 'none';
@@ -3315,9 +3317,9 @@
       if (appPlanning) appPlanning.style.display = 'none';
       if (appAdmin) appAdmin.style.display = 'none';
       if (appHygiene) appHygiene.style.display = 'none';
-      const appCRM = document.getElementById('appCRM');
-      if (appCRM) appCRM.style.display = 'none';
       if (appMgmt) appMgmt.style.display = 'none';
+      if (appScheduler) appScheduler.style.display = 'none';
+      if (typeof appCRM !== 'undefined' && appCRM) appCRM.style.display = 'none';
 
       const appMain = document.getElementById('appMain');
       if (appMain) appMain.style.maxWidth = ''; // Reset global width constraint
@@ -3336,6 +3338,7 @@
       if (navAdmin) navAdmin.classList.remove('active');
       if (navHygiene) navHygiene.classList.remove('active');
       if (navMgmt) navMgmt.classList.remove('active');
+      if (navScheduler) navScheduler.classList.remove('active');
 
       const navSuppliers = document.getElementById('navSuppliers');
       const navStats = document.getElementById('navStats');
@@ -3440,6 +3443,15 @@
       mainNav.style.display = 'flex';
       if (navAdmin) navAdmin.classList.add('active');
       if (typeof renderAdminUsers === 'function') renderAdminUsers();
+      if (typeof updateRandomTip === 'function') updateRandomTip();
+    }
+
+    function showScheduler() {
+      hideAllApps();
+      if (appScheduler) appScheduler.style.display = 'block';
+      mainNav.style.display = 'flex';
+      if (navScheduler) navScheduler.classList.add('active');
+      if (typeof switchExamType === 'function') switchExamType('EP1');
       if (typeof updateRandomTip === 'function') updateRandomTip();
     }
 
@@ -3623,7 +3635,7 @@
 
   <!-- Core Scripts -->
   <script src="./data.js?v=2.2.5"></script>
-  <script src="./i18n.js?v=3.5.3"></script>
+  <script src="./i18n.js?v=3.6.1"></script>
   <script src="./app.js?v=2.5.1"></script>
   <script src="./pro-features.js?v=1.0.8"></script>
   <script src="./equipment.js?v=2.1.1"></script>
@@ -3634,7 +3646,7 @@
   <script src="./crm.js?v=1.0.1"></script>
   <script src="./commercial-features.js?v=1.1.2"></script>
   <script src="./advanced-modules.js?v=1.0.2"></script>
-  <script src="./exam-scheduler.js?v=2.1.0"></script>
+  <script src="./exam-scheduler.js?v=2.2.0"></script>
   <script src="./crm-enhanced-v2.js?v=2.2.0"></script>
   <script src="./premium-effects.js?v=1.0.2"></script>
 
@@ -3714,7 +3726,7 @@
           'navCrmOrders': () => showCRM('orders'),
           'navPlanningProd': () => showMgmt('production'),
           'navShopping': () => showMgmt('shopping'),
-          'navScheduler': () => showMgmt('scheduler'),
+          'navScheduler': showScheduler,
           'navInflation': () => showMgmt('inflation'),
           'navCatalogue': generateECatalogue,
           'navChefsBrain': openChefsBrain,
@@ -3850,12 +3862,7 @@
       } else if (category === 'pilotage') {
         moreMenuTitle.textContent = "📈 Gestion & Rentabilité";
         items = [
-          { id: 'mLinkStats', icon: '📊', label: 'nav.stats', action: showStats },
-          { id: 'mLinkPlanningProd', icon: '📅', label: 'nav.planning_prod', action: () => showMgmt('production') },
-          { id: 'mLinkShopping', icon: '🛒', label: 'nav.shopping', action: () => showMgmt('shopping') },
-          { id: 'mLinkCrm', icon: '🤝', label: 'nav.crm', action: () => showCRM('clients') },
-          { id: 'mLinkWaste', icon: '📉', label: 'nav.waste', action: () => showMgmt('quality') },
-          { id: 'mLinkInflation', icon: '🔥', label: 'nav.inflation', action: () => showMgmt('inflation') }
+          { id: 'mLinkStats', icon: '📊', label: 'nav.stats', action: showStats }
         ];
       } else if (category === 'catalogue') {
         moreMenuTitle.textContent = "🛡️ Labo & Sécurité";
@@ -4267,7 +4274,6 @@
   <!-- ======================================================== -->
   <!-- ENHANCED CRM & FEATURES v8.0                            -->
   <!-- ======================================================== -->
-  <script src="./crm-enhanced-v2.js"></script>
   <script>
     /* Safety net — si crm-enhanced-v2.js n'a pas pu charger, on définit des stubs
        pour éviter des erreurs "function is not defined" dans les nav links */
