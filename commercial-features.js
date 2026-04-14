@@ -714,6 +714,7 @@ window.renderWasteMonthlyReport = function() {
 // ============================================================================
 
 window.generateECatalogue = function() {
+  console.log("Generating E-Catalogue...");
   const recipes = APP.savedRecipes || [];
   if (recipes.length === 0) {
     showToast("Aucune recette à afficher dans le catalogue.", 'error');
@@ -755,16 +756,22 @@ window.generateECatalogue = function() {
     };
   });
 
-  // Generate standalone HTML page
-  const html = generateCatalogueHTML(catalogItems, shopName, userName);
-  
-  // Show preview modal
-  showCataloguePreview(html, catalogItems, shopName);
+    // Generate standalone HTML page
+    try {
+      const html = window.generateCatalogueHTML(catalogItems, shopName, userName);
+      window.showCataloguePreview(html, catalogItems, shopName);
+    } catch(e) {
+      console.error("Manual HTML Generation Error:", e);
+      showToast("Erreur lors de la génération du contenu visuel.", 'error');
+    }
 };
 
-function generateCatalogueHTML(items, shopName, userName) {
+window.generateCatalogueHTML = function(items, shopName, userName) {
+  console.log("Building HTML for", items.length, "items");
+  const sName = shopName || 'Mon Atelier';
+  const uName = userName || 'Chef';
   // Select a theme color based on shop name or random
-  const hue = Math.abs(shopName.split('').reduce((a,b) => a + b.charCodeAt(0), 0) % 360);
+  const hue = Math.abs(sName.split('').reduce((a,b) => a + b.charCodeAt(0), 0) % 360);
   const primaryColor = `hsl(${hue}, 80%, 60%)`;
   const secondaryColor = `hsl(${(hue + 40) % 360}, 80%, 60%)`;
 
@@ -980,7 +987,7 @@ function generateCatalogueHTML(items, shopName, userName) {
 </html>`;
 }
 
-function showCataloguePreview(html, items, shopName) {
+window.showCataloguePreview = function(html, items, shopName) {
   let modal = document.getElementById('eCatalogueModal');
   if (!modal) {
     modal = document.createElement('div');
