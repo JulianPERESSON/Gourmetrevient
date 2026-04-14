@@ -113,7 +113,7 @@ const TRANSLATIONS = {
 
         // Gestion Pro (Management)
         'mgmt.hero.badge': '💎 Excellence Opérationnelle',
-        'mgmt.hero.title': 'Gestion Experte & Rentabilité',
+        'mgmt.hero.title': 'Gestion Experte & <span class="accent">Rentabilité</span>',
         'mgmt.hero.desc': 'Optimisez vos besoins matières, surveillez vos allergènes et traquez vos pertes réelles.',
         'mgmt.tabs.shopping': '🛒 Liste de Courses',
         'mgmt.tabs.allergens': '🛡️ Matrice Allergènes',
@@ -1686,7 +1686,7 @@ const TRANSLATIONS = {
 
         // Pro Management
         'mgmt.hero.badge': '💎 Operational Excellence',
-        'mgmt.hero.title': 'Expert Steering & Profitability',
+        'mgmt.hero.title': 'Expert Steering & <span class="accent">Profitability</span>',
         'mgmt.hero.desc': 'Optimize your material needs, monitor your allergens, and track your actual losses.',
         'mgmt.tabs.shopping': '🛒 Shopping List',
         'mgmt.tabs.allergens': '🛡️ Allergen Matrix',
@@ -3237,7 +3237,7 @@ const TRANSLATIONS = {
 
         // Gestión Pro
         'mgmt.hero.badge': '💎 Excelencia Operativa',
-        'mgmt.hero.title': 'Dirección Experta y Rentabilidad',
+        'mgmt.hero.title': 'Dirección Experta y <span class="accent">Rentabilidad</span>',
         'mgmt.hero.desc': 'Optimice sus necesidades de materiales, controle sus alérgenos y rastree sus pérdidas reales.',
         'mgmt.tabs.shopping': '🛒 Lista de Compras',
         'mgmt.tabs.allergens': '🛡️ Matriz de Alérgenos',
