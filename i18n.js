@@ -643,6 +643,11 @@ const TRANSLATIONS = {
         'plan.zone.C': 'Zone C (Toulouse, Paris, Montpellier...)',
         'plan.calendar.title': "Planning d'Activité",
         'plan.calendar.desc': 'Organisation annuelle du laboratoire et des équipes.',
+        
+        // HACCP Hero
+        'haccp.hero.badge': '🛡️ Conformité & Sécurité',
+        'haccp.hero.title': 'HACCP <span class="accent">Expert PRO</span>',
+        'haccp.hero.desc': 'Assurez la sécurité alimentaire de votre laboratoire avec un suivi digital rigoureux et automatisé.',
 
         // Portfolio
         'portfolio.badge': '🖼️ Mon Portfolio',
@@ -2278,6 +2283,11 @@ const TRANSLATIONS = {
         'plan.zone.C': 'Zone C (Toulouse, Paris, Montpellier...)',
         'plan.calendar.title': 'Activity Planning',
         'plan.calendar.desc': 'Annual organization of the laboratory and teams.',
+
+        // HACCP Hero
+        'haccp.hero.badge': '🛡️ Compliance & Safety',
+        'haccp.hero.title': 'HACCP <span class="accent">PRO Expert</span>',
+        'haccp.hero.desc': 'Ensure your laboratory food safety with a professional digital automated tracking system.',
         'plan.team.empty': 'No team members registered.',
         'plan.team.no_employee': 'No employees',
         'plan.team.removed': 'Member removed.',
@@ -3790,6 +3800,11 @@ const TRANSLATIONS = {
 
         // HACCP
         'haccp.badge': '🛡️ Seguridad e Higiene',
+        
+        // HACCP Hero
+        'haccp.hero.badge': '🛡️ Cumplimiento y Seguridad',
+        'haccp.hero.title': 'HACCP <span class="accent">Experto PRO</span>',
+        'haccp.hero.desc': 'Asegure la seguridad alimentaria de su laboratorio con un seguimiento digital riguroso y automatizado.',
         'haccp.title': 'Módulo de Higiene y HACCP',
         'haccp.desc': 'Seguimiento de temperaturas, plan de limpieza y trazabilidad de lotes.',
         'haccp.tab.temp': '📉 Temperaturas',
