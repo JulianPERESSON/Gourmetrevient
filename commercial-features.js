@@ -992,7 +992,8 @@ function showCataloguePreview(html, items, shopName) {
   const previewArea = document.getElementById('eCataloguePreviewArea');
   previewArea.innerHTML = '';
   const iframe = document.createElement('iframe');
-  iframe.style.cssText = 'width:100%; height:500px; border:none; border-radius:var(--radius);';
+  iframe.id = 'eCatIframePreview_' + Date.now();
+  iframe.style.cssText = 'width:100%; height:550px; border:none; border-radius:var(--radius);';
   previewArea.appendChild(iframe);
   iframe.contentDocument.open();
   iframe.contentDocument.write(html);
