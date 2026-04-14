@@ -409,26 +409,30 @@ function updateBCGLegend(data, legendContainer) {
     { id: 'dead_weight', color: '#ef4444', icon: '💀' }
   ];
 
-  legendContainer.innerHTML = quadrants.map(q => {
-    const items = data.filter(d => d.quadrant === q.id);
-    if (items.length === 0) return '';
-    
-    return `
-      <div class="bcg-quadrant-group" style="margin-bottom:1.5rem; padding:1rem; background:var(--bg-alt); border-radius:12px; border:1px solid var(--surface-border);">
-        <div style="display:flex; align-items:center; gap:8px; margin-bottom:0.8rem;">
-           <span style="font-size:1.2rem;">${q.icon}</span>
-           <span style="font-weight:800; font-size:0.9rem; color:var(--primary);">${i18n.t('bcg.' + q.id)}</span>
-           <span style="margin-left:auto; background:${q.color}; color:white; padding:2px 8px; border-radius:10px; font-size:0.7rem; font-weight:900;">${items.length}</span>
-        </div>
-        <div style="font-size:0.75rem; color:var(--text-secondary); margin-bottom:0.8rem; line-height:1.4;">
-           <b>Conseil:</b> ${i18n.t('bcg.action.' + q.id)}
-        </div>
-        <div style="display:flex; flex-wrap:wrap; gap:5px;">
-           ${items.map(it => `<span class="bcg-item-tag" style="background:white; border:1px solid var(--surface-border); padding:2px 8px; border-radius:4px; font-size:0.7rem; font-weight:600;">${it.name}</span>`).join('')}
-        </div>
-      </div>
-    `;
-  }).join('');
+  legendContainer.innerHTML = `
+    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:1.5rem;">
+      ${quadrants.map(q => {
+        const items = data.filter(d => d.quadrant === q.id);
+        if (items.length === 0) return '';
+        
+        return `
+          <div class="bcg-quadrant-group" style="padding:1.2rem; background:var(--bg-alt); border-radius:12px; border:1px solid var(--surface-border); display:flex; flex-direction:column; gap:0.8rem;">
+            <div style="display:flex; align-items:center; gap:10px;">
+               <span style="font-size:1.4rem;">${q.icon}</span>
+               <span style="font-weight:800; font-size:1rem; color:var(--primary);">${i18n.t('bcg.' + q.id)}</span>
+               <span style="margin-left:auto; background:${q.color}; color:white; padding:2px 10px; border-radius:12px; font-size:0.75rem; font-weight:900;">${items.length}</span>
+            </div>
+            <div style="font-size:0.8rem; color:var(--text-secondary); line-height:1.5; padding:0.5rem; background:rgba(255,255,255,0.5); border-radius:8px;">
+               <b style="color:var(--primary);">💡 Conseil:</b> ${i18n.t('bcg.action.' + q.id)}
+            </div>
+            <div style="display:flex; flex-wrap:wrap; gap:6px;">
+               ${items.map(it => `<span class="bcg-item-tag" style="background:white; border:1px solid var(--surface-border); padding:3px 10px; border-radius:6px; font-size:0.75rem; font-weight:600; color:var(--text-main); box-shadow: 0 1px 3px rgba(0,0,0,0.05);">${it.name}</span>`).join('')}
+            </div>
+          </div>
+        `;
+      }).join('')}
+    </div>
+  `;
 }
 
 // ============================================================================

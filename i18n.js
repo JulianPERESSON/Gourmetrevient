@@ -488,6 +488,7 @@ const TRANSLATIONS = {
         'ui.label.cook': 'Cuisson',
         'ui.label.total_material': 'Total matière',
         'ui.label.financial_analysis': 'Analyse financière',
+        'ui.summary.insights': '🚀 Recommandations Stratégiques',
         'ui.label.scaling': "Passage à l'échelle (Total Matière)",
 
         // Lab
@@ -2107,6 +2108,7 @@ const TRANSLATIONS = {
         'ui.label.cook': 'Cooking',
         'ui.label.total_material': 'Total material',
         'ui.label.financial_analysis': 'Financial Analysis',
+        'ui.summary.insights': '🚀 Strategic Insights',
         'ui.label.scaling': 'Batch Scaling (Total Material)',
 
         'lab.tab1': '1. Budget & Equipment',
@@ -3706,6 +3708,7 @@ const TRANSLATIONS = {
         'ui.label.cook': 'Cocción',
         'ui.label.total_material': 'Total material',
         'ui.label.financial_analysis': 'Análisis financiero',
+        'ui.summary.insights': '🚀 Recomendaciones Estratégicas',
         'ui.label.scaling': 'Escalado por lotes (Total material)',
 
         'lab.tab1': '1. Presupuesto y Equipos',
