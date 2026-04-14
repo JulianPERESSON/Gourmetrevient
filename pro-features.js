@@ -245,6 +245,7 @@ function renderBCGMatrix(isUpdate = false) {
   const savedRecs = (window.APP && window.APP.savedRecipes) || [];
   const libraryRecs = typeof RECIPES !== 'undefined' ? RECIPES : [];
   const recipes = [...savedRecs, ...libraryRecs];
+  
   if (recipes.length === 0) {
     if (bcgChartInstance) { bcgChartInstance.destroy(); bcgChartInstance = null; }
     if (legendContainer) legendContainer.innerHTML = `<p style="text-align:center; color:var(--text-muted); padding:2rem;">${i18n.t('bcg.no_data')}</p>`;
@@ -254,43 +255,48 @@ function renderBCGMatrix(isUpdate = false) {
   // 1. Prepare Data
   const data = recipes.map(r => {
     let costObj = (window.inflationFactor > 0 && typeof window.calcFullCost === 'function') 
-        ? window.calcFullCost(r.margin || 70, r)
+        ? window.calcFullCost(r.margin || 70, r, window.inflationFactor)
         : (r.costs || r.data);
+    
+    // Fallback if costs object is not calculated yet
+    if (!costObj && typeof window.calcFullCost === 'function') {
+      costObj = window.calcFullCost(r.margin || 70, r, window.inflationFactor || 0);
+    }
         
     let margin = costObj?.marginPct || 70;
     
-    // Stable "random" popularity based on name to prevent jumpy animation
+    // Simulated popularity (between 10 and 90)
     const seed = r.name.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    const popularity = 10 + ((seed * 7) % 80);
+    let popularity = 10 + ((seed * 13) % 80);
     
-    // Nuance de la marge pour éviter que toutes les recettes s'alignent parfaitement sur un même axe horizontal
-    const marginOffset = ((seed * 11) % 120) / 10 - 6; // Oscille entre -6.0 et +6.0
+    // Nuance margin slightly for visualization
+    const marginOffset = ((seed * 7) % 60) / 10 - 3; 
     margin += marginOffset;
     
     let quadrant = '';
     let color = '';
     
-    if (margin >= 75 && popularity >= 50) { quadrant = 'star'; color = '#10b981'; } 
-    else if (margin >= 75 && popularity < 50) { quadrant = 'question'; color = '#f59e0b'; } 
-    else if (margin < 75 && popularity >= 50) { quadrant = 'cash_cow'; color = '#3b82f6'; } 
+    // Thresholds: Margin > 70% (Profitability) and Popularity > 50%
+    if (margin >= 70 && popularity >= 50) { quadrant = 'star'; color = '#10b981'; } 
+    else if (margin >= 70 && popularity < 50) { quadrant = 'question'; color = '#f59e0b'; } 
+    else if (margin < 70 && popularity >= 50) { quadrant = 'cash_cow'; color = '#3b82f6'; } 
     else { quadrant = 'dead_weight'; color = '#ef4444'; } 
     
     return {
       x: popularity,
       y: margin,
-      v: r.costs?.unitCost || 0,
       name: r.name,
       quadrant: quadrant,
       color: color
     };
   });
 
-  // If chart exists, just update data and colors for maximum smoothness
+  // Smooth update if chart already exists
   if (bcgChartInstance) {
      bcgChartInstance.data.datasets[0].data = data;
      bcgChartInstance.data.datasets[0].pointBackgroundColor = data.map(d => d.color);
-     bcgChartInstance.options.animation = false; // Disable animation during live moves
-     bcgChartInstance.update('none'); 
+     bcgChartInstance.options.animation = isUpdate ? false : { duration: 600 };
+     bcgChartInstance.update(isUpdate ? 'none' : 'default'); 
      updateBCGLegend(data, legendContainer);
      return;
   }
@@ -301,58 +307,39 @@ function renderBCGMatrix(isUpdate = false) {
     beforeDraw(chart) {
       const { ctx, chartArea: { top, bottom, left, right, width, height }, scales: { x, y } } = chart;
       const midX = x.getPixelForValue(50);
-      const midY = y.getPixelForValue(75);
+      const midY = y.getPixelForValue(70);
 
       ctx.save();
       
-      // Draw Quadrants
-      // Top Right: Stars (Green)
-      ctx.fillStyle = 'rgba(16, 185, 129, 0.05)';
-      ctx.fillRect(midX, top, right - midX, midY - top);
-      
-      // Top Left: Dilemmas (Orange)
-      ctx.fillStyle = 'rgba(245, 158, 11, 0.05)';
-      ctx.fillRect(left, top, midX - left, midY - top);
-      
-      // Bottom Right: Cash Cows (Blue)
-      ctx.fillStyle = 'rgba(59, 130, 246, 0.05)';
-      ctx.fillRect(midX, midY, right - midX, bottom - midY);
-      
-      // Bottom Left: Dogs (Red)
-      ctx.fillStyle = 'rgba(239, 68, 68, 0.05)';
-      ctx.fillRect(left, midY, midX - left, bottom - midY);
+      // Quadrant Colors (Subtle Gradients)
+      const drawQuad = (x1, y1, w, h, color) => {
+        ctx.fillStyle = color;
+        ctx.fillRect(x1, y1, w, h);
+      };
 
-      // Draw Axis Lines
-      ctx.strokeStyle = 'rgba(0,0,0,0.1)';
-      ctx.lineWidth = 2;
-      ctx.setLineDash([5, 5]);
-      
-      ctx.beginPath();
-      ctx.moveTo(midX, top);
-      ctx.lineTo(midX, bottom);
-      ctx.stroke();
-      
-      ctx.beginPath();
-      ctx.moveTo(left, midY);
-      ctx.lineTo(right, midY);
-      ctx.stroke();
+      drawQuad(midX, top, right - midX, midY - top, 'rgba(16, 185, 129, 0.04)'); // Top Right
+      drawQuad(left, top, midX - left, midY - top, 'rgba(245, 158, 11, 0.04)');  // Top Left
+      drawQuad(midX, midY, right - midX, bottom - midY, 'rgba(59, 130, 246, 0.04)'); // Bottom Right
+      drawQuad(left, midY, midX - left, bottom - midY, 'rgba(239, 68, 68, 0.04)');   // Bottom Left
 
-      // Quadrant Labels
+      // Axis Lines
+      ctx.strokeStyle = 'rgba(0,0,0,0.08)';
+      ctx.lineWidth = 1;
+      ctx.setLineDash([8, 4]);
+      
+      ctx.beginPath(); ctx.moveTo(midX, top); ctx.lineTo(midX, bottom); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(left, midY); ctx.lineTo(right, midY); ctx.stroke();
+
+      // Labels
       ctx.setLineDash([]);
-      ctx.fillStyle = 'rgba(0,0,0,0.3)';
-      ctx.font = 'bold 12px Inter';
+      ctx.fillStyle = 'rgba(0,0,0,0.4)';
+      ctx.font = '600 11px Inter';
       ctx.textAlign = 'center';
       
-      const starTxt = i18n.t('bcg.star').toUpperCase();
-      const questionTxt = i18n.t('bcg.question').toUpperCase();
-      const cowTxt = i18n.t('bcg.cash_cow').toUpperCase();
-      const dogTxt = i18n.t('bcg.dead_weight').toUpperCase();
-
-      // Draw Labels with icons (relying on i18n keys having emojis)
-      ctx.fillText(starTxt, midX + (right - midX)/2, top + 25);
-      ctx.fillText(questionTxt, left + (midX - left)/2, top + 25);
-      ctx.fillText(cowTxt, midX + (right - midX)/2, bottom - 15);
-      ctx.fillText(dogTxt, left + (midX - left)/2, bottom - 15);
+      ctx.fillText(i18n.t('bcg.star').toUpperCase(), midX + (right - midX)/2, top + 30);
+      ctx.fillText(i18n.t('bcg.question').toUpperCase(), left + (midX - left)/2, top + 30);
+      ctx.fillText(i18n.t('bcg.cash_cow').toUpperCase(), midX + (right - midX)/2, bottom - 20);
+      ctx.fillText(i18n.t('bcg.dead_weight').toUpperCase(), left + (midX - left)/2, bottom - 20);
       
       ctx.restore();
     }
@@ -368,21 +355,25 @@ function renderBCGMatrix(isUpdate = false) {
         pointBackgroundColor: data.map(d => d.color),
         pointBorderColor: '#fff',
         pointBorderWidth: 2,
-        pointRadius: 8,
-        pointHoverRadius: 12
+        pointRadius: 9,
+        pointHoverRadius: 13,
+        pointHoverBorderWidth: 3
       }]
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      animation: { duration: 400 }, // Default animation for initial load
       plugins: {
         legend: { display: false },
         tooltip: {
+          backgroundColor: 'rgba(0, 0, 0, 0.8)',
+          titleFont: { size: 14, weight: 'bold' },
+          padding: 12,
+          cornerRadius: 8,
           callbacks: {
             label: (context) => {
               const p = context.raw;
-              return ` ${p.name}: ${p.y.toFixed(1)}% Marge | Pop: ${p.x.toFixed(0)}`;
+              return ` ${p.name}: ${p.y.toFixed(1)}% Marge | Popularité: ${p.x.toFixed(0)}%`;
             }
           }
         }
@@ -390,13 +381,15 @@ function renderBCGMatrix(isUpdate = false) {
       scales: {
         x: {
           min: 0, max: 100,
-          title: { display: true, text: i18n.t('bcg.axis.popularity'), font: { weight: 'bold' } },
-          grid: { display: false }
+          title: { display: true, text: i18n.t('bcg.axis.popularity'), font: { weight: '800', size: 12 }, padding: 10 },
+          grid: { color: 'rgba(0,0,0,0.03)' },
+          ticks: { font: { weight: '600' } }
         },
         y: {
           min: 40, max: 100,
-          title: { display: true, text: i18n.t('bcg.axis.margin'), font: { weight: 'bold' } },
-          grid: { display: false }
+          title: { display: true, text: i18n.t('bcg.axis.margin'), font: { weight: '800', size: 12 }, padding: 10 },
+          grid: { color: 'rgba(0,0,0,0.03)' },
+          ticks: { font: { weight: '600' }, callback: (v) => v + '%' }
         }
       }
     },
@@ -408,28 +401,34 @@ function renderBCGMatrix(isUpdate = false) {
 
 function updateBCGLegend(data, legendContainer) {
   if (!legendContainer) return;
-  legendContainer.innerHTML = `
-    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:1rem; margin-top:1rem;">
-      ${['star', 'cash_cow', 'question', 'dead_weight'].map(q => {
-        const items = data.filter(d => d.quadrant === q);
-        if (items.length === 0) return '';
-        return `
-          <div class="bcg-quadrant-group" style="padding:1rem; border-radius:12px; border: 1px solid rgba(0,0,0,0.05); background: #fdfdfd;">
-            <h4 style="margin:0 0 10px 0; font-size:0.8rem; display:flex; align-items:center; gap:8px;">
-              <span style="width:10px; height:10px; border-radius:50%; background:${items[0].color}"></span>
-              ${i18n.t('bcg.' + q)}
-            </h4>
-            <ul style="list-style:none; padding:0; margin:0; font-size:0.75rem; color:var(--text-muted);">
-              ${items.map(it => `<li>• ${it.name}</li>`).join('')}
-            </ul>
-            <div style="margin-top:8px; font-size:0.65rem; font-style:italic; color:var(--accent);">
-              Target: ${i18n.t('bcg.action.' + q)}
-            </div>
-          </div>
-        `;
-      }).join('')}
-    </div>
-  `;
+  
+  const quadrants = [
+    { id: 'star', color: '#10b981', icon: '⭐' },
+    { id: 'cash_cow', color: '#3b82f6', icon: '🐄' },
+    { id: 'question', color: '#f59e0b', icon: '❓' },
+    { id: 'dead_weight', color: '#ef4444', icon: '💀' }
+  ];
+
+  legendContainer.innerHTML = quadrants.map(q => {
+    const items = data.filter(d => d.quadrant === q.id);
+    if (items.length === 0) return '';
+    
+    return `
+      <div class="bcg-quadrant-group" style="margin-bottom:1.5rem; padding:1rem; background:var(--bg-alt); border-radius:12px; border:1px solid var(--surface-border);">
+        <div style="display:flex; align-items:center; gap:8px; margin-bottom:0.8rem;">
+           <span style="font-size:1.2rem;">${q.icon}</span>
+           <span style="font-weight:800; font-size:0.9rem; color:var(--primary);">${i18n.t('bcg.' + q.id)}</span>
+           <span style="margin-left:auto; background:${q.color}; color:white; padding:2px 8px; border-radius:10px; font-size:0.7rem; font-weight:900;">${items.length}</span>
+        </div>
+        <div style="font-size:0.75rem; color:var(--text-secondary); margin-bottom:0.8rem; line-height:1.4;">
+           <b>Conseil:</b> ${i18n.t('bcg.action.' + q.id)}
+        </div>
+        <div style="display:flex; flex-wrap:wrap; gap:5px;">
+           ${items.map(it => `<span class="bcg-item-tag" style="background:white; border:1px solid var(--surface-border); padding:2px 8px; border-radius:4px; font-size:0.7rem; font-weight:600;">${it.name}</span>`).join('')}
+        </div>
+      </div>
+    `;
+  }).join('');
 }
 
 // ============================================================================

@@ -50,7 +50,7 @@
   }
   </script>
 
-  <link rel="stylesheet" href="./styles.css?v=3.5.2" />
+  <link rel="stylesheet" href="./styles.css?v=3.5.3" />
   <link rel="stylesheet" href="./css/premium-branding.css?v=1.0.7" />
   <link rel="stylesheet" href="./css/creative-tools.css?v=1.0.1" />
   <link rel="stylesheet" href="./css/master-converter.css?v=1.0.1" />
@@ -1078,14 +1078,32 @@
 
         <!-- TAB: BOSTON MATRIX -->
         <div id="mgmtViewBoston" class="mgmt-view" style="display:none;">
-           <div class="mgmt-glass-card" style="padding:2rem;">
-              <h3 style="margin:0 0 0.5rem 0; font-size:1.4rem;">🌀 Matrice de Positionnement Stratégique</h3>
-              <p style="color:var(--text-muted); margin-bottom:2rem;">Croisement entre la Marge et la Complexité (Charge de travail/Prix de revient).</p>
-              
-              <div class="bcg-container" style="position:relative; width:100%; height:500px; background:var(--bg-alt); border:2px solid var(--surface-border); border-radius:16px; margin-top:1rem;">
-                 <canvas id="bcgChart"></canvas>
-              </div>
-           </div>
+            <div class="stats-header" style="margin-bottom:2rem;">
+               <h2 style="margin:0; font-family:var(--font-display); font-size:1.8rem; color:var(--primary);" data-i18n="bcg.title">🌀 Matrice de Positionnement Stratégique</h2>
+               <p style="color:var(--text-muted); margin:0; font-size:0.9rem;" data-i18n="bcg.desc">Croisement entre Profitabilité et Popularité (analyse BCG).</p>
+            </div>
+            
+            <div class="bcg-workspace" style="display:grid; grid-template-columns: 1fr 320px; gap:2rem;">
+               <div class="bcg-chart-pane">
+                  <div class="mgmt-glass-card" style="padding:1.5rem; position:relative;">
+                     <div style="height:500px; position:relative;">
+                        <canvas id="bcgChartCanvas"></canvas>
+                     </div>
+                  </div>
+               </div>
+               
+               <div class="bcg-info-pane">
+                  <div class="mgmt-glass-card" style="padding:1.5rem; height:100%; display:flex; flex-direction:column;">
+                     <h4 style="margin:0 0 1rem 0; font-size:1rem; border-bottom:1px solid var(--surface-border); padding-bottom:0.5rem;" data-i18n="ui.summary.insights">🚀 Recommandations</h4>
+                     <div id="bcgLegend" style="flex:1; overflow-y:auto;">
+                        <!-- JS Populated -->
+                        <div style="text-align:center; padding:2rem; color:var(--text-muted);">
+                           <p>Charge en cours...</p>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
         </div>
 
         <!-- TAB: INFLATION SIMULATOR -->
@@ -3670,7 +3688,7 @@
   <script src="./data.js?v=2.2.5"></script>
   <script src="./i18n.js?v=3.5.2"></script>
   <script src="./app.js?v=2.5.0"></script>
-  <script src="./pro-features.js?v=1.0.1"></script>
+  <script src="./pro-features.js?v=1.0.2"></script>
   <script src="./equipment.js?v=2.1.1"></script>
   <script src="./lab-logic.js?v=2.1.1"></script>
   <script src="./dashboard-premium.js?v=1.0.2"></script>

@@ -2218,6 +2218,12 @@ select.form-input {
   line-height: 1.4;
 }
 
+@media (max-width: 1100px) {
+  .bcg-workspace {
+    grid-template-columns: 1fr !important;
+  }
+}
+
 .portfolio-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
