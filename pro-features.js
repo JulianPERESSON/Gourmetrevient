@@ -265,21 +265,21 @@ function renderBCGMatrix(isUpdate = false) {
         
     let margin = costObj?.marginPct || 70;
     
-    // Simulated popularity (skewed higher to avoid too many Dogs/Questions)
+    // Simulated popularity (Stretched 5-95)
     const seed = r.name.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    let popularity = 30 + ((seed * 13) % 65); // Now between 30 and 95
+    let popularity = 5 + ((seed * 17) % 90); 
     
     // Nuance margin slightly for visualization
-    const marginOffset = ((seed * 7) % 40) / 10 - 2; 
+    const marginOffset = ((seed * 7) % 30) / 10 - 1.5; 
     margin += marginOffset;
     
     let quadrant = '';
     let color = '';
     
-    // Adjusted Thresholds: Margin > 65% (Profitability) and Popularity > 40% (Volume)
-    if (margin >= 65 && popularity >= 40) { quadrant = 'star'; color = '#10b981'; } 
-    else if (margin >= 65 && popularity < 40) { quadrant = 'question'; color = '#f59e0b'; } 
-    else if (margin < 65 && popularity >= 40) { quadrant = 'cash_cow'; color = '#3b82f6'; } 
+    // Exclusive thresholds (MidX=60, MidY=75)
+    if (margin >= 75 && popularity >= 60) { quadrant = 'star'; color = '#10b981'; } 
+    else if (margin >= 75 && popularity < 60) { quadrant = 'question'; color = '#f59e0b'; } 
+    else if (margin < 75 && popularity >= 60) { quadrant = 'cash_cow'; color = '#3b82f6'; } 
     else { quadrant = 'dead_weight'; color = '#ef4444'; } 
     
     return {
@@ -306,8 +306,8 @@ function renderBCGMatrix(isUpdate = false) {
     id: 'quadrantPlugin',
     beforeDraw(chart) {
       const { ctx, chartArea: { top, bottom, left, right, width, height }, scales: { x, y } } = chart;
-      const midX = x.getPixelForValue(40);
-      const midY = y.getPixelForValue(65);
+      const midX = x.getPixelForValue(60);
+      const midY = y.getPixelForValue(75);
 
       ctx.save();
       
