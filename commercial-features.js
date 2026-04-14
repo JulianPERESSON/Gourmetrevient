@@ -763,194 +763,207 @@ window.generateECatalogue = function() {
 };
 
 function generateCatalogueHTML(items, shopName, userName) {
+  // Select a theme color based on shop name or random
+  const hue = Math.abs(shopName.split('').reduce((a,b) => a + b.charCodeAt(0), 0) % 360);
+  const primaryColor = `hsl(${hue}, 80%, 60%)`;
+  const secondaryColor = `hsl(${(hue + 40) % 360}, 80%, 60%)`;
+
   return `<!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${shopName} — L'Expérience Sucrée</title>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+  <title>${shopName}</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&family=Playfair+Display:ital,wght@0,900;1,900&family=Bebas+Neue&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --primary: #ff4d8d;      /* Vibrant Pink */
-      --secondary: #6c5ce7;    /* Modern Purple */
-      --accent: #ffbe76;       /* Soft Orange */
-      --bg: #f8f9ff;
-      --card-bg: rgba(255, 255, 255, 0.9);
-    }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body { 
-      font-family: 'Outfit', sans-serif; 
-      background: linear-gradient(135deg, #f8f9ff 0%, #ffeef8 100%);
-      color: #2d3436; 
-      line-height: 1.6;
-      min-height: 100vh;
-      padding: 2rem 1rem;
+      font-family: 'Montserrat', sans-serif; 
+      background: #0f0f1b;
+      color: #ffffff; 
+      line-height: 1.4;
+      padding: 0;
+      overflow-x: hidden;
     }
     .hero {
+      height: 60vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
       text-align: center;
-      padding: 4rem 1rem;
-      position: relative;
+      background: linear-gradient(45deg, ${primaryColor}, ${secondaryColor});
+      padding: 2rem;
+      clip-path: polygon(0 0, 100% 0, 100% 85%, 0 100%);
+      margin-bottom: -5vh;
     }
     .hero h1 {
       font-family: 'Playfair Display', serif;
-      font-size: clamp(3rem, 8vw, 5rem);
+      font-size: clamp(3.5rem, 12vw, 7rem);
+      font-weight: 900;
       font-style: italic;
-      background: linear-gradient(90deg, var(--primary), var(--secondary));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      margin-bottom: 1rem;
+      line-height: 0.9;
+      margin-bottom: 1.5rem;
+      text-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      color: white;
     }
     .hero p {
-      font-size: 1.2rem;
-      color: #636e72;
-      font-weight: 500;
-      letter-spacing: 0.1rem;
+      font-size: 1.5rem;
+      letter-spacing: 0.5rem;
       text-transform: uppercase;
+      font-weight: 300;
+      opacity: 0.9;
     }
     .container {
-      max-width: 1100px;
+      max-width: 1200px;
       margin: 0 auto;
+      padding: 4rem 2rem;
     }
     .category-group {
-      margin-bottom: 5rem;
+      margin-bottom: 8rem;
     }
-    .category-header {
+    .category-title {
+      font-family: 'Bebas Neue', cursive;
+      font-size: 5rem;
+      color: rgba(255,255,255,0.05);
+      position: absolute;
+      z-index: -1;
+      margin-top: -2rem;
+      user-select: none;
+    }
+    .category-label {
+      font-size: 2rem;
+      font-weight: 900;
+      color: ${primaryColor};
+      margin-bottom: 3rem;
       display: flex;
       align-items: center;
       gap: 1.5rem;
-      margin-bottom: 2.5rem;
     }
-    .category-header h2 {
-      font-size: 2rem;
-      font-weight: 800;
-      color: #2d3436;
-      white-space: nowrap;
-    }
-    .category-line {
-      height: 4px;
+    .category-label::after {
+      content: "";
+      height: 2px;
       flex: 1;
-      background: linear-gradient(90deg, var(--accent), transparent);
-      border-radius: 2px;
+      background: linear-gradient(90deg, ${primaryColor}, transparent);
     }
     .catalog-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-      gap: 2.5rem;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      gap: 3rem;
     }
     .card {
-      background: var(--card-bg);
-      border-radius: 24px;
-      padding: 2rem;
-      box-shadow: 0 10px 40px rgba(255, 77, 141, 0.1);
-      border: 1px solid rgba(255,255,255,0.5);
-      backdrop-filter: blur(10px);
-      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      background: #1a1a2e;
+      border-radius: 32px;
+      padding: 2.5rem;
+      border: 1px solid rgba(255,255,255,0.05);
+      transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
       display: flex;
       flex-direction: column;
       position: relative;
       overflow: hidden;
     }
-    .card::before {
-      content: "";
-      position: absolute;
-      top: 0; left: 0; width: 6px; height: 100%;
-      background: var(--primary);
-    }
     .card:hover {
-      transform: translateY(-10px) scale(1.02);
-      box-shadow: 0 20px 60px rgba(108, 92, 231, 0.15);
-      border-color: var(--primary);
+      transform: translateY(-15px) rotate(1deg);
+      background: #23233b;
+      border-color: ${primaryColor};
+      box-shadow: 0 30px 60px rgba(0,0,0,0.5);
     }
-    .card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 1.5rem;
+    .card-accent {
+      position: absolute;
+      top: 0; right: 0;
+      width: 150px; height: 150px;
+      background: radial-gradient(circle, ${primaryColor}77, transparent 70%);
+      opacity: 0.2;
+      pointer-events: none;
     }
     .name {
-      font-size: 1.5rem;
-      font-weight: 800;
-      line-height: 1.2;
-      color: #2d3436;
-    }
-    .price {
-      background: var(--primary);
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      font-weight: 900;
       color: white;
-      padding: 0.5rem 1rem;
-      border-radius: 100px;
-      font-weight: 800;
-      font-size: 1.1rem;
-      box-shadow: 0 4px 15px rgba(255, 77, 141, 0.3);
+      margin-bottom: 1rem;
+      line-height: 1.1;
+    }
+    .price-tag {
+      font-family: 'Bebas Neue', cursive;
+      font-size: 3rem;
+      color: ${primaryColor};
+      margin: 1.5rem 0;
+      display: inline-block;
+      line-height: 1;
     }
     .description {
       font-size: 1rem;
-      color: #636e72;
+      color: rgba(255,255,255,0.6);
       margin-bottom: 2rem;
       flex: 1;
-      line-height: 1.5;
+      font-weight: 400;
+      letter-spacing: 0.02rem;
     }
-    .footer-info {
+    .card-footer {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding-top: 1.5rem;
-      border-top: 1px dashed #dfe6e9;
+      background: rgba(255,255,255,0.03);
+      margin: 0 -2.5rem -2.5rem;
+      padding: 1.5rem 2.5rem;
     }
     .allergens {
-      font-size: 0.75rem;
+      font-size: 0.8rem;
       font-weight: 700;
-      color: #ff7675;
+      color: #ff4d4d;
       text-transform: uppercase;
+      letter-spacing: 0.1rem;
     }
     .portions {
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: #b2bec3;
+      font-size: 0.9rem;
+      color: white;
+      background: rgba(255,255,255,0.1);
+      padding: 0.3rem 0.8rem;
+      border-radius: 8px;
     }
     footer {
       text-align: center;
-      margin-top: 10rem;
-      padding-bottom: 4rem;
+      padding: 10rem 2rem;
+      background: #0a0a14;
     }
-    .copyright {
-      font-size: 0.9rem;
-      color: #b2bec3;
-      margin-top: 1rem;
+    .footer-stamp {
+      font-family: 'Bebas Neue', cursive;
+      font-size: 4rem;
+      color: rgba(255,255,255,0.1);
+      margin-bottom: 2rem;
     }
     @media (max-width: 600px) {
       .catalog-grid { grid-template-columns: 1fr; }
-      .hero h1 { font-size: 3rem; }
+      .hero h1 { font-size: 4rem; }
+      .category-title { font-size: 3rem; }
     }
   </style>
 </head>
 <body>
   <div class="hero">
-    <p>Collection Exclusive</p>
+    <p>La Signature Gastronomique</p>
     <h1>${shopName}</h1>
-    <p>Par ${userName}</p>
+    <p>By ${userName}</p>
   </div>
 
   <div class="container">
     ${Object.entries(groupByCategory(items)).map(([cat, catItems]) => `
       <div class="category-group">
-        <div class="category-header">
-          <h2>${cat}</h2>
-          <div class="category-line"></div>
-        </div>
+        <div class="category-title">${cat}</div>
+        <div class="category-label">${cat}</div>
         <div class="catalog-grid">
           ${catItems.map((item, i) => `
             <div class="card">
-              <div class="card-header">
-                <div class="name">${item.name}</div>
-                <div class="price">${item.price}€</div>
-              </div>
+              <div class="card-accent"></div>
+              <div class="name">${item.name}</div>
               <div class="description">
-                ${item.description || "Une création artisanale d'exception alliant finesse et gourmandise."}
+                ${item.description || "Une immersion sensorielle unique entre textures et saveurs d'exception."}
               </div>
-              <div class="footer-info">
-                <div class="allergens">${item.allergens.length > 0 ? '⚠️ ' + item.allergens.join(', ') : '✨ Sans allergènes majeurs'}</div>
-                <div class="portions">${item.portions} pers.</div>
+              <div class="price-tag">${item.price} €</div>
+              <div class="card-footer">
+                <div class="allergens">${item.allergens.length > 0 ? '🚫 ' + item.allergens.join(', ') : '✓ Sans Allergènes'}</div>
+                <div class="portions">${item.portions} PERS.</div>
               </div>
             </div>
           `).join('')}
@@ -960,8 +973,8 @@ function generateCatalogueHTML(items, shopName, userName) {
   </div>
 
   <footer>
-    <div style="font-size:1.5rem;">🧁🍰🍩</div>
-    <p class="copyright">© ${new Date().getFullYear()} ${shopName} — Créé avec Passion</p>
+    <div class="footer-stamp">${shopName}</div>
+    <p style="color:rgba(255,255,255,0.3); letter-spacing:0.2rem;">L'EXCELLENCE À CHAQUE PORTION</p>
   </footer>
 </body>
 </html>`;
