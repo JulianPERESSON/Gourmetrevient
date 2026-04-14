@@ -780,10 +780,6 @@ window.generateCatalogueHTML = function(items, shopName, userName) {
   console.log("Building HTML for", items.length, "items");
   const sName = String(shopName || 'Mon Atelier');
   const uName = String(userName || 'Chef');
-  // Select a theme color based on shop name or random
-  const hue = Math.abs(sName.split('').reduce((a,b) => a + b.charCodeAt(0), 0) % 360);
-  const primaryColor = `hsl(${hue}, 80%, 60%)`;
-  const secondaryColor = `hsl(${(hue + 40) % 360}, 80%, 60%)`;
 
   return `<!DOCTYPE html>
 <html lang="fr">
@@ -791,196 +787,184 @@ window.generateCatalogueHTML = function(items, shopName, userName) {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${shopName}</title>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&family=Playfair+Display:ital,wght@0,900;1,900&family=Bebas+Neue&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,700;1,6..96,400&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --gold: #b39449;
+      --gold-light: #d4bc82;
+      --charcoal: #1a1a1a;
+      --ivory: #fcfaf7;
+      --border: #eaddca;
+    }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body { 
-      font-family: 'Montserrat', sans-serif; 
-      background: #0f0f1b;
-      color: #ffffff; 
-      line-height: 1.4;
+      font-family: 'Inter', sans-serif; 
+      background-color: var(--ivory); 
+      color: var(--charcoal); 
+      line-height: 1.6;
       padding: 0;
-      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
     }
-    .hero {
-      height: 60vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
+    .header {
       text-align: center;
-      background: linear-gradient(45deg, ${primaryColor}, ${secondaryColor});
-      padding: 2rem;
-      clip-path: polygon(0 0, 100% 0, 100% 85%, 0 100%);
-      margin-bottom: -5vh;
+      padding: 6rem 2rem;
+      border-bottom: 1px solid var(--border);
+      background: white;
+      position: relative;
     }
-    .hero h1 {
-      font-family: 'Playfair Display', serif;
-      font-size: clamp(3.5rem, 12vw, 7rem);
-      font-weight: 900;
-      font-style: italic;
-      line-height: 0.9;
-      margin-bottom: 1.5rem;
-      text-shadow: 0 10px 30px rgba(0,0,0,0.3);
-      color: white;
+    .header::after {
+      content: "";
+      position: absolute;
+      bottom: -1px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100px;
+      height: 3px;
+      background: var(--gold);
     }
-    .hero p {
-      font-size: 1.5rem;
-      letter-spacing: 0.5rem;
+    .header span {
+      display: block;
       text-transform: uppercase;
-      font-weight: 300;
-      opacity: 0.9;
+      letter-spacing: 0.4em;
+      font-size: 0.75rem;
+      color: var(--gold);
+      margin-bottom: 1.5rem;
+      font-weight: 600;
+    }
+    h1 {
+      font-family: 'Bodoni Moda', serif;
+      font-size: clamp(2.5rem, 6vw, 4.5rem);
+      font-weight: 400;
+      color: var(--charcoal);
+      margin-bottom: 1rem;
+    }
+    .header p {
+      font-family: 'Bodoni Moda', serif;
+      font-style: italic;
+      font-size: 1.2rem;
+      color: #777;
     }
     .container {
-      max-width: 1200px;
+      max-width: 1000px;
       margin: 0 auto;
-      padding: 4rem 2rem;
+      padding: 5rem 2rem;
     }
-    .category-group {
-      margin-bottom: 8rem;
+    .category-section {
+      margin-bottom: 6rem;
     }
     .category-title {
-      font-family: 'Bebas Neue', cursive;
-      font-size: 5rem;
-      color: rgba(255,255,255,0.05);
-      position: absolute;
-      z-index: -1;
-      margin-top: -2rem;
-      user-select: none;
+      font-family: 'Bodoni Moda', serif;
+      font-size: 2.2rem;
+      text-align: center;
+      margin-bottom: 4rem;
+      color: var(--gold);
+      position: relative;
     }
-    .category-label {
-      font-size: 2rem;
-      font-weight: 900;
-      color: ${primaryColor};
-      margin-bottom: 3rem;
-      display: flex;
-      align-items: center;
-      gap: 1.5rem;
+    .category-title::after {
+      content: "✧";
+      display: block;
+      font-size: 1.2rem;
+      margin-top: 0.5rem;
+      opacity: 0.5;
     }
-    .category-label::after {
-      content: "";
-      height: 2px;
-      flex: 1;
-      background: linear-gradient(90deg, ${primaryColor}, transparent);
-    }
-    .catalog-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-      gap: 3rem;
-    }
-    .card {
-      background: #1a1a2e;
-      border-radius: 32px;
-      padding: 2.5rem;
-      border: 1px solid rgba(255,255,255,0.05);
-      transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+    .items-list {
       display: flex;
       flex-direction: column;
-      position: relative;
-      overflow: hidden;
+      gap: 3.5rem;
     }
-    .card:hover {
-      transform: translateY(-15px) rotate(1deg);
-      background: #23233b;
-      border-color: ${primaryColor};
-      box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+    .item {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: baseline;
+      gap: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid rgba(179, 148, 73, 0.1);
     }
-    .card-accent {
-      position: absolute;
-      top: 0; right: 0;
-      width: 150px; height: 150px;
-      background: radial-gradient(circle, ${primaryColor}77, transparent 70%);
-      opacity: 0.2;
-      pointer-events: none;
-    }
-    .name {
-      font-family: 'Playfair Display', serif;
-      font-size: 2rem;
-      font-weight: 900;
-      color: white;
-      margin-bottom: 1rem;
-      line-height: 1.1;
-    }
-    .price-tag {
-      font-family: 'Bebas Neue', cursive;
-      font-size: 3rem;
-      color: ${primaryColor};
-      margin: 1.5rem 0;
-      display: inline-block;
-      line-height: 1;
-    }
-    .description {
-      font-size: 1rem;
-      color: rgba(255,255,255,0.6);
-      margin-bottom: 2rem;
-      flex: 1;
-      font-weight: 400;
-      letter-spacing: 0.02rem;
-    }
-    .card-footer {
+    .item-main {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: rgba(255,255,255,0.03);
-      margin: 0 -2.5rem -2.5rem;
-      padding: 1.5rem 2.5rem;
+      flex-direction: column;
+      gap: 0.5rem;
     }
-    .allergens {
-      font-size: 0.8rem;
+    .item-name {
+      font-family: 'Bodoni Moda', serif;
+      font-size: 1.8rem;
+      font-weight: 500;
+      color: var(--charcoal);
+    }
+    .item-desc {
+      font-size: 0.95rem;
+      color: #666;
+      max-width: 80%;
+      font-style: italic;
+    }
+    .item-price {
+      font-family: 'Bodoni Moda', serif;
+      font-size: 1.6rem;
       font-weight: 700;
-      color: #ff4d4d;
-      text-transform: uppercase;
-      letter-spacing: 0.1rem;
+      color: var(--gold);
     }
-    .portions {
-      font-size: 0.9rem;
-      color: white;
-      background: rgba(255,255,255,0.1);
-      padding: 0.3rem 0.8rem;
-      border-radius: 8px;
+    .item-meta {
+      grid-column: 1 / -1;
+      display: flex;
+      gap: 2rem;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #aaa;
+      margin-top: 0.5rem;
+    }
+    .allergen-warning {
+      color: #c0a080;
     }
     footer {
       text-align: center;
-      padding: 10rem 2rem;
-      background: #0a0a14;
+      padding: 6rem 2rem;
+      background: white;
+      border-top: 1px solid var(--border);
     }
-    .footer-stamp {
-      font-family: 'Bebas Neue', cursive;
-      font-size: 4rem;
-      color: rgba(255,255,255,0.1);
-      margin-bottom: 2rem;
+    .footer-signature {
+      font-family: 'Bodoni Moda', serif;
+      font-size: 1.2rem;
+      margin-bottom: 1rem;
+    }
+    .footer-tag {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: #ccc;
     }
     @media (max-width: 600px) {
-      .catalog-grid { grid-template-columns: 1fr; }
-      .hero h1 { font-size: 4rem; }
-      .category-title { font-size: 3rem; }
+      .item { grid-template-columns: 1fr; gap: 0.5rem; }
+      .item-price { order: -1; font-size: 1.4rem; }
+      .header { padding: 4rem 1rem; }
+      h1 { font-size: 2.2rem; }
     }
   </style>
 </head>
 <body>
-  <div class="hero">
-    <p>La Signature Gastronomique</p>
+  <div class="header">
+    <span>Collection Exclusive</span>
     <h1>${shopName}</h1>
-    <p>By ${userName}</p>
+    <p>Créations signées par ${userName}</p>
   </div>
 
   <div class="container">
-    ${Object.entries(groupByCategory(items)).map(([cat, catItems]) => `
-      <div class="category-group">
-        <div class="category-title">${cat}</div>
-        <div class="category-label">${cat}</div>
-        <div class="catalog-grid">
-          ${catItems.map((item, i) => `
-            <div class="card">
-              <div class="card-accent"></div>
-              <div class="name">${item.name}</div>
-              <div class="description">
-                ${item.description || "Une immersion sensorielle unique entre textures et saveurs d'exception."}
+    ${Object.entries(window.groupByCategory(items)).map(([cat, catItems]) => `
+      <div class="category-section">
+        <h2 class="category-title">${cat}</h2>
+        <div class="items-list">
+          ${catItems.map(item => `
+            <div class="item">
+              <div class="item-main">
+                <div class="item-name">${item.name}</div>
+                <div class="item-desc">
+                  ${item.description || "Une création artisanale alliant la noblesse des produits à la précision du geste."}
+                </div>
               </div>
-              <div class="price-tag">${item.price} €</div>
-              <div class="card-footer">
-                <div class="allergens">${item.allergens.length > 0 ? '🚫 ' + item.allergens.join(', ') : '✓ Sans Allergènes'}</div>
-                <div class="portions">${item.portions} PERS.</div>
+              <div class="item-price">${item.price}€</div>
+              <div class="item-meta">
+                <span>Portions : ${item.portions}</span>
+                <span class="allergen-warning">${item.allergens.length > 0 ? 'Allergènes : ' + item.allergens.join(', ') : 'Exclusivité Maison'}</span>
               </div>
             </div>
           `).join('')}
@@ -990,8 +974,8 @@ window.generateCatalogueHTML = function(items, shopName, userName) {
   </div>
 
   <footer>
-    <div class="footer-stamp">${shopName}</div>
-    <p style="color:rgba(255,255,255,0.3); letter-spacing:0.2rem;">L'EXCELLENCE À CHAQUE PORTION</p>
+    <div class="footer-signature">L'Art de la Pâtisserie par ${shopName}</div>
+    <div class="footer-tag">GourmetRevient • Haute Gastronomie</div>
   </footer>
 </body>
 </html>`;
