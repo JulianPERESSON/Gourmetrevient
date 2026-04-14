@@ -17,12 +17,13 @@ function applySmartPricing(val) {
   if (isNaN(p) || p <= 0) return p;
   
   let whole = Math.floor(p);
-  let dec = Math.round((p - whole) * 100) / 100;
+  let dec = p - whole;
   
-  if (dec <= 0.00) return whole;
+  // High-End Pastry Pricing strategy: Mostly .90, .50 or .00 but biased towards .90 for perceived value
+  if (dec < 0.20) return (whole > 0 ? whole : 1) - 0.10; // e.g. 4.15 -> 3.90
   if (dec <= 0.50) return whole + 0.50;
-  if (dec <= 0.90) return whole + 0.90;
-  return whole + 1.00;
+  if (dec <= 1.00) return whole + 0.90;
+  return Math.ceil(p) - 0.10;
 }
 
 // ============================================================================
@@ -767,49 +768,202 @@ function generateCatalogueHTML(items, shopName, userName) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${shopName} — Catalogue</title>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <title>${shopName} — Carte Gourmande</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --gold: #c5a55a;
+      --bg: #fffdf9;
+      --text: #1a1a1a;
+      --muted: #6e6e6e;
+      --border: #e8e2d6;
+    }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Inter', sans-serif; background: #faf9f6; color: #1a1a2e; line-height: 1.6; }
-    .catalog-header { text-align: center; padding: 3rem 1rem 2rem; background: linear-gradient(135deg, #1a1a2e 0%, #2d2b55 100%); color: white; }
-    .catalog-header h1 { font-family: 'Playfair Display', serif; font-size: 2.5rem; margin-bottom: 0.3rem; }
-    .catalog-header p { opacity: 0.7; font-size: 0.9rem; }
-    .catalog-grid { max-width: 1200px; margin: 2rem auto; padding: 0 1rem; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; }
-    .catalog-card { background: white; border-radius: 16px; padding: 1.5rem; box-shadow: 0 2px 12px rgba(0,0,0,0.06); border: 1px solid #f0ebe3; transition: transform 0.2s, box-shadow 0.2s; }
-    .catalog-card:hover { transform: translateY(-4px); box-shadow: 0 8px 25px rgba(0,0,0,0.1); }
-    .catalog-card h3 { font-family: 'Playfair Display', serif; font-size: 1.3rem; margin-bottom: 0.5rem; color: #1a1a2e; }
-    .catalog-price { font-size: 1.4rem; font-weight: 800; color: #c5a55a; margin: 0.5rem 0; }
-    .catalog-category { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: #888; font-weight: 700; margin-bottom: 0.5rem; }
-    .catalog-desc { font-size: 0.85rem; color: #666; margin-bottom: 0.8rem; }
-    .catalog-allergens { font-size: 0.75rem; color: #ef4444; font-weight: 600; padding: 0.5rem; background: rgba(239,68,68,0.05); border-radius: 8px; margin-top: 0.5rem; }
-    .catalog-footer { text-align: center; padding: 2rem; color: #999; font-size: 0.8rem; border-top: 1px solid #f0ebe3; margin-top: 2rem; }
-    .catalog-contact-btn { display: inline-block; margin-top: 1rem; padding: 0.8rem 2rem; background: #c5a55a; color: white; text-decoration: none; border-radius: 100px; font-weight: 700; transition: background 0.2s; }
-    .catalog-contact-btn:hover { background: #b39449; }
-    @media (max-width: 600px) { .catalog-grid { grid-template-columns: 1fr; } .catalog-header h1 { font-size: 1.8rem; } }
+    body { 
+      font-family: 'Montserrat', sans-serif; 
+      background-color: var(--bg); 
+      color: var(--text); 
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 4rem 2rem;
+    }
+    header {
+      text-align: center;
+      margin-bottom: 5rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 3rem;
+    }
+    header span {
+      text-transform: uppercase;
+      letter-spacing: 0.3em;
+      font-size: 0.75rem;
+      color: var(--gold);
+      font-weight: 600;
+      display: block;
+      margin-bottom: 1rem;
+    }
+    h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 3.5rem;
+      font-weight: 500;
+      line-height: 1;
+      margin-bottom: 1rem;
+    }
+    header p {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 1.3rem;
+      color: var(--muted);
+    }
+    .menu-section {
+      margin-bottom: 4rem;
+    }
+    .section-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2rem;
+      text-align: center;
+      margin-bottom: 3rem;
+      position: relative;
+    }
+    .section-title::after {
+      content: "";
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 40px;
+      height: 1px;
+      background: var(--gold);
+    }
+    .menu-item {
+      margin-bottom: 2.5rem;
+      display: flex;
+      flex-direction: column;
+      animation: fadeIn 0.8s ease forwards;
+      opacity: 0;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .item-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 0.5rem;
+    }
+    .item-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .item-dots {
+      flex: 1;
+      border-bottom: 1px dotted var(--border);
+      margin: 0 1rem;
+      position: relative;
+      top: -5px;
+    }
+    .item-price {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--gold);
+    }
+    .item-description {
+      font-size: 0.9rem;
+      color: var(--muted);
+      max-width: 85%;
+      font-style: italic;
+      line-height: 1.4;
+    }
+    .item-allergens {
+      font-size: 0.7rem;
+      color: #9c9c9c;
+      margin-top: 0.4rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    footer {
+      text-align: center;
+      margin-top: 6rem;
+      padding-top: 3rem;
+      border-top: 1px solid var(--border);
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.1rem;
+      color: var(--muted);
+    }
+    .luxury-badge {
+      display: inline-block;
+      border: 1px solid var(--gold);
+      padding: 1rem 2rem;
+      margin-top: 2rem;
+      font-family: 'Montserrat', sans-serif;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      font-size: 0.7rem;
+      color: var(--gold);
+    }
+    @media (max-width: 600px) {
+      h1 { font-size: 2.5rem; }
+      .container { padding: 2rem 1rem; }
+      .item-header { flex-direction: column; align-items: flex-start; }
+      .item-dots { display: none; }
+      .item-price { margin-top: 0.2rem; }
+      .item-description { max-width: 100%; }
+    }
   </style>
 </head>
 <body>
-  <div class="catalog-header">
-    <p>✨ Catalogue des Créations</p>
-    <h1>${shopName}</h1>
-    <p>Artisan Pâtissier</p>
+  <div class="container">
+    <header>
+      <span>PÂTISSERIE HAUTE COUTURE</span>
+      <h1>${shopName}</h1>
+      <p>La passion du goût, l'excellence du geste.</p>
+    </header>
+
+    <div class="menu-content">
+      ${Object.entries(groupByCategory(items)).map(([cat, catItems]) => `
+        <div class="menu-section">
+          <h2 class="section-title">${cat}</h2>
+          ${catItems.map((item, i) => `
+            <div class="menu-item" style="animation-delay: ${i * 0.1}s">
+              <div class="item-header">
+                <div class="item-name">${item.name}</div>
+                <div class="item-dots"></div>
+                <div class="item-price">${item.price}€</div>
+              </div>
+              <div class="item-description">
+                ${item.description || "Une création artisanale d'exception alliant finesse et gourmandise."}
+              </div>
+              ${item.allergens.length > 0 ? `<div class="item-allergens">Allergènes : ${item.allergens.join(', ')}</div>` : ''}
+            </div>
+          `).join('')}
+        </div>
+      `).join('')}
+    </div>
+
+    <footer>
+      <p>— Carte disponible sous réserve de production journalière —</p>
+      <div class="luxury-badge">Signé ${userName}</div>
+      <p style="margin-top:1.5rem; font-size:0.8rem; opacity:0.5;">Généré avec élégance par GourmetRevient</p>
+    </footer>
   </div>
-  <div class="catalog-grid">
-    ${items.map(item => `
-      <div class="catalog-card">
-        <div class="catalog-category">${item.category}</div>
-        <h3>${item.name}</h3>
-        <div class="catalog-price">${item.price} €</div>
-        ${item.description ? `<div class="catalog-desc">${item.description}</div>` : ''}
-        ${item.allergens.length > 0 ? `<div class="catalog-allergens">⚠️ Allergènes : ${item.allergens.join(', ')}</div>` : ''}
-      </div>
-    `).join('')}
-  </div>
-  <div class="catalog-footer">
-    <p>Catalogue généré par GourmetRevient</p>
-    <p>Mis à jour le ${new Date().toLocaleDateString('fr-FR')}</p>
-  </div>
+
+  <script>
+    function groupByCategory(items) {
+      const g = {};
+      items.forEach(it => {
+        if (!g[it.category]) g[it.category] = [];
+        g[it.category].push(it);
+      });
+      return g;
+    }
+  </script>
 </body>
 </html>`;
 }
