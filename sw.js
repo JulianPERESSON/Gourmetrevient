@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = 'gourmet-v' + new Date().getTime() + '-1'; // Auto-versioning
+const CACHE_NAME = 'gourmet-v' + new Date().getTime() + '-2'; // Version bump
 const ASSETS = [
     './',
     './index.html',
@@ -8,6 +8,14 @@ const ASSETS = [
     './i18n.js',
     './dashboard-premium.js',
     './lab-logic.js',
+    './exam-scheduler.js',
+    './creative-tools.js',
+    './advanced-modules.js',
+    './crm-enhanced-v2.js',
+    './equipment.js',
+    './master-converter.js',
+    './premium-effects.js',
+    './pro-features.js',
     './manifest.json'
 ];
 
