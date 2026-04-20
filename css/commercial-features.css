@@ -1,4 +1,4 @@
-﻿/* =============================================================
+/* =============================================================
    COMMERCIAL-FEATURES.CSS — GourmetRevient v6.0
    🛒 Smart Order Builder + 📦 Bon d'Économat
    🚨 Waste Report + 🌐 E-Catalogue
@@ -59,8 +59,8 @@
 .smart-order-margin {
   margin-top: 1rem;
   padding: 1rem;
-  background: linear-gradient(135deg, rgba(197, 165, 90, 0.06) 0%, rgba(16, 185, 129, 0.04) 100%);
-  border: 1px solid rgba(197, 165, 90, 0.15);
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(16, 185, 129, 0.04) 100%);
+  border: 1px solid rgba(99, 102, 241, 0.12);
   border-radius: 12px;
   animation: fadeUp 0.4s ease-out;
 }
@@ -187,7 +187,7 @@
   align-items: center;
   margin-bottom: 2rem;
   padding-bottom: 1.2rem;
-  border-bottom: 3px solid var(--accent, #c5a55a);
+  border-bottom: 3px solid var(--accent, #6366f1);
   position: relative;
 }
 
@@ -198,7 +198,7 @@
   left: 0;
   width: 80px;
   height: 3px;
-  background: linear-gradient(90deg, var(--accent, #c5a55a), transparent);
+  background: linear-gradient(90deg, var(--accent, #6366f1), transparent);
 }
 
 .bon-economat-header h3 {
@@ -295,7 +295,7 @@
 }
 
 .bon-table tbody tr:hover td {
-  background: rgba(197, 165, 90, 0.03);
+  background: rgba(99, 102, 241, 0.03);
 }
 
 .bon-row.bon-critical td {
@@ -380,8 +380,8 @@
   align-items: center;
   gap: 0.8rem;
   padding: 1rem 1.2rem;
-  background: linear-gradient(135deg, rgba(197, 165, 90, 0.06), rgba(197, 165, 90, 0.02));
-  border: 1px solid rgba(197, 165, 90, 0.15);
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(99, 102, 241, 0.02));
+  border: 1px solid rgba(99, 102, 241, 0.12);
   border-radius: 12px;
   margin-bottom: 1.5rem;
 }
@@ -400,7 +400,7 @@
 
 .waste-report-quote em {
   font-style: italic;
-  color: var(--accent, #c5a55a);
+  color: var(--accent, #6366f1);
   font-weight: 600;
 }
 

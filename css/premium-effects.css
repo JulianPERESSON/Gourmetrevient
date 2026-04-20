@@ -1,4 +1,4 @@
-﻿/* =============================================================
+/* =============================================================
    PREMIUM-EFFECTS.CSS — GourmetRevient v5.5
    ✨ Atmosphère Pâtissière + Glassmorphism 2.0 + Haptic Effects
    ✨ Predictive Margin Alerts + Allergen Audit + Smart OCR
@@ -39,7 +39,7 @@ body.auth-pending #atmosphereCanvas {
   height: 250px;
   background: radial-gradient(
     circle,
-    rgba(197, 165, 90, 0.12) 0%,
+    rgba(99, 102, 241, 0.12) 0%,
     rgba(232, 213, 163, 0.06) 30%,
     transparent 70%
   );
@@ -59,11 +59,11 @@ body.auth-pending #atmosphereCanvas {
 
 /* Specular border glow */
 .cockpit-card.specular-active {
-  border-color: rgba(197, 165, 90, 0.2) !important;
+  border-color: rgba(99, 102, 241, 0.2) !important;
   box-shadow:
     var(--shadow),
-    0 0 30px rgba(197, 165, 90, 0.06),
-    inset 0 0 30px rgba(197, 165, 90, 0.03) !important;
+    0 0 30px rgba(99, 102, 241, 0.06),
+    inset 0 0 30px rgba(99, 102, 241, 0.03) !important;
 }
 
 /* Dark theme adjustments */
@@ -246,7 +246,7 @@ body.auth-pending #atmosphereCanvas {
 }
 
 .ai-tip:hover {
-  background: rgba(197, 165, 90, 0.15) !important;
+  background: rgba(99, 102, 241, 0.15) !important;
   transform: translateY(-1px);
 }
 
@@ -328,16 +328,16 @@ body.auth-pending #atmosphereCanvas {
 .btn-mold-adapter {
   font-size: 0.72rem !important;
   padding: 4px 10px !important;
-  border-color: var(--gold) !important;
-  color: var(--gold) !important;
+  border-color: var(--accent) !important;
+  color: var(--accent) !important;
   border-radius: 8px !important;
   transition: all 0.3s ease !important;
 }
 
 .btn-mold-adapter:hover {
-  background: var(--gold) !important;
+  background: var(--accent) !important;
   color: var(--chocolate) !important;
-  box-shadow: 0 4px 15px rgba(197, 165, 90, 0.3) !important;
+  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3) !important;
   transform: translateY(-2px) !important;
 }
 
@@ -351,8 +351,8 @@ body.auth-pending #atmosphereCanvas {
   align-items: center;
   gap: 0.6rem;
   padding: 0.8rem 1rem;
-  background: linear-gradient(135deg, rgba(197, 165, 90, 0.1), rgba(197, 165, 90, 0.05));
-  border: 1px solid rgba(197, 165, 90, 0.2);
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(99, 102, 241, 0.05));
+  border: 1px solid rgba(99, 102, 241, 0.2);
   border-radius: 12px;
   margin-bottom: 1rem;
   font-size: 0.9rem;

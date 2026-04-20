@@ -504,7 +504,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       proToolsGrid.insertAdjacentHTML('beforeend', `
         <div class="protools-card" onclick="openVitrineLabels()" id="vitrineProCard">
-          <div class="protools-card-icon" style="background:rgba(197,165,90,0.12); color:var(--gold-dark);">🏷️</div>
+          <div class="protools-card-icon" style="background:rgba(99,102,241,0.10); color:var(--accent-dark);">🏷️</div>
           <div class="protools-card-body">
             <h3>Étiquettes Vitrine</h3>
             <p>Générez des étiquettes élégantes avec QR code pour votre vitrine. Le client scanne pour voir allergènes et composition.</p>
@@ -691,7 +691,7 @@ window.generateVitrineLabels = function() {
         font-family: 'Inter', sans-serif; position: relative; overflow: hidden;
         box-shadow: 0 2px 12px rgba(0,0,0,0.04);
       ">
-        <div style="position:absolute; top:0; left:0; right:0; height:3px; background:linear-gradient(90deg, #c5a55a, #d4ba7a, #c5a55a);"></div>
+        <div style="position:absolute; top:0; left:0; right:0; height:3px; background:linear-gradient(90deg, #6366f1, #818cf8, #6366f1);"></div>
         
         <div style="display:flex; justify-content:space-between; align-items:flex-start;">
           <div style="flex:1;">

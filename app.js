@@ -8,6 +8,8 @@
 // ============================================================================
 // STATE
 // ============================================================================
+document.title = "GourmetRevient — " + (new Date().toLocaleTimeString()); // Diagnostic to confirm script is running
+
 
 const APP = {
   currentStep: 0,
@@ -2057,10 +2059,10 @@ function exportPdf() {
       }).join('')
     : `<div class="step"><div class="step-num">1</div><div class="step-body"><div class="step-title">Procédé de fabrication</div><div class="step-desc">${esc(r.description||'Suivre le protocole de production défini pour cette recette.')}</div></div></div>`;
 
-  const html = `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><title>Fiche Technique</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:Arial,Helvetica,sans-serif;background:#fff;color:#1a202c;-webkit-print-color-adjust:exact;print-color-adjust:exact}.header{background:linear-gradient(135deg,#0f1923 0%,#1a3040 60%,#12232e 100%);color:#fff;padding:28px 38px 22px}.header-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px}.brand{display:flex;align-items:center;gap:10px}.brand-name{font-size:1.15rem;font-weight:800;color:#C5A55A;letter-spacing:.04em}.brand-sub{font-size:.6rem;color:rgba(255,255,255,.45);letter-spacing:.12em;text-transform:uppercase}.doc-meta{text-align:right;font-size:.7rem;color:rgba(255,255,255,.5);line-height:1.7}.doc-meta strong{color:rgba(255,255,255,.8)}.header-title-block{border-top:1px solid rgba(197,165,90,.25);padding-top:14px}.doc-type-badge{display:inline-block;background:rgba(197,165,90,.15);color:#C5A55A;font-size:.6rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;padding:3px 10px;border-radius:20px;border:1px solid rgba(197,165,90,.3);margin-bottom:6px}.recipe-title{font-size:1.8rem;font-weight:900;color:#fff;line-height:1.2}.recipe-subtitle{font-size:.75rem;color:rgba(255,255,255,.45);margin-top:4px}.kpi-bar{display:grid;grid-template-columns:repeat(5,1fr);background:#f8f9fb;border-bottom:1px solid #eaedf2}.kpi-item{padding:14px 10px;text-align:center;border-right:1px solid #eaedf2}.kpi-item:last-child{border-right:none}.kpi-value{font-size:1.3rem;font-weight:900;color:#0f1923}.kpi-value.green{color:#10b981}.kpi-value.gold{color:#C5A55A}.kpi-value.blue{color:#3b82f6}.kpi-value.red{color:#ef4444}.kpi-label{font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#94a3b8;margin-top:4px}.body-grid{display:grid;grid-template-columns:1fr 195px}.main-col{padding:22px 26px}.side-col{background:#f8f9fb;border-left:1px solid #eaedf2;padding:18px 14px}.section-title{display:flex;align-items:center;gap:8px;font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.13em;color:#64748b;margin-bottom:10px}.section-title::after{content:'';flex:1;height:1px;background:#eaedf2}.ing-table{width:100%;border-collapse:collapse;font-size:.75rem;margin-bottom:18px}.ing-table thead tr{background:#0f1923;color:#fff}.ing-table thead th{padding:8px 9px;text-align:left;font-size:.58rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase}.ing-table thead th:last-child{text-align:right}.ing-table tbody tr:nth-child(even){background:#f8f9fb}.ing-table td{padding:6px 9px;border-bottom:1px solid #eaedf2;vertical-align:middle}.ing-table td:last-child{text-align:right}.ing-name{font-weight:600;color:#1a202c}.ing-note{font-size:.62rem;color:#94a3b8}.cost-pill{background:#f1f5f9;color:#334155;font-weight:700;font-size:.68rem;padding:2px 7px;border-radius:5px;white-space:nowrap}.steps{margin-bottom:18px}.step{display:flex;gap:12px;margin-bottom:10px;padding-bottom:10px;border-bottom:1px dashed #eaedf2}.step:last-child{border-bottom:none}.step-num{width:26px;height:26px;border-radius:50%;background:#0f1923;color:#C5A55A;font-size:.68rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}.step-body{flex:1}.step-title{font-size:.78rem;font-weight:700;color:#0f1923;margin-bottom:3px}.step-desc{font-size:.7rem;color:#475569;line-height:1.5}.step-temp{font-size:.6rem;color:#ef4444;font-weight:600;margin-top:2px}.side-section{margin-bottom:16px}.side-section-title{font-size:.58rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#94a3b8;margin-bottom:8px;border-bottom:1px solid #eaedf2;padding-bottom:4px}.side-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;font-size:.68rem;border-bottom:1px dotted #eaedf2}.side-row:last-child{border-bottom:none}.side-key{color:#64748b}.side-val{font-weight:700;color:#0f1923}.gauge-label{display:flex;justify-content:space-between;font-size:.65rem;margin-bottom:4px}.gauge-track{background:#eaedf2;border-radius:20px;height:8px;overflow:hidden}.gauge-fill{height:100%;border-radius:20px;background:linear-gradient(90deg, #10b981, #34d399)}.cost-summary{background:#0f1923;border-radius:9px;padding:12px;color:#fff;margin-top:9px}.cost-row-s{display:flex;justify-content:space-between;font-size:.68rem;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.08)}.cost-row-s:last-child{border-bottom:none}.cost-key-s{color:rgba(255,255,255,.55)}.cost-val-s{font-weight:700}.cost-val-s.gold{color:#C5A55A;font-size:.82rem}.allergen-badges{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px}.allergen-badge{background:#fee2e2;color:#991b1b;font-size:.56rem;font-weight:700;padding:2px 6px;border-radius:4px;text-transform:uppercase;letter-spacing:.06em}.footer{background:#f8f9fb;border-top:1px solid #eaedf2;padding:12px 38px;display:flex;justify-content:space-between;align-items:center;font-size:.62rem;color:#94a3b8}.footer-logo{color:#C5A55A;font-weight:700;font-size:.68rem}.confidential{background:rgba(197,165,90,.1);color:#C5A55A;font-size:.56rem;font-weight:700;padding:2px 8px;border-radius:4px;letter-spacing:.08em;text-transform:uppercase}</style></head><body>
+  const html = `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><title>Fiche Technique</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:Arial,Helvetica,sans-serif;background:#fff;color:#1a202c;-webkit-print-color-adjust:exact;print-color-adjust:exact}.header{background:linear-gradient(135deg,#0f1923 0%,#1a3040 60%,#12232e 100%);color:#fff;padding:28px 38px 22px}.header-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px}.brand{display:flex;align-items:center;gap:10px}.brand-name{font-size:1.15rem;font-weight:800;color:#6366f1;letter-spacing:.04em}.brand-sub{font-size:.6rem;color:rgba(255,255,255,.45);letter-spacing:.12em;text-transform:uppercase}.doc-meta{text-align:right;font-size:.7rem;color:rgba(255,255,255,.5);line-height:1.7}.doc-meta strong{color:rgba(255,255,255,.8)}.header-title-block{border-top:1px solid rgba(99,102,241,.25);padding-top:14px}.doc-type-badge{display:inline-block;background:rgba(99,102,241,.15);color:#6366f1;font-size:.6rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;padding:3px 10px;border-radius:20px;border:1px solid rgba(99,102,241,.3);margin-bottom:6px}.recipe-title{font-size:1.8rem;font-weight:900;color:#fff;line-height:1.2}.recipe-subtitle{font-size:.75rem;color:rgba(255,255,255,.45);margin-top:4px}.kpi-bar{display:grid;grid-template-columns:repeat(5,1fr);background:#f8f9fb;border-bottom:1px solid #eaedf2}.kpi-item{padding:14px 10px;text-align:center;border-right:1px solid #eaedf2}.kpi-item:last-child{border-right:none}.kpi-value{font-size:1.3rem;font-weight:900;color:#0f1923}.kpi-value.green{color:#10b981}.kpi-value.gold{color:#6366f1}.kpi-value.blue{color:#3b82f6}.kpi-value.red{color:#ef4444}.kpi-label{font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#94a3b8;margin-top:4px}.body-grid{display:grid;grid-template-columns:1fr 195px}.main-col{padding:22px 26px}.side-col{background:#f8f9fb;border-left:1px solid #eaedf2;padding:18px 14px}.section-title{display:flex;align-items:center;gap:8px;font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.13em;color:#64748b;margin-bottom:10px}.section-title::after{content:'';flex:1;height:1px;background:#eaedf2}.ing-table{width:100%;border-collapse:collapse;font-size:.75rem;margin-bottom:18px}.ing-table thead tr{background:#0f1923;color:#fff}.ing-table thead th{padding:8px 9px;text-align:left;font-size:.58rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase}.ing-table thead th:last-child{text-align:right}.ing-table tbody tr:nth-child(even){background:#f8f9fb}.ing-table td{padding:6px 9px;border-bottom:1px solid #eaedf2;vertical-align:middle}.ing-table td:last-child{text-align:right}.ing-name{font-weight:600;color:#1a202c}.ing-note{font-size:.62rem;color:#94a3b8}.cost-pill{background:#f1f5f9;color:#334155;font-weight:700;font-size:.68rem;padding:2px 7px;border-radius:5px;white-space:nowrap}.steps{margin-bottom:18px}.step{display:flex;gap:12px;margin-bottom:10px;padding-bottom:10px;border-bottom:1px dashed #eaedf2}.step:last-child{border-bottom:none}.step-num{width:26px;height:26px;border-radius:50%;background:#0f1923;color:#6366f1;font-size:.68rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}.step-body{flex:1}.step-title{font-size:.78rem;font-weight:700;color:#0f1923;margin-bottom:3px}.step-desc{font-size:.7rem;color:#475569;line-height:1.5}.step-temp{font-size:.6rem;color:#ef4444;font-weight:600;margin-top:2px}.side-section{margin-bottom:16px}.side-section-title{font-size:.58rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#94a3b8;margin-bottom:8px;border-bottom:1px solid #eaedf2;padding-bottom:4px}.side-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;font-size:.68rem;border-bottom:1px dotted #eaedf2}.side-row:last-child{border-bottom:none}.side-key{color:#64748b}.side-val{font-weight:700;color:#0f1923}.gauge-label{display:flex;justify-content:space-between;font-size:.65rem;margin-bottom:4px}.gauge-track{background:#eaedf2;border-radius:20px;height:8px;overflow:hidden}.gauge-fill{height:100%;border-radius:20px;background:linear-gradient(90deg, #10b981, #34d399)}.cost-summary{background:#0f1923;border-radius:9px;padding:12px;color:#fff;margin-top:9px}.cost-row-s{display:flex;justify-content:space-between;font-size:.68rem;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.08)}.cost-row-s:last-child{border-bottom:none}.cost-key-s{color:rgba(255,255,255,.55)}.cost-val-s{font-weight:700}.cost-val-s.gold{color:#6366f1;font-size:.82rem}.allergen-badges{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px}.allergen-badge{background:#fee2e2;color:#991b1b;font-size:.56rem;font-weight:700;padding:2px 6px;border-radius:4px;text-transform:uppercase;letter-spacing:.06em}.footer{background:#f8f9fb;border-top:1px solid #eaedf2;padding:12px 38px;display:flex;justify-content:space-between;align-items:center;font-size:.62rem;color:#94a3b8}.footer-logo{color:#6366f1;font-weight:700;font-size:.68rem}.confidential{background:rgba(99,102,241,.1);color:#6366f1;font-size:.56rem;font-weight:700;padding:2px 8px;border-radius:4px;letter-spacing:.08em;text-transform:uppercase}</style></head><body>
 <div class="header"><div class="header-top"><div class="brand"><div style="font-size:1.6rem">🍰</div><div><div class="brand-name">GourmetRevient</div><div class="brand-sub">Solution Pâtisserie Pro</div></div></div><div class="doc-meta"><div><strong>Réf :</strong> ${refId}</div><div><strong>Date :</strong> ${today}</div><div><strong>Catégorie :</strong> ${esc(category)}</div><div><strong>Validée par :</strong> ${esc(user)}</div></div></div><div class="header-title-block"><div class="doc-type-badge">📋 Fiche Technique Premium</div><div class="recipe-title">${esc(recipeName)}</div><div class="recipe-subtitle">Production en laboratoire — ${esc(category)}</div></div></div>
 <div class="kpi-bar"><div class="kpi-item"><div class="kpi-value">${portions}</div><div class="kpi-label">Portions</div></div><div class="kpi-item"><div class="kpi-value green">${totalMat} €</div><div class="kpi-label">Coût Matière</div></div><div class="kpi-item"><div class="kpi-value gold">${margin} %</div><div class="kpi-label">Marge Brute</div></div><div class="kpi-item"><div class="kpi-value blue">${sellPrice} €</div><div class="kpi-label">Prix Vente HT</div></div><div class="kpi-item"><div class="kpi-value red">${prepTime}</div><div class="kpi-label">Préparation</div></div></div>
-<div class="body-grid"><div class="main-col"><div class="section-title">📋 Composition Harmonisée</div><table class="ing-table"><thead><tr><th>Ingrédient</th><th>Qté</th><th>Unité</th><th>Prix U.</th><th>Coût</th></tr></thead><tbody>${ingRows||'<tr><td colspan="5" style="text-align:center;color:#94a3b8;padding:10px">Aucun ingrédient enregistré</td></tr>'}<tr style="background:#f1f5f9;font-weight:700"><td colspan="4" style="text-align:right;color:#64748b;font-size:.65rem;padding:6px 7px">TOTAL MATIÈRE</td><td><span class="cost-pill" style="background:#0f1923;color:#C5A55A">${totalMat} €</span></td></tr></tbody></table><div class="section-title">⚙️ Protocole de Production</div><div class="steps">${stepsHtml}</div></div><div class="side-col"><div class="side-section"><div class="side-section-title">📦 Infos Recette</div><div class="side-row"><span class="side-key">Catégorie</span><span class="side-val">${esc(category)}</span></div><div class="side-row"><span class="side-key">Portions</span><span class="side-val">${portions}</span></div><div class="side-row"><span class="side-key">Préparation</span><span class="side-val">${prepTime}</span></div><div class="side-row"><span class="side-key">Cuisson</span><span class="side-val">${cookTime}</span></div>${r.difficulty?`<div class="side-row"><span class="side-key">Niveau</span><span class="side-val">${esc(r.difficulty)}</span></div>`:''}</div><div class="side-section"><div class="side-section-title">📊 Rentabilité</div><div class="gauge-label"><span>Marge</span><span style="font-weight:700;color:${gaugeColor}">${margin} %</span></div><div class="gauge-track"><div class="gauge-fill" style="width:${Math.min(margin,100)}%"></div></div><div class="cost-summary"><div class="cost-row-s"><span class="cost-key-s">Coût matière</span><span class="cost-val-s">${totalMat} €</span></div><div class="cost-row-s"><span class="cost-key-s">Prix vente HT</span><span class="cost-val-s">${sellPrice} €</span></div><div class="cost-row-s"><span class="cost-key-s">TVA (5,5%)</span><span class="cost-val-s">${((costs.sellingPrice||0)*.055).toFixed(2)} €</span></div><div class="cost-row-s"><span class="cost-key-s">Prix TTC</span><span class="cost-val-s gold">${tvaTTC} €</span></div></div></div><div class="side-section"><div class="side-section-title">⚠️ Allergènes</div><div class="allergen-badges">${allergenList}</div></div><div class="side-section"><div class="side-section-title">🌡️ Hygiène & HACCP</div><div class="side-row"><span class="side-key">Stockage</span><span class="side-val" style="color:#3b82f6">0–4 °C</span></div><div class="side-row"><span class="side-key">DLC</span><span class="side-val" style="color:#ef4444">48 h max</span></div><div class="side-row"><span class="side-key">Service</span><span class="side-val" style="color:#3b82f6">2–4 °C</span></div></div></div></div>
+<div class="body-grid"><div class="main-col"><div class="section-title">📋 Composition Harmonisée</div><table class="ing-table"><thead><tr><th>Ingrédient</th><th>Qté</th><th>Unité</th><th>Prix U.</th><th>Coût</th></tr></thead><tbody>${ingRows||'<tr><td colspan="5" style="text-align:center;color:#94a3b8;padding:10px">Aucun ingrédient enregistré</td></tr>'}<tr style="background:#f1f5f9;font-weight:700"><td colspan="4" style="text-align:right;color:#64748b;font-size:.65rem;padding:6px 7px">TOTAL MATIÈRE</td><td><span class="cost-pill" style="background:#0f1923;color:#6366f1">${totalMat} €</span></td></tr></tbody></table><div class="section-title">⚙️ Protocole de Production</div><div class="steps">${stepsHtml}</div></div><div class="side-col"><div class="side-section"><div class="side-section-title">📦 Infos Recette</div><div class="side-row"><span class="side-key">Catégorie</span><span class="side-val">${esc(category)}</span></div><div class="side-row"><span class="side-key">Portions</span><span class="side-val">${portions}</span></div><div class="side-row"><span class="side-key">Préparation</span><span class="side-val">${prepTime}</span></div><div class="side-row"><span class="side-key">Cuisson</span><span class="side-val">${cookTime}</span></div>${r.difficulty?`<div class="side-row"><span class="side-key">Niveau</span><span class="side-val">${esc(r.difficulty)}</span></div>`:''}</div><div class="side-section"><div class="side-section-title">📊 Rentabilité</div><div class="gauge-label"><span>Marge</span><span style="font-weight:700;color:${gaugeColor}">${margin} %</span></div><div class="gauge-track"><div class="gauge-fill" style="width:${Math.min(margin,100)}%"></div></div><div class="cost-summary"><div class="cost-row-s"><span class="cost-key-s">Coût matière</span><span class="cost-val-s">${totalMat} €</span></div><div class="cost-row-s"><span class="cost-key-s">Prix vente HT</span><span class="cost-val-s">${sellPrice} €</span></div><div class="cost-row-s"><span class="cost-key-s">TVA (5,5%)</span><span class="cost-val-s">${((costs.sellingPrice||0)*.055).toFixed(2)} €</span></div><div class="cost-row-s"><span class="cost-key-s">Prix TTC</span><span class="cost-val-s gold">${tvaTTC} €</span></div></div></div><div class="side-section"><div class="side-section-title">⚠️ Allergènes</div><div class="allergen-badges">${allergenList}</div></div><div class="side-section"><div class="side-section-title">🌡️ Hygiène & HACCP</div><div class="side-row"><span class="side-key">Stockage</span><span class="side-val" style="color:#3b82f6">0–4 °C</span></div><div class="side-row"><span class="side-key">DLC</span><span class="side-val" style="color:#ef4444">48 h max</span></div><div class="side-row"><span class="side-key">Service</span><span class="side-val" style="color:#3b82f6">2–4 °C</span></div></div></div></div>
 <div class="footer"><span class="footer-logo">GourmetRevient</span><span>Fiche Technique Premium — &copy; ${new Date().getFullYear()}</span><span class="confidential">Strictement Confidentiel</span></div>
 </body></html>`;
 
@@ -5129,70 +5131,69 @@ function closeRoleModal() {
 }
 
 function renderAnnualCalendar() {
-  const container = $('#annualCalendarView');
-  if (!container) return; 
+    const container = document.getElementById('annualCalendarView');
+    if (!container) return;
+    
+    const currentZone = localStorage.getItem('gourmet_vacation_zone') || 'C';
+    const currentYear = 2026;
+    const months = {
+      1:'Janvier', 2:'Février', 3:'Mars', 4:'Avril', 5:'Mai', 6:'Juin',
+      7:'Juillet', 8:'Août', 9:'Septembre', 10:'Octobre', 11:'Novembre', 12:'Décembre'
+    };
 
-  const currentZone = localStorage.getItem(STORAGE_KEYS.vacationZone) || 'C';
-  const holidays = HOLIDAYS_2026[currentZone] || HOLIDAYS_2026.C;
+    const zoneHolidays = {
+      'A': ['2026-02-07', '2026-02-23', '2026-04-11', '2026-04-27'],
+      'B': ['2026-02-14', '2026-03-02', '2026-04-18', '2026-05-04'],
+      'C': ['2026-02-21', '2026-03-09', '2026-04-04', '2026-04-20']
+    };
 
-  // OPTIMIZATION: Maps for O(1) lookups
-  const leavesMap = new Map();
-  (APP.staffLeaves || []).forEach(l => {
-    if (l.status !== 'approved') return;
-    const start = new Date(l.start);
-    const end = new Date(l.end);
-    for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
-      leavesMap.set(d.toISOString().split('T')[0], l.memberName);
+    const events = {
+      '01-01': '✨ Nouvel An', '01-06': '👑 Épiphanie', '02-02': '🥞 Chandeleur', '02-14': '💖 Valentin',
+      '03-01': '👵 Fête G-Mères', '04-05': '🐣 Pâques', '04-06': '🍫 Lundi Pâques', '05-01': '🌿 Fête Travail',
+      '05-08': '🎖️ Victoire 1945', '05-14': '☁️ Ascension', '05-24': '🕊️ Pentecôte', '05-31': '🌸 Fête Mères',
+      '06-21': '👔 Fête Pères', '07-14': '🎆 Fête Nationale', '08-15': '⛪ Assomption', '11-01': '🕯️ Toussaint',
+      '12-25': '🎄 Noël', '12-31': '🍾 St Sylvestre'
+    };
+
+    let html = '';
+    for (let m = 0; m < 12; m++) {
+        const daysInMonth = new Date(currentYear, m + 1, 0).getDate();
+        html += `<div class="month-view" style="display:grid; grid-template-columns: 160px 1fr; align-items:center; gap:2rem; padding:1.2rem; border-bottom:1px solid rgba(0,0,0,0.05);">
+            <h4 style="margin:0; font-family:var(--font-heading); color:var(--primary); font-size:1.3rem; font-weight:900; text-transform:capitalize;">${months[m+1]}</h4>
+            <div style="display:grid; grid-template-columns: repeat(31, 1fr); gap:5px; width:100%;">`;
+        
+        for (let d = 1; d <= 31; d++) {
+            if (d > daysInMonth) { html += `<div></div>`; continue; }
+            const date = new Date(currentYear, m, d);
+            const dateStr = date.toISOString().split('T')[0];
+            const mmDd = dateStr.slice(5);
+            const isWE = date.getDay() === 0 || date.getDay() === 6;
+            const holidayRange = zoneHolidays[currentZone] || zoneHolidays.C;
+            
+            let isVacation = false;
+            if ((dateStr >= holidayRange[0] && dateStr <= holidayRange[1]) || 
+                (dateStr >= holidayRange[2] && dateStr <= holidayRange[3]) ||
+                (dateStr >= '2026-07-04' && dateStr <= '2026-08-31') ||
+                (dateStr >= '2026-10-17' && dateStr <= '2026-11-02') ||
+                (dateStr >= '2026-12-19' && dateStr <= '2027-01-04')) {
+                isVacation = true;
+            }
+
+            const event = events[mmDd];
+            let cellStyle = `height:46px; display:flex; align-items:center; justify-content:center; font-size:0.9rem; font-weight:800; border-radius:8px; position:relative; `;
+            
+            if (event) cellStyle += `background:var(--accent); color:white; scale:1.15; z-index:2; box-shadow:0 6px 12px var(--accent-glow); margin:0 2px;`;
+            else if (isVacation) cellStyle += `background:rgba(16, 185, 129, 0.15); color:var(--success); `;
+            else if (isWE) cellStyle += `background:var(--bg-alt); opacity:0.6; `;
+            else cellStyle += `background:rgba(0,0,0,0.02); color:var(--text-secondary);`;
+
+            html += `<div style="${cellStyle}" title="${event || (isVacation ? 'Vacances' : '')}">
+                ${d}${event ? `<span style="position:absolute; bottom:0px; font-size:0.55rem; width:100%; text-align:center;">${event.split(' ')[0]}</span>` : ''}
+            </div>`;
+        }
+        html += `</div></div>`;
     }
-  });
-
-  const hMap = new Map();
-  holidays.forEach(h => {
-    const start = new Date(h.start);
-    const end = new Date(h.end);
-    for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
-      hMap.set(d.toISOString().split('T')[0], h.label);
-    }
-  });
-
-  const monthNames = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(m => t('month.' + m));
-  const dayNames = [1, 2, 3, 4, 5, 6, 7].map(d => t('day.' + d));
-  const currentYear = 2026;
-  let html = '';
-
-  for (let month = 0; month < 12; month++) {
-    const daysInMonth = new Date(currentYear, month + 1, 0).getDate();
-    html += `<div class="month-view"><h4 class="month-title">${monthNames[month]}</h4><div class="days-grid">`;
-
-    for (let day = 1; day <= 31; day++) {
-      if (day > daysInMonth) { html += `<div class="day-cell empty"></div>`; continue; }
-
-      const date = new Date(currentYear, month, day);
-      const dateStr = date.toISOString().split('T')[0];
-      const mmDd = dateStr.slice(5); // "MM-DD"
-      const dayNum = date.getDay();
-      const classes = ['day-cell'];
-      let toolTip = `${day} ${monthNames[month]}`;
-
-      if (dayNum === 0 || dayNum === 6) classes.push('sunday-day');
-      if (PASTRY_EVENTS_2026[mmDd]) {
-        classes.push('event-day');
-        toolTip += ` - 🔥 ${getTranslatedEvent(mmDd)}`;
-      }
-      if (hMap.has(dateStr)) {
-        classes.push('holiday-day');
-        toolTip += ` - 🏖️ ${getTranslatedHoliday(hMap.get(dateStr))}`;
-      }
-      if (leavesMap.has(dateStr)) {
-        classes.push('leave-active-day');
-        toolTip += ` - 🌴 ${t('plan.leave.employee')}: ${leavesMap.get(dateStr)}`;
-      }
-
-      html += `<div class="${classes.join(' ')}" title="${toolTip}">${day}</div>`;
-    }
-    html += `</div></div>`;
-  }
-  container.innerHTML = html;
+    container.innerHTML = html;
 }
 
 function renderAdminUsers() {
@@ -7489,9 +7490,9 @@ if (typeof saveCurrentRecipe === 'function') {
   document.addEventListener('DOMContentLoaded', () => {
     // Add a golden line under the morning briefing
     const briefing = document.querySelector('.morning-briefing');
-    if (briefing && !briefing.nextElementSibling?.classList.contains('golden-divider')) {
+    if (briefing && !briefing.nextElementSibling?.classList.contains('section-divider')) {
       const divider = document.createElement('div');
-      divider.className = 'golden-divider';
+      divider.className = 'section-divider';
       briefing.after(divider);
     }
   });

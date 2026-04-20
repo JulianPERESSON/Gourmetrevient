@@ -1,4 +1,4 @@
-﻿/*
+/*
   =====================================================================
   PREMIUM-EFFECTS.JS — GourmetRevient v5.5
   ✨ Atmosphère Pâtissière (Particules Interactives)
@@ -47,19 +47,19 @@
 
     const PARTICLE_COUNT = 45;
     const COLORS_LIGHT = [
-      'rgba(197, 165, 90, 0.35)',   // Gold shimmer
-      'rgba(212, 186, 122, 0.25)',  // Light gold
-      'rgba(232, 213, 163, 0.2)',   // Pale gold
-      'rgba(255, 253, 247, 0.4)',   // Flour white
-      'rgba(245, 230, 200, 0.3)',   // Cream
-      'rgba(196, 122, 63, 0.15)',   // Praline
+      'rgba(99, 102, 241, 0.20)',    // Indigo shimmer
+      'rgba(129, 140, 248, 0.15)',   // Light indigo
+      'rgba(165, 180, 252, 0.12)',   // Pale indigo
+      'rgba(248, 250, 252, 0.35)',   // Clean white
+      'rgba(226, 232, 240, 0.25)',   // Slate mist
+      'rgba(124, 58, 237, 0.10)',    // Violet hint
     ];
     const COLORS_DARK = [
-      'rgba(212, 186, 122, 0.2)',
-      'rgba(197, 165, 90, 0.15)',
-      'rgba(232, 213, 163, 0.1)',
-      'rgba(255, 253, 247, 0.08)',
-      'rgba(245, 230, 200, 0.12)',
+      'rgba(129, 140, 248, 0.15)',
+      'rgba(99, 102, 241, 0.12)',
+      'rgba(165, 180, 252, 0.08)',
+      'rgba(248, 250, 252, 0.06)',
+      'rgba(226, 232, 240, 0.10)',
     ];
 
     class Particle {

@@ -116,7 +116,7 @@
     s.textContent = `
       #schedulerRecipeList { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 10px; margin-top: 15px; }
       .scheduler-recipe-card { display: flex; align-items: center; gap: 12px; padding: 12px 15px; background: white; border: 1px solid #e0e0e0; border-radius: 10px; cursor: pointer; transition: 0.2s; }
-      .scheduler-recipe-card.selected { border-color: #C5A55A; background: #fffdf8; box-shadow: 0 0 0 2px #C5A55A; }
+      .scheduler-recipe-card.selected { border-color: #6366f1; background: #f8f9fc; box-shadow: 0 0 0 2px #6366f1; }
       .g-wrap { overflow-x: auto; background: white; padding: 1rem; border-radius: 12px; border: 1px solid #eee; }
       .g-tbl { width: 100%; border-collapse: collapse; min-width: 900px; }
       .g-tm { width: 70px; text-align: center; font-weight: 800; background: #f8f9fa; border: 1px solid #ddd; font-size: 0.85rem; }
@@ -129,7 +129,7 @@
       .g-cold-neg { background: #1565c0 !important; color: white !important; border-left: 4px solid #0d47a1 !important; font-style: italic; opacity: 0.9; }
       .g-clean { background: #f5f5f5 !important; border-left: 4px solid #9e9e9e !important; color: #757575; font-size: 0.72rem; }
       .route-tactique { margin-top: 1.5rem; background: #fdfaf4; padding: 1.2rem; border-radius: 15px; border: 1px solid #e9dfc6; }
-      .route-tactique h3 { margin: 0 0 1rem 0; font-size: 1.1rem; color: #2a1508; border-bottom: 2px solid #C5A55A; padding-bottom: 5px; display: inline-block; }
+      .route-tactique h3 { margin: 0 0 1rem 0; font-size: 1.1rem; color: #1e293b; border-bottom: 2px solid #6366f1; padding-bottom: 5px; display: inline-block; }
       .route-step { display: flex; gap: 12px; margin-bottom: 8px; font-size: 0.9rem; font-weight: 600; }
       .step-num { width: 22px; height: 22px; background: #2a1508; color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 0.75rem; flex-shrink:0; }
     `;

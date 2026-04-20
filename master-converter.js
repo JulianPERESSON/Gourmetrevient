@@ -1,4 +1,4 @@
-﻿/*
+/*
   =====================================================================
   MASTER-CONVERTER.JS — GourmetRevient v5.2
   Géométrie Culinaire — Convertisseur de Moules Premium
@@ -274,7 +274,7 @@ function renderMCResult(vFrom, vTo, coeff) {
 
   const pct   = ((coeff - 1) * 100).toFixed(1);
   const arrow = coeff > 1 ? '↑' : coeff < 1 ? '↓' : '=';
-  const color = coeff > 1 ? 'var(--gold)' : coeff < 1 ? '#6366f1' : 'var(--success)';
+  const color = coeff > 1 ? 'var(--accent)' : coeff < 1 ? '#6366f1' : 'var(--success)';
 
   const portionLabel = coeff > 1
     ? `Multipliez toutes les quantités par <strong>${coeff.toFixed(3)}</strong>`
@@ -378,13 +378,13 @@ function renderMCSVG(shapeFrom, dimsFrom, shapeTo, dimsTo) {
   const fromLabel = buildLabel(shapeFrom, dimsFrom);
   const toLabel   = buildLabel(shapeTo,   dimsTo);
   const coeff     = mcState.coefficient;
-  const arrowColor = coeff > 1.05 ? '#C5A55A' : coeff < 0.95 ? '#6366f1' : '#10b981';
+  const arrowColor = coeff > 1.05 ? '#6366f1' : coeff < 0.95 ? '#818cf8' : '#10b981';
 
   const svgContent = `
     <svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <pattern id="mcGrid" width="20" height="20" patternUnits="userSpaceOnUse">
-          <path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(197,165,90,0.06)" stroke-width="1"/>
+          <path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(99,102,241,0.06)" stroke-width="1"/>
         </pattern>
         <marker id="arrowHead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
           <polygon points="0 0, 10 3.5, 0 7" fill="${arrowColor}"/>
@@ -404,7 +404,7 @@ function renderMCSVG(shapeFrom, dimsFrom, shapeTo, dimsTo) {
       </text>
 
       <text x="${x2}" y="22" text-anchor="middle" font-family="Playfair Display, serif" font-size="13" font-weight="700" fill="var(--text)">Nouveau moule</text>
-      ${drawShape(to, x2, yBase - 10, '#C5A55A', toLabel)}
+      ${drawShape(to, x2, yBase - 10, '#6366f1', toLabel)}
     </svg>
   `;
 
@@ -492,7 +492,7 @@ function renderMCIngredients(coeff) {
   const costRow = (oldCost > 0) ? `
     <div class="mc-cost-summary">
       <span>💰 Coût matière estimé :</span>
-      <span><s style="color:var(--text-muted)">${oldCost.toFixed(2)}€</s> → <strong style="color:var(--gold)">${newCost.toFixed(2)}€</strong></span>
+      <span><s style="color:var(--text-muted)">${oldCost.toFixed(2)}€</s> → <strong style="color:var(--accent)">${newCost.toFixed(2)}€</strong></span>
     </div>
   ` : '';
 
@@ -597,8 +597,8 @@ window.getIngredientIcon = getIngredientIcon;
       background: var(--surface, #fff); color: var(--text-secondary);
       cursor: pointer; transition: all 0.15s;
     }
-    .mc-tart-btn:hover { border-color: var(--gold, #C5A55A); color: var(--gold); background: rgba(197,165,90,0.06); }
-    .mc-tart-btn.active { border-color: var(--gold, #C5A55A); background: var(--gold, #C5A55A); color: #fff; }
+    .mc-tart-btn:hover { border-color: var(--accent, #6366f1); color: var(--accent); background: rgba(99,102,241,0.06); }
+    .mc-tart-btn.active { border-color: var(--accent, #6366f1); background: var(--accent, #6366f1); color: #fff; }
   `;
   document.head.appendChild(s);
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => {});

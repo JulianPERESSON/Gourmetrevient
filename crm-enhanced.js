@@ -1,4 +1,4 @@
-﻿// ============================================================================
+// ============================================================================
 // CRM-ENHANCED.JS — GourmetRevient v8.0
 // Nouvelles fonctionnalités CRM & Autres améliorations
 //
@@ -295,14 +295,14 @@ function _buildInvoiceHTML(docType) {
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: 'Inter', sans-serif; background: #fff; color: #1a1a2e; font-size: 14px; line-height: 1.6; }
 .doc-wrap { max-width: 860px; margin: 0 auto; padding: 40px; }
-.doc-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; padding-bottom: 24px; border-bottom: 3px solid #C5A55A; }
+.doc-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; padding-bottom: 24px; border-bottom: 3px solid #6366f1; }
 .shop-name { font-size: 2rem; font-weight: 900; color: #1a1a2e; letter-spacing: -0.02em; }
 .shop-sub  { color: #888; font-size: 0.85rem; margin-top: 4px; }
 .doc-badge { text-align: right; }
-.doc-type  { font-size: 2rem; font-weight: 900; color: #C5A55A; text-transform: uppercase; letter-spacing: 0.05em; }
+.doc-type  { font-size: 2rem; font-weight: 900; color: #6366f1; text-transform: uppercase; letter-spacing: 0.05em; }
 .doc-num   { font-size: 0.8rem; color: #888; margin-top: 4px; }
 .doc-meta  { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 36px; }
-.meta-block h4 { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: #C5A55A; margin-bottom: 8px; font-weight: 700; }
+.meta-block h4 { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: #6366f1; margin-bottom: 8px; font-weight: 700; }
 .meta-block p  { font-size: 0.9rem; color: #333; line-height: 1.7; }
 table { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
 thead tr { background: #1a1a2e; color: #fff; }
@@ -313,7 +313,7 @@ tbody td { padding: 12px 16px; border-bottom: 1px solid #eee; font-size: 0.9rem;
 tbody td:last-child, tbody td:nth-child(n+2) { text-align: right; }
 .totals-block { margin-left: auto; width: 300px; }
 .totals-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 0.9rem; border-bottom: 1px solid #eee; }
-.totals-row.grand { font-weight: 900; font-size: 1.1rem; color: #C5A55A; border-top: 2px solid #C5A55A; padding-top: 10px; margin-top: 4px; }
+.totals-row.grand { font-weight: 900; font-size: 1.1rem; color: #6366f1; border-top: 2px solid #6366f1; padding-top: 10px; margin-top: 4px; }
 .notes-block { margin-top: 32px; padding: 16px; background: #f5f5f5; border-radius: 8px; font-size: 0.8rem; color: #666; line-height: 1.7; }
 .signature-block { margin-top: 40px; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
 .sign-box { border: 1px dashed #ccc; border-radius: 8px; padding: 24px; text-align: center; min-height: 120px; }
@@ -430,7 +430,7 @@ window.computeClientLTV = function(clientId) {
 };
 
 window.getClientVIPBadge = function(ltv) {
-    if (ltv >= 1000) return { label: '👑 VIP Or', color: '#C5A55A', bg: 'rgba(197,165,90,0.1)' };
+    if (ltv >= 1000) return { label: '👑 VIP Premium', color: '#6366f1', bg: 'rgba(99,102,241,0.1)' };
     if (ltv >= 500)  return { label: '🥈 VIP Argent', color: '#9ca3af', bg: 'rgba(156,163,175,0.1)' };
     if (ltv >= 200)  return { label: '🥉 VIP Bronze', color: '#b45309', bg: 'rgba(180,83,9,0.1)' };
     return null;
@@ -1321,7 +1321,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!document.getElementById('invoiceProCard')) {
                 proToolsGrid.insertAdjacentHTML('afterbegin', `
                   <div class="protools-card" onclick="openInvoiceGenerator()" id="invoiceProCard">
-                    <div class="protools-card-icon" style="background:rgba(197,165,90,0.1); color:var(--gold-dark);">📄</div>
+                    <div class="protools-card-icon" style="background:rgba(99,102,241,0.10); color:var(--accent-dark);">📄</div>
                     <div class="protools-card-body">
                       <h3>Devis & Factures PDF</h3>
                       <p>Générez des devis professionnels avec bloc de signature ou des factures clients directement depuis le CRM.</p>

@@ -1,4 +1,4 @@
-﻿/* =============================================================
+/* =============================================================
    MASTER CONVERTER — Géométrie Culinaire
    Premium CSS — Or / Chocolat / Crème
    ============================================================= */
@@ -37,7 +37,7 @@
 }
 
 .mc-from .mc-side-title { color: #8B5E3C; }
-.mc-to   .mc-side-title { color: var(--gold-dark); }
+.mc-to   .mc-side-title { color: var(--accent-dark); }
 
 /* Shape select with icon preview */
 .mc-shape-select {
@@ -53,9 +53,9 @@
 }
 
 .mc-shape-select:focus {
-  border-color: var(--gold);
+  border-color: var(--accent);
   outline: none;
-  box-shadow: 0 0 0 3px var(--gold-glow);
+  box-shadow: 0 0 0 3px var(--accent-glow);
 }
 
 .mc-fields {
@@ -142,7 +142,7 @@
   width: 100%;
   background: var(--cream-warm);
   border-radius: var(--radius);
-  border: 1px solid rgba(197, 165, 90, 0.1);
+  border: 1px solid rgba(99, 102, 241, 0.1);
   overflow: hidden;
   min-height: 140px;
 }
@@ -180,7 +180,7 @@
 
 .mc-kpi-main {
   border-width: 2px;
-  background: linear-gradient(135deg, rgba(197, 165, 90, 0.05) 0%, rgba(60, 31, 14, 0.03) 100%);
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(60, 31, 14, 0.03) 100%);
   box-shadow: var(--shadow-gold);
 }
 
@@ -209,8 +209,8 @@
 
 /* Instruction box */
 .mc-instruction-box {
-  background: linear-gradient(135deg, rgba(197, 165, 90, 0.06) 0%, rgba(39, 174, 96, 0.04) 100%);
-  border: 1px solid rgba(197, 165, 90, 0.18);
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.06) 0%, rgba(39, 174, 96, 0.04) 100%);
+  border: 1px solid rgba(99, 102, 241, 0.18);
   border-radius: var(--radius-sm);
   padding: 0.8rem 1.2rem;
   font-size: 0.88rem;
@@ -267,7 +267,7 @@
 }
 
 .mc-ing-row:hover {
-  background: rgba(197, 165, 90, 0.04);
+  background: rgba(99, 102, 241, 0.04);
 }
 
 .mc-ing-name {
@@ -288,7 +288,7 @@
 }
 
 .mc-ing-up {
-  color: var(--gold-dark);
+  color: var(--accent-dark);
   font-weight: 700;
   text-align: center;
   font-size: 0.78rem;
@@ -325,8 +325,8 @@
   align-items: center;
   margin-top: 1rem;
   padding: 0.8rem 1rem;
-  background: linear-gradient(135deg, rgba(197, 165, 90, 0.06), rgba(39, 174, 96, 0.04));
-  border: 1px solid rgba(197, 165, 90, 0.15);
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.06), rgba(39, 174, 96, 0.04));
+  border: 1px solid rgba(99, 102, 241, 0.15);
   border-radius: var(--radius-sm);
   font-size: 0.88rem;
   font-weight: 600;

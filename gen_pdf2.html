@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -8,15 +8,15 @@
 @media print { header, footer { display: none !important; } }
 body { font-family: 'Inter', Arial, sans-serif; background:#fff; color:#1a202c; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
 .header { background: linear-gradient(135deg,#0f1923 0%,#1a3040 60%,#12232e 100%); color:#fff; padding:28px 38px 22px; position:relative; overflow:hidden; }
-.header::before { content:''; position:absolute; top:-50px; right:-50px; width:200px; height:200px; border-radius:50%; background:rgba(197,165,90,0.07); }
+.header::before { content:''; position:absolute; top:-50px; right:-50px; width:200px; height:200px; border-radius:50%; background:rgba(99,102,241,0.07); }
 .header-top { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:16px; }
 .brand { display:flex; align-items:center; gap:10px; }
-.brand-name { font-size:1.15rem; font-weight:800; color:#C5A55A; letter-spacing:.04em; font-family: 'Playfair Display', serif;}
+.brand-name { font-size:1.15rem; font-weight:800; color:#6366f1; letter-spacing:.04em; font-family: 'Playfair Display', serif;}
 .brand-sub { font-size:.6rem; color:rgba(255,255,255,.45); letter-spacing:.12em; text-transform:uppercase; margin-top:2px; }
 .doc-meta { text-align:right; font-size:.7rem; color:rgba(255,255,255,.5); line-height:1.7; }
 .doc-meta strong { color:rgba(255,255,255,.8); }
-.header-title-block { border-top:1px solid rgba(197,165,90,.25); padding-top:14px; }
-.doc-type-badge { display:inline-block; background:rgba(197,165,90,.15); color:#C5A55A; font-size:.6rem; font-weight:700; letter-spacing:.15em; text-transform:uppercase; padding:3px 10px; border-radius:20px; border:1px solid rgba(197,165,90,.3); margin-bottom:6px; }
+.header-title-block { border-top:1px solid rgba(99,102,241,.25); padding-top:14px; }
+.doc-type-badge { display:inline-block; background:rgba(99,102,241,.15); color:#818cf8; font-size:.6rem; font-weight:700; letter-spacing:.15em; text-transform:uppercase; padding:3px 10px; border-radius:20px; border:1px solid rgba(99,102,241,.3); margin-bottom:6px; }
 .recipe-title { font-size:2rem; font-weight:900; color:#fff; line-height:1.2; font-family: 'Playfair Display', serif;}
 .recipe-subtitle { font-size:.75rem; color:rgba(255,255,255,.45); margin-top:4px; letter-spacing:.03em;}
 .kpi-bar { display:grid; grid-template-columns:repeat(5,1fr); background:#f8f9fb; border-bottom:1px solid #eaedf2; }
@@ -24,7 +24,7 @@ body { font-family: 'Inter', Arial, sans-serif; background:#fff; color:#1a202c; 
 .kpi-item:last-child { border-right:none; }
 .kpi-value { font-size:1.3rem; font-weight:900; color:#0f1923; }
 .kpi-value.green { color:#10b981; }
-.kpi-value.gold { color:#C5A55A; }
+.kpi-value.gold { color:#6366f1; }
 .kpi-value.blue { color:#3b82f6; }
 .kpi-value.red { color:#ef4444; }
 .kpi-label { font-size:.58rem; font-weight:700; text-transform:uppercase; letter-spacing:.1em; color:#94a3b8; margin-top:4px; }
@@ -47,7 +47,7 @@ body { font-family: 'Inter', Arial, sans-serif; background:#fff; color:#1a202c; 
 .steps { margin-bottom:18px; }
 .step { display:flex; gap:12px; margin-bottom:10px; padding-bottom:10px; border-bottom:1px dashed #eaedf2; }
 .step:last-child { border-bottom:none; }
-.step-num { width:26px; height:26px; border-radius:50%; background:#0f1923; color:#C5A55A; font-size:.68rem; font-weight:800; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.step-num { width:26px; height:26px; border-radius:50%; background:#0f1923; color:#818cf8; font-size:.68rem; font-weight:800; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
 .step-body { flex:1; }
 .step-title { font-size:.78rem; font-weight:700; color:#0f1923; margin-bottom:3px; display:flex; justify-content:space-between; align-items:center; }
 .step-desc { font-size:.7rem; color:#475569; line-height:1.5; }
@@ -65,12 +65,12 @@ body { font-family: 'Inter', Arial, sans-serif; background:#fff; color:#1a202c; 
 .cost-row-s:last-child { border-bottom:none; }
 .cost-key-s { color:rgba(255,255,255,.55); }
 .cost-val-s { font-weight:700; }
-.cost-val-s.gold { color:#C5A55A; font-size:.82rem; }
+.cost-val-s.gold { color:#6366f1; font-size:.82rem; }
 .allergen-badges { display:flex; flex-wrap:wrap; gap:4px; margin-top:5px; }
 .allergen-badge { background:#fee2e2; color:#991b1b; font-size:.56rem; font-weight:700; padding:2px 6px; border-radius:4px; text-transform:uppercase; letter-spacing:.06em;}
 .footer { background:#f8f9fb; border-top:1px solid #eaedf2; padding:12px 38px; display:flex; justify-content:space-between; align-items:center; font-size:.62rem; color:#94a3b8; }
-.footer-logo { color:#C5A55A; font-weight:700; font-size:.68rem; }
-.confidential { background:rgba(197,165,90,.1); color:#C5A55A; font-size:.56rem; font-weight:700; padding:2px 8px; border-radius:4px; letter-spacing:.08em; text-transform:uppercase; }
+.footer-logo { color:#6366f1; font-weight:700; font-size:.68rem; }
+.confidential { background:rgba(99,102,241,.1); color:#6366f1; font-size:.56rem; font-weight:700; padding:2px 8px; border-radius:4px; letter-spacing:.08em; text-transform:uppercase; }
 </style>
 <script src="data.js"></script>
 <script>
@@ -156,7 +156,7 @@ function render() {
     <div class="section-title">📋 Composition Harmonisée</div>
     <table class="ing-table"><thead><tr><th>Ingrédient</th><th>Qté</th><th>Uté</th><th>Prix Réf.</th><th>Coût</th></tr></thead><tbody>
       ${ingRows}
-      <tr style="background:#f1f5f9;font-weight:700"><td colspan="4" style="text-align:right;">TOTAL MATIÈRE PREMIÈRE</td><td><span class="cost-pill" style="background:#0f1923;color:#C5A55A">${totalMat.toFixed(2)} €</span></td></tr>
+      <tr style="background:#f1f5f9;font-weight:700"><td colspan="4" style="text-align:right;">TOTAL MATIÈRE PREMIÈRE</td><td><span class="cost-pill" style="background:#0f1923;color:#818cf8">${totalMat.toFixed(2)} €</span></td></tr>
     </tbody></table>
     <div class="section-title">⚙️ Protocole de Production</div>
     <div class="steps">${stepsHtml}</div>

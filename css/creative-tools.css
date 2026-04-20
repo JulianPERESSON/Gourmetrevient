@@ -1,4 +1,4 @@
-﻿/* =============================================================
+/* =============================================================
    CREATIVE TOOLS — Chef's Brain + Assembly Simulator
    ============================================================= */
 
@@ -11,8 +11,8 @@
   align-items: center;
   gap: 1rem;
   padding: 1rem 1.5rem;
-  background: linear-gradient(135deg, rgba(197, 165, 90, 0.08) 0%, rgba(60, 31, 14, 0.04) 100%);
-  border: 1px solid rgba(197, 165, 90, 0.2);
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.06) 0%, rgba(30, 41, 59, 0.04) 100%);
+  border: 1px solid rgba(99, 102, 241, 0.15);
   border-radius: var(--radius);
   animation: fadeUp 0.3s ease-out;
 }
@@ -58,15 +58,15 @@
 }
 
 .cb-pairing-card:hover {
-  border-color: rgba(197, 165, 90, 0.3);
+  border-color: rgba(99, 102, 241, 0.25);
   transform: translateY(-3px);
-  box-shadow: 0 8px 25px rgba(60, 31, 14, 0.08);
+  box-shadow: 0 8px 25px rgba(30, 41, 59, 0.08);
 }
 
 .cb-pairing-card.selected {
-  border-color: var(--gold);
-  background: rgba(197, 165, 90, 0.06);
-  box-shadow: 0 0 0 3px var(--gold-glow);
+  border-color: var(--accent);
+  background: rgba(99, 102, 241, 0.06);
+  box-shadow: 0 0 0 3px var(--accent-glow);
 }
 
 .cb-pairing-card .cb-pair-icon {
@@ -136,8 +136,8 @@
 .cb-cost-panel {
   margin-top: 1.5rem;
   padding: 1.2rem;
-  background: linear-gradient(135deg, rgba(197, 165, 90, 0.05) 0%, rgba(39, 174, 96, 0.05) 100%);
-  border: 1px solid rgba(197, 165, 90, 0.15);
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.04) 0%, rgba(39, 174, 96, 0.04) 100%);
+  border: 1px solid rgba(99, 102, 241, 0.12);
   border-radius: var(--radius);
   animation: fadeUp 0.4s ease-out;
 }
@@ -172,10 +172,10 @@
   border-bottom: none;
   font-weight: 800;
   font-size: 1rem;
-  color: var(--gold-dark);
+  color: var(--accent-dark);
   padding-top: 0.8rem;
   margin-top: 0.3rem;
-  border-top: 2px solid var(--gold);
+  border-top: 2px solid var(--accent);
 }
 
 .cb-cost-row .cb-cost-name {
@@ -277,8 +277,8 @@
 }
 
 .assembly-palette-item:hover {
-  border-color: var(--gold);
-  background: rgba(197, 165, 90, 0.05);
+  border-color: var(--accent);
+  background: rgba(99, 102, 241, 0.04);
   transform: translateX(4px);
 }
 
@@ -344,7 +344,7 @@
   min-height: 350px;
   max-height: 450px;
   background:
-    radial-gradient(circle at 50% 100%, rgba(197, 165, 90, 0.04) 0%, transparent 60%),
+    radial-gradient(circle at 50% 100%, rgba(99, 102, 241, 0.03) 0%, transparent 60%),
     repeating-linear-gradient(0deg, transparent, transparent 19px, rgba(0,0,0,0.03) 19px, rgba(0,0,0,0.03) 20px),
     repeating-linear-gradient(90deg, transparent, transparent 19px, rgba(0,0,0,0.03) 19px, rgba(0,0,0,0.03) 20px);
   border: 2px dashed var(--surface-border);
@@ -494,8 +494,8 @@
 
 /* Drag over states */
 .assembly-canvas.drag-over {
-  border-color: var(--gold);
-  background-color: rgba(197, 165, 90, 0.04);
+  border-color: var(--accent);
+  background-color: rgba(99, 102, 241, 0.04);
 }
 
 .assembly-layer.dragging {
@@ -503,7 +503,7 @@
 }
 
 .assembly-layer.drag-over-layer {
-  border-top: 3px solid var(--gold);
+  border-top: 3px solid var(--accent);
 }
 
 /* Responsive */

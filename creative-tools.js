@@ -1,4 +1,4 @@
-﻿/*
+/*
   =====================================================================
   CREATIVE-TOOLS.JS — GourmetRevient v5.0
   - Chef's Brain: Flavor Pairing Generator with Cost Analysis
@@ -357,7 +357,7 @@ const ASSEMBLY_COMPONENTS = [
   { id: 'biscuit_joconde', name: 'Biscuit Joconde', height: 1.0, color: '#D4A574', icon: '🍰', category: 'Biscuits' },
   { id: 'genoise',         name: 'Génoise',         height: 1.5, color: '#E8C99B', icon: '🧁', category: 'Biscuits' },
   { id: 'dacquoise',       name: 'Dacquoise',       height: 1.0, color: '#C9A96E', icon: '🥜', category: 'Biscuits' },
-  { id: 'sable_breton',    name: 'Sablé Breton',    height: 0.8, color: '#C5A55A', icon: '🍪', category: 'Biscuits' },
+  { id: 'sable_breton',    name: 'Sablé Breton',    height: 0.8, color: '#6366f1', icon: '🍪', category: 'Biscuits' },
   { id: 'croustillant',    name: 'Croustillant',     height: 0.5, color: '#A67B3D', icon: '✨', category: 'Biscuits' },
   { id: 'streusel',        name: 'Streusel',         height: 0.5, color: '#B8956A', icon: '🔶', category: 'Biscuits' },
   { id: 'mousse_chocolat', name: 'Mousse Chocolat',  height: 3.0, color: '#5C3A1E', icon: '🍫', category: 'Mousses' },

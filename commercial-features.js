@@ -852,14 +852,14 @@ window.generateCatalogueHTML = function(items, shopName, userName) {
       transform: translateX(-50%);
       width: 100px;
       height: 3px;
-      background: var(--gold);
+      background: var(--accent);
     }
     .header span {
       display: block;
       text-transform: uppercase;
       letter-spacing: 0.4em;
       font-size: 0.75rem;
-      color: var(--gold);
+      color: var(--accent);
       margin-bottom: 1.5rem;
       font-weight: 600;
     }
@@ -889,7 +889,7 @@ window.generateCatalogueHTML = function(items, shopName, userName) {
       font-size: 2.2rem;
       text-align: center;
       margin-bottom: 4rem;
-      color: var(--gold);
+      color: var(--accent);
       position: relative;
     }
     .category-title::after {
@@ -933,7 +933,7 @@ window.generateCatalogueHTML = function(items, shopName, userName) {
       font-family: 'Bodoni Moda', serif;
       font-size: 1.6rem;
       font-weight: 700;
-      color: var(--gold);
+      color: var(--accent);
     }
     .item-meta {
       grid-column: 1 / -1;
