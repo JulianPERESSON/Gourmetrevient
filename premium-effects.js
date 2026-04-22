@@ -175,20 +175,19 @@
 
 
 // ============================================================================
-// 2. GLASSMORPHISM 2.0 — Réfraction Lumineuse Spéculaire
+// 2. GLASSMORPHISM 2.0 — Réfraction Lumineuse Spéculaire & Levitation
 // ============================================================================
 
 (function initSpecularCards() {
   document.addEventListener('DOMContentLoaded', () => {
-    // Inject gradient overlay on cards that reacts to cursor
+    // 2a. Specular Light Effect
     document.addEventListener('mousemove', (e) => {
-      const cards = document.querySelectorAll('.cockpit-card, .mgmt-glass-card, .priority-card, .ai-expert-card, .production-main-card, .stock-compact-card, .business-compact-card, .activity-compact-card, .crm-kpi-card');
+      const cards = document.querySelectorAll('.cockpit-card, .mgmt-glass-card, .priority-card, .ai-expert-card, .production-main-card, .stock-compact-card, .business-compact-card, .activity-compact-card, .crm-kpi-card, .saved-card');
       cards.forEach(card => {
         const rect = card.getBoundingClientRect();
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
 
-        // Only apply when mouse is near the card
         if (x >= -80 && x <= rect.width + 80 && y >= -80 && y <= rect.height + 80) {
           card.style.setProperty('--specular-x', `${x}px`);
           card.style.setProperty('--specular-y', `${y}px`);
@@ -198,6 +197,33 @@
         }
       });
     });
+
+    // 2b. GSAP Levitation on hover
+    document.addEventListener('mouseenter', (e) => {
+      const card = e.target.closest('.saved-card, .mgmt-glass-card');
+      if (card && window.gsap) {
+        gsap.to(card, { 
+          y: -8, 
+          scale: 1.02, 
+          boxShadow: '0 20px 40px rgba(0,0,0,0.15)',
+          duration: 0.4, 
+          ease: 'power2.out' 
+        });
+      }
+    }, true);
+
+    document.addEventListener('mouseleave', (e) => {
+      const card = e.target.closest('.saved-card, .mgmt-glass-card');
+      if (card && window.gsap) {
+        gsap.to(card, { 
+          y: 0, 
+          scale: 1, 
+          boxShadow: 'var(--shadow-glass)',
+          duration: 0.6, 
+          ease: 'elastic.out(1, 0.75)' 
+        });
+      }
+    }, true);
   });
 })();
 
@@ -378,6 +404,12 @@ window.hydratePremiumDashboard = function() {
   setTimeout(() => {
     if (typeof renderPredictiveMarginAlert === 'function') renderPredictiveMarginAlert();
   }, 100);
+  // Refresh interactive analytics charts (module chargé après ce fichier)
+  setTimeout(() => {
+    if (window.AnalyticsInteractive && typeof window.AnalyticsInteractive.refresh === 'function') {
+      window.AnalyticsInteractive.refresh();
+    }
+  }, 200);
 };
 
 

@@ -5139,18 +5139,25 @@
       if (typeof _origSave !== 'function') return;
 
       window.saveSavedRecipes = function() {
-        _origSave.apply(this, arguments);
-        // Si offline, mettre en file d'attente pour sync ultérieure
-        if (!navigator.onLine && typeof window.queueOfflineOp === 'function') {
-          const currUser = (localStorage.getItem('gourmet_current_user') || 'chef').toLowerCase();
-          const key = `gourmetrevient_recipes_${currUser}`;
-          window.queueOfflineOp({
-            action: 'save_recipe',
-            key,
-            data: JSON.parse(localStorage.getItem(key) || '[]'),
-            ts: Date.now()
-          });
+        // Si offline, marquer les nouvelles données pour le badge visuel
+        if (!navigator.onLine) {
+           const currUser = (localStorage.getItem('gourmet_current_user') || 'chef').toLowerCase();
+           const key = `gourmetrevient_recipes_${currUser}`;
+           const recipes = JSON.parse(localStorage.getItem(key) || '[]');
+           // On marque tout comme "local" si on sauve en offline
+           recipes.forEach(r => { if(!r.id_online) r._isOffline = true; });
+           localStorage.setItem(key, JSON.stringify(recipes));
+           
+           if (typeof window.queueOfflineOp === 'function') {
+             window.queueOfflineOp({
+               action: 'save_recipe',
+               key,
+               data: recipes,
+               ts: Date.now()
+             });
+           }
         }
+        _origSave.apply(this, arguments);
       };
     })();
   </script>

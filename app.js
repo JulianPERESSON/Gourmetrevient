@@ -1626,7 +1626,8 @@ function renderSavedRecipes() {
     const costLabel = costs.additionalCosts > 0 ? t('s4.adv.kpi.full_cost') : t('label.cost');
 
     return `
-      <div class="saved-card">
+      <div class="saved-card" style="position:relative;">
+        ${r._isOffline ? '<div class="sync-badge pending" style="position:absolute; top:1rem; right:1rem;">⏳ Hors Ligne</div>' : ''}
         <div class="sc-name">${escapeHtml(r.name)}</div>
         <div class="sc-meta">${escapeHtml(r.category || t('lab.cat.all'))} · ${r.portions} portions · ${date}</div>
         <div class="sc-cost">${costLabel}: ${costs.totalFullCost.toFixed(2)} € · ${costs.costPerPortion.toFixed(2)} €/${t('unit.portion')}</div>

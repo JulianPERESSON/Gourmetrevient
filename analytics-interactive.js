@@ -495,57 +495,58 @@ window.AnalyticsInteractive = (function() {
     const canvas = document.getElementById(canvasId);
     if (!canvas || document.getElementById(btnId)) return;
 
-    // On remonte jusqu'à la mgmt-glass-card parente pour placer
-    // le hint/reset APRÈS le canvas, jamais en overlay dessus.
-    const canvasWrapper = canvas.parentElement; // div avec height fixe
+    const canvasWrapper = canvas.parentElement;
     const card = canvasWrapper ? canvasWrapper.closest('.mgmt-glass-card, .analytics-chart-card') : null;
-    const insertTarget = card || canvasWrapper;
-    if (!insertTarget) return;
+    if (!canvasWrapper) return;
 
-    // Footer sous le chart (flex row : hint à gauche, reset à droite)
+    // Footer sous le chart
     const footer = document.createElement('div');
     footer.id = `${btnId}-footer`;
-    footer.style.cssText = [
-      'display:flex',
-      'align-items:center',
-      'justify-content:space-between',
-      'margin-top:8px',
-      'padding:0 2px',
-      'min-height:22px',
-    ].join(';');
+    footer.style.cssText = `
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 10px;
+      padding: 4px 6px;
+      min-height: 24px;
+      transition: opacity 0.3s ease;
+    `;
 
-    // Hint discret (à gauche)
+    // Hint discret (à gauche) - Invisible par défaut, apparaît au hover
     const hint = document.createElement('span');
     hint.className = 'chart-zoom-hint-label';
-    hint.textContent = '🖱 Molette : zoom  ·  Clic-glisser : naviguer';
-    hint.style.cssText = [
-      'font-size:0.68rem',
-      'color:var(--text-muted)',
-      'font-weight:500',
-      'opacity:0.65',
-      'pointer-events:none',
-      'white-space:nowrap',
-      'overflow:hidden',
-      'text-overflow:ellipsis',
-    ].join(';');
+    hint.innerHTML = '<span style="font-size:0.9rem; margin-right:4px;">🖱️</span> Molette : zoom  ·  Glisser : naviguer';
+    hint.style.cssText = `
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      font-weight: 600;
+      opacity: 0;
+      transform: translateY(4px);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      pointer-events: none;
+      letter-spacing: 0.02em;
+    `;
 
-    // Bouton reset (à droite, caché par défaut)
+    // Bouton reset (à droite)
     const btn = document.createElement('button');
     btn.id = btnId;
     btn.className = 'chart-zoom-reset';
-    btn.innerHTML = '↺ Reset zoom';
-    // Pas de position absolute — il est dans le flow du footer
+    btn.innerHTML = '↺ Réinitialiser la vue';
     btn.style.cssText = 'position:static; margin-left:auto; flex-shrink:0;';
 
     footer.appendChild(hint);
     footer.appendChild(btn);
 
-    // Insérer le footer après le canvasWrapper (pas dedans)
-    if (canvasWrapper && canvasWrapper.parentElement) {
+    if (canvasWrapper.parentElement) {
       canvasWrapper.parentElement.insertBefore(footer, canvasWrapper.nextSibling);
-    } else {
-      insertTarget.appendChild(footer);
     }
+
+    // Interaction : afficher le hint au survol du canvas
+    const showHint = () => { hint.style.opacity = '0.7'; hint.style.transform = 'translateY(0)'; };
+    const hideHint = () => { hint.style.opacity = '0'; hint.style.transform = 'translateY(4px)'; };
+
+    canvasWrapper.addEventListener('mouseenter', showHint);
+    canvasWrapper.addEventListener('mouseleave', hideHint);
   }
 
   // Hooker sur le changement de tab Dashboard
