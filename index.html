@@ -699,6 +699,143 @@
       border-color: rgba(255,255,255,0.1);
       color: var(--text-muted);
     }
+
+    /* ═══════════════════════════════════════════════════════════════
+       ASSEMBLY SIMULATOR — Premium Split-View Styles
+       ═══════════════════════════════════════════════════════════════ */
+    .asm-layer-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px;
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: 10px;
+      margin-bottom: 8px;
+      cursor: grab;
+      transition: all var(--transition-fast);
+      position: relative;
+      user-select: none;
+    }
+
+    .asm-layer-row:hover {
+      border-color: var(--accent);
+      transform: translateX(4px);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .asm-layer-row.active {
+      border-color: var(--accent);
+      background: var(--accent-glow);
+      box-shadow: 0 0 0 2px var(--accent);
+    }
+
+    .asm-layer-row.dragging {
+      opacity: 0.5;
+      cursor: grabbing;
+      background: var(--bg-alt);
+    }
+
+    .asm-layer-row.drag-over-row {
+      border-top: 3px solid var(--accent);
+      margin-top: -3px;
+    }
+
+    .asm-row-drag {
+      color: var(--text-muted);
+      font-size: 1rem;
+      cursor: grab;
+      opacity: 0.5;
+    }
+
+    .asm-row-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
+      flex-shrink: 0;
+    }
+
+    .asm-row-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .asm-row-name {
+      font-weight: 800;
+      font-size: 0.82rem;
+      color: var(--primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .asm-row-meta {
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .asm-row-actions {
+      display: flex;
+      gap: 4px;
+      opacity: 0;
+      transition: opacity var(--transition-fast);
+    }
+
+    .asm-layer-row:hover .asm-row-actions {
+      opacity: 1;
+    }
+
+    .asm-row-btn {
+      width: 26px;
+      height: 26px;
+      border-radius: 6px;
+      border: 1px solid var(--surface-border);
+      background: var(--surface);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+
+    .asm-row-btn:hover {
+      background: var(--bg-alt);
+      border-color: var(--accent);
+      transform: scale(1.1);
+    }
+
+    .assembly-palette-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px;
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: 8px;
+      margin-bottom: 6px;
+      cursor: grab;
+      transition: all var(--transition-fast);
+    }
+
+    .assembly-palette-item:hover {
+      border-color: var(--accent);
+      background: var(--bg-alt);
+      transform: scale(1.02);
+    }
+
+    .asm-layers-container {
+      display: flex;
+      flex-direction: column-reverse; /* Bottom up assembly */
+    }
   </style>
 </head>
 
@@ -1931,7 +2068,7 @@
 
           <div class="step-nav">
             <button class="btn btn-outline" id="btnToStep2b" data-i18n="s3.btn.prev">← Ingrédients</button>
-            <button class="btn btn-primary" id="btnToStep4" data-i18n="s3.btn.next">Analyse des coûts →</button>
+            <button class="btn btn-primary" id="btnToStep4" data-i18n="s3.btn.next" style="color: #ffffff !important; -webkit-font-smoothing: antialiased;">Analyse des coûts →</button>
           </div>
         </div>
       </div>
@@ -2791,7 +2928,7 @@
               </select>
             </div>
 
-            <div class="legend-items">
+<div class="legend-items">
               <div class="legend-item"><span class="day-cell-mini event-day"></span> <span
                   data-i18n="plan.legend.events">Événements Clés</span></div>
               <div class="legend-item"><span class="day-cell-mini holiday-day"></span> <span id="planningHolidayLegend"
@@ -4372,6 +4509,8 @@
     }
     window.switchQualitySubTab = switchQualitySubTab;
 
+
+
   </script>
 
   <!-- Core Scripts -->
@@ -4770,68 +4909,15 @@
     <div class="modal-content glass-panel" style="max-width:500px; width:95%;">
       <div class="modal-header" style="display:flex; justify-content:space-between; margin-bottom:1.2rem;">
         <h3 style="margin:0;">☁️ <span data-i18n="cloud.modal.title">Synchronisation Cloud</span></h3>
-        <button id="btnCloseCloudSync" class="btn-icon" onclick="closeCloudSync()">✕</button>
+        <button class="btn-icon" onclick="closeCloudSync()">✕</button>
       </div>
-      <div id="cloudStatus" class="cloud-status-bar" style="margin-bottom:1.5rem;"></div>
-      <div class="form-group">
-        <label data-i18n="cloud.label.url">URL Supabase</label>
-        <input type="url" id="supabaseUrl" class="form-input" placeholder="https://xxxx.supabase.co">
-      </div>
-      <div class="form-group">
-        <label data-i18n="cloud.label.key">Clé API (anon)</label>
-        <input type="password" id="supabaseKey" class="form-input" placeholder="eyJhbGc...">
-      </div>
-      <button class="btn btn-outline btn-full" onclick="saveCloudConfig()" style="margin-bottom:1rem;" data-i18n="cloud.btn.save">💾 Enregistrer la configuration</button>
-      <hr style="opacity:0.1; margin:1.5rem 0;">
-      <div style="display:flex; gap:10px;">
-        <button class="btn btn-primary btn-full" id="btnCloudSync" onclick="syncToCloud()" data-i18n="cloud.btn.sync">☁️ Synchroniser maintenant</button>
-        <button class="btn btn-outline btn-full" onclick="syncFromCloud()" data-i18n="cloud.btn.restore">📥 Restaurer depuis le cloud</button>
+      <div class="modal-body">
+          <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1.5rem;">Synchronisez vos recettes et votre inventaire sur tous vos appareils.</p>
+          <button class="btn btn-primary btn-full" onclick="syncNow()">🔄 Synchroniser maintenant</button>
       </div>
     </div>
   </div>
 
-  <!-- ================================================ -->
-  <!-- CLIENT QR CODE MODAL -->
-  <!-- ================================================ -->
-  <div id="clientQRModal" class="modal-overlay" style="display:none;">
-    <div class="modal-content glass-panel" style="max-width:420px; width:95%;">
-      <div class="modal-header" style="display:flex; justify-content:space-between; margin-bottom:1.2rem;">
-        <h3 style="margin:0;">📱 <span data-i18n="clientqr.modal.title">Fiche Client QR Code</span></h3>
-        <button class="btn-icon" onclick="closeClientQR()">✕</button>
-      </div>
-      <div id="clientQRContent" class="client-qr-card">
-        <div class="client-qr-header">
-          <div class="client-qr-logo">🧁</div>
-          <h4 id="clientQRRecipeName" class="client-qr-name">—</h4>
-          <p id="clientQRDescription" class="client-qr-desc"></p>
-        </div>
-        <div class="client-qr-price-badge">
-          <span id="clientQRPrice">—</span>
-        </div>
-        <div class="client-qr-code-box">
-          <div id="clientQRCode"></div>
-        </div>
-        <div class="client-qr-details">
-          <div class="client-qr-section">
-            <strong data-i18n="clientqr.ingredients">Ingrédients :</strong>
-            <p id="clientQRIngredients" class="client-qr-text"></p>
-          </div>
-          <div class="client-qr-section">
-            <strong data-i18n="clientqr.allergens">Allergènes :</strong>
-            <p id="clientQRAllergens" class="client-qr-text" style="color:var(--danger);"></p>
-          </div>
-        </div>
-      </div>
-      <div style="margin-top:1.5rem; display:flex; gap:10px;">
-        <button class="btn btn-primary btn-full" onclick="exportClientQRPdf()">💾 PDF</button>
-        <button class="btn btn-outline btn-full" onclick="window.print()">🖨️ Imprimer</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ================================================ -->
-  <!-- CHEF'S BRAIN — FLAVOR PAIRING GENERATOR          -->
-  <!-- ================================================ -->
   <div id="chefsBrainModal" class="modal-overlay" style="display:none;">
     <div class="modal-content glass-panel" style="max-width:820px; width:95%;">
       <div class="modal-header" style="display:flex; justify-content:space-between; margin-bottom:1.2rem;">
@@ -4872,32 +4958,85 @@
   </div>
 
   <!-- ================================================ -->
-  <!-- ASSEMBLY SIMULATOR — ENTREMETS BUILDER            -->
+  <!-- ASSEMBLY SIMULATOR — ENTREMETS BUILDER (PRO SPLIT VIEW) -->
   <!-- ================================================ -->
   <div id="assemblyModal" class="modal-overlay" style="display:none;">
-    <div class="modal-content glass-panel" style="max-width:980px; width:95%; max-height:92vh; overflow:hidden; display:flex; flex-direction:column; gap:0;">
-      <div class="modal-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
-        <h3 style="margin:0;">🏗️ <span class="premium-shimmer-text">Simulateur de Montage &amp; Coupe</span></h3>
+    <div class="modal-content glass-panel" style="max-width:1250px; width:98%; max-height:92vh; overflow:hidden; display:flex; flex-direction:column; gap:0;">
+      <div class="modal-header" style="display:flex; justify-content:space-between; align-items:center; margin: 1.2rem 1.5rem;">
+        <h3 style="margin:0;">🏗️ <span class="premium-shimmer-text">Simulateur de Montage &amp; Coupe Professionnel</span></h3>
         <div style="display:flex; gap:8px;">
           <button class="btn btn-sm btn-outline" onclick="clearAssembly()">🗑️ Effacer</button>
-          <button class="btn btn-sm btn-primary" onclick="exportAssemblyPNG()">💾 Exporter</button>
+          <button class="btn btn-sm btn-primary" onclick="exportAssemblyPNG()">💾 Exporter SVG</button>
           <button class="btn-icon" onclick="closeAssemblySimulator()">✕</button>
         </div>
       </div>
 
-      <div class="assembly-workspace" style="flex:1; overflow:hidden;">
+      <div class="assembly-workspace" style="flex:1; overflow:hidden; display:grid; grid-template-columns: 240px 1fr; gap:1.5rem; padding: 0 1.5rem 1.5rem;">
         <!-- Layer Palette -->
-        <div class="assembly-palette">
-          <h4 class="premium-shimmer-text">📦 Composants</h4>
+        <div class="assembly-palette" style="background:var(--bg-alt); border-radius:12px; border:1px solid var(--surface-border); padding: 1rem; overflow-y:auto;">
+          <h4 class="premium-shimmer-text" style="margin-bottom:1rem; font-size:0.9rem;">📦 Bibliothèque</h4>
           <div class="assembly-palette-items" id="assemblyPaletteItems"></div>
         </div>
 
-        <!-- Canvas Area -->
-        <div class="assembly-canvas-area" style="display:flex; flex-direction:column; gap:10px; overflow:hidden;">
-          <!-- Controls Row -->
-          <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
-            <div class="assembly-mold-selector">
-              <label class="premium-shimmer-text" style="font-weight:800; font-size:0.8rem; letter-spacing:0.05em;">MOULE :</label>
+        <!-- Working Area: Split View -->
+        <div class="assembly-working-area" style="display:grid; grid-template-columns: 380px 1fr; gap:1.5rem; overflow:hidden;">
+          
+          <!-- LEFT: Layer Manager -->
+          <div class="asm-manager-panel" style="display:flex; flex-direction:column; gap:1rem; overflow:hidden;">
+            <div style="display:flex; align-items:center; gap:10px; background:var(--surface); padding:10px; border-radius:10px; border:1px solid var(--surface-border);">
+              <label class="premium-shimmer-text" style="font-weight:800; font-size:0.75rem; letter-spacing:0.05em;">MOULE :</label>
+              <select id="assemblyMoldSelect" class="form-input" style="width:auto; font-size:0.85rem; padding:4px 8px; margin:0;" onchange="changeAssemblyMold()">
+                <option value="cercle">⭕ Cercle (22cm)</option>
+                <option value="carre">⬛ Carré (20cm)</option>
+                <option value="buche">📏 Bûche (30cm)</option>
+                <option value="tarte">🥧 Tarte (24cm)</option>
+                <option value="verrine">🥃 Verrine (8cm)</option>
+              </select>
+            </div>
+            
+            <div id="asmViewStack" style="flex:1; overflow-y:auto; background:var(--bg-alt); border-radius:12px; border:1px solid var(--surface-border); padding:10px;">
+              <div id="assemblyLayers" class="asm-layers-container"></div>
+            </div>
+            
+            <div class="assembly-total" id="assemblyTotal" style="font-size:0.85rem; padding:12px; background:var(--accent-glow); border-radius:10px; color:var(--accent-dark); font-weight:800; text-align:center; border:1px solid var(--accent);">Hauteur : 0 cm</div>
+          </div>
+
+          <!-- RIGHT: Cross Section (The Visual) -->
+          <div class="asm-visual-panel" style="background:#f8fafc; border-radius:12px; border:1px solid var(--surface-border); overflow:auto; display:flex; justify-content:center; align-items:flex-start; padding:20px; box-shadow: inset 0 0 40px rgba(0,0,0,0.02);">
+            <div id="assemblyCrossSection"></div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Annotation Panel -->
+      <div id="asmAnnotationPanel" style="display:none; background:var(--surface); border-top:1px solid var(--surface-border); padding: 1rem 1.5rem;">
+        <div style="font-size:0.7rem; font-weight:800; text-transform:uppercase; letter-spacing:.1em; color:var(--text-muted); margin-bottom:8px;">📝 Annotation couche : <span id="asmAnnotLayerName" style="color:var(--accent);"></span></div>
+        <div style="display:grid; grid-template-columns:1fr 1fr 1fr 2fr auto; gap:12px; align-items:end;">
+          <div class="form-group" style="margin:0;">
+            <label style="font-size:0.72rem;">📏 Hauteur (cm)</label>
+            <input type="number" id="asmAnnotHeight" step="0.1" class="form-input" style="font-size:0.85rem; padding:8px;">
+          </div>
+          <div class="form-group" style="margin:0;">
+            <label style="font-size:0.72rem;">🌡️ Température (°C)</label>
+            <input type="number" id="asmAnnotTemp" class="form-input" placeholder="ex: 18" style="font-size:0.85rem; padding:8px;">
+          </div>
+          <div class="form-group" style="margin:0;">
+            <label style="font-size:0.72rem;">⏱ Repos (min)</label>
+            <input type="number" id="asmAnnotRest" class="form-input" placeholder="ex: 120" style="font-size:0.85rem; padding:8px;">
+          </div>
+          <div class="form-group" style="margin:0;">
+            <label style="font-size:0.72rem;">📌 Note technique</label>
+            <input type="text" id="asmAnnotNote" class="form-input" placeholder="ex: Cristalliser au froid 2h" style="font-size:0.85rem; padding:8px;">
+          </div>
+          <button class="btn btn-primary" onclick="saveLayerAnnotation()">✅ Enregistrer</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- MASTER CONVERTER — Géométrie Culinaire           -->
+  <!-- ================================================ -->
+  <div id="masterConverterModal" class="modal-overlay" style="display:none;">
+    <div class="modal-content glass-panel" style="max-width:860px; width:95%;">m;">MOULE :</label>
               <select id="assemblyMoldSelect" class="form-input" style="width:auto;" onchange="changeAssemblyMold()">
                 <option value="cercle">⭕ Cercle (22cm)</option>
                 <option value="carre">⬜ Carré (20cm)</option>
@@ -4924,7 +5063,7 @@
             <div id="assemblyCrossSection" style="width:100%; display:flex; justify-content:center;"></div>
           </div>
 
-          <div class="assembly-total" id="assemblyTotal">Hauteur totale : 0 cm</div>
+
         </div>
       </div>
 

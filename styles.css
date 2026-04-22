@@ -1423,6 +1423,7 @@ select.form-input {
   border: 1px solid var(--surface-border);
   box-shadow: var(--shadow-sm);
   transition: all var(--transition);
+  opacity: 1 !important;
 }
 
 .kpi-card:hover {
@@ -1447,15 +1448,15 @@ select.form-input {
 }
 
 .kpi-card.accent .kpi-value {
-  color: var(--accent);
+  color: var(--accent-dark);
 }
 
 .kpi-card.success .kpi-value {
-  color: var(--success);
+  color: #059669; /* Vert émeraude sombre */
 }
 
 .kpi-card.warning .kpi-value {
-  color: var(--warning);
+  color: #d97706; /* Ambre sombre */
 }
 
 .kpi-card .kpi-sub {

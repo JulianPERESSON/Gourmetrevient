@@ -217,44 +217,69 @@ function updateChefBrainCost(pairings) {
 // ============================================================================
 
 const ASSEMBLY_COMPONENTS = [
-  { id: 'biscuit_joconde', name: 'Biscuit Joconde', height: 1.0, color: '#D4A574', grad: ['#D4A574','#B8845A'], icon: '🍰', category: 'Biscuits', texture: 'grain' },
-  { id: 'genoise',         name: 'Génoise',         height: 1.5, color: '#E8C99B', grad: ['#E8C99B','#D4A574'], icon: '🧁', category: 'Biscuits', texture: 'grain' },
-  { id: 'dacquoise',       name: 'Dacquoise',       height: 1.0, color: '#C9A96E', grad: ['#C9A96E','#A8825A'], icon: '🥜', category: 'Biscuits', texture: 'grain' },
-  { id: 'sable_breton',    name: 'Sablé Breton',    height: 0.8, color: '#6366f1', grad: ['#818cf8','#4f46e5'], icon: '🍪', category: 'Biscuits', texture: 'dots' },
-  { id: 'croustillant',    name: 'Croustillant',    height: 0.5, color: '#A67B3D', grad: ['#C49A4E','#8B6530'], icon: '✨', category: 'Biscuits', texture: 'dots' },
-  { id: 'streusel',        name: 'Streusel',         height: 0.5, color: '#B8956A', grad: ['#C9A97A','#9A7A55'], icon: '🔶', category: 'Biscuits', texture: 'grain' },
-  { id: 'mousse_chocolat', name: 'Mousse Chocolat',  height: 3.0, color: '#5C3A1E', grad: ['#7A4E2A','#3D2010'], icon: '🍫', category: 'Mousses', texture: 'smooth' },
-  { id: 'mousse_fruit',    name: 'Mousse Fruits',    height: 3.0, color: '#E85D75', grad: ['#F07090','#C04060'], icon: '🍓', category: 'Mousses', texture: 'smooth' },
-  { id: 'mousse_vanille',  name: 'Mousse Vanille',   height: 3.0, color: '#FFF5E1', grad: ['#FFFBF0','#F5E8C0'], icon: '🍦', category: 'Mousses', texture: 'smooth' },
-  { id: 'bavarois',        name: 'Bavarois',          height: 2.5, color: '#FFE4C4', grad: ['#FFF0D8','#F0D090'], icon: '🥛', category: 'Mousses', texture: 'smooth' },
-  { id: 'cremeux',         name: 'Crémeux',           height: 1.5, color: '#6B4226', grad: ['#8B5A36','#50300E'], icon: '🤎', category: 'Crèmes', texture: 'smooth' },
-  { id: 'creme_brulee',    name: 'Crème Brûlée',     height: 1.5, color: '#E8D5A3', grad: ['#F0E0B0','#D0B870'], icon: '🔥', category: 'Crèmes', texture: 'smooth' },
-  { id: 'ganache',         name: 'Ganache',           height: 1.0, color: '#3C1F0E', grad: ['#5A3020','#201008'], icon: '🍫', category: 'Crèmes', texture: 'smooth' },
-  { id: 'curd_citron',     name: 'Curd Citron',      height: 1.0, color: '#F5E050', grad: ['#FFEC70','#E0C820'], icon: '🍋', category: 'Crèmes', texture: 'smooth' },
-  { id: 'insert_fruit',    name: 'Insert Fruits',    height: 1.5, color: '#FF6B6B', grad: ['#FF8080','#E04040'], icon: '🍒', category: 'Inserts', texture: 'bubble' },
-  { id: 'insert_caramel',  name: 'Insert Caramel',   height: 1.0, color: '#D4840A', grad: ['#F0A020','#B06000'], icon: '🍯', category: 'Inserts', texture: 'bubble' },
-  { id: 'confit',          name: 'Confit / Compotée', height: 1.0, color: '#8B2252', grad: ['#AA3870','#6A1040'], icon: '🫙', category: 'Inserts', texture: 'bubble' },
-  { id: 'gelee',           name: 'Gelée Mirror',     height: 0.5, color: '#FF4757', grad: ['#FF7080','#DD2040'], icon: '💎', category: 'Inserts', texture: 'glass' },
-  { id: 'glacage_miroir',  name: 'Glaçage Miroir',   height: 0.3, color: '#2C3E50', grad: ['#4A6070','#1A2830'], icon: '🪞', category: 'Finitions', texture: 'glass' },
-  { id: 'velours',         name: 'Velours Chocolat',  height: 0.2, color: '#654321', grad: ['#806040','#482010'], icon: '🧶', category: 'Finitions', texture: 'velvet' },
-  { id: 'chantilly',       name: 'Chantilly',         height: 2.0, color: '#FFFCF0', grad: ['#FFFFFF','#F5F0E0'], icon: '☁️', category: 'Finitions', texture: 'cloud' },
-  { id: 'meringue',        name: 'Meringue',          height: 1.0, color: '#FFF8F0', grad: ['#FFFFFF','#F8F0E8'], icon: '🔮', category: 'Finitions', texture: 'cloud' },
+  // --- BISCUITS & BASES ---
+  { id: 'biscuit_joconde', name: 'Biscuit Joconde', height: 0.8, color: '#D4A574', grad: ['#E2B386','#C69668'], icon: '🍰', category: 'Biscuits', texture: 'grain' },
+  { id: 'genoise',         name: 'Génoise Nature',  height: 1.5, color: '#E8C99B', grad: ['#E8C99B','#D4A574'], icon: '🧁', category: 'Biscuits', texture: 'grain' },
+  { id: 'dacquoise_hz',    name: 'Dacquoise Noisette', height: 1.0, color: '#C9A96E', grad: ['#D9B97E','#B9995E'], icon: '🌰', category: 'Biscuits', texture: 'grain' },
+  { id: 'sable_breton',    name: 'Sablé Breton',    height: 1.2, color: '#6366f1', grad: ['#818cf8','#4f46e5'], icon: '🍪', category: 'Biscuits', texture: 'dots' },
+  { id: 'croustillant_pr', name: 'Croustillant Praliné', height: 0.5, color: '#A67B3D', grad: ['#C49A4E','#8B6530'], icon: '✨', category: 'Inserts', texture: 'dots' },
+  { id: 'streusel',        name: 'Streusel Noisette', height: 0.6, color: '#B8956A', grad: ['#C9A97A','#9A7A55'], icon: '🔶', category: 'Inserts', texture: 'grain' },
+  { id: 'biscuit_cuillere',name: 'Biscuit à la Cuillère', height: 1.5, color: '#F3E5AB', grad: ['#FFF8DC','#EEDC82'], icon: '🥖', category: 'Biscuits', texture: 'grain' },
+  { id: 'financier',       name: 'Financier Vanille', height: 1.0, color: '#E5C49F', grad: ['#F5D4AF','#D5B48F'], icon: '🍯', category: 'Biscuits', texture: 'grain' },
+  { id: 'pate_sablee',     name: 'Pâte Sablée',     height: 0.3, color: '#D2B48C', grad: ['#E6CCB2','#B08968'], icon: '🥧', category: 'Biscuits', texture: 'grain' },
+  { id: 'biscuit_madeleine',name: 'Biscuit Madeleine',   height: 1.2, color: '#F3E5AB', grad: ['#FDF5E6','#EEDC82'], icon: '🐚', category: 'Biscuits', texture: 'grain' },
+  { id: 'croustillant_sp',  name: 'Croustillant Speculoos', height: 0.5, color: '#8B4513', grad: ['#A0522D','#6B4226'], icon: '🍪', category: 'Inserts', texture: 'dots' },
+
+  // --- MOUSSES & LÉGÈRETÉ ---
+  { id: 'mousse_choc_64',  name: 'Mousse Choc Noir 64%', height: 3.0, color: '#3D2010', grad: ['#5C3A1E','#2A1508'], icon: '🍫', category: 'Mousses', texture: 'smooth' },
+  { id: 'mousse_fraise',   name: 'Mousse Fraise Mara', height: 3.0, color: '#E85D75', grad: ['#F07090','#C04060'], icon: '🍓', category: 'Mousses', texture: 'smooth' },
+  { id: 'mousse_vanille',  name: 'Mousse Vanille Bourbon', height: 3.0, color: '#FFF5E1', grad: ['#FFFBF0','#F5E8C0'], icon: '🍦', category: 'Mousses', texture: 'cloud' },
+  { id: 'ganache_montee_v',name: 'Ganache Montée Vanille', height: 2.5, color: '#FFF5E1', grad: ['#FFFBF0','#F5E8C0'], icon: '🍦', category: 'Mousses', texture: 'cloud' },
+  { id: 'creme_diplomate', name: 'Crème Diplomate', height: 2.0, color: '#FFE4C4', grad: ['#FFF0D8','#F0D090'], icon: '🥛', category: 'Mousses', texture: 'cloud' },
+  { id: 'mousse_exo',      name: 'Mousse Passion-Mangue', height: 3.0, color: '#FFB347', grad: ['#FFCC33','#FF8C00'], icon: '🥭', category: 'Mousses', texture: 'smooth' },
+  { id: 'mousse_hz',       name: 'Mousse Noisette Grillée', height: 3.0, color: '#AE8964', grad: ['#C5A582','#8E6A44'], icon: '🌰', category: 'Mousses', texture: 'smooth' },
+  { id: 'bavarois',        name: 'Bavarois Vanille',  height: 2.5, color: '#FFE4C4', grad: ['#FFF0D8','#F0D090'], icon: '🥛', category: 'Mousses', texture: 'smooth' },
+
+  // --- CRÈMES & ONCTUOSITÉ ---
+  { id: 'namelaka_choc',   name: 'Namelaka Chocolat', height: 1.5, color: '#6B4226', grad: ['#8B5A36','#50300E'], icon: '🤎', category: 'Crèmes', texture: 'smooth' },
+  { id: 'cremeux_caramel', name: 'Crémeux Caramel Salé', height: 1.2, color: '#D4840A', grad: ['#F0A020','#B06000'], icon: '🍯', category: 'Crèmes', texture: 'smooth' },
+  { id: 'curd_citron_yuzu',name: 'Curd Citron-Yuzu', height: 1.0, color: '#F5E050', grad: ['#FFEC70','#E0C820'], icon: '🍋', category: 'Crèmes', texture: 'smooth' },
+  { id: 'pasticciere',     name: 'Crème Pâtissière', height: 2.0, color: '#FDF5E6', grad: ['#FFFACD','#F5DEB3'], icon: '🥚', category: 'Crèmes', texture: 'smooth' },
+  { id: 'cremeux_passion',  name: 'Crémeux Passion Éclat', height: 1.2, color: '#FFD700', grad: ['#FFEA00','#DAA520'], icon: '🥝', category: 'Crèmes', texture: 'smooth' },
+  { id: 'ganache_fixe',    name: 'Ganache de Fourrage', height: 1.0, color: '#3C1F0E', grad: ['#5A3020','#201008'], icon: '🍫', category: 'Crèmes', texture: 'smooth' },
+
+  // --- INSERTS & FRUITS ---
+  { id: 'confit_framboise',name: 'Confit Framboise Pépins', height: 0.8, color: '#8B2252', grad: ['#AA3870','#6A1040'], icon: '🫙', category: 'Inserts', texture: 'bubble' },
+  { id: 'insert_coulant',  name: 'Insert Coulant Praliné', height: 1.0, color: '#8B4513', grad: ['#A0522D','#5D2E0B'], icon: '🌋', category: 'Inserts', texture: 'bubble' },
+  { id: 'compotee_pomme',  name: 'Compotée de Pommes Tatin', height: 1.5, color: '#CD853F', grad: ['#D2B48C','#8B4513'], icon: '🍎', category: 'Inserts', texture: 'bubble' },
+  { id: 'gelee_miroir',    name: 'Gelée de Fruits Rouges', height: 0.4, color: '#FF4757', grad: ['#FF7080','#DD2040'], icon: '💎', category: 'Inserts', texture: 'glass' },
+  { id: 'confit_myrtille', name: 'Confit Myrtille Sauvage', height: 0.8, color: '#3B3B98', grad: ['#5758BB','#1B1464'], icon: '🫐', category: 'Inserts', texture: 'bubble' },
+  { id: 'insert_vanille_c',name: 'Insert Vanille Coulant', height: 1.0, color: '#FFF5E1', grad: ['#FFFFFF','#FDF5E6'], icon: '🍦', category: 'Inserts', texture: 'bubble' },
+  { id: 'insert_caramel',  name: 'Insert Caramel Mou',   height: 1.0, color: '#D4840A', grad: ['#F0A020','#B06000'], icon: '🍯', category: 'Inserts', texture: 'bubble' },
+
+  // --- FINITIONS ---
+  { id: 'glacage_miroir',  name: 'Glaçage Miroir Ultra-Gloss', height: 0.3, color: '#2C3E50', grad: ['#4A6070','#1A2830'], icon: '🪞', category: 'Finitions', texture: 'glass' },
+  { id: 'velours_choc',    name: 'Effet Velours Chocolat', height: 0.2, color: '#654321', grad: ['#806040','#482010'], icon: '🧶', category: 'Finitions', texture: 'velvet' },
+  { id: 'chantilly_v',     name: 'Chantilly Mascarpone', height: 2.5, color: '#FFFCF0', grad: ['#FFFFFF','#F5F0E0'], icon: '☁️', category: 'Finitions', texture: 'cloud' },
+  { id: 'nappage_neutre',  name: 'Nappage Neutre Brillance', height: 0.2, color: '#FFFFFF', grad: ['#F8F9FA','#E9ECEF'], icon: '✨', category: 'Finitions', texture: 'glass' },
+  { id: 'opaline',         name: 'Opaline Craquante', height: 0.1, color: '#E0F2F1', grad: ['#B2DFDB','#80CBC4'], icon: '❄️', category: 'Finitions', texture: 'glass' },
+  { id: 'meringue_italienne', name: 'Meringue Italienne', height: 1.5, color: '#FFF8F0', grad: ['#FFFFFF','#F8F0E8'], icon: '🔮', category: 'Finitions', texture: 'cloud' },
 ];
 
 let assemblyLayers = [];
 let currentMold = 'cercle';
-let currentView = 'stack';
+let currentView = 'split'; // Default to split view
 let selectedLayerInstanceId = null;
 
 // --- Open / Close -------------------------------------------------------
 function openAssemblySimulator() {
   const modal = document.getElementById('assemblyModal');
   if (modal) modal.style.display = 'flex';
-  loadAssemblyFromStorage(); // Load saved state
+  loadAssemblyFromStorage(); 
   initAssemblyPalette();
   initAssemblyDragDrop();
   renderAssemblyCanvas();
-  switchAssemblyView('stack');
+  renderCrossSection(); // Always render cross section in split view
 }
 
 function closeAssemblySimulator() {
@@ -303,15 +328,21 @@ function onAssemblyDragStart(e, componentId) {
 }
 
 function initAssemblyDragDrop() {
-  var canvas = document.getElementById('assemblyCanvas');
-  if (!canvas) return;
-  canvas.addEventListener('dragover', function(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'copy'; canvas.classList.add('drag-over'); });
-  canvas.addEventListener('dragleave', function() { canvas.classList.remove('drag-over'); });
-  canvas.addEventListener('drop', function(e) {
-    e.preventDefault(); canvas.classList.remove('drag-over');
-    var componentId = e.dataTransfer.getData('text/plain');
-    var comp = ASSEMBLY_COMPONENTS.find(function(c) { return c.id === componentId; });
-    if (comp) addAssemblyLayer(comp);
+  var zones = ['asmViewStack', 'assemblyCrossSection'];
+  zones.forEach(function(id) {
+    var zone = document.getElementById(id);
+    if (!zone) return;
+    zone.addEventListener('dragover', function(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'copy'; zone.style.boxShadow = 'inset 0 0 10px var(--accent)'; });
+    zone.addEventListener('dragleave', function() { zone.style.boxShadow = ''; });
+    zone.addEventListener('drop', function(e) {
+      e.preventDefault(); 
+      zone.style.boxShadow = '';
+      var componentId = e.dataTransfer.getData('text/plain');
+      if (componentId && !componentId.startsWith('reorder:')) {
+        var comp = ASSEMBLY_COMPONENTS.find(function(c) { return c.id === componentId; });
+        if (comp) addAssemblyLayer(comp);
+      }
+    });
   });
 }
 
@@ -321,7 +352,18 @@ function addAssemblyLayer(comp) {
     annotation: { temp: '', rest: '', note: '' }
   }));
   renderAssemblyCanvas();
-  if (currentView === 'cross') renderCrossSection();
+  renderCrossSection();
+}
+
+function duplicateAssemblyLayer(instanceId) {
+  const layer = assemblyLayers.find(l => l.instanceId === instanceId);
+  if (!layer) return;
+  const newLayer = JSON.parse(JSON.stringify(layer));
+  newLayer.instanceId = 'layer_' + Date.now() + '_' + Math.random().toString(36).substr(2,4);
+  const idx = assemblyLayers.indexOf(layer);
+  assemblyLayers.splice(idx + 1, 0, newLayer);
+  renderAssemblyCanvas();
+  renderCrossSection();
 }
 
 function removeAssemblyLayer(instanceId) {
@@ -332,7 +374,7 @@ function removeAssemblyLayer(instanceId) {
     if (panel) panel.style.display = 'none';
   }
   renderAssemblyCanvas();
-  if (currentView === 'cross') renderCrossSection();
+  renderCrossSection();
 }
 
 function clearAssembly() {
@@ -341,14 +383,14 @@ function clearAssembly() {
   var panel = document.getElementById('asmAnnotationPanel');
   if (panel) panel.style.display = 'none';
   renderAssemblyCanvas();
-  if (currentView === 'cross') renderCrossSection();
+  renderCrossSection();
 }
 
 function changeAssemblyMold() {
   var select = document.getElementById('assemblyMoldSelect');
   currentMold = select ? select.value : 'cercle';
   renderAssemblyCanvas();
-  if (currentView === 'cross') renderCrossSection();
+  renderCrossSection();
 }
 
 // --- Layer Manager (Montage) --------------------------------------------
@@ -383,6 +425,7 @@ function renderAssemblyCanvas() {
           '<span class="asm-row-meta">' + layer.height + ' cm' + (hasAnnot ? ' • 📌 Annoté' : '') + '</span>' +
         '</div>' +
         '<div class="asm-row-actions">' +
+          '<button class="asm-row-btn" onclick="event.stopPropagation(); duplicateAssemblyLayer(\'' + layer.instanceId + '\')" title="Dupliquer">👯</button>' +
           '<button class="asm-row-btn" onclick="event.stopPropagation(); removeAssemblyLayer(\'' + layer.instanceId + '\')" title="Supprimer">✕</button>' +
         '</div>' +
         '</div>';
@@ -416,15 +459,25 @@ function initLayerReorder() {
           var moved = assemblyLayers.splice(fromIdx, 1)[0]; 
           assemblyLayers.splice(toIdx, 0, moved); 
           renderAssemblyCanvas(); 
-          if (currentView === 'cross') renderCrossSection();
+          renderCrossSection();
         }
       } else {
         var comp = ASSEMBLY_COMPONENTS.find(function(c) { return c.id === data; });
         if (comp) {
-          var newLayer = Object.assign({}, comp, { instanceId: 'layer_' + Date.now() + '_' + Math.random().toString(36).substr(2,4), annotation: { temp:'', rest:'', note:'' } });
-          assemblyLayers.splice(parseInt(layer.dataset.idx) + 1, 0, newLayer);
+          // Check if we should REPLACE or INSERT
+          // For simplicity, we'll INSERT after by default, 
+          // but if we want to "SWITCH" (replace), we can use a prompt or a specific drop zone.
+          // Let's implement REPLACE if they drop it while holding Alt, or just provide a REPLACE button.
+          // Better: If they drop it on a row, we ask if they want to replace or insert.
+          // Actually, let's just REPLACE for now if dropped on a row, it's what "Switch" usually means.
+          var idx = parseInt(layer.dataset.idx);
+          var newLayer = Object.assign({}, comp, { 
+            instanceId: 'layer_' + Date.now() + '_' + Math.random().toString(36).substr(2,4), 
+            annotation: assemblyLayers[idx].annotation // Preserve annotations when switching!
+          });
+          assemblyLayers[idx] = newLayer; // REPLACE
           renderAssemblyCanvas();
-          if (currentView === 'cross') renderCrossSection();
+          renderCrossSection();
         }
       }
     });
@@ -441,25 +494,26 @@ function selectLayerForAnnotation(instanceId) {
   if (panel) panel.style.display = 'block';
   var nameEl = document.getElementById('asmAnnotLayerName');
   if (nameEl) nameEl.textContent = layer.icon + ' ' + layer.name;
-  var tempEl = document.getElementById('asmAnnotTemp');
-  var restEl = document.getElementById('asmAnnotRest');
-  var noteEl = document.getElementById('asmAnnotNote');
+  var heightEl = document.getElementById('asmAnnotHeight');
   if (tempEl) tempEl.value = (layer.annotation && layer.annotation.temp) || '';
   if (restEl) restEl.value = (layer.annotation && layer.annotation.rest) || '';
   if (noteEl) noteEl.value = (layer.annotation && layer.annotation.note) || '';
+  if (heightEl) heightEl.value = layer.height || 0;
   renderAssemblyCanvas();
 }
 
 function saveLayerAnnotation() {
   const layer = assemblyLayers.find(l => l.instanceId === selectedLayerInstanceId);
   if (!layer) return;
+  const heightVal = parseFloat(document.getElementById('asmAnnotHeight').value);
+  if (!isNaN(heightVal)) layer.height = heightVal;
   layer.annotation = {
     temp: document.getElementById('asmAnnotTemp').value,
     rest: document.getElementById('asmAnnotRest').value,
     note: document.getElementById('asmAnnotNote').value
   };
   renderAssemblyCanvas();
-  if (currentView === 'cross') renderCrossSection();
+  renderCrossSection();
   if (typeof showToast === 'function') showToast('Annotation sauvegardée ✓', 'success');
 }
 
@@ -561,16 +615,23 @@ function renderCrossSection() {
     <defs>
       ${gradDefs}
       ${patDefs}
-      <linearGradient id="titleGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-        <stop offset="0%" stop-color="#334155"/>
-        <stop offset="50%" stop-color="#6366f1">
-          <animate attributeName="offset" values="0;1;0" dur="4s" repeatCount="indefinite" />
-        </stop>
-        <stop offset="100%" stop-color="#334155"/>
-      </linearGradient>
+      <filter id="innerShadow">
+        <feComponentTransfer in="SourceAlpha">
+          <feFuncA type="table" tableValues="1 0" />
+        </feComponentTransfer>
+        <feGaussianBlur stdDeviation="3"/>
+        <feOffset dx="0" dy="2" result="offsetblur"/>
+        <feFlood flood-color="black" flood-opacity="0.3"/>
+        <feComposite in2="offsetblur" operator="in"/>
+        <feComposite in2="SourceAlpha" operator="in" />
+        <feMerge>
+          <feMergeNode in="SourceGraphic" />
+          <feMergeNode />
+        </feMerge>
+      </filter>
       <clipPath id="sClip"><path d="${moldPath}"/></clipPath>
       <filter id="sdrp" x="-10%" y="-10%" width="120%" height="120%">
-        <feDropShadow dx="3" dy="5" stdDeviation="8" flood-color="rgba(0,0,0,0.2)"/>
+        <feDropShadow dx="0" dy="15" stdDeviation="20" flood-color="rgba(0,0,0,0.15)"/>
       </filter>
     </defs>`;
 
@@ -578,9 +639,12 @@ function renderCrossSection() {
   let layerRects = '';
   layerData.forEach(d => {
     layerRects += `
-      <rect x="${MOLD_X}" y="${d.y}" width="${MOLD_W}" height="${d.h}" fill="url(#${d.pId})"/>
-      <rect x="${MOLD_X}" y="${d.y}" width="${MOLD_W}" height="2" fill="rgba(255,255,255,0.3)"/>
-      <line x1="${MOLD_X}" y1="${d.y + d.h}" x2="${MOLD_X + MOLD_W}" y2="${d.y + d.h}" stroke="rgba(0,0,0,0.1)" stroke-width="0.5"/>`;
+      <g filter="url(#innerShadow)">
+        <rect x="${MOLD_X}" y="${d.y}" width="${MOLD_W}" height="${d.h}" fill="url(#${d.pId})"/>
+        <rect x="${MOLD_X}" y="${d.y}" width="${MOLD_W}" height="${d.h}" fill="url(#${d.glossId})"/>
+      </g>
+      <rect x="${MOLD_X}" y="${d.y}" width="${MOLD_W}" height="1" fill="rgba(255,255,255,0.4)"/>
+      <rect x="${MOLD_X}" y="${d.y + d.h - 1}" width="${MOLD_W}" height="1" fill="rgba(0,0,0,0.1)"/>`;
   });
 
   // ── Dimensions (Architectural Style) ───────────────────────────────────
@@ -659,64 +723,51 @@ function renderCrossSection() {
   }
 
   const svg = `
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${SVG_W} ${SVG_H}" width="${SVG_W}" height="${SVG_H}" style="max-width:100%;height:auto;background:#ffffff;display:block;border:1px solid #e2e8f0;box-shadow: 0 20px 50px rgba(0,0,0,0.1);">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${SVG_W} ${SVG_H}" width="${SVG_W}" height="${SVG_H}" style="max-width:100%;height:auto;background:#ffffff;display:block;border-radius:16px;box-shadow: 0 40px 100px rgba(0,0,0,0.12);">
       ${defs}
       
-      <!-- Frame & Background -->
-      <rect x="10" y="10" width="${SVG_W - 20}" height="${SVG_H - 20}" fill="#ffffff" stroke="#cbd5e1" stroke-width="1"/>
-      <rect x="15" y="15" width="${SVG_W - 30}" height="${SVG_H - 30}" fill="none" stroke="#e2e8f0" stroke-width="0.5"/>
+      <!-- Premium Background -->
+      <rect width="${SVG_W}" height="${SVG_H}" fill="white"/>
+      <defs>
+        <radialGradient id="bgGrad" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#f8fafc"/>
+          <stop offset="100%" stop-color="#ffffff"/>
+        </radialGradient>
+      </defs>
+      <rect width="${SVG_W}" height="${SVG_H}" fill="url(#bgGrad)"/>
 
-      <!-- Engineering Grid -->
-      <pattern id="grid" width="30" height="30" patternUnits="userSpaceOnUse">
-        <path d="M 30 0 L 0 0 0 30" fill="none" stroke="#f1f5f9" stroke-width="1"/>
-        <path d="M 15 0 L 15 30 M 0 15 L 30 15" fill="none" stroke="#f8fafc" stroke-width="0.5"/>
+      <!-- Blueprint Grid -->
+      <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+        <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#f1f5f9" stroke-width="1"/>
       </pattern>
-      <rect x="20" y="20" width="${SVG_W - 40}" height="${SVG_H - 40}" fill="url(#grid)"/>
+      <rect width="${SVG_W}" height="${SVG_H}" fill="url(#grid)"/>
 
-      <!-- Cartouche (Information Block) -->
-      <g transform="translate(${SVG_W - 320}, 40)">
-        <rect width="280" height="85" fill="#f8fafc" stroke="#334155" stroke-width="1.5" rx="2"/>
-        <text x="12" y="25" font-size="16" font-family="Outfit" font-weight="900" fill="url(#titleGrad)">FICHE TECHNIQUE MONTAGE</text>
-        <line x1="12" y1="35" x2="268" y2="35" stroke="#6366f1" stroke-width="2"/>
-        <g font-family="Inter" font-weight="700" font-size="10" fill="#64748b">
-          <text x="12" y="52">PROJET : RECETTE EN COURS</text>
-          <text x="12" y="66">MOULE : ${moldLabels[currentMold].toUpperCase()}</text>
-          <text x="12" y="80">VERSION : REV.${assemblyLayers.length} / ${new Date().toLocaleDateString('fr-FR')}</text>
-        </g>
-        <rect x="190" y="42" width="78" height="35" fill="none" stroke="#e2e8f0" stroke-width="1"/>
-        <text x="229" y="54" text-anchor="middle" font-size="8" fill="#94a3b8">ÉCHELLE</text>
-        <text x="229" y="70" text-anchor="middle" font-size="11" fill="#475569" font-weight="800">1 : 1.25</text>
+      <!-- Cartouche High-End -->
+      <g transform="translate(50, 50)">
+        <text font-family="Outfit" font-weight="900" font-size="28" fill="#1e293b" letter-spacing="-0.02em">Gourmet<tspan fill="#6366f1">Revient</tspan></text>
+        <text y="22" font-family="Inter" font-weight="700" font-size="10" fill="#94a3b8" letter-spacing="0.2em">DESIGN TECHNIQUE ET COUPE</text>
+      </g>
+
+      <g transform="translate(${SVG_W - 250}, 50)">
+        <rect width="200" height="60" rx="12" fill="#1e293b"/>
+        <text x="100" y="25" text-anchor="middle" font-family="Outfit" font-weight="900" font-size="14" fill="white">MODE : ${moldLabels[currentMold].toUpperCase()}</text>
+        <text x="100" y="45" text-anchor="middle" font-family="Inter" font-weight="700" font-size="9" fill="#94a3b8">H. TOTALE : ${totalHeight.toFixed(1)} cm</text>
       </g>
 
       <!-- Main Drawing Area -->
       <g filter="url(#sdrp)">
-        <path d="${moldPath}" fill="rgba(241,245,249,0.5)"/>
         <g clip-path="url(#sClip)">
           ${layerRects}
-          ${wallHatch}
         </g>
-        <path d="${moldPath}" fill="none" stroke="#0f172a" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+        <path d="${moldPath}" fill="none" stroke="#1e293b" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
       </g>
       
-      <!-- Ground Level -->
-      <line x1="${MOLD_X - 100}" y1="${BASE_Y}" x2="${MOLD_X + MOLD_W + 50}" y2="${BASE_Y}" stroke="#334155" stroke-width="2"/>
-      <text x="${MOLD_X + MOLD_W/2}" y="${BASE_Y + 22}" text-anchor="middle" font-size="9" font-family="Inter" font-weight="900" fill="#94a3b8" letter-spacing="4">BASE DE MONTAGE / FOND DU MOULE</text>
-
+      <!-- Designer Dimensions -->
       ${dimSvg}
       ${labelSvg}
 
-      <!-- Production Stamp -->
-      <g transform="translate(${SVG_W - 80}, ${SVG_H - 80})">
-        <circle cx="0" cy="0" r="45" fill="none" stroke="#6366f1" stroke-width="1" stroke-dasharray="3,3" opacity="0.3"/>
-        <text text-anchor="middle" font-size="9" font-family="Outfit" font-weight="900" fill="#6366f1" opacity="0.5">CERTIFIÉ LABO</text>
-        <text y="12" text-anchor="middle" font-size="8" font-family="Inter" fill="#94a3b8">GourmetRevient</text>
-      </g>
-
-      <!-- Total Height Indicator -->
-      <g transform="translate(${MOLD_X + MOLD_W / 2}, ${TOP_Y - 40})">
-         <rect x="-60" y="-15" width="120" height="30" rx="15" fill="#6366f1"/>
-         <text text-anchor="middle" y="5" font-size="12" font-family="Outfit" font-weight="900" fill="#ffffff">H. TOTALE: ${totalHeight.toFixed(1)} cm</text>
-      </g>
+      <!-- Production Watermark -->
+      <text x="${SVG_W/2}" y="${SVG_H - 30}" text-anchor="middle" font-family="Outfit" font-weight="900" font-size="12" fill="#cbd5e1" letter-spacing="0.5em">DOCUMENT TECHNIQUE - PROPRIÉTÉ DU CHEF</text>
     </svg>`;
 
   container.innerHTML = svg;

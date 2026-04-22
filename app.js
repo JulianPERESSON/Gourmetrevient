@@ -1163,15 +1163,12 @@ function renderCostAnalysis() {
         });
       }
 
-      // Animate KPI Cards
+      // Animate KPI Cards (Guaranteed opacity 1)
       if (window.gsap) {
-        gsap.from('#kpiGrid .kpi-card', {
-          opacity: 0,
-          scale: 0.95,
-          duration: 0.4,
-          stagger: 0.08,
-          ease: 'back.out(1.7)'
-        });
+        gsap.fromTo('#kpiGrid .kpi-card', 
+          { opacity: 0, scale: 0.95 },
+          { opacity: 1, scale: 1, duration: 0.4, stagger: 0.08, ease: 'back.out(1.7)' }
+        );
       }
     }
 
@@ -7591,7 +7588,8 @@ function checkSeasonality(name, currentMonth) {
 // AUTO-SAVE DRAFTS & RECOVERY (PREMIUM)
 // ============================================================================
 document.addEventListener('DOMContentLoaded', () => {
-  // 1. Recover Draft
+  // 1. Recover Draft (DEACTIVATED)
+  /*
   setTimeout(() => {
     const draftStr = localStorage.getItem('gourmet_recipe_draft');
     if (draftStr && APP.currentStep === 0 && (!APP.recipe.name || APP.recipe.name === '')) {
@@ -7620,7 +7618,8 @@ document.addEventListener('DOMContentLoaded', () => {
         console.warn('Draft parsing failed:', e);
       }
     }
-  }, 500); // Slight delay to ensure translations and initial state are loaded
+  }, 500);
+  */
 
   // 2. Background Auto-save every 15 seconds if editing
   setInterval(() => {

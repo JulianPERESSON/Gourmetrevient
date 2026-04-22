@@ -498,6 +498,7 @@ const TRANSLATIONS = {
         'ui.label.financial_analysis': 'Analyse financière',
         'ui.summary.insights': '🚀 Recommandations Stratégiques',
         'ui.label.scaling': "Passage à l'échelle (Total Matière)",
+        'label.per_portion': 'Coût pour',
 
         // Lab
         'lab.tab1': '1. Budget & Équipement',
