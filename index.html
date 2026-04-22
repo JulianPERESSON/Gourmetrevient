@@ -61,6 +61,7 @@
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 </head>
 
 <body class="auth-pending">
@@ -4216,9 +4217,9 @@
   <!-- ASSEMBLY SIMULATOR — ENTREMETS BUILDER            -->
   <!-- ================================================ -->
   <div id="assemblyModal" class="modal-overlay" style="display:none;">
-    <div class="modal-content glass-panel" style="max-width:960px; width:95%; max-height:90vh; overflow:hidden; display:flex; flex-direction:column;">
-      <div class="modal-header" style="display:flex; justify-content:space-between; margin-bottom:1rem;">
-        <h3 style="margin:0;"><span data-i18n="modal.assembly.title">🏗️ Simulateur de Montage</span></h3>
+    <div class="modal-content glass-panel" style="max-width:980px; width:95%; max-height:92vh; overflow:hidden; display:flex; flex-direction:column; gap:0;">
+      <div class="modal-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+        <h3 style="margin:0;">🏗️ <span class="premium-shimmer-text">Simulateur de Montage &amp; Coupe</span></h3>
         <div style="display:flex; gap:8px;">
           <button class="btn btn-sm btn-outline" onclick="clearAssembly()">🗑️ Effacer</button>
           <button class="btn btn-sm btn-primary" onclick="exportAssemblyPNG()">💾 Exporter</button>
@@ -4226,36 +4227,66 @@
         </div>
       </div>
 
-      <div class="assembly-workspace">
+      <div class="assembly-workspace" style="flex:1; overflow:hidden;">
         <!-- Layer Palette -->
         <div class="assembly-palette">
-          <h4>📦 Composants</h4>
-          <div class="assembly-palette-items" id="assemblyPaletteItems">
-            <!-- Populated by JS -->
-          </div>
+          <h4 class="premium-shimmer-text">📦 Composants</h4>
+          <div class="assembly-palette-items" id="assemblyPaletteItems"></div>
         </div>
 
         <!-- Canvas Area -->
-        <div class="assembly-canvas-area">
-          <div class="assembly-mold-selector">
-            <label>Moule :</label>
-            <select id="assemblyMoldSelect" class="form-input" style="width:auto;" onchange="changeAssemblyMold()">
-              <option value="cercle">⭕ Cercle (22cm)</option>
-              <option value="carre">⬜ Carré (20cm)</option>
-              <option value="buche">📏 Bûche (30cm)</option>
-              <option value="tarte">🥧 Moule à tarte (24cm)</option>
-              <option value="verrine">🥃 Verrine (8cm)</option>
-            </select>
-          </div>
-          <div class="assembly-canvas" id="assemblyCanvas">
-            <div class="assembly-mold" id="assemblyMold">
-              <div class="assembly-layers" id="assemblyLayers">
-                <!-- Drag & drop layers go here -->
-              </div>
+        <div class="assembly-canvas-area" style="display:flex; flex-direction:column; gap:10px; overflow:hidden;">
+          <!-- Controls Row -->
+          <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+            <div class="assembly-mold-selector">
+              <label class="premium-shimmer-text" style="font-weight:800; font-size:0.8rem; letter-spacing:0.05em;">MOULE :</label>
+              <select id="assemblyMoldSelect" class="form-input" style="width:auto;" onchange="changeAssemblyMold()">
+                <option value="cercle">⭕ Cercle (22cm)</option>
+                <option value="carre">⬜ Carré (20cm)</option>
+                <option value="buche">📏 Bûche (30cm)</option>
+                <option value="tarte">🥧 Moule à tarte (24cm)</option>
+                <option value="verrine">🥃 Verrine (8cm)</option>
+              </select>
             </div>
-            <div class="assembly-height-ruler" id="assemblyRuler"></div>
+            <div class="asm-view-tabs">
+              <button class="asm-tab active" id="asmTabStack" onclick="switchAssemblyView('stack')">🧱 Montage</button>
+              <button class="asm-tab" id="asmTabCross" onclick="switchAssemblyView('cross')">🔬 Coupe</button>
+            </div>
           </div>
+
+          <!-- STACK VIEW (Now Layer Manager List) -->
+          <div id="asmViewStack" style="overflow:auto; max-height:400px; padding: 10px;">
+            <div id="assemblyLayers" class="asm-layers-container">
+              <!-- Layers are rendered as a list here -->
+            </div>
+          </div>
+
+          <!-- CROSS-SECTION VIEW (Large Format Blueprint) -->
+          <div id="asmViewCross" style="display:none; overflow:auto; max-height:550px; background:#f1f5f9; padding:20px;">
+            <div id="assemblyCrossSection" style="width:100%; display:flex; justify-content:center;"></div>
+          </div>
+
           <div class="assembly-total" id="assemblyTotal">Hauteur totale : 0 cm</div>
+        </div>
+      </div>
+
+      <!-- Annotation Panel -->
+      <div id="asmAnnotationPanel" style="display:none; border-top:1px solid var(--surface-border); padding: 12px 0 0; margin-top:4px;">
+        <div style="font-size:0.7rem; font-weight:800; text-transform:uppercase; letter-spacing:.1em; color:var(--text-muted); margin-bottom:8px;">📝 Annotation couche : <span id="asmAnnotLayerName" style="color:var(--accent);"></span></div>
+        <div style="display:grid; grid-template-columns:1fr 1fr 2fr auto; gap:10px; align-items:end;">
+          <div class="form-group" style="margin:0;">
+            <label style="font-size:0.72rem;">🌡️ Température (°C)</label>
+            <input type="number" id="asmAnnotTemp" class="form-input" placeholder="ex: 18" style="font-size:0.85rem; padding:6px 8px;">
+          </div>
+          <div class="form-group" style="margin:0;">
+            <label style="font-size:0.72rem;">⏱ Repos (min)</label>
+            <input type="number" id="asmAnnotRest" class="form-input" placeholder="ex: 120" style="font-size:0.85rem; padding:6px 8px;">
+          </div>
+          <div class="form-group" style="margin:0;">
+            <label style="font-size:0.72rem;">📌 Note technique</label>
+            <input type="text" id="asmAnnotNote" class="form-input" placeholder="ex: Cristalliser au froid 2h" style="font-size:0.85rem; padding:6px 8px;">
+          </div>
+          <button class="btn btn-sm btn-primary" style="white-space:nowrap;" onclick="saveLayerAnnotation()">✅ Enregistrer</button>
         </div>
       </div>
     </div>

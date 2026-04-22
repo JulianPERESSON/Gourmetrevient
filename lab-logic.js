@@ -1,4 +1,4 @@
-﻿// ============================================================================
+// ============================================================================
 // LAB CONFIGURATOR LOGIC (Merged from Chef d'Oeuvre)
 // ============================================================================
 
@@ -28,10 +28,26 @@ function getLabTagline(budget) {
     return window.BUDGET_TAGLINES[window.BUDGET_TAGLINES.length - 1];
 }
 
+let labBudgetAnimateState = { val: 0 };
 function updateLabBudgetDisplay(budget) {
     const amountEl = document.getElementById('budgetAmount');
     if (!amountEl) return;
-    amountEl.textContent = formatLabPrice(budget);
+    
+    // Smooth Counter Animation using GSAP if available, or simple lerp
+    if (window.gsap) {
+        gsap.to(labBudgetAnimateState, {
+            val: budget,
+            duration: 0.8,
+            ease: "power3.out",
+            overwrite: true,
+            onUpdate: () => {
+                amountEl.textContent = formatLabPrice(Math.round(labBudgetAnimateState.val));
+            }
+        });
+    } else {
+        amountEl.textContent = formatLabPrice(budget);
+    }
+    
     amountEl.classList.add('pulse');
     setTimeout(() => amountEl.classList.remove('pulse'), 150);
 
@@ -44,8 +60,16 @@ function updateLabBudgetDisplay(budget) {
         if (i === window.BUDGET_TAGLINES.length - 1) levelIndex = i;
     }
 
-    document.getElementById('taglineBadge').textContent = t(`lab.budget.level.${levelIndex}.label`);
-    document.getElementById('taglineText').textContent = t(`lab.budget.level.${levelIndex}.tagline`);
+    const badge = document.getElementById('taglineBadge');
+    const text = document.getElementById('taglineText');
+    if (badge) {
+        badge.style.opacity = 0;
+        setTimeout(() => {
+            badge.textContent = t(`lab.budget.level.${levelIndex}.label`);
+            badge.style.opacity = 1;
+        }, 150);
+    }
+    if (text) text.textContent = t(`lab.budget.level.${levelIndex}.tagline`);
 }
 
 function createLabEquipmentCard(eq) {
@@ -88,11 +112,12 @@ function createLabEquipmentCard(eq) {
     return card;
 }
 
-function renderLabGrid(results, category, animate = false) {
+function renderLabGrid(results, category, animateOverride = false) {
     const gridEl = document.getElementById('equipmentGrid');
     if (!gridEl) return;
 
     const filtered = category === 'all' ? results : results.filter(r => r.category === category);
+    const animate = animateOverride || (window.innerWidth > 768); // Always subtle animate on desktop
 
     const renderCards = () => {
         gridEl.innerHTML = '';
@@ -108,21 +133,29 @@ function renderLabGrid(results, category, animate = false) {
 
         sorted.forEach((eq, i) => {
             const card = createLabEquipmentCard(eq);
+            // Hide initially for stagger
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(10px)';
             gridEl.appendChild(card);
         });
 
-        if (animate && window.gsap && filtered.length > 0) {
-            gsap.from('#equipmentGrid .lab-card', {
-                opacity: 0,
-                y: 20,
-                duration: 0.4,
-                stagger: 0.05,
-                ease: 'power2.out'
+        if (window.gsap && filtered.length > 0) {
+            gsap.to('#equipmentGrid .lab-card', {
+                opacity: 1,
+                y: 0,
+                duration: 0.3,
+                stagger: {
+                    each: 0.03,
+                    from: "start"
+                },
+                ease: 'power1.out',
+                overwrite: true
             });
         }
     };
 
-    if (animate) {
+    // Use skeleton only for tab switches (manual animateOverride), not for slider moves
+    if (animateOverride === 'skeleton') {
         gridEl.innerHTML = Array(6).fill(0).map(() => `
             <div class="card skeleton" style="height:180px; margin-top:0.5rem;"></div>
         `).join('');
@@ -143,14 +176,31 @@ function updateLabCounts(results) {
     setC('countStockage', c.stockage);
 }
 
+let labSummaryAnimateState = { total: 0, remain: 0 };
 function updateLabSummary(budget, total, count) {
     const remaining = budget - total;
     const totalEl = document.getElementById('summaryTotal');
     const remainEl = document.getElementById('summaryRemaining');
     const statusEl = document.getElementById('summaryStatus');
     if (!totalEl) return;
-    totalEl.textContent = formatLabPrice(total);
-    remainEl.textContent = formatLabPrice(Math.abs(remaining));
+
+    if (window.gsap) {
+        gsap.to(labSummaryAnimateState, {
+            total: total,
+            remain: Math.abs(remaining),
+            duration: 0.7,
+            ease: "power2.out",
+            overwrite: true,
+            onUpdate: () => {
+                totalEl.textContent = formatLabPrice(Math.round(labSummaryAnimateState.total));
+                remainEl.textContent = formatLabPrice(Math.round(labSummaryAnimateState.remain));
+            }
+        });
+    } else {
+        totalEl.textContent = formatLabPrice(total);
+        remainEl.textContent = formatLabPrice(Math.abs(remaining));
+    }
+    
     document.getElementById('summaryCount').textContent = count;
 
     if (remaining >= 0) {
@@ -606,7 +656,7 @@ function initLabConfigurator() {
             btn.style.color = 'var(--accent)';
             btn.style.borderColor = 'var(--accent)';
             labCurrentCategory = btn.dataset.cat;
-            renderLabGrid(labCurrentResults, labCurrentCategory, true);
+            renderLabGrid(labCurrentResults, labCurrentCategory, 'skeleton');
         });
     }
 

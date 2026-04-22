@@ -35,30 +35,55 @@ function seedDemoData() {
         localStorage.setItem('gourmet_production_plan', JSON.stringify([...existingPlan, ...demoPlan]));
     }
 
-    // ── Ingredient Price Watch (user-scoped key) ─────────────────────────
+    // ── Ingredient Price Watch & Expiry (user-scoped key) ─────────────────────────
     const invKey = `gourmet_inventory_${currUser}`;
     let inv = JSON.parse(localStorage.getItem(invKey) || '[]');
     const hasHistory = inv.some(item => item.priceHistory && item.priceHistory.length > 1);
     
-    if (!hasHistory) {
+    if (!hasHistory || inv.length < 5) {
         const demoInv = [
-            { id: 901, name: 'Beurre AOP', unit: 'kg', pricePerUnit: 9.80, priceHistory: [
-                { date: '2026-03-01', price: 8.40 }, { date: '2026-04-01', price: 9.80 }
+            { id: '901', name: 'Beurre AOP', unit: 'kg', price: 9.80, stock: 12, alertThreshold: 15, lastUpdate: new Date().toISOString(), expiryDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(), priceHistory: [
+                { date: '2026-03-01', price: 8.40, change: 0 }, { date: '2026-04-01', price: 9.80, change: 16 }
             ]},
-            { id: 902, name: 'Farine T55', unit: 'kg', pricePerUnit: 1.10, priceHistory: [
-                { date: '2026-03-01', price: 1.25 }, { date: '2026-04-01', price: 1.10 }
+            { id: '902', name: 'Farine T55', unit: 'kg', price: 1.10, stock: 45, alertThreshold: 10, lastUpdate: new Date().toISOString(), priceHistory: [
+                { date: '2026-03-01', price: 1.25, change: 0 }, { date: '2026-04-01', price: 1.10, change: -12 }
             ]},
-            { id: 903, name: 'Œufs fermiers', unit: 'dz', pricePerUnit: 3.60, priceHistory: [
-                { date: '2026-03-01', price: 3.40 }, { date: '2026-04-01', price: 3.60 }
+            { id: '903', name: 'Œufs fermiers', unit: 'dz', price: 3.60, stock: 4, alertThreshold: 8, lastUpdate: new Date().toISOString(), expiryDate: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000).toISOString(), priceHistory: [
+                { date: '2026-03-01', price: 3.40, change: 0 }, { date: '2026-04-01', price: 3.60, change: 6 }
             ]},
-            { id: 904, name: 'Crème liquide 35%', unit: 'L', pricePerUnit: 4.20, priceHistory: [
-                { date: '2026-03-01', price: 4.50 }, { date: '2026-04-01', price: 4.20 }
+            { id: '904', name: 'Crème liquide 35%', unit: 'L', price: 4.20, stock: 8, alertThreshold: 10, lastUpdate: new Date().toISOString(), expiryDate: new Date(Date.now() + 0.5 * 24 * 60 * 60 * 1000).toISOString(), priceHistory: [
+                { date: '2026-03-01', price: 4.50, change: 0 }, { date: '2026-04-01', price: 4.20, change: -6 }
             ]},
         ];
-        // Merge demo to front of existing
-        inv = [...demoInv, ...inv];
+        // Merge demo to front of existing if not duplicating names
+        const names = new Set(inv.map(i => i.name));
+        demoInv.forEach(d => { if(!names.has(d.name)) inv.unshift(d); });
         localStorage.setItem(invKey, JSON.stringify(inv));
-        localStorage.setItem('gourmet_inventory', JSON.stringify(inv));
+    }
+
+    // ── Data Repair & Normalization ──────────────────────────────────
+    let needsSave = false;
+    let currentInv = JSON.parse(localStorage.getItem(invKey) || '[]');
+    currentInv.forEach(item => {
+        if (!item.lastUpdate) { item.lastUpdate = new Date().toISOString(); needsSave = true; }
+        if (item.price === undefined && item.pricePerUnit !== undefined) { item.price = item.pricePerUnit; needsSave = true; }
+        item.price = parseFloat(item.price) || 0;
+        item.stock = parseFloat(item.stock) || 0;
+        if (typeof item.id !== 'string') { item.id = String(item.id); needsSave = true; }
+    });
+    if (needsSave) {
+        localStorage.setItem(invKey, JSON.stringify(currentInv));
+        // Also trigger a global state update if available
+        if (typeof APP !== 'undefined' && APP.inventory) APP.inventory = currentInv;
+    }
+
+    // ── Upcoming Deliveries ──────────────────────────────────────────
+    const deliveries = JSON.parse(localStorage.getItem('gourmet_deliveries') || '[]');
+    if (deliveries.length === 0) {
+        localStorage.setItem('gourmet_deliveries', JSON.stringify([
+            { id: 101, supplier: 'Grossiste Pâtissier', status: 'planned', eta: '08h00 - 10h00', items: 'Farine, Sucre, Chocolat' },
+            { id: 102, supplier: 'Laiterie Locale', status: 'confirmed', eta: '14h30', items: 'Crème, Beurre' }
+        ]));
     }
 
     // ── Team (user-scoped key) ────────────────────────────────────────
@@ -67,34 +92,33 @@ function seedDemoData() {
     const team = JSON.parse(localStorage.getItem(teamKey) || '[]');
     if (team.length === 0) {
         const demoTeam = [
-            { id: 1, name: 'Chef Larroque', role: 'Chef Pâtissier', avatar: '👨‍🍳' },
+            { id: 1, name: 'Chef Julian', role: 'Chef Pâtissier', avatar: '👨‍🍳' },
             { id: 2, name: 'M. Dupont', role: 'Pâtissier', avatar: '🧑‍🍳' },
             { id: 3, name: 'Mme. Martin', role: 'Pâtissière', avatar: '👩‍🍳' },
             { id: 4, name: 'J. Petit', role: 'Apprenti', avatar: '🧑‍🍳' },
-            { id: 5, name: 'C. Bernard', role: 'Apprentie', avatar: '👩‍🍳' },
-            { id: 6, name: 'R. Moreau', role: 'Aide-Pâtissier', avatar: '🧑‍🍳' },
         ];
         const demoLeaves = [
-            { memberId: 6, memberName: 'R. Moreau', start: today, end: today, reason: 'Maladie' }
+            { memberId: 2, memberName: 'M. Dupont', start: today, end: today, reason: 'Maladie' }
         ];
         localStorage.setItem(teamKey, JSON.stringify(demoTeam));
         localStorage.setItem(leavesKey, JSON.stringify(demoLeaves));
     }
 
-    // ── HACCP Temperature Log (2h ago) ─────────────────────────────
+    // ── HACCP Temperature Log (simulate missing morning log if after 11am) ────────
     const haccpRaw = JSON.parse(localStorage.getItem('gourmet_haccp_logs') || '{"temp":[]}');
-    const recentLogs = (haccpRaw.temp || []).filter(l => (Date.now() - new Date(l.date || l.timestamp)) < 24 * 60 * 60 * 1000);
+    const logsToday = (haccpRaw.temp || []).filter(l => l.date && l.date.split('T')[0] === today);
     
-    if (recentLogs.length === 0) {
-        const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString();
+    // Only seed if empty to allow users to play with it
+    if (logsToday.length === 0) {
+        const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
         const demoTemp = [
-            { date: twoHoursAgo, timestamp: twoHoursAgo, zone: 'Chambre froide 1', temp: 3.2, status: 'ok', by: 'Chef Larroque' },
-            { date: twoHoursAgo, timestamp: twoHoursAgo, zone: 'Vitrine desserts', temp: 5.8, status: 'ok', by: 'Chef Larroque' },
+            { date: yesterday, timestamp: yesterday, zone: 'Chambre froide 1', temp: 3.2, status: 'ok', by: 'Chef Julian' },
         ];
         haccpRaw.temp = [...demoTemp, ...(haccpRaw.temp || [])];
         localStorage.setItem('gourmet_haccp_logs', JSON.stringify(haccpRaw));
     }
 }
+
 
 window.hydratePremiumDashboard = function () {
     // Force-seed demo data if missing every time hydrate runs, so soft reloads get the data
@@ -183,34 +207,51 @@ window.hydratePremiumDashboard = function () {
     if (priorityList) {
         let priorities = [];
         
+        // Priority: HACCP Missing Log Alert (if after 10am and no log today)
+        const currentHour = now.getHours();
+        const haccpToday = (haccpLogs.temp || []).filter(l => (l.date || l.timestamp || '').split('T')[0] === todayStr);
+        if (currentHour >= 10 && haccpToday.length === 0) {
+            priorities.push({ urgency: 'urgent', icon: '🧪',
+                title: t('dash.haccp.alert_missing') || 'HACCP : Relevé manquant',
+                desc: t('dash.haccp.alert_desc') || 'Le relevé de température matinal n\'a pas encore été saisi.',
+                action: `showHygiene();`,
+                btn: t('dash.priority.btn_saisir') || 'Saisir'
+            });
+        }
+
+        // Priority: Team Absence
+        const todayISO = now.toISOString().split('T')[0];
+        const absentToday = leaves.filter(l => {
+             const start = l.start || l.from;
+             const end = l.end || l.to;
+             return start && end && todayISO >= start && todayISO <= end;
+        });
+        if (absentToday.length > 0) {
+            priorities.push({ urgency: 'warning', icon: '👤',
+                title: `${absentToday[0].memberName} est absent`,
+                desc: `Motif: ${absentToday[0].reason || 'Congé'}. Capacité réduite.`,
+                action: `showPlanning();`,
+                btn: 'Planning'
+            });
+        }
+
         // Priority: Production plan items for today
-        if (todayProds.length > 0) {
-            const prod = todayProds[0];
-            const fallbackProdCount = `${todayProds.length} production(s) planifiée(s) aujourd'hui`;
-            priorities.push({ urgency: 'urgent', icon: '🍰',
-                title: `${t('dash.priority.launch', {name: prod.recipe || prod.name || recipes[0]?.name || 'Production'})}`,
-                desc: t('dash.priority.prod_count', { count: todayProds.length }) || fallbackProdCount,
+        const plannedItems = todayProds.filter(p => p.status === 'planned');
+        if (plannedItems.length > 0) {
+            const first = plannedItems[0];
+            priorities.push({ urgency: 'info', icon: '🍰',
+                title: t('dash.priority.launch', { name: first.recipe || first.name }),
+                desc: t('dash.priority.prod_count', { count: plannedItems.length }) || `${plannedItems.length} productions en attente`,
                 action: `showMgmt(); switchMgmtTab('production');`,
                 btn: t('dash.priority.btn_launch') || 'Lancer'
-            });
-        } else if (recipes.length > 0) {
-            // Fallback: suggest launching most recent recipe
-            const recent = [...recipes].sort((a,b) => new Date(b.savedAt||0) - new Date(a.savedAt||0))[0];
-            priorities.push({ urgency: 'info', icon: '📋',
-                title: t('dash.priority.no_prod') || 'Aucune production planifiée',
-                desc: t('dash.priority.suggest_plan') || 'Planifiez votre journée dans le module Production',
-                action: `showMgmt(); switchMgmtTab('production');`,
-                btn: t('dash.priority.btn_plan') || 'Planifier'
             });
         }
         
         // Priority: Critical stock alerts
         if (stockAlerts.length > 0) {
-            const criticalItems = stockAlerts.slice(0, 2).map(i => i.name).join(', ');
-            const fallbackStockCount = `${stockAlerts.length} ingrédient(s) en stock critique : ${criticalItems}`;
-            priorities.push({ urgency: 'warning', icon: '🛒',
-                title: `${t('dash.priority.order', {name: stockAlerts[0].name})}`,
-                desc: t('dash.priority.stock_critical', { count: stockAlerts.length, items: criticalItems }) || fallbackStockCount,
+            priorities.push({ urgency: 'urgent', icon: '🛒',
+                title: t('dash.priority.order', { name: stockAlerts[0].name }),
+                desc: t('dash.priority.stock_critical', { count: stockAlerts.length, items: stockAlerts.slice(0,2).map(i=>i.name).join(', ') }),
                 action: `showInventaire();`,
                 btn: t('dash.priority.btn_order') || 'Commander'
             });
@@ -218,29 +259,13 @@ window.hydratePremiumDashboard = function () {
 
         // Priority: Low margin recipes
         const lowMarginRecipes = recipes.filter(r => (r.costs?.marginPct || 70) < 65);
-        if (lowMarginRecipes.length > 0) {
+        if (lowMarginRecipes.length > 0 && priorities.length < 3) {
             const lowPerf = lowMarginRecipes[0];
-            const margin = Math.round(lowPerf.costs?.marginPct || 60);
             priorities.push({ urgency: 'warning', icon: '💰',
-                title: `${t('dash.priority.adjust_margin', {name: lowPerf.name})}`,
-                desc: t('dash.priority.margin_desc', { margin: margin, count: lowMarginRecipes.length }),
+                title: t('dash.priority.adjust_margin', { name: lowPerf.name }),
+                desc: t('dash.priority.margin_desc', { margin: Math.round(lowPerf.costs?.marginPct || 60) }),
                 action: `openRecipeEditorByName('${lowPerf.name.replace(/'/g, "\\'") }')`,
-                btn: t('dash.priority.btn_revise') || 'Ajuster'
-            });
-        }
-
-        // Priority: Recent waste/losses
-        const recentWaste = wasteLogs.filter(w => {
-            const d = new Date(w.date || w.timestamp);
-            return (now - d) < 7 * 24 * 60 * 60 * 1000; // Last 7 days
-        });
-        if (recentWaste.length >= 3) {
-            const totalLoss = recentWaste.reduce((s, w) => s + (w.cost || 0), 0);
-            priorities.push({ urgency: 'info', icon: '📉',
-                title: t('dash.priority.waste_alert', { count: recentWaste.length }),
-                desc: t('dash.priority.waste_desc', { total: totalLoss.toFixed(2), count: recentWaste.length }),
-                action: `showMgmt(); switchMgmtTab('quality');`,
-                btn: t('dash.priority.btn_analyze') || 'Analyser'
+                btn: t('dash.priority.btn_revise') || 'Réviser'
             });
         }
 
@@ -372,23 +397,66 @@ window.hydratePremiumDashboard = function () {
         }
     }
 
-    // 6. Stock Alerts Mini
+    // 6. RADAR LOGISTIQUE (Enhanced Stock Alerts)
     const stockMini = document.getElementById('dashStockAlerts');
     if (stockMini) {
-        if (stockAlerts.length > 0) {
-            stockMini.innerHTML = stockAlerts.slice(0, 3).map(item => {
-                const stockVal = item.stock !== undefined ? item.stock : 0;
-                const unitStr = (item.unit && item.unit !== 'undefined') ? item.unit : 'kg';
-                return `
-                <div class="radar-item-mini">
-                    <span>${item.name}</span>
-                    <span style="color:var(--cockpit-danger)">${stockVal} ${unitStr}</span>
-                </div>`;
-            }).join('');
+        let radarItems = [];
+
+        // 1. Deliveries Today
+        const deliveries = JSON.parse(localStorage.getItem('gourmet_deliveries') || '[]');
+        if (deliveries.length > 0) {
+            deliveries.forEach(d => {
+                radarItems.push({
+                    icon: '🚚',
+                    label: d.supplier,
+                    value: d.eta,
+                    type: 'delivery'
+                });
+            });
+        }
+
+        // 2. Short Expiry (DLC Courte)
+        const expiringSoon = inv.filter(item => {
+            if (!item.expiryDate) return false;
+            const diff = new Date(item.expiryDate) - now;
+            return diff > 0 && diff < 3 * 24 * 60 * 60 * 1000; // Next 3 days
+        });
+        expiringSoon.forEach(item => {
+            const diffH = Math.round((new Date(item.expiryDate) - now) / 3600000);
+            const timeLabel = diffH < 24 ? `exp. ${diffH}h` : `exp. ${Math.round(diffH/24)}j`;
+            radarItems.push({
+                icon: '⏰',
+                label: item.name,
+                value: timeLabel,
+                type: 'expiry'
+            });
+        });
+
+        // 3. Stock Alerts (only if space left or very critical)
+        stockAlerts.slice(0, 3).forEach(item => {
+            radarItems.push({
+                icon: '⚠️',
+                label: item.name,
+                value: `${item.stock || 0} ${item.unit || 'kg'}`,
+                type: 'alert'
+            });
+        });
+
+        if (radarItems.length > 0) {
+            stockMini.innerHTML = radarItems.slice(0, 5).map(item => `
+                <div class="radar-item-mini" style="display:flex; justify-content:space-between; align-items:center; padding: 4px 0; font-size:0.85rem; border-bottom:1px solid rgba(0,0,0,0.05);">
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <span>${item.icon}</span>
+                        <span style="font-weight:600;">${item.label}</span>
+                    </div>
+                    <span style="color:${item.type === 'alert' || item.type === 'expiry' ? 'var(--cockpit-danger)' : 'var(--cockpit-accent)'}; font-weight:700;">${item.value}</span>
+                </div>
+            `).join('');
         } else {
             stockMini.innerHTML = `<p style="font-size:0.8rem; color:var(--cockpit-success)">${t('dash.stock.optimal')}</p>`;
         }
     }
+
 
     // 7. Météo des Prix — Price Watch Widget
     const priceWatchEl = document.getElementById('dashPriceWatch');
