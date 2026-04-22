@@ -27,12 +27,17 @@
   --info: #3b82f6;
 
   /* ── Surfaces - Glassmorphism Premium Apple-Like ── */
-  --bg: #faf9f6; /* Crème chaud */
-  --bg-alt: #f1f0ea;
+  --bg: #f8f9fa; /* Gris très clair légèrement bleuté pour contraste */
+  --bg-alt: #f1f3f5;
   --surface: #ffffff;
   --surface-hover: #fcfcfc;
-  --surface-border: rgba(26, 27, 30, 0.05);
-  --surface-shadow: rgba(0, 0, 0, 0.04);
+  --surface-border: rgba(0, 0, 0, 0.08);
+  --surface-shadow: rgba(0, 0, 0, 0.05);
+
+  --text: #1a1b1e;
+  --text-secondary: #3d4451;
+  --text-muted: #64748b;
+  --text-inverse: #ffffff;
 
   /* Glass layers hiérarchisés */
   --bg-card: #ffffff;
@@ -965,8 +970,8 @@ body.auth-pending .app-main {
 
 .btn-outline {
   background: transparent;
-  color: var(--text-secondary);
-  border: 1.5px solid var(--surface-border);
+  color: var(--primary);
+  border: 1.5px solid rgba(0, 0, 0, 0.2);
 }
 
 .btn-outline:hover {
@@ -1106,7 +1111,7 @@ body.auth-pending .app-main {
 /* ---------- Cards ---------- */
 .card {
   background: var(--surface);
-  border: 1px solid var(--surface-border);
+  border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: var(--radius-lg);
   padding: 1.8rem;
   box-shadow: var(--shadow-sm);
@@ -1129,9 +1134,10 @@ body.auth-pending .app-main {
 
 .card-subtitle {
   font-size: 0.85rem;
-  color: var(--text-muted);
+  color: var(--text-secondary);
   margin-bottom: 1.2rem;
   line-height: 1.5;
+  opacity: 0.9;
 }
 
 /* ---------- Form Elements ---------- */
@@ -1142,9 +1148,9 @@ body.auth-pending .app-main {
 .form-group label {
   display: block;
   font-size: 0.8rem;
-  font-weight: 600;
-  color: var(--text-secondary);
-  margin-bottom: 0.35rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 0.4rem;
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
@@ -1152,8 +1158,8 @@ body.auth-pending .app-main {
 .form-input {
   width: 100%;
   padding: 0.65rem 0.9rem;
-  background: var(--bg);
-  border: 1.5px solid var(--surface-border);
+  background: var(--surface);
+  border: 1.5px solid rgba(0, 0, 0, 0.15);
   border-radius: var(--radius-sm);
   font-size: 0.9rem;
   color: var(--text);
@@ -1163,12 +1169,11 @@ body.auth-pending .app-main {
 
 .form-input:focus {
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-glow);
-  background: var(--surface);
+  box-shadow: 0 0 0 4px var(--accent-glow-strong);
 }
 
 .form-input::placeholder {
-  color: var(--text-muted);
+  color: #94a3b8;
 }
 
 textarea.form-input {
@@ -1199,12 +1204,12 @@ select.form-input {
   display: grid;
   grid-template-columns: 2fr 1fr 0.8fr 1fr 0.8fr 40px;
   gap: 0.5rem;
-  padding: 0.5rem 0.7rem;
-  font-size: 0.7rem;
-  font-weight: 700;
-  color: var(--text-muted);
+  padding: 0.75rem 0.7rem;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--primary);
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.08em;
   border-bottom: 2px solid var(--surface-border);
 }
 
