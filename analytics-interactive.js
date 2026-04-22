@@ -494,20 +494,58 @@ window.AnalyticsInteractive = (function() {
   function addResetBtn(canvasId, btnId) {
     const canvas = document.getElementById(canvasId);
     if (!canvas || document.getElementById(btnId)) return;
-    const wrapper = canvas.parentElement;
-    if (!wrapper) return;
-    if (getComputedStyle(wrapper).position === 'static') wrapper.style.position = 'relative';
+
+    // On remonte jusqu'à la mgmt-glass-card parente pour placer
+    // le hint/reset APRÈS le canvas, jamais en overlay dessus.
+    const canvasWrapper = canvas.parentElement; // div avec height fixe
+    const card = canvasWrapper ? canvasWrapper.closest('.mgmt-glass-card, .analytics-chart-card') : null;
+    const insertTarget = card || canvasWrapper;
+    if (!insertTarget) return;
+
+    // Footer sous le chart (flex row : hint à gauche, reset à droite)
+    const footer = document.createElement('div');
+    footer.id = `${btnId}-footer`;
+    footer.style.cssText = [
+      'display:flex',
+      'align-items:center',
+      'justify-content:space-between',
+      'margin-top:8px',
+      'padding:0 2px',
+      'min-height:22px',
+    ].join(';');
+
+    // Hint discret (à gauche)
+    const hint = document.createElement('span');
+    hint.className = 'chart-zoom-hint-label';
+    hint.textContent = '🖱 Molette : zoom  ·  Clic-glisser : naviguer';
+    hint.style.cssText = [
+      'font-size:0.68rem',
+      'color:var(--text-muted)',
+      'font-weight:500',
+      'opacity:0.65',
+      'pointer-events:none',
+      'white-space:nowrap',
+      'overflow:hidden',
+      'text-overflow:ellipsis',
+    ].join(';');
+
+    // Bouton reset (à droite, caché par défaut)
     const btn = document.createElement('button');
     btn.id = btnId;
     btn.className = 'chart-zoom-reset';
-    btn.innerHTML = '🔄 Reset zoom';
-    btn.style.cssText = 'position:absolute;top:8px;right:8px;';
-    wrapper.appendChild(btn);
+    btn.innerHTML = '↺ Reset zoom';
+    // Pas de position absolute — il est dans le flow du footer
+    btn.style.cssText = 'position:static; margin-left:auto; flex-shrink:0;';
 
-    const hint = document.createElement('div');
-    hint.className = 'chart-zoom-hint';
-    hint.textContent = '🖱 Molette pour zoomer · Clic-glisser pour naviguer';
-    wrapper.appendChild(hint);
+    footer.appendChild(hint);
+    footer.appendChild(btn);
+
+    // Insérer le footer après le canvasWrapper (pas dedans)
+    if (canvasWrapper && canvasWrapper.parentElement) {
+      canvasWrapper.parentElement.insertBefore(footer, canvasWrapper.nextSibling);
+    } else {
+      insertTarget.appendChild(footer);
+    }
   }
 
   // Hooker sur le changement de tab Dashboard

@@ -462,24 +462,26 @@
       color: var(--accent);
     }
 
-    /* Bouton reset zoom */
+    /* Bouton reset zoom — reste dans le flux flex, caché par opacity */
     .chart-zoom-reset {
-      padding: 0.4rem 0.9rem;
+      padding: 0.35rem 0.8rem;
       border-radius: var(--radius-sm);
-      font-size: var(--text-xs);
-      font-weight: var(--fw-bold);
+      font-size: 0.72rem;
+      font-weight: 700;
       background: var(--accent-glow);
       color: var(--accent);
       border: 1px solid rgba(99,102,241,0.2);
       cursor: pointer;
-      transition: all var(--transition-fast);
-      display: none;
+      transition: all 0.2s ease;
+      visibility: hidden;
+      opacity: 0;
+      flex-shrink: 0;
+      white-space: nowrap;
     }
 
     .chart-zoom-reset.visible {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.35rem;
+      visibility: visible;
+      opacity: 1;
     }
 
     .chart-zoom-reset:hover {
@@ -492,16 +494,21 @@
       position: relative;
     }
 
-    .chart-zoom-hint {
-      position: absolute;
-      bottom: 8px;
-      right: 12px;
+    /* Hint zoom — positionné par JS dans un footer flex, jamais en overlay */
+    .chart-zoom-hint-label {
       font-size: 0.68rem;
       color: var(--text-muted);
-      font-weight: var(--fw-medium);
+      font-weight: 500;
+      opacity: 0.6;
       pointer-events: none;
-      opacity: 0.7;
-      transition: opacity 0.3s;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Ancien sélecteur conservé pour compatibilité, neutralisé */
+    .chart-zoom-hint {
+      display: none;
     }
 
     /* KPI Analytics Cards */
