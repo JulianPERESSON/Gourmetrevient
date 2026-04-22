@@ -58,13 +58,664 @@
   <link rel="stylesheet" href="./css/commercial-features.css?v=2.1.0" />
   <!-- Libraries for new features -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Chart.js Zoom Plugin (nécessite hammer.js) -->
+  <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1/dist/chartjs-plugin-zoom.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+  <style>
+    /* ═══════════════════════════════════════════════════════════════
+       GLASSMORPHISM PREMIUM — Cartes avec bordures lumineuses (Apple-Like)
+       ═══════════════════════════════════════════════════════════════ */
+
+    /* Carte glass de base — niveau 1 (surface principale) */
+    .glass-card-premium {
+      background: var(--surface-glass);
+      backdrop-filter: blur(24px) saturate(200%);
+      -webkit-backdrop-filter: blur(24px) saturate(200%);
+      border-radius: var(--radius-lg);
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow-glass);
+      transition: box-shadow var(--transition), transform var(--transition);
+    }
+
+    /* Bordure lumineuse via pseudo-element (pas de border classique) */
+    .glass-card-premium::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      padding: 1px; /* épaisseur de la bordure */
+      background: var(--border-shine);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+    }
+
+    .glass-card-premium:hover {
+      box-shadow: var(--shadow-glass-hover);
+      transform: translateY(-2px);
+    }
+
+    /* Niveau 2 — plus transparent, pour les widgets imbriqués */
+    .glass-card-inner {
+      background: var(--surface-glass-2);
+      backdrop-filter: blur(16px) saturate(180%);
+      -webkit-backdrop-filter: blur(16px) saturate(180%);
+      border-radius: var(--radius);
+      position: relative;
+      overflow: hidden;
+      transition: background var(--transition);
+    }
+
+    .glass-card-inner::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      padding: 1px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.6), rgba(255,255,255,0.1));
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+    }
+
+    /* Upgrade des cartes mgmt existantes */
+    .mgmt-glass-card {
+      background: var(--surface-glass) !important;
+      backdrop-filter: blur(24px) saturate(180%) !important;
+      -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
+      border: none !important;
+      border-radius: var(--radius-lg) !important;
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow-glass) !important;
+      transition: box-shadow var(--transition), transform var(--transition) !important;
+    }
+
+    .mgmt-glass-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      padding: 1px;
+      background: var(--border-shine);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .mgmt-glass-card:hover {
+      box-shadow: var(--shadow-glass-hover) !important;
+      transform: translateY(-1px);
+    }
+
+    /* Hub Bento Cards — glassmorphism renforcé */
+    .hub-bento-card {
+      background: var(--surface-glass) !important;
+      backdrop-filter: blur(20px) saturate(180%) !important;
+      -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+      border: none !important;
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow-glass) !important;
+    }
+
+    .hub-bento-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      padding: 1px;
+      background: var(--border-shine);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+    }
+
+    /* KPI Cards — bordure accent lumineuse */
+    .hub-kpi-card {
+      position: relative;
+      overflow: hidden;
+      background: var(--surface-glass) !important;
+      backdrop-filter: blur(16px) !important;
+      -webkit-backdrop-filter: blur(16px) !important;
+      border: none !important;
+      box-shadow: var(--shadow-glass) !important;
+    }
+
+    .hub-kpi-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      padding: 1px;
+      background: linear-gradient(145deg, rgba(255,255,255,0.8) 0%, rgba(99,102,241,0.1) 100%);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       TYPOGRAPHIE ÉDITORIALE — Hiérarchie visuelle forte
+       ═══════════════════════════════════════════════════════════════ */
+
+    /* Classe display : grand titre impact */
+    .text-display {
+      font-family: var(--font-display);
+      font-weight: var(--fw-black);
+      letter-spacing: var(--tracking-tight);
+      line-height: var(--leading-tight);
+    }
+
+    /* Classe headline : titres de sections */
+    .text-headline {
+      font-family: var(--font-heading);
+      font-weight: var(--fw-extrabold);
+      letter-spacing: var(--tracking-tight);
+      line-height: var(--leading-snug);
+    }
+
+    /* Classe label : étiquettes uppercase */
+    .text-label {
+      font-family: var(--font);
+      font-size: var(--text-xs);
+      font-weight: var(--fw-extrabold);
+      letter-spacing: var(--tracking-widest);
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    /* Classe caption : méta-informations */
+    .text-caption {
+      font-family: var(--font);
+      font-size: var(--text-sm);
+      font-weight: var(--fw-medium);
+      letter-spacing: var(--tracking-wide);
+      color: var(--text-muted);
+      line-height: var(--leading-relaxed);
+    }
+
+    /* KPI Value premium — chiffre fort */
+    .text-kpi {
+      font-family: var(--font-display);
+      font-weight: var(--fw-black);
+      letter-spacing: var(--tracking-tight);
+      line-height: 1;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* Gradient text accent */
+    .text-gradient-accent {
+      background: linear-gradient(135deg, var(--accent-dark), var(--accent-light));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* Hub titles améliorés */
+    .hub-card-title-group h3 {
+      font-family: var(--font-heading);
+      font-weight: var(--fw-extrabold);
+      font-size: var(--text-md);
+      letter-spacing: var(--tracking-tight);
+    }
+
+    /* KPI values upgrade */
+    .hub-kpi-value {
+      font-family: var(--font-display) !important;
+      font-weight: var(--fw-black) !important;
+      letter-spacing: var(--tracking-tight) !important;
+    }
+
+    /* Section headers édito */
+    .stats-header h2,
+    .mgmt-card-title h3 {
+      font-family: var(--font-display);
+      font-weight: var(--fw-black);
+      letter-spacing: var(--tracking-tight);
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       BANNIÈRE OFFLINE PWA
+       ═══════════════════════════════════════════════════════════════ */
+
+    #offlineBanner {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 9998;
+      background: var(--offline-bg);
+      color: var(--offline-text);
+      padding: 0.75rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      font-size: var(--text-sm);
+      font-weight: var(--fw-semibold);
+      transform: translateY(100%);
+      transition: transform var(--transition-spring);
+      backdrop-filter: blur(20px);
+      box-shadow: 0 -4px 30px rgba(0,0,0,0.3);
+    }
+
+    #offlineBanner.visible {
+      transform: translateY(0);
+    }
+
+    #offlineBanner .offline-left {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    #offlineBanner .offline-icon {
+      font-size: 1.2rem;
+      animation: pulse-icon 1.5s ease-in-out infinite;
+    }
+
+    @keyframes pulse-icon {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.7; transform: scale(0.9); }
+    }
+
+    #offlineBanner .offline-text strong {
+      display: block;
+      font-weight: var(--fw-extrabold);
+      font-size: var(--text-base);
+    }
+
+    #offlineBanner .offline-text span {
+      font-size: var(--text-xs);
+      opacity: 0.8;
+    }
+
+    #offlineBanner .offline-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    #syncPendingBadge {
+      background: rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.3);
+      padding: 0.3rem 0.7rem;
+      border-radius: 50px;
+      font-size: var(--text-xs);
+      font-weight: var(--fw-extrabold);
+      display: none;
+    }
+
+    #syncPendingBadge.has-pending {
+      display: inline-block;
+      background: var(--sync-pending-bg);
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       MODULE ANALYTICS INTERACTIF — Filtres & Zoom Charts
+       ═══════════════════════════════════════════════════════════════ */
+
+    .analytics-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .analytics-title {
+      font-family: var(--font-display);
+      font-weight: var(--fw-black);
+      font-size: var(--text-xl);
+      letter-spacing: var(--tracking-tight);
+      color: var(--primary);
+      margin: 0;
+    }
+
+    .analytics-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    /* Groupe de filtres par période */
+    .period-filter-group {
+      display: flex;
+      background: var(--bg-alt);
+      border-radius: var(--radius-sm);
+      padding: 3px;
+      gap: 2px;
+    }
+
+    .period-filter-btn {
+      padding: 0.4rem 0.9rem;
+      border-radius: 9px;
+      font-size: var(--text-xs);
+      font-weight: var(--fw-extrabold);
+      letter-spacing: var(--tracking-wider);
+      text-transform: uppercase;
+      color: var(--text-muted);
+      background: none;
+      border: none;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+
+    .period-filter-btn.active {
+      background: var(--surface);
+      color: var(--accent);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .period-filter-btn:hover:not(.active) {
+      color: var(--primary);
+      background: rgba(255,255,255,0.5);
+    }
+
+    /* Filtres par catégorie — Pills */
+    .category-filter-pills {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .cat-pill {
+      padding: 0.35rem 0.85rem;
+      border-radius: 50px;
+      font-size: var(--text-xs);
+      font-weight: var(--fw-bold);
+      border: 1.5px solid var(--surface-border);
+      background: var(--surface);
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      white-space: nowrap;
+    }
+
+    .cat-pill.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: white;
+      box-shadow: 0 4px 15px rgba(99,102,241,0.35);
+    }
+
+    .cat-pill:hover:not(.active) {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* Bouton reset zoom */
+    .chart-zoom-reset {
+      padding: 0.4rem 0.9rem;
+      border-radius: var(--radius-sm);
+      font-size: var(--text-xs);
+      font-weight: var(--fw-bold);
+      background: var(--accent-glow);
+      color: var(--accent);
+      border: 1px solid rgba(99,102,241,0.2);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      display: none;
+    }
+
+    .chart-zoom-reset.visible {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .chart-zoom-reset:hover {
+      background: var(--accent);
+      color: white;
+    }
+
+    /* Container chart avec hint zoom */
+    .chart-container-interactive {
+      position: relative;
+    }
+
+    .chart-zoom-hint {
+      position: absolute;
+      bottom: 8px;
+      right: 12px;
+      font-size: 0.68rem;
+      color: var(--text-muted);
+      font-weight: var(--fw-medium);
+      pointer-events: none;
+      opacity: 0.7;
+      transition: opacity 0.3s;
+    }
+
+    /* KPI Analytics Cards */
+    .analytics-kpi-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .analytics-kpi-card {
+      background: var(--surface-glass);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-radius: var(--radius);
+      padding: 1.25rem 1.5rem;
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow-glass);
+      transition: transform var(--transition), box-shadow var(--transition);
+    }
+
+    .analytics-kpi-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      padding: 1px;
+      background: var(--border-shine);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+    }
+
+    .analytics-kpi-card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-glass-hover);
+    }
+
+    .analytics-kpi-label {
+      font-size: var(--text-xs);
+      font-weight: var(--fw-extrabold);
+      letter-spacing: var(--tracking-widest);
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+    }
+
+    .analytics-kpi-value {
+      font-family: var(--font-display);
+      font-weight: var(--fw-black);
+      font-size: var(--text-2xl);
+      letter-spacing: var(--tracking-tight);
+      color: var(--primary);
+      line-height: 1;
+      margin-bottom: 0.4rem;
+    }
+
+    .analytics-kpi-trend {
+      font-size: var(--text-xs);
+      font-weight: var(--fw-bold);
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .analytics-kpi-trend.up   { color: var(--success); }
+    .analytics-kpi-trend.down { color: var(--danger); }
+    .analytics-kpi-trend.flat { color: var(--text-muted); }
+
+    /* Chart cards glassmorphism */
+    .analytics-chart-card {
+      background: var(--surface-glass);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border-radius: var(--radius-lg);
+      padding: 1.75rem;
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow-glass);
+      transition: box-shadow var(--transition);
+    }
+
+    .analytics-chart-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      padding: 1px;
+      background: var(--border-shine);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+    }
+
+    .analytics-chart-card h3 {
+      font-family: var(--font-display);
+      font-weight: var(--fw-extrabold);
+      font-size: var(--text-md);
+      letter-spacing: var(--tracking-tight);
+      margin: 0 0 1.25rem 0;
+      color: var(--primary);
+    }
+
+    /* Légende custom des charts */
+    .chart-legend-custom {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+
+    .chart-legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: var(--text-xs);
+      font-weight: var(--fw-semibold);
+      color: var(--text-secondary);
+    }
+
+    .chart-legend-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    /* Loading state chart */
+    .chart-loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 200px;
+      color: var(--text-muted);
+      gap: 0.75rem;
+      font-size: var(--text-sm);
+    }
+
+    .chart-loading-spinner {
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--surface-border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       DARK THEME — Adaptations glassmorphism
+       ═══════════════════════════════════════════════════════════════ */
+
+    .dark-theme .glass-card-premium,
+    .dark-theme .mgmt-glass-card,
+    .dark-theme .hub-bento-card,
+    .dark-theme .hub-kpi-card,
+    .dark-theme .analytics-kpi-card,
+    .dark-theme .analytics-chart-card {
+      background: var(--surface-glass) !important;
+      box-shadow: var(--shadow-glass) !important;
+    }
+
+    .dark-theme .glass-card-premium::before,
+    .dark-theme .mgmt-glass-card::before,
+    .dark-theme .hub-bento-card::before,
+    .dark-theme .hub-kpi-card::before,
+    .dark-theme .analytics-kpi-card::before,
+    .dark-theme .analytics-chart-card::before {
+      background: var(--border-shine) !important;
+    }
+
+    .dark-theme .period-filter-group {
+      background: rgba(255,255,255,0.05);
+    }
+
+    .dark-theme .period-filter-btn.active {
+      background: rgba(255,255,255,0.1);
+    }
+
+    .dark-theme .cat-pill {
+      background: rgba(255,255,255,0.05);
+      border-color: rgba(255,255,255,0.1);
+      color: var(--text-muted);
+    }
+  </style>
 </head>
 
 <body class="auth-pending">
+  <!-- ================================================ -->
+  <!-- OFFLINE PWA BANNER                               -->
+  <!-- ================================================ -->
+  <div id="offlineBanner" role="alert" aria-live="polite">
+    <div class="offline-left">
+      <span class="offline-icon">✈️</span>
+      <div class="offline-text">
+        <strong>Mode Hors Ligne</strong>
+        <span>Vos données sont accessibles en local. Sync automatique au retour du réseau.</span>
+      </div>
+    </div>
+    <div class="offline-actions">
+      <span id="syncPendingBadge">⏳ <span id="syncCount">0</span> en attente</span>
+      <button onclick="document.getElementById('offlineBanner').classList.remove('visible')"
+        style="background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.3); color:white; padding:0.3rem 0.8rem; border-radius:8px; font-size:0.75rem; font-weight:700; cursor:pointer;">
+        ✕
+      </button>
+    </div>
+  </div>
+
   <!-- ================================================ -->
   <!-- PREMIUM SPLASH SCREEN                            -->
   <!-- ================================================ -->
@@ -4410,6 +5061,90 @@
           window['openInvoiceGenerator'].toString().length > 100) {
         console.info('%c[GourmetRevient] crm-enhanced-v2.js ✓ chargé avec succès', 'color:#10b981; font-weight:bold;');
       }
+    })();
+  </script>
+
+  <!-- ======================================================== -->
+  <!-- ANALYTICS INTERACTIF + PWA OFFLINE MANAGER               -->
+  <!-- ======================================================== -->
+  <script src="./analytics-interactive.js?v=3.0.0"></script>
+
+  <script>
+    // ── Enregistrement du Service Worker v3 ─────────────────────────────────
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js?v=3.0.2')
+          .then(reg => {
+            console.info('%c[SW] GourmetRevient Service Worker v3 enregistré', 'color:#6366f1;font-weight:bold;');
+
+            // Écoute les mises à jour du SW
+            reg.addEventListener('updatefound', () => {
+              const newSW = reg.installing;
+              newSW.addEventListener('statechange', () => {
+                if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
+                  if (typeof showToast === 'function') {
+                    showToast('🔄 Mise à jour disponible — rechargez pour l\'appliquer.', 'info');
+                  }
+                }
+              });
+            });
+          })
+          .catch(err => console.warn('[SW] Échec enregistrement:', err));
+      });
+
+      // Réception messages du SW (sync complète, etc.)
+      navigator.serviceWorker.addEventListener('message', ({ data }) => {
+        if (!data) return;
+        if (data.type === 'SYNC_OP' && data.payload) {
+          // Rejouer l'opération en attente côté client
+          try {
+            const op = data.payload;
+            if (op.action === 'save_recipe' && op.key && op.data) {
+              localStorage.setItem(op.key, JSON.stringify(op.data));
+              if (typeof loadSavedRecipes === 'function') loadSavedRecipes();
+            }
+          } catch(e) { console.warn('[SW SYNC]', e); }
+        }
+      });
+    }
+
+    // ── Gestion des raccourcis PWA (URL params) ──────────────────────────────
+    (function handlePWAShortcuts() {
+      const params = new URLSearchParams(window.location.search);
+      const action = params.get('action');
+      if (!action) return;
+
+      // Attendre que l'app soit prête (auth passée)
+      const waitForApp = setInterval(() => {
+        if (document.body.classList.contains('auth-pending')) return;
+        clearInterval(waitForApp);
+        setTimeout(() => {
+          if (action === 'new-recipe'  && typeof showRecettes   === 'function') showRecettes();
+          if (action === 'dashboard'   && typeof showStats      === 'function') showStats();
+          if (action === 'inventory'   && typeof showInventaire === 'function') showInventaire();
+        }, 300);
+      }, 200);
+    })();
+
+    // ── Sauvegarde offline : intercepter saveSavedRecipes ────────────────────
+    (function patchOfflineSave() {
+      const _origSave = window.saveSavedRecipes;
+      if (typeof _origSave !== 'function') return;
+
+      window.saveSavedRecipes = function() {
+        _origSave.apply(this, arguments);
+        // Si offline, mettre en file d'attente pour sync ultérieure
+        if (!navigator.onLine && typeof window.queueOfflineOp === 'function') {
+          const currUser = (localStorage.getItem('gourmet_current_user') || 'chef').toLowerCase();
+          const key = `gourmetrevient_recipes_${currUser}`;
+          window.queueOfflineOp({
+            action: 'save_recipe',
+            key,
+            data: JSON.parse(localStorage.getItem(key) || '[]'),
+            ts: Date.now()
+          });
+        }
+      };
     })();
   </script>
 
