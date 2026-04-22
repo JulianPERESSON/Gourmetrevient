@@ -787,15 +787,12 @@ function renderIngredients() {
     container.appendChild(row);
   });
 
-  // GSAP Stagger Animation (Using gsap.from for safety)
+  // GSAP Stagger Animation (Guaranteed opacity 1)
   if (window.gsap && APP.recipe.ingredients.length > 0) {
-    gsap.from('#ingredientsList .ing-row', {
-      opacity: 0,
-      y: 15,
-      duration: 0.4,
-      stagger: 0.05,
-      ease: 'power2.out'
-    });
+    gsap.fromTo('#ingredientsList .ing-row', 
+      { opacity: 0, y: 15 },
+      { opacity: 1, y: 0, duration: 0.4, stagger: 0.05, ease: 'power2.out' }
+    );
   }
 
   updateIngredientsTotal();
