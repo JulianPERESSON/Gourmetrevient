@@ -1011,7 +1011,14 @@ function showAutocomplete(input, listEl, idx) {
 
 function renderProcedure() {
   const container = $('#procedureList');
+  if (!container) return;
+  
   container.innerHTML = '';
+
+  // UI ENHANCEMENT: If no steps, add one empty row to guide the user
+  if (APP.recipe.steps.length === 0) {
+    APP.recipe.steps.push('');
+  }
 
   APP.recipe.steps.forEach((step, idx) => {
     container.appendChild(createProcedureStep(step, idx));
@@ -1056,6 +1063,10 @@ function addProcedureStep() {
 
 function collectProcedure() {
   const steps = $$('.procedure-step');
+  
+  // SÉCURITÉ : Ne pas vider la mémoire si le DOM est vide (ex: navigation rapide ou erreur de rendu)
+  if (steps.length === 0) return;
+
   APP.recipe.steps = [];
   steps.forEach(stepEl => {
     const input = stepEl.querySelector('.proc-input');
