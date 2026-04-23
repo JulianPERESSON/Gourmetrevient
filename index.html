@@ -5216,44 +5216,6 @@
   <script src="./analytics-interactive.js?v=3.0.0"></script>
 
   <script>
-    // ── Enregistrement du Service Worker v3 ─────────────────────────────────
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js?v=3.0.2')
-          .then(reg => {
-            console.info('%c[SW] GourmetRevient Service Worker v3 enregistré', 'color:#6366f1;font-weight:bold;');
-
-            // Écoute les mises à jour du SW
-            reg.addEventListener('updatefound', () => {
-              const newSW = reg.installing;
-              newSW.addEventListener('statechange', () => {
-                if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
-                  if (typeof showToast === 'function') {
-                    showToast('🔄 Mise à jour disponible — rechargez pour l\'appliquer.', 'info');
-                  }
-                }
-              });
-            });
-          })
-          .catch(err => console.warn('[SW] Échec enregistrement:', err));
-      });
-
-      // Réception messages du SW (sync complète, etc.)
-      navigator.serviceWorker.addEventListener('message', ({ data }) => {
-        if (!data) return;
-        if (data.type === 'SYNC_OP' && data.payload) {
-          // Rejouer l'opération en attente côté client
-          try {
-            const op = data.payload;
-            if (op.action === 'save_recipe' && op.key && op.data) {
-              localStorage.setItem(op.key, JSON.stringify(op.data));
-              if (typeof loadSavedRecipes === 'function') loadSavedRecipes();
-            }
-          } catch(e) { console.warn('[SW SYNC]', e); }
-        }
-      });
-    }
-
     // ── Gestion des raccourcis PWA (URL params) ──────────────────────────────
     (function handlePWAShortcuts() {
       const params = new URLSearchParams(window.location.search);

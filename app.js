@@ -6217,6 +6217,7 @@ document.addEventListener('keydown', (e) => {
 // PWA Registration with update handling
 window.addEventListener('load', () => {
   if ('serviceWorker' in navigator) {
+    // Register the SW. Using a fixed URL is more stable.
     navigator.serviceWorker.register('./sw.js').then(reg => {
       // Check for updates periodically
       setInterval(() => {
@@ -6225,21 +6226,52 @@ window.addEventListener('load', () => {
       
       reg.onupdatefound = () => {
         const installingWorker = reg.installing;
+        if (!installingWorker) return;
         installingWorker.onstatechange = () => {
           if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
             // New content is available; show notification
-            showToast("Une nouvelle version est disponible ! Elle s'installera au prochain rechargement.", "info", 5000);
+            if (typeof showToast === 'function') {
+              showToast("🔄 Mise à jour disponible — rechargez pour l'appliquer.", "info", 5000);
+            }
           }
         };
       };
-    }).catch(err => console.log('SW register error', err));
+    }).catch(err => console.warn('[SW] Register error:', err));
 
     // Handle the 'controllerchange' event to reload when the new SW takes control
     let refreshing = false;
     navigator.serviceWorker.addEventListener('controllerchange', () => {
       if (refreshing) return;
+      
+      // Safety check: avoid reload loops
+      const lastReload = sessionStorage.getItem('sw_last_reload');
+      const now = Date.now();
+      if (lastReload && (now - parseInt(lastReload)) < 2000) {
+        console.warn('[SW] Loop detected, skipping reload.');
+        return;
+      }
+      
       refreshing = true;
-      window.location.reload();
+      sessionStorage.setItem('sw_last_reload', now.toString());
+      
+      // Add a small delay to avoid rapid reload loops and let the user see the notification
+      setTimeout(() => {
+        window.location.reload();
+      }, 500);
+    });
+
+    // Handle messages from the SW (e.g. for offline sync)
+    navigator.serviceWorker.addEventListener('message', ({ data }) => {
+      if (!data) return;
+      if (data.type === 'SYNC_OP' && data.payload) {
+        try {
+          const op = data.payload;
+          if (op.action === 'save_recipe' && op.key && op.data) {
+            localStorage.setItem(op.key, JSON.stringify(op.data));
+            if (typeof loadSavedRecipes === 'function') loadSavedRecipes();
+          }
+        } catch(e) { console.warn('[SW SYNC] Error:', e); }
+      }
     });
   }
 });

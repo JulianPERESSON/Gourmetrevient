@@ -3,7 +3,7 @@
 // Stratégie : Cache-First pour assets statiques + Offline Queue pour mutations
 // =============================================================================
 
-const CACHE_VERSION = '3.0.2';
+const CACHE_VERSION = '3.0.3';
 const CACHE_STATIC  = `gourmet-static-v${CACHE_VERSION}`;
 const CACHE_RUNTIME = `gourmet-runtime-v${CACHE_VERSION}`;
 const SYNC_TAG      = 'gourmet-sync-recipes';
@@ -107,7 +107,7 @@ self.addEventListener('activate', (event) => {
           .filter((name) => !validCaches.includes(name))
           .map((name) => caches.delete(name))
       );
-    }).then(() => self.clients.claim())
+    })
   );
 });
 
