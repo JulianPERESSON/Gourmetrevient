@@ -3,7 +3,7 @@
 // Stratégie : Cache-First pour assets statiques + Offline Queue pour mutations
 // =============================================================================
 
-const CACHE_VERSION = '3.0.3';
+const CACHE_VERSION = '3.0.4';
 const CACHE_STATIC  = `gourmet-static-v${CACHE_VERSION}`;
 const CACHE_RUNTIME = `gourmet-runtime-v${CACHE_VERSION}`;
 const SYNC_TAG      = 'gourmet-sync-recipes';
@@ -138,7 +138,7 @@ self.addEventListener('fetch', (event) => {
 
 // Cache-First : retourne le cache immédiatement, sinon réseau → cache
 async function cacheFirstWithNetworkFallback(request) {
-  const cached = await caches.match(request);
+  const cached = await caches.match(request, { ignoreSearch: true });
   if (cached) return cached;
 
   try {
@@ -151,7 +151,7 @@ async function cacheFirstWithNetworkFallback(request) {
   } catch {
     // Offline et pas en cache → page offline de secours
     if (request.destination === 'document') {
-      const fallback = await caches.match('./index.html');
+      const fallback = await caches.match('./index.html', { ignoreSearch: true });
       return fallback || new Response(offlinePage(), {
         headers: { 'Content-Type': 'text/html; charset=utf-8' }
       });
@@ -163,7 +163,7 @@ async function cacheFirstWithNetworkFallback(request) {
 // Stale-While-Revalidate : cache immédiatement + mise à jour en arrière-plan
 async function staleWhileRevalidate(request) {
   const cache  = await caches.open(CACHE_RUNTIME);
-  const cached = await cache.match(request);
+  const cached = await cache.match(request, { ignoreSearch: true });
 
   const networkPromise = fetch(request).then((networkResponse) => {
     if (networkResponse && networkResponse.status === 200) {

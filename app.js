@@ -6217,8 +6217,8 @@ document.addEventListener('keydown', (e) => {
 // PWA Registration with update handling
 window.addEventListener('load', () => {
   if ('serviceWorker' in navigator) {
-    // Register the SW. Using a fixed URL is more stable.
-    navigator.serviceWorker.register('./sw.js').then(reg => {
+    // Register the SW. Using a versioned URL helps force updates.
+    navigator.serviceWorker.register('./sw.js?v=3.0.4').then(reg => {
       // Check for updates periodically
       setInterval(() => {
         reg.update();
