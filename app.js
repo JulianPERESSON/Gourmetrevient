@@ -6252,7 +6252,7 @@ document.addEventListener('keydown', (e) => {
 window.addEventListener('load', () => {
   if ('serviceWorker' in navigator) {
     // Register the SW. Using a versioned URL helps force updates.
-    navigator.serviceWorker.register('./sw.js?v=3.0.4').then(reg => {
+    navigator.serviceWorker.register('./sw.js').then(reg => {
       // Check for updates periodically
       setInterval(() => {
         reg.update();
