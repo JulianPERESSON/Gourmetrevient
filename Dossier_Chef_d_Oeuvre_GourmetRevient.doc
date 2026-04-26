@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Dossier Chef-d'œuvre - Julian PERESSON</title>
+<style>
+    @page { size: A4; margin: 2.5cm; }
+    body { font-family: 'Segoe UI', Arial, sans-serif; line-height: 1.65; color: #333; padding: 20px; max-width: 900px; margin: auto; font-size: 11.5pt; }
+    .header-box { border-bottom: 3px solid #2a1508; padding-bottom: 10px; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: flex-end; }
+    .header-info { text-align: left; }
+    .header-title { text-align: right; }
+    h1 { color: #2a1508; font-size: 24pt; margin: 0; }
+    h2 { color: #6366f1; border-bottom: 2px solid #6366f1; padding-bottom: 5px; margin-top: 25px; font-size: 18pt; }
+    h3 { color: #2a1508; font-size: 13.5pt; margin-top: 15px; border-left: 6px solid #6366f1; padding-left: 12px; font-weight: 800; }
+    p { margin-bottom: 12px; text-align: justify; }
+    ul { margin-bottom: 15px; padding-left: 30px; }
+    li { margin-bottom: 8px; }
+    .page-break { page-break-after: always; height: 1px; }
+    .highlight { background-color: #f0f7ff; padding: 15px; border-left: 6px solid #6366f1; margin: 15px 0; border-radius: 4px; }
+    .footer { font-size: 9pt; text-align: center; color: #999; margin-top: 20px; border-top: 1px solid #eee; padding-top: 10px; }
+</style>
+</head>
+<body>
+
+<div class="header-box">
+    <div class="header-info">
+        <strong>Julian PERESSON</strong> — CAP 1 AN Pâtisserie<br>
+        CMA Formation Muret — 21 Chem. de la Pyramide, 31600 Muret<br>
+        Encadré par MM. BOUVIER-GAZ et PELLETIER
+    </div>
+    <div class="header-title">
+        <h1>GOURMET REVIENT</h1>
+        <span style="font-size: 11pt; color: #6366f1; font-weight: bold;">PILOTAGE DIGITAL DU LABORATOIRE</span>
+    </div>
+</div>
+
+<h2>I. PARCOURS PERSONNEL ET GENÈSE DU PROJET</h2>
+<p>
+    Issu d'une <strong>Licence d'Informatique et de Mathématiques</strong>, j'ai choisi de me reconvertir dans la pâtisserie par passion. Mon parcours n'est pas une rupture, mais une fusion. Mon chef-d'œuvre, <i>GourmetRevient</i>, est l'aboutissement de cette double culture. J'ai souhaité prouver que la rigueur algorithmique peut magnifier le travail de l'artisan en offrant des outils de pilotage inédits dans un laboratoire traditionnel.
+</p>
+<p>
+    Le projet a débuté dès septembre 2024 par une phase d'analyse des besoins au sein du CMA de Muret. J'ai d'abord modélisé la base de données des ingrédients avant d'intégrer, en janvier 2025, le moteur de saveurs "Chef's Brain". Les tests en conditions réelles d'examen ont eu lieu en mai 2025, suivis de l'intégration du scanner OCR en octobre. La finalisation de l'interface Premium s'est achevée en avril 2026.
+</p>
+
+<h2>II. LE PÔLE CRÉATION : INNOVER SANS GASPILLER</h2>
+
+<h3>2.1 Le "Chef's Brain" et l'aide à l'imagination</h3>
+<p>
+    Le module suggère des accords de saveurs basés sur une base culinaire précise. Cela permet de tester virtuellement des mariages de goûts sans gaspiller de matières premières. Le système calcule immédiatement si l'idée est rentable avant même le premier essai.
+</p>
+
+<h3>2.2 Sécurité alimentaire : Gestion des Allergènes (INCO)</h3>
+<p>
+    C'est une fonctionnalité clé déjà opérationnelle. Pour chaque recette, l'application identifie automatiquement les allergènes et génère une étiquette conforme. C'est une sécurité majeure pour le client et un gain de temps précieux pour l'artisan qui n'a plus à faire ces recherches manuellement.
+</p>
+
+<h3>2.3 Équilibrage scientifique et Évolution des goûts</h3>
+<p>
+    Grâce aux mathématiques, j'ai intégré des outils pour ajuster les taux de sucre et de gras. Cela permet de répondre aux tendances actuelles (pâtisserie moins sucrée, sans gluten) tout en garantissant une texture parfaite. L'outil devient un allié pour moderniser les recettes classiques sans perdre leur âme.
+</p>
+
+<div class="page-break"></div>
+
+<h2>III. LE PÔLE OPÉRATIONNEL : OPTIMISER LE LABORATOIRE</h2>
+
+<h3>3.1 Le Tactical Scheduler : L'ordonnancement intelligent</h3>
+<p>
+    L'organisation d'une session de 5 heures est modélisée mathématiquement pour optimiser les temps de repos des pâtes et les tâches de nettoyage. L'outil identifie les "vides" pour y insérer les pesées, transformant le stress de l'examen en une suite d'actions logiques.
+</p>
+
+<h3>3.2 Scanner OCR et Traçabilité HACCP</h3>
+<p>
+    Le pâtissier photographie sa facture, et l'application extrait les prix automatiquement via un module <strong>OCR</strong>. GourmetRevient simplifie aussi la <strong>Traçabilité HACCP</strong> : on peut noter les numéros de lots et les DLC directement sur les fiches techniques, digitalisant ainsi le registre d'hygiène obligatoire et sécurisant les contrôles.
+</p>
+
+<h3>3.3 Organisation 2D et Ergonomie du poste</h3>
+<p>
+    Le site permet de simuler l'aménagement d'un laboratoire. On place le matériel sur un plan numérique pour tester l'ergonomie (limiter les pas inutiles) avant toute installation physique. C'est une démarche d'ingénierie appliquée à la santé au travail et à l'efficacité productive au quotidien.
+</p>
+
+<h2>IV. PILOTER LA RENTABILITÉ FINANCIÈRE</h2>
+
+<h3>4.1 Analyse du Coût de Revient 360°</h3>
+<p>
+    Le calculateur intègre les matières premières, la main-d'œuvre et le coût de l'énergie. On sort de la simple "fiche recette" pour entrer dans un vrai pilotage d'entreprise. On estime que la marge brute doit se situer autour de 55% à 70% selon les produits pour assurer la pérennité de la boutique.
+</p>
+
+<h3>4.2 Le Simulateur d'Inflation : Anticiper la crise</h3>
+<p>
+    Un curseur permet de simuler une hausse globale des prix. L'outil montre immédiatement l'érosion des marges, permettant de piloter son catalogue de manière proactive. C'est un outil de survie économique indispensable dans le climat actuel d'instabilité des prix du beurre et de l'énergie.
+</p>
+
+<div class="page-break"></div>
+
+<h2>V. ÉTUDE DE CAS N°1 : LA FABRICATION DU CROISSANT</h2>
+<p>
+    Pour illustrer l'efficacité de l'outil, prenons le croissant, recette emblématique du CAP. GourmetRevient intervient à chaque étape pour sécuriser le résultat et la rentabilité.
+</p>
+
+<h3>5.1 Création, Coût et Réactivité</h3>
+<p>
+    Le chef définit sa recette (Beurre AOP, Farine T45). L'application calcule le coût de revient à l'unité. Grâce au scanner OCR, si le prix du beurre de tourage a augmenté ce matin, le prix de revient du croissant est mis à jour instantanément, permettant au chef d'ajuster sa stratégie immédiatement.
+</p>
+
+<h3>5.2 Organisation du temps (Scheduler)</h3>
+<p>
+    La fabrication demande de nombreux temps de repos. Le <i>Tactical Scheduler</i> fragmente ces 5 heures : il planifie les tours à donner exactement au moment où la pâte est à la bonne température, tout en utilisant les 45 minutes de repos pour lancer d'autres préparations comme la crème pâtissière ou le nettoyage du poste de travail.
+</p>
+
+<h2>VI. ÉTUDE DE CAS N°2 : L'ENTREMETS SIGNATURE</h2>
+<p>
+    Pour un entremets complexe, l'enjeu est la régularité et la précision des volumes de chaque couche.
+</p>
+
+<h3>6.1 Simulation de montage et Précision</h3>
+<p>
+    Grâce à l'<i>Assembly Simulator</i>, le chef dessine la coupe technique de son entremets. Le système calcule le volume exact de mousse, de crémeux et de biscuit nécessaire pour un cadre ou un cercle précis. On évite ainsi de produire trop de mousse, ce qui réduit le gaspillage alimentaire de manière significative.
+</p>
+
+<h3>6.2 Fiche de montage visuelle</h3>
+<p>
+    Le simulateur génère un document visuel pour la brigade. Chaque employé sait exactement dans quel ordre et à quelle hauteur couler chaque préparation. Cela garantit une coupe parfaite en vitrine, élément essentiel de la pâtisserie haut de gamme.
+</p>
+
+<div class="page-break"></div>
+
+<h2>VII. STRATÉGIE COMMERCIALE ET RELATION CLIENT</h2>
+
+<h3>7.1 Le E-Catalogue et les QR Codes Interactifs</h3>
+<p>
+    GourmetRevient génère des QR Codes. Scannés en boutique, ils racontent l'histoire du produit ; scannés au laboratoire, ils affichent la fiche technique. C'est un lien moderne entre la production et le client final, apportant une transparence totale sur les ingrédients et les allergènes.
+</p>
+
+<h3>7.2 Gestion de la Clientèle (CRM) et Fidélisation</h3>
+<p>
+    Le site permet de noter les préférences des clients et l'historique de leurs commandes. Cette approche personnalisée permet de fidéliser la clientèle locale en proposant des produits adaptés à leurs besoins spécifiques (anniversaires, régimes particuliers).
+</p>
+
+<h2>VIII. ÉCORESPONSABILITÉ ET LUTTE CONTRE LE GASPILLAGE</h2>
+<p>
+    Au-delà des économies de matières premières, le planning tactique aide à regrouper les cuissons. En sachant exactement quand chaque produit doit entrer au four, on évite de laisser les machines allumées inutilement, réduisant ainsi l'empreinte carbone et la facture énergétique du laboratoire.
+</p>
+
+<h2>IX. ANALYSE DES DIFFICULTÉS ET SOLUTIONS APPORTÉES</h2>
+
+<h3>9.1 Traduire le "vivant" en logique informatique</h3>
+<p>
+    En informatique, 1+1=2. En labo, une pâte peut réagir différemment selon l'humidité. La difficulté a été de coder cette souplesse. J'ai créé un système de planification "élastique" où l'artisan peut manuellement ajuster les durées de repos.
+</p>
+
+<h3>9.2 Simplification et Adaptation Terrain</h3>
+<p>
+    D'abord trop complexe, l'interface a été épurée pour être utilisable avec les mains pleines de farine. L'essentiel est accessible en un clic via des icônes visuelles, adaptant la puissance numérique aux contraintes physiques du laboratoire.
+</p>
+
+<h3>9.3 Gestion de la charge de travail personnelle</h3>
+<p>
+    Mener de front un CAP intensif et le développement de <i>GourmetRevient</i> a été un défi. J'ai utilisé mon propre logiciel pour planifier mes révisions, validant ainsi l'efficacité de l'outil par ma propre expérience de terrain.
+</p>
+
+<div class="page-break"></div>
+
+<h2>X. TRANSMISSION ET PERSPECTIVES</h2>
+
+<h3>10.1 Un outil de formation pédagogique</h3>
+<p>
+    GourmetRevient est aussi un outil pour former les futurs apprentis de mon laboratoire. Les fiches techniques visuelles facilitent l'intégration des nouveaux arrivants et garantissent que la qualité de la maison est maintenue, peu importe qui est au poste ce jour-là.
+</p>
+
+<h3>10.2 Sécurité et Éthique des données</h3>
+<p>
+    Toutes les recettes et les données stratégiques sont stockées localement sur l'appareil du pâtissier. Cela garantit la confidentialité totale du savoir-faire de l'artisan, protégeant ainsi sa propriété intellectuelle et son secret de fabrication.
+</p>
+
+<h3>10.3 Conclusion</h3>
+<p>
+    Ce projet est le reflet de ma nouvelle identité : un artisan pâtissier qui utilise l'intelligence des chiffres pour servir la noblesse du goût. GourmetRevient prouve que le numérique n'est pas l'ennemi de l'artisanat, mais son bouclier face aux crises économiques. En sécurisant les marges et en optimisant le temps, il permet au pâtissier de se concentrer sur l'essentiel : la création et le plaisir du client.
+</p>
+
+<br><br><br>
+<p style="text-align:center; font-style:italic; color:#666; border-top:1px solid #ccc; padding-top:10px;">
+    Dossier de Chef-d'œuvre — Julian PERESSON — CAP 1 AN Pâtisserie — Session 2026
+</p>
+
+<div class="footer">
+    CMA Formation Muret — 21 Chem. de la Pyramide, 31600 Muret
+</div>
+
+</body>
+</html>

@@ -218,58 +218,118 @@ function updateChefBrainCost(pairings) {
 
 const ASSEMBLY_COMPONENTS = [
   // --- BISCUITS & BASES ---
-  { id: 'biscuit_joconde', name: 'Biscuit Joconde', height: 0.8, color: '#D4A574', grad: ['#E2B386','#C69668'], icon: '🍰', category: 'Biscuits', texture: 'grain' },
-  { id: 'genoise',         name: 'Génoise Nature',  height: 1.5, color: '#E8C99B', grad: ['#E8C99B','#D4A574'], icon: '🧁', category: 'Biscuits', texture: 'grain' },
-  { id: 'dacquoise_hz',    name: 'Dacquoise Noisette', height: 1.0, color: '#C9A96E', grad: ['#D9B97E','#B9995E'], icon: '🌰', category: 'Biscuits', texture: 'grain' },
-  { id: 'sable_breton',    name: 'Sablé Breton',    height: 1.2, color: '#6366f1', grad: ['#818cf8','#4f46e5'], icon: '🍪', category: 'Biscuits', texture: 'dots' },
-  { id: 'croustillant_pr', name: 'Croustillant Praliné', height: 0.5, color: '#A67B3D', grad: ['#C49A4E','#8B6530'], icon: '✨', category: 'Inserts', texture: 'dots' },
-  { id: 'streusel',        name: 'Streusel Noisette', height: 0.6, color: '#B8956A', grad: ['#C9A97A','#9A7A55'], icon: '🔶', category: 'Inserts', texture: 'grain' },
-  { id: 'biscuit_cuillere',name: 'Biscuit à la Cuillère', height: 1.5, color: '#F3E5AB', grad: ['#FFF8DC','#EEDC82'], icon: '🥖', category: 'Biscuits', texture: 'grain' },
-  { id: 'financier',       name: 'Financier Vanille', height: 1.0, color: '#E5C49F', grad: ['#F5D4AF','#D5B48F'], icon: '🍯', category: 'Biscuits', texture: 'grain' },
-  { id: 'pate_sablee',     name: 'Pâte Sablée',     height: 0.3, color: '#D2B48C', grad: ['#E6CCB2','#B08968'], icon: '🥧', category: 'Biscuits', texture: 'grain' },
-  { id: 'biscuit_madeleine',name: 'Biscuit Madeleine',   height: 1.2, color: '#F3E5AB', grad: ['#FDF5E6','#EEDC82'], icon: '🐚', category: 'Biscuits', texture: 'grain' },
-  { id: 'croustillant_sp',  name: 'Croustillant Speculoos', height: 0.5, color: '#8B4513', grad: ['#A0522D','#6B4226'], icon: '🍪', category: 'Inserts', texture: 'dots' },
+  { id: 'biscuit_joconde', name: 'Biscuit Joconde', height: 0.8, color: '#D4A574', grad: ['#E2B386','#C69668'], icon: '🍰', category: 'Biscuits', texture: 'grain', costPerKg: 5.80, density: 0.45 },
+  { id: 'genoise',         name: 'Génoise Nature',  height: 1.5, color: '#E8C99B', grad: ['#E8C99B','#D4A574'], icon: '🧁', category: 'Biscuits', texture: 'grain', costPerKg: 2.80, density: 0.35 },
+  { id: 'genoise_choc',    name: 'Génoise Chocolat', height: 1.5, color: '#3D2010', grad: ['#4A2511','#2A1508'], icon: '🍫', category: 'Biscuits', texture: 'grain', costPerKg: 3.50, density: 0.35 },
+  { id: 'dacquoise_hz',    name: 'Dacquoise Noisette', height: 1.0, color: '#C9A96E', grad: ['#D9B97E','#B9995E'], icon: '🌰', category: 'Biscuits', texture: 'grain', costPerKg: 8.50, density: 0.40 },
+  { id: 'sable_breton',    name: 'Sablé Breton',    height: 1.2, color: '#E5C49F', grad: ['#F5D4AF','#D5B48F'], icon: '🍪', category: 'Biscuits', texture: 'dots', costPerKg: 4.20, density: 0.60 },
+  { id: 'pate_sucree',     name: 'Pâte Sucrée',     height: 0.3, color: '#D2B48C', grad: ['#E6CCB2','#B08968'], icon: '🥧', category: 'Biscuits', texture: 'grain', costPerKg: 4.10, density: 0.70 },
+  { id: 'pate_sablee',     name: 'Pâte Sablée',     height: 0.3, color: '#D2B48C', grad: ['#E6CCB2','#B08968'], icon: '🥧', category: 'Biscuits', texture: 'grain', costPerKg: 3.90, density: 0.70 },
+  { id: 'pate_brisee',     name: 'Pâte Brisée',     height: 0.3, color: '#EEDC82', grad: ['#FFF8DC','#EEDC82'], icon: '🥧', category: 'Biscuits', texture: 'grain', costPerKg: 2.50, density: 0.75 },
+  { id: 'pate_cacao',      name: 'Pâte Sucrée Cacao', height: 0.3, color: '#2A1508', grad: ['#3D2010','#1A0A04'], icon: '🍫', category: 'Biscuits', texture: 'grain', costPerKg: 4.80, density: 0.70 },
+  { id: 'feuilletage',     name: 'Pâte Feuilletée', height: 0.4, color: '#D4A574', grad: ['#E2B386','#C69668'], icon: '🥐', category: 'Biscuits', texture: 'grain', costPerKg: 4.50, density: 0.55 },
+  { id: 'biscuit_cuillere',name: 'Biscuit Cuillère', height: 1.5, color: '#F3E5AB', grad: ['#FFF8DC','#EEDC82'], icon: '🥖', category: 'Biscuits', texture: 'grain', costPerKg: 3.80, density: 0.30 },
+  { id: 'financier',       name: 'Financier Vanille', height: 1.0, color: '#E5C49F', grad: ['#F5D4AF','#D5B48F'], icon: '🍯', category: 'Biscuits', texture: 'grain', costPerKg: 6.80, density: 0.55 },
+  { id: 'biscuit_choc_i',  name: 'Biscuit Choc Intense', height: 1.0, color: '#1A0A04', grad: ['#2A1508','#000000'], icon: '🖤', category: 'Biscuits', texture: 'grain', costPerKg: 6.20, density: 0.50 },
 
   // --- MOUSSES & LÉGÈRETÉ ---
-  { id: 'mousse_choc_64',  name: 'Mousse Choc Noir 64%', height: 3.0, color: '#3D2010', grad: ['#5C3A1E','#2A1508'], icon: '🍫', category: 'Mousses', texture: 'smooth' },
-  { id: 'mousse_fraise',   name: 'Mousse Fraise Mara', height: 3.0, color: '#E85D75', grad: ['#F07090','#C04060'], icon: '🍓', category: 'Mousses', texture: 'smooth' },
-  { id: 'mousse_vanille',  name: 'Mousse Vanille Bourbon', height: 3.0, color: '#FFF5E1', grad: ['#FFFBF0','#F5E8C0'], icon: '🍦', category: 'Mousses', texture: 'cloud' },
-  { id: 'ganache_montee_v',name: 'Ganache Montée Vanille', height: 2.5, color: '#FFF5E1', grad: ['#FFFBF0','#F5E8C0'], icon: '🍦', category: 'Mousses', texture: 'cloud' },
-  { id: 'creme_diplomate', name: 'Crème Diplomate', height: 2.0, color: '#FFE4C4', grad: ['#FFF0D8','#F0D090'], icon: '🥛', category: 'Mousses', texture: 'cloud' },
-  { id: 'mousse_exo',      name: 'Mousse Passion-Mangue', height: 3.0, color: '#FFB347', grad: ['#FFCC33','#FF8C00'], icon: '🥭', category: 'Mousses', texture: 'smooth' },
-  { id: 'mousse_hz',       name: 'Mousse Noisette Grillée', height: 3.0, color: '#AE8964', grad: ['#C5A582','#8E6A44'], icon: '🌰', category: 'Mousses', texture: 'smooth' },
-  { id: 'bavarois',        name: 'Bavarois Vanille',  height: 2.5, color: '#FFE4C4', grad: ['#FFF0D8','#F0D090'], icon: '🥛', category: 'Mousses', texture: 'smooth' },
+  { id: 'mousse_choc_64',  name: 'Mousse Choc Noir 64%', height: 3.0, color: '#3D2010', grad: ['#5C3A1E','#2A1508'], icon: '🍫', category: 'Mousses', texture: 'smooth', costPerKg: 6.90, density: 0.55 },
+  { id: 'mousse_fraise',   name: 'Mousse Fraise Mara', height: 3.0, color: '#E85D75', grad: ['#F07090','#C04060'], icon: '🍓', category: 'Mousses', texture: 'smooth', costPerKg: 5.80, density: 0.50 },
+  { id: 'mousse_vanille',  name: 'Mousse Vanille Bourbon', height: 3.0, color: '#FFF5E1', grad: ['#FFFBF0','#F5E8C0'], icon: '🍦', category: 'Mousses', texture: 'cloud', costPerKg: 7.20, density: 0.45 },
+  { id: 'ganache_montee_v',name: 'Ganache Montée Vanille', height: 2.5, color: '#FFF5E1', grad: ['#FFFBF0','#F5E8C0'], icon: '🍦', category: 'Mousses', texture: 'cloud', costPerKg: 8.50, density: 0.50 },
+  { id: 'ganache_montee_p',name: 'Ganache Montée Pistache', height: 2.5, color: '#9ACD32', grad: ['#ADFF2F','#6B8E23'], icon: '💚', category: 'Mousses', texture: 'cloud', costPerKg: 12.80, density: 0.50 },
+  { id: 'creme_diplomate', name: 'Crème Diplomate Vanille', height: 2.0, color: '#FFE4C4', grad: ['#FFF0D8','#F0D090'], icon: '🥛', category: 'Mousses', texture: 'cloud', costPerKg: 4.80, density: 0.60 },
+  { id: 'diplomate_choc',  name: 'Diplomate Chocolat', height: 2.0, color: '#4A2511', grad: ['#5C3A1E','#3D2010'], icon: '🍫', category: 'Mousses', texture: 'cloud', costPerKg: 6.20, density: 0.60 },
+  { id: 'mousse_exo',      name: 'Mousse Passion-Mangue', height: 3.0, color: '#FFB347', grad: ['#FFCC33','#FF8C00'], icon: '🥭', category: 'Mousses', texture: 'smooth', costPerKg: 6.80, density: 0.55 },
+  { id: 'mousse_hz',       name: 'Mousse Noisette Grillée', height: 3.0, color: '#AE8964', grad: ['#C5A582','#8E6A44'], icon: '🌰', category: 'Mousses', texture: 'smooth', costPerKg: 7.90, density: 0.55 },
+  { id: 'bavarois',        name: 'Bavarois Vanille',  height: 2.5, color: '#FFE4C4', grad: ['#FFF0D8','#F0D090'], icon: '🥛', category: 'Mousses', texture: 'smooth', costPerKg: 5.50, density: 0.65 },
 
   // --- CRÈMES & ONCTUOSITÉ ---
-  { id: 'namelaka_choc',   name: 'Namelaka Chocolat', height: 1.5, color: '#6B4226', grad: ['#8B5A36','#50300E'], icon: '🤎', category: 'Crèmes', texture: 'smooth' },
-  { id: 'cremeux_caramel', name: 'Crémeux Caramel Salé', height: 1.2, color: '#D4840A', grad: ['#F0A020','#B06000'], icon: '🍯', category: 'Crèmes', texture: 'smooth' },
-  { id: 'curd_citron_yuzu',name: 'Curd Citron-Yuzu', height: 1.0, color: '#F5E050', grad: ['#FFEC70','#E0C820'], icon: '🍋', category: 'Crèmes', texture: 'smooth' },
-  { id: 'pasticciere',     name: 'Crème Pâtissière', height: 2.0, color: '#FDF5E6', grad: ['#FFFACD','#F5DEB3'], icon: '🥚', category: 'Crèmes', texture: 'smooth' },
-  { id: 'cremeux_passion',  name: 'Crémeux Passion Éclat', height: 1.2, color: '#FFD700', grad: ['#FFEA00','#DAA520'], icon: '🥝', category: 'Crèmes', texture: 'smooth' },
-  { id: 'ganache_fixe',    name: 'Ganache de Fourrage', height: 1.0, color: '#3C1F0E', grad: ['#5A3020','#201008'], icon: '🍫', category: 'Crèmes', texture: 'smooth' },
+  { id: 'namelaka_choc',   name: 'Namelaka Chocolat', height: 1.5, color: '#6B4226', grad: ['#8B5A36','#50300E'], icon: '🤎', category: 'Crèmes', texture: 'smooth', costPerKg: 7.20, density: 0.95 },
+  { id: 'cremeux_caramel', name: 'Crémeux Caramel Salé', height: 1.2, color: '#D4840A', grad: ['#F0A020','#B06000'], icon: '🍯', category: 'Crèmes', texture: 'smooth', costPerKg: 4.80, density: 1.05 },
+  { id: 'cremeux_citron',  name: 'Crémeux Citron Jaune', height: 1.0, color: '#F5E050', grad: ['#FFEC70','#E0C820'], icon: '🍋', category: 'Crèmes', texture: 'smooth', costPerKg: 5.20, density: 1.05 },
+  { id: 'pasticciere',     name: 'Crème Pâtissière', height: 2.0, color: '#FDF5E6', grad: ['#FFFACD','#F5DEB3'], icon: '🥚', category: 'Crèmes', texture: 'smooth', costPerKg: 2.80, density: 1.10 },
+  { id: 'creme_amande',    name: 'Crème d\'Amandes', height: 1.5, color: '#E5C49F', grad: ['#F5D4AF','#D5B48F'], icon: '🥜', category: 'Crèmes', texture: 'grain', costPerKg: 7.80, density: 1.00 },
+  { id: 'amande_pistache', name: 'Crème Amande Pistache', height: 1.5, color: '#9ACD32', grad: ['#ADFF2F','#6B8E23'], icon: '💚', category: 'Crèmes', texture: 'grain', costPerKg: 10.50, density: 1.00 },
+  { id: 'creme_frangipane',name: 'Crème Frangipane', height: 1.5, color: '#F5D4AF', grad: ['#FFE4C4','#D5B48F'], icon: '🥐', category: 'Crèmes', texture: 'smooth', costPerKg: 6.20, density: 1.00 },
+  { id: 'appareil_flan',   name: 'Appareil à Flan', height: 4.0, color: '#FFFACD', grad: ['#FAFAD2','#F5DEB3'], icon: '🍮', category: 'Crèmes', texture: 'smooth', costPerKg: 3.50, density: 1.10 },
+  { id: 'creme_beurre_c',  name: 'Crème au Beurre Café', height: 1.0, color: '#6F4E37', grad: ['#8B5A36','#5D3A1A'], icon: '☕', category: 'Crèmes', texture: 'smooth', costPerKg: 5.50, density: 0.90 },
 
   // --- INSERTS & FRUITS ---
-  { id: 'confit_framboise',name: 'Confit Framboise Pépins', height: 0.8, color: '#8B2252', grad: ['#AA3870','#6A1040'], icon: '🫙', category: 'Inserts', texture: 'bubble' },
-  { id: 'insert_coulant',  name: 'Insert Coulant Praliné', height: 1.0, color: '#8B4513', grad: ['#A0522D','#5D2E0B'], icon: '🌋', category: 'Inserts', texture: 'bubble' },
-  { id: 'compotee_pomme',  name: 'Compotée de Pommes Tatin', height: 1.5, color: '#CD853F', grad: ['#D2B48C','#8B4513'], icon: '🍎', category: 'Inserts', texture: 'bubble' },
-  { id: 'gelee_miroir',    name: 'Gelée de Fruits Rouges', height: 0.4, color: '#FF4757', grad: ['#FF7080','#DD2040'], icon: '💎', category: 'Inserts', texture: 'glass' },
-  { id: 'confit_myrtille', name: 'Confit Myrtille Sauvage', height: 0.8, color: '#3B3B98', grad: ['#5758BB','#1B1464'], icon: '🫐', category: 'Inserts', texture: 'bubble' },
-  { id: 'insert_vanille_c',name: 'Insert Vanille Coulant', height: 1.0, color: '#FFF5E1', grad: ['#FFFFFF','#FDF5E6'], icon: '🍦', category: 'Inserts', texture: 'bubble' },
-  { id: 'insert_caramel',  name: 'Insert Caramel Mou',   height: 1.0, color: '#D4840A', grad: ['#F0A020','#B06000'], icon: '🍯', category: 'Inserts', texture: 'bubble' },
+  { id: 'croustillant_pr', name: 'Croustillant Praliné', height: 0.5, color: '#A67B3D', grad: ['#C49A4E','#8B6530'], icon: '✨', category: 'Inserts', texture: 'dots', costPerKg: 9.80, density: 1.10 },
+  { id: 'confit_framboise',name: 'Confit Framboise', height: 0.8, color: '#8B2252', grad: ['#AA3870','#6A1040'], icon: '🫙', category: 'Inserts', texture: 'bubble', costPerKg: 6.50, density: 1.15 },
+  { id: 'confit_rouge',    name: 'Confit Fruits Rouges', height: 0.8, color: '#A52A2A', grad: ['#CD5C5C','#800000'], icon: '🫐', category: 'Inserts', texture: 'bubble', costPerKg: 5.90, density: 1.15 },
+  { id: 'compotee_pomme',  name: 'Pommes Tatin', height: 1.5, color: '#CD853F', grad: ['#D2B48C','#8B4513'], icon: '🍎', category: 'Inserts', texture: 'bubble', costPerKg: 3.20, density: 1.05 },
+  { id: 'poires_pochees',  name: 'Poires Pochées', height: 1.5, color: '#F5F5DC', grad: ['#FFFFF0','#EEDC82'], icon: '🍐', category: 'Inserts', texture: 'bubble', costPerKg: 4.10, density: 1.05 },
+  { id: 'cerises_griottes',name: 'Cerises Griottes', height: 1.0, color: '#800000', grad: ['#A52A2A','#4B0000'], icon: '🍒', category: 'Inserts', texture: 'bubble', costPerKg: 5.50, density: 1.10 },
+  { id: 'framboises_f',    name: 'Framboises Fraîches', height: 1.5, color: '#DC143C', grad: ['#FF4D4D','#B30000'], icon: '🍓', category: 'Inserts', texture: 'bubble', costPerKg: 11.50, density: 0.50 },
+  { id: 'insert_praline',  name: 'Insert Praliné Coulant', height: 1.0, color: '#8B4513', grad: ['#A0522D','#5D2E0B'], icon: '🌋', category: 'Inserts', texture: 'bubble', costPerKg: 9.50, density: 1.05 },
 
   // --- FINITIONS ---
-  { id: 'glacage_miroir',  name: 'Glaçage Miroir Ultra-Gloss', height: 0.3, color: '#2C3E50', grad: ['#4A6070','#1A2830'], icon: '🪞', category: 'Finitions', texture: 'glass' },
-  { id: 'velours_choc',    name: 'Effet Velours Chocolat', height: 0.2, color: '#654321', grad: ['#806040','#482010'], icon: '🧶', category: 'Finitions', texture: 'velvet' },
-  { id: 'chantilly_v',     name: 'Chantilly Mascarpone', height: 2.5, color: '#FFFCF0', grad: ['#FFFFFF','#F5F0E0'], icon: '☁️', category: 'Finitions', texture: 'cloud' },
-  { id: 'nappage_neutre',  name: 'Nappage Neutre Brillance', height: 0.2, color: '#FFFFFF', grad: ['#F8F9FA','#E9ECEF'], icon: '✨', category: 'Finitions', texture: 'glass' },
-  { id: 'opaline',         name: 'Opaline Craquante', height: 0.1, color: '#E0F2F1', grad: ['#B2DFDB','#80CBC4'], icon: '❄️', category: 'Finitions', texture: 'glass' },
-  { id: 'meringue_italienne', name: 'Meringue Italienne', height: 1.5, color: '#FFF8F0', grad: ['#FFFFFF','#F8F0E8'], icon: '🔮', category: 'Finitions', texture: 'cloud' },
+  { id: 'glacage_miroir',  name: 'Glaçage Miroir', height: 0.3, color: '#2C3E50', grad: ['#4A6070','#1A2830'], icon: '🪞', category: 'Finitions', texture: 'glass', costPerKg: 4.80, density: 1.10 },
+  { id: 'velours_choc',    name: 'Velours Chocolat', height: 0.2, color: '#654321', grad: ['#806040','#482010'], icon: '🧶', category: 'Finitions', texture: 'velvet', costPerKg: 10.50, density: 0.80 },
+  { id: 'chantilly_v',     name: 'Chantilly Vanille', height: 2.5, color: '#FFFCF0', grad: ['#FFFFFF','#F5F0E0'], icon: '☁️', category: 'Finitions', texture: 'cloud', costPerKg: 5.80, density: 0.40 },
+  { id: 'meringue_italienne', name: 'Meringue Italienne', height: 1.5, color: '#FFF8F0', grad: ['#FFFFFF','#F8F0E8'], icon: '🔮', category: 'Finitions', texture: 'cloud', costPerKg: 3.20, density: 0.30 },
+  { id: 'nappage_neutre',  name: 'Nappage Brillance', height: 0.2, color: '#FFFFFF', grad: ['#F8F9FA','#E9ECEF'], icon: '✨', category: 'Finitions', texture: 'glass', costPerKg: 3.50, density: 1.05 },
 ];
+
+const ASSEMBLY_TEMPLATES = {
+  opera: ['biscuit_joconde', 'creme_beurre_c', 'biscuit_joconde', 'namelaka_choc', 'biscuit_joconde', 'creme_beurre_c', 'glacage_miroir'],
+  foret_noire: ['genoise_choc', 'chantilly_v', 'cerises_griottes', 'genoise_choc', 'chantilly_v', 'genoise_choc', 'chantilly_v'],
+  tarte_citron: ['pate_sucree', 'cremeux_citron', 'meringue_italienne'],
+  royal: ['dacquoise_hz', 'croustillant_pr', 'mousse_choc_64', 'glacage_miroir'],
+  tatin: ['sable_breton', 'cremeux_caramel', 'compotee_pomme', 'mousse_vanille', 'nappage_neutre'],
+  bourdaloue: ['pate_sablee', 'creme_amande', 'poires_pochees'],
+  negresco: ['biscuit_choc_i', 'mousse_choc_64', 'confit_rouge', 'mousse_choc_64', 'framboises_f']
+};
 
 let assemblyLayers = [];
 let currentMold = 'cercle';
-let currentView = 'split'; // Default to split view
+let currentView = 'split'; 
 let selectedLayerInstanceId = null;
+
+function loadAssemblyTemplate() {
+  const select = document.getElementById('assemblyTemplateSelect');
+  const templateId = select ? select.value : '';
+  if (!templateId || !ASSEMBLY_TEMPLATES[templateId]) return;
+  
+  const componentIds = ASSEMBLY_TEMPLATES[templateId];
+  const newLayers = [];
+  
+  componentIds.forEach(id => {
+    const comp = ASSEMBLY_COMPONENTS.find(c => c.id === id);
+    if (comp) {
+      newLayers.push(Object.assign({}, comp, {
+        instanceId: 'layer_' + Date.now() + '_' + Math.random().toString(36).substr(2,4),
+        annotation: { temp: '', rest: '', note: '' }
+      }));
+    }
+  });
+  
+  assemblyLayers = newLayers;
+  
+  // Auto-adjust mold and size for templates
+  const sizeInput = document.getElementById('assemblyMoldSize');
+  const moldSelect = document.getElementById('assemblyMoldSelect');
+
+  if (templateId.startsWith('tarte') || templateId === 'bourdaloue') {
+    currentMold = 'tarte';
+    if (moldSelect) moldSelect.value = 'tarte';
+    if (sizeInput) sizeInput.value = '24';
+  } else if (templateId === 'opera') {
+    currentMold = 'carre';
+    if (moldSelect) moldSelect.value = 'carre';
+    if (sizeInput) sizeInput.value = '20';
+  } else {
+    currentMold = 'cercle';
+    if (moldSelect) moldSelect.value = 'cercle';
+    if (sizeInput) sizeInput.value = '22';
+  }
+
+  renderAssemblyCanvas();
+  renderCrossSection();
+  if (typeof showToast === 'function') showToast('Modèle chargé avec succès ✓', 'success');
+}
 
 // --- Open / Close -------------------------------------------------------
 function openAssemblySimulator() {
@@ -388,7 +448,15 @@ function clearAssembly() {
 
 function changeAssemblyMold() {
   var select = document.getElementById('assemblyMoldSelect');
+  var sizeInput = document.getElementById('assemblyMoldSize');
   currentMold = select ? select.value : 'cercle';
+  
+  // Basic constraints
+  if (sizeInput) {
+    let val = parseFloat(sizeInput.value);
+    if (isNaN(val) || val < 1) sizeInput.value = 22;
+  }
+
   renderAssemblyCanvas();
   renderCrossSection();
 }
@@ -397,20 +465,43 @@ function changeAssemblyMold() {
 function renderAssemblyCanvas() {
   var layersContainer = document.getElementById('assemblyLayers');
   var totalEl = document.getElementById('assemblyTotal');
-  var moldContainer = document.querySelector('.assembly-mold');
   
   if (!layersContainer) return;
   
-  // Montage view transition: From cake representation to Layer Manager List
+  const sizeInput = document.getElementById('assemblyMoldSize');
+  const size = sizeInput ? parseFloat(sizeInput.value) : 22;
+
+  // Real-time Area calculation
+  let currentArea = 0;
+  if (currentMold === 'cercle' || currentMold === 'tarte' || currentMold === 'verrine') {
+    currentArea = Math.PI * Math.pow(size / 2, 2);
+  } else if (currentMold === 'carre') {
+    currentArea = Math.pow(size, 2);
+  } else if (currentMold === 'buche') {
+    currentArea = size * 8; // length * standard width
+  }
+
   var totalHeight = 0;
+  var totalWeight = 0;
+  var totalCost = 0;
   var html = '';
   
   if (assemblyLayers.length === 0) {
-    html = '<div style="text-align:center;padding:2rem;color:var(--text-muted);border:2px dashed var(--surface-border);border-radius:12px;">' +
-           '<p>Glissez des composants ici pour commencer le montage</p></div>';
+    html = '<div style="text-align:center;padding:3rem 1rem;color:var(--text-muted);border:2px dashed var(--surface-border);border-radius:12px;font-size:0.85rem;">' +
+           '<div style="font-size:2rem;margin-bottom:10px;opacity:0.3;">🎨</div>' +
+           '<p>Glissez des composants ici pour démarrer votre création</p></div>';
   } else {
     assemblyLayers.forEach(function(layer, idx) {
       totalHeight += layer.height;
+      
+      // Calculations
+      const volumeCm3 = currentArea * layer.height;
+      const weightG = volumeCm3 * (layer.density || 1.0);
+      const layerCost = (weightG / 1000) * (layer.costPerKg || 10);
+      
+      totalWeight += weightG;
+      totalCost += layerCost;
+
       var isSelected = layer.instanceId === selectedLayerInstanceId;
       var hasAnnot = layer.annotation && (layer.annotation.temp || layer.annotation.rest || layer.annotation.note);
       
@@ -421,8 +512,11 @@ function renderAssemblyCanvas() {
         '<div class="asm-row-drag">⋮⋮</div>' +
         '<div class="asm-row-icon" style="background:linear-gradient(135deg,' + layer.grad[0] + ',' + layer.grad[1] + ')">' + layer.icon + '</div>' +
         '<div class="asm-row-info">' +
-          '<span class="asm-row-name">' + layer.name + '</span>' +
-          '<span class="asm-row-meta">' + layer.height + ' cm' + (hasAnnot ? ' • 📌 Annoté' : '') + '</span>' +
+          '<div style="display:flex; justify-content:space-between; align-items:center;">' +
+            '<span class="asm-row-name">' + layer.name + '</span>' +
+            '<span style="font-size:0.75rem; font-weight:800; color:var(--accent); font-family:\'JetBrains Mono\', monospace;">' + layerCost.toFixed(2) + ' €</span>' +
+          '</div>' +
+          '<span class="asm-row-meta">' + layer.height + ' cm • ' + Math.round(weightG) + 'g' + (hasAnnot ? ' • 📌' : '') + '</span>' +
         '</div>' +
         '<div class="asm-row-actions">' +
           '<button class="asm-row-btn" onclick="event.stopPropagation(); duplicateAssemblyLayer(\'' + layer.instanceId + '\')" title="Dupliquer">👯</button>' +
@@ -433,7 +527,38 @@ function renderAssemblyCanvas() {
   }
   
   layersContainer.innerHTML = html;
-  if (totalEl) totalEl.innerHTML = 'Hauteur totale : <strong>' + totalHeight.toFixed(1) + ' cm</strong> — ' + assemblyLayers.length + ' couche' + (assemblyLayers.length > 1 ? 's' : '');
+  
+  if (totalEl) {
+    const portInput = document.getElementById('assemblyPortions');
+    const portions = portInput ? parseInt(portInput.value) || 10 : 10;
+    const costPerPortion = totalCost / portions;
+    
+    totalEl.innerHTML = `
+      <div style="display:flex; flex-direction:column; gap:12px;">
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+          <div style="background:var(--surface); padding:10px; border-radius:10px; border:1px solid var(--surface-border); display:flex; flex-direction:column; gap:2px;">
+            <span style="font-size:0.6rem; font-weight:800; text-transform:uppercase; color:var(--text-muted); letter-spacing:0.05em;">Poids Estimé</span>
+            <span style="font-family:'Outfit', sans-serif; font-size:1.2rem; font-weight:900; color:var(--text);">${(totalWeight/1000).toFixed(3)} <small style="font-size:0.6em; opacity:0.6;">kg</small></span>
+          </div>
+          <div style="background:var(--surface); padding:10px; border-radius:10px; border:1px solid var(--surface-border); display:flex; flex-direction:column; gap:2px;">
+            <span style="font-size:0.6rem; font-weight:800; text-transform:uppercase; color:var(--text-muted); letter-spacing:0.05em;">Coût Matière</span>
+            <span style="font-family:'Outfit', sans-serif; font-size:1.2rem; font-weight:900; color:var(--accent-dark);">${totalCost.toFixed(2)} <small style="font-size:0.6em; opacity:0.6;">€</small></span>
+          </div>
+        </div>
+        
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:0 4px; border-top:1px dashed var(--surface-border); pt:10px;">
+          <div style="display:flex; flex-direction:column;">
+            <span style="font-size:0.6rem; font-weight:800; color:var(--text-muted); text-transform:uppercase;">Volume Total</span>
+            <span style="font-size:0.85rem; font-weight:700;">${totalHeight.toFixed(1)} <small>cm</small></span>
+          </div>
+          <div style="display:flex; flex-direction:column; align-items:flex-end;">
+            <span style="font-size:0.6rem; font-weight:800; color:var(--text-muted); text-transform:uppercase;">Prix / Part (${portions}p)</span>
+            <span style="font-size:0.85rem; font-weight:700; color:var(--accent);">${costPerPortion.toFixed(2)} €</span>
+          </div>
+        </div>
+      </div>
+    `;
+  }
   
   initLayerReorder();
 }
@@ -639,10 +764,7 @@ function renderCrossSection() {
   let layerRects = '';
   layerData.forEach(d => {
     layerRects += `
-      <g filter="url(#innerShadow)">
-        <rect x="${MOLD_X}" y="${d.y}" width="${MOLD_W}" height="${d.h}" fill="url(#${d.pId})"/>
-        <rect x="${MOLD_X}" y="${d.y}" width="${MOLD_W}" height="${d.h}" fill="url(#${d.glossId})"/>
-      </g>
+      <rect x="${MOLD_X}" y="${d.y}" width="${MOLD_W}" height="${d.h}" fill="url(#${d.pId})" filter="url(#innerShadow)"/>
       <rect x="${MOLD_X}" y="${d.y}" width="${MOLD_W}" height="1" fill="rgba(255,255,255,0.4)"/>
       <rect x="${MOLD_X}" y="${d.y + d.h - 1}" width="${MOLD_W}" height="1" fill="rgba(0,0,0,0.1)"/>`;
   });
@@ -849,3 +971,4 @@ window.exportAssemblyPNG      = exportAssemblyPNG;
 window.switchAssemblyView     = switchAssemblyView;
 window.selectLayerForAnnotation = selectLayerForAnnotation;
 window.saveLayerAnnotation    = saveLayerAnnotation;
+window.loadAssemblyTemplate   = loadAssemblyTemplate;

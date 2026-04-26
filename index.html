@@ -920,7 +920,7 @@
         <div class="form-group">
           <label data-i18n="auth.label.username">Nom d'utilisateur</label>
           <input type="text" id="authUsername" class="form-input" placeholder="Votre prénom"
-            data-i18n-placeholder="auth.placeholder.username" autocomplete="username">
+            data-i18n-placeholder="auth.placeholder.username" autocomplete="off">
         </div>
 
         <div class="form-group" id="pinGroup">
@@ -1034,6 +1034,7 @@
         <div class="nav-dropdown-content">
           <button class="nav-link nav-dropdown-link" id="navStats">📊 <span data-i18n="nav.stats">Dashboard & Statistiques</span></button>
           <button class="nav-link nav-dropdown-link" id="navCatalogue">🌐 <span data-i18n="nav.catalogue">E-Catalogue Client</span></button>
+          <button class="nav-link nav-dropdown-link" id="navCRM">🤝 <span data-i18n="nav.crm">Commandes & CRM</span></button>
           <button class="nav-link nav-dropdown-link" id="navComparator">⚖️ <span data-i18n="nav.comparator">Comparateur de Prix</span></button>
         </div>
       </div>
@@ -3006,7 +3007,7 @@
                     for (let d = 1; d <= 31; d++) {
                         if (d > daysInMonth) { html += `<div></div>`; continue; }
                         const date = new Date(currentYear, m, d);
-                        const dateStr = date.toISOString().split('T')[0];
+                        const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
                         const mmDd = dateStr.slice(5);
                         const isWE = date.getDay() === 0 || date.getDay() === 6;
                         const holidayRange = zoneHolidays[currentZone] || zoneHolidays.C;
@@ -4609,6 +4610,7 @@
           'navScheduler': showScheduler,
           'navInflation': () => showMgmt('inflation'),
           'navCatalogue': generateECatalogue,
+          'navCRM': showCRM, 'mLinkCRM': showCRM,
           'navChefsBrain': openChefsBrain,
           'navAssembly': openAssemblySimulator,
           'navConverter': openMasterConverter,
@@ -4671,9 +4673,21 @@
         </tbody>
       </table>
 
+      <!-- Added: Cost Breakdown & Visuals -->
+      <div id="comparatorExtra" style="margin-top:1.5rem; display:grid; grid-template-columns: 1fr 1fr; gap:1rem;">
+        <div class="glass-panel" style="padding:1rem; background:rgba(0,0,0,0.02); border-radius:var(--radius-sm);">
+          <div style="font-size:0.75rem; text-transform:uppercase; font-weight:800; color:var(--text-muted); margin-bottom:0.5rem;">Structure des Coûts</div>
+          <div id="comparatorBreakdown" style="font-size:0.85rem;"></div>
+        </div>
+        <div class="glass-panel" style="padding:1rem; background:rgba(0,0,0,0.02); border-radius:var(--radius-sm); display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;">
+          <div id="comparatorHealthIcon" style="font-size:2rem; margin-bottom:0.5rem;">⚖️</div>
+          <div id="comparatorHealthLabel" style="font-weight:700; font-size:0.85rem;">Analyse...</div>
+        </div>
+      </div>
+
       <div
-        style="margin-top:1.5rem; padding:1rem; border-radius:var(--radius); background:var(--bg-alt); border-left:4px solid var(--accent);">
-        <div id="comparatorVerdict" style="font-weight:700; font-size:0.95rem;">Chargement...</div>
+        style="margin-top:1.5rem; padding:1.2rem; border-radius:var(--radius); background:var(--bg-alt); border-left:4px solid var(--accent); box-shadow: var(--shadow-sm);">
+        <div id="comparatorVerdict" style="font-weight:700; font-size:0.95rem; line-height:1.4;">Chargement...</div>
       </div>
 
       <div class="modal-footer" style="margin-top:2rem; display:flex; justify-content:flex-end;">
@@ -4737,12 +4751,15 @@
           { id: 'mLinkChefsBrain', icon: '🧠', label: 'nav.creative.brain', action: openChefsBrain },
           { id: 'mLinkAssembly', icon: '🏗️', label: 'nav.creative.assembly', action: openAssemblySimulator },
           { id: 'mLinkConverter', icon: '📏', label: 'nav.creative.converter', action: openMasterConverter },
-          { id: 'mLinkPortfolio', icon: '🖼️', label: 'nav.portfolio', action: showPortfolio }
+          { id: 'mLinkPortfolio', icon: '🖼️', label: 'nav.portfolio', action: showPortfolio },
+          { id: 'mLinkScheduler', icon: '🎓', label: 'nav.scheduler', action: showScheduler }
         ];
       } else if (category === 'pilotage') {
         moreMenuTitle.textContent = "📈 Gestion & Rentabilité";
         items = [
-          { id: 'mLinkStats', icon: '📊', label: 'nav.stats', action: showStats }
+          { id: 'mLinkStats', icon: '📊', label: 'nav.stats', action: showStats },
+          { id: 'mLinkCatalogue', icon: '🌐', label: 'nav.catalogue', action: generateECatalogue },
+          { id: 'mLinkCRM', icon: '🤝', label: 'nav.crm', action: showCRM }
         ];
       } else if (category === 'catalogue') {
         moreMenuTitle.textContent = "🛡️ Labo & Sécurité";
@@ -4964,7 +4981,17 @@
     <div class="modal-content glass-panel" style="max-width:1250px; width:98%; max-height:92vh; overflow:hidden; display:flex; flex-direction:column; gap:0;">
       <div class="modal-header" style="display:flex; justify-content:space-between; align-items:center; margin: 1.2rem 1.5rem;">
         <h3 style="margin:0;">🏗️ <span class="premium-shimmer-text">Simulateur de Montage &amp; Coupe Professionnel</span></h3>
-        <div style="display:flex; gap:8px;">
+        <div style="display:flex; gap:8px; align-items:center;">
+          <select id="assemblyTemplateSelect" class="form-input" style="width:auto; font-size:0.85rem; padding:4px 8px; margin:0; border-color:var(--accent);" onchange="loadAssemblyTemplate()">
+            <option value="">📂 Charger un modèle...</option>
+            <option value="opera">🍰 Opéra (7 couches)</option>
+            <option value="foret_noire">🍒 Forêt-Noire</option>
+            <option value="tarte_citron">🍋 Tarte Citron Meringuée</option>
+            <option value="royal">🍫 Royal Chocolat</option>
+            <option value="tatin">🍎 Entremet Pomme Tatin</option>
+            <option value="bourdaloue">🥧 Tarte Bourdaloue</option>
+            <option value="negresco">🍓 Negresco Signature</option>
+          </select>
           <button class="btn btn-sm btn-outline" onclick="clearAssembly()">🗑️ Effacer</button>
           <button class="btn btn-sm btn-primary" onclick="exportAssemblyPNG()">💾 Exporter SVG</button>
           <button class="btn-icon" onclick="closeAssemblySimulator()">✕</button>
@@ -4986,19 +5013,27 @@
             <div style="display:flex; align-items:center; gap:10px; background:var(--surface); padding:10px; border-radius:10px; border:1px solid var(--surface-border);">
               <label class="premium-shimmer-text" style="font-weight:800; font-size:0.75rem; letter-spacing:0.05em;">MOULE :</label>
               <select id="assemblyMoldSelect" class="form-input" style="width:auto; font-size:0.85rem; padding:4px 8px; margin:0;" onchange="changeAssemblyMold()">
-                <option value="cercle">⭕ Cercle (22cm)</option>
-                <option value="carre">⬛ Carré (20cm)</option>
-                <option value="buche">📏 Bûche (30cm)</option>
-                <option value="tarte">🥧 Tarte (24cm)</option>
-                <option value="verrine">🥃 Verrine (8cm)</option>
+                <option value="cercle">⭕ Cercle</option>
+                <option value="carre">⬛ Carré</option>
+                <option value="buche">📏 Bûche</option>
+                <option value="tarte">🥧 Tarte</option>
+                <option value="verrine">🥃 Verrine</option>
               </select>
+              <input type="number" id="assemblyMoldSize" class="form-input" style="width:55px; font-size:0.85rem; padding:4px 8px; margin:0; text-align:center;" value="22" step="1" onchange="changeAssemblyMold()">
+              <span style="font-size:0.75rem; opacity:0.6; font-weight:800;">cm</span>
             </div>
             
             <div id="asmViewStack" style="flex:1; overflow-y:auto; background:var(--bg-alt); border-radius:12px; border:1px solid var(--surface-border); padding:10px;">
               <div id="assemblyLayers" class="asm-layers-container"></div>
             </div>
             
-            <div class="assembly-total" id="assemblyTotal" style="font-size:0.85rem; padding:12px; background:var(--accent-glow); border-radius:10px; color:var(--accent-dark); font-weight:800; text-align:center; border:1px solid var(--accent);">Hauteur : 0 cm</div>
+            <div id="assemblyTotal" class="assembly-total-panel" style="margin-top:auto; padding:1rem; background:var(--bg-alt); border:1px solid var(--surface-border); border-radius:12px;">
+              <!-- Dynamically populated -->
+            </div>
+            <div style="display:flex; justify-content:center; gap:10px; margin-top:8px;">
+               <span style="font-size:0.7rem; opacity:0.6; align-self:center;">Portions:</span>
+               <input type="number" id="assemblyPortions" class="form-input" style="width:50px; font-size:0.75rem; padding:2px 5px; margin:0; text-align:center;" value="10" min="1" onchange="renderAssemblyCanvas()">
+            </div>
           </div>
 
           <!-- RIGHT: Cross Section (The Visual) -->
@@ -5033,61 +5068,7 @@
       </div>
     </div>
   </div>
-  <!-- MASTER CONVERTER — Géométrie Culinaire           -->
-  <!-- ================================================ -->
-  <div id="masterConverterModal" class="modal-overlay" style="display:none;">
-    <div class="modal-content glass-panel" style="max-width:860px; width:95%;">m;">MOULE :</label>
-              <select id="assemblyMoldSelect" class="form-input" style="width:auto;" onchange="changeAssemblyMold()">
-                <option value="cercle">⭕ Cercle (22cm)</option>
-                <option value="carre">⬜ Carré (20cm)</option>
-                <option value="buche">📏 Bûche (30cm)</option>
-                <option value="tarte">🥧 Moule à tarte (24cm)</option>
-                <option value="verrine">🥃 Verrine (8cm)</option>
-              </select>
-            </div>
-            <div class="asm-view-tabs">
-              <button class="asm-tab active" id="asmTabStack" onclick="switchAssemblyView('stack')">🧱 Montage</button>
-              <button class="asm-tab" id="asmTabCross" onclick="switchAssemblyView('cross')">🔬 Coupe</button>
-            </div>
-          </div>
 
-          <!-- STACK VIEW (Now Layer Manager List) -->
-          <div id="asmViewStack" style="overflow:auto; max-height:400px; padding: 10px;">
-            <div id="assemblyLayers" class="asm-layers-container">
-              <!-- Layers are rendered as a list here -->
-            </div>
-          </div>
-
-          <!-- CROSS-SECTION VIEW (Large Format Blueprint) -->
-          <div id="asmViewCross" style="display:none; overflow:auto; max-height:550px; background:#f1f5f9; padding:20px;">
-            <div id="assemblyCrossSection" style="width:100%; display:flex; justify-content:center;"></div>
-          </div>
-
-
-        </div>
-      </div>
-
-      <!-- Annotation Panel -->
-      <div id="asmAnnotationPanel" style="display:none; border-top:1px solid var(--surface-border); padding: 12px 0 0; margin-top:4px;">
-        <div style="font-size:0.7rem; font-weight:800; text-transform:uppercase; letter-spacing:.1em; color:var(--text-muted); margin-bottom:8px;">📝 Annotation couche : <span id="asmAnnotLayerName" style="color:var(--accent);"></span></div>
-        <div style="display:grid; grid-template-columns:1fr 1fr 2fr auto; gap:10px; align-items:end;">
-          <div class="form-group" style="margin:0;">
-            <label style="font-size:0.72rem;">🌡️ Température (°C)</label>
-            <input type="number" id="asmAnnotTemp" class="form-input" placeholder="ex: 18" style="font-size:0.85rem; padding:6px 8px;">
-          </div>
-          <div class="form-group" style="margin:0;">
-            <label style="font-size:0.72rem;">⏱ Repos (min)</label>
-            <input type="number" id="asmAnnotRest" class="form-input" placeholder="ex: 120" style="font-size:0.85rem; padding:6px 8px;">
-          </div>
-          <div class="form-group" style="margin:0;">
-            <label style="font-size:0.72rem;">📌 Note technique</label>
-            <input type="text" id="asmAnnotNote" class="form-input" placeholder="ex: Cristalliser au froid 2h" style="font-size:0.85rem; padding:6px 8px;">
-          </div>
-          <button class="btn btn-sm btn-primary" style="white-space:nowrap;" onclick="saveLayerAnnotation()">✅ Enregistrer</button>
-        </div>
-      </div>
-    </div>
-  </div>
 
   <!-- ================================================ -->
   <!-- MASTER CONVERTER — Géométrie Culinaire           -->

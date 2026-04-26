@@ -88,6 +88,8 @@ let mcState = {
   linkedRecipeIdx: null,
 };
 
+let mcFilteredRecipes = [];
+
 // ============================================================================
 // OPEN / CLOSE
 // ============================================================================
@@ -188,9 +190,36 @@ function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
 function populateMCRecipeSelect() {
   const sel = document.getElementById('mcRecipeSelect');
   if (!sel) return;
-  const recipes = (typeof APP !== 'undefined' && APP.savedRecipes) ? APP.savedRecipes : [];
-  sel.innerHTML = `<option value="">— Aucune recette (calcul seul) —</option>` +
-    recipes.map((r, i) => `<option value="${i}">${r.name}</option>`).join('');
+
+  const globalRecipes = (typeof RECIPES !== 'undefined') ? RECIPES : [];
+  const savedRecipes = (typeof APP !== 'undefined' && APP.savedRecipes) ? APP.savedRecipes : [];
+  
+  // Tag and merge
+  const all = [
+    ...globalRecipes.map(r => ({ ...r, source: 'global' })),
+    ...savedRecipes.map(r => ({ ...r, source: 'saved' }))
+  ];
+
+  // Filter: Keep Entremets and Tartes, exclude Choux/Baba/Macaron/etc.
+  mcFilteredRecipes = all.filter(r => {
+    const cat = (r.category || '').toLowerCase();
+    const name = (r.name || '').toLowerCase();
+    
+    // Explicit exclusions (Pâte à choux, Baba, Macaron, Boulangerie)
+    if (cat.includes('choux') || cat.includes('baba') || cat.includes('macaron') || 
+        cat.includes('brioche') || cat.includes('viennoiserie') || cat.includes('pain') ||
+        name.includes('baba') || name.includes('éclair') || name.includes('chou')) {
+        return false;
+    }
+    
+    // Explicit inclusions (Entremets, Tartes, Bûches, Classiques/Feuilletage if entremets-like)
+    return cat.includes('entremet') || cat.includes('tarte') || cat.includes('bûche') || 
+           cat.includes('buche') || cat.includes('feuilletage') || cat.includes('classique');
+  });
+
+  sel.innerHTML = `<option value="">— Sélectionner un Entremets ou Tarte —</option>` +
+    mcFilteredRecipes.map((r, i) => `<option value="${i}">${r.name} ${r.source === 'global' ? '🌐' : '💾'}</option>`).join('');
+  
   sel.value = mcState.linkedRecipeIdx !== null ? mcState.linkedRecipeIdx : '';
 }
 
@@ -432,27 +461,16 @@ function renderMCIngredients(coeff) {
   if (!container) return;
 
   const idx = mcState.linkedRecipeIdx;
-
-  if (idx === null || idx === undefined || idx === '') {
-    const savedRecipes = (typeof APP !== 'undefined' && APP.savedRecipes) ? APP.savedRecipes : [];
-    if (savedRecipes.length === 0) {
-      container.innerHTML = `
-        <div class="mc-ingredients-empty">
-          <span>🍽️</span>
-          <p>Créez ou sélectionnez une recette pour voir les quantités adaptées.</p>
-        </div>`;
-    } else {
-      container.innerHTML = `
-        <div class="mc-ingredients-empty">
-          <span>👆</span>
-          <p>Sélectionnez une recette dans le menu ci-dessus pour adapter ses quantités.</p>
-        </div>`;
-    }
+  if (idx === null || !mcFilteredRecipes[idx]) {
+    container.innerHTML = `
+      <div class="mc-ingredients-empty">
+        <span>🥧</span>
+        <p>Sélectionnez un entremets ou une tarte pour adapter ses quantités.</p>
+      </div>`;
     return;
   }
 
-  const recipes = (typeof APP !== 'undefined' && APP.savedRecipes) ? APP.savedRecipes : [];
-  const recipe = recipes[idx];
+  const recipe = mcFilteredRecipes[idx];
   if (!recipe || !recipe.ingredients || recipe.ingredients.length === 0) {
     container.innerHTML = `<div class="mc-ingredients-empty"><span>📭</span><p>Cette recette n'a pas d'ingrédients enregistrés.</p></div>`;
     return;
@@ -518,9 +536,8 @@ function renderMCIngredients(coeff) {
 
 function mcCopyIngredients() {
   const idx = mcState.linkedRecipeIdx;
-  const recipes = (typeof APP !== 'undefined' && APP.savedRecipes) ? APP.savedRecipes : [];
-  const recipe = recipes[idx];
-  if (!recipe) return;
+  if (idx === null || !mcFilteredRecipes[idx]) return;
+  const recipe = mcFilteredRecipes[idx];
 
   const coeff = mcState.coefficient;
   let text = `=== ${recipe.name} — Moule adapté ===\n`;
@@ -539,12 +556,22 @@ function mcCopyIngredients() {
 
 function mcApplyToRecipe() {
   const idx = mcState.linkedRecipeIdx;
-  if (idx === null) return;
-  const recipes = (typeof APP !== 'undefined' && APP.savedRecipes) ? APP.savedRecipes : [];
-  const recipe = recipes[idx];
-  if (!recipe) return;
-
+  if (idx === null || !mcFilteredRecipes[idx]) return;
+  
+  let recipe = mcFilteredRecipes[idx];
   const coeff = mcState.coefficient;
+
+  // If global, we clone and save to APP.savedRecipes
+  if (recipe.source === 'global') {
+    recipe = JSON.parse(JSON.stringify(recipe));
+    recipe.id = 'r_' + Date.now();
+    recipe.name += ' (Adapté)';
+    recipe.source = 'saved';
+    if (typeof APP !== 'undefined') {
+       APP.savedRecipes.push(recipe);
+    }
+  }
+
   recipe.ingredients = recipe.ingredients.map(ing => ({
     ...ing,
     quantity: ((parseFloat(ing.quantity) || 0) * coeff).toFixed(2)

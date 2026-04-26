@@ -76,7 +76,14 @@
     let timeline = Array(NS).fill(false);
     for (let i = 0; i < recipes.length; i++) grid[0][i] = { type:'MANUAL', n:'⚖️ Pesées & Mise en place' };
     timeline[0] = true;
-    let queues = recipes.map(r => ({ steps: [...r.steps], next: 1 }));
+    let queues = recipes.map(r => {
+      let steps = [...r.steps];
+      if (type === 'EP2' && r.cat === 'Entremet') {
+        steps.push({ n: 'Mise au point chocolat', dur: 15, type: 'MANUAL' });
+        steps.push({ n: 'Réalisation décors chocolats', dur: 15, type: 'MANUAL' });
+      }
+      return { steps, next: 1 };
+    });
     for (let s = 1; s < NS; s++) {
       queues.forEach((q, i) => {
         if (q.steps.length > 0 && q.steps[0].type !== 'MANUAL' && s >= q.next) {
@@ -92,7 +99,9 @@
         let targets = queues.filter((q, i) => q.steps.length > 0 && q.steps[0].type === 'MANUAL' && s >= q.next);
         if (targets.length > 0) {
           let q = targets[0], st = q.steps.shift(), ns = Math.ceil(st.dur / SLOT), ci = queues.indexOf(q), text = st.n.toLowerCase();
-          let em = '🧤'; if(text.includes('décor')||text.includes('fini')||text.includes('glaç')||text.includes('montag')) em='🎨';
+          let em = '🧤'; 
+          if(text.includes('chocolat')||text.includes('mise au point')) em='🍫';
+          if(text.includes('décor')||text.includes('fini')||text.includes('glaç')||text.includes('montag')) em='🎨';
           if(text.includes('crème')||text.includes('appari')||text.includes('pétri')||text.includes('biscuit')||text.includes('base')) em='🥣';
           if(text.includes('pesée')) em='⚖️';
           for (let k = 0; k < ns && (s+k) < NS; k++) { 
@@ -115,23 +124,23 @@
     s.id = 'gStyle';
     s.textContent = `
       #schedulerRecipeList { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 10px; margin-top: 15px; }
-      .scheduler-recipe-card { display: flex; align-items: center; gap: 12px; padding: 12px 15px; background: white; border: 1px solid #e0e0e0; border-radius: 10px; cursor: pointer; transition: 0.2s; }
-      .scheduler-recipe-card.selected { border-color: #6366f1; background: #f8f9fc; box-shadow: 0 0 0 2px #6366f1; }
-      .g-wrap { overflow-x: auto; background: white; padding: 1rem; border-radius: 12px; border: 1px solid #eee; }
+      .scheduler-recipe-card { display: flex; align-items: center; gap: 12px; padding: 12px 15px; background: var(--surface); border: 1px solid var(--surface-border); border-radius: 10px; cursor: pointer; transition: 0.2s; color: var(--text); }
+      .scheduler-recipe-card.selected { border-color: var(--accent); background: var(--accent-glow); box-shadow: 0 0 0 2px var(--accent); }
+      .g-wrap { overflow-x: auto; background: var(--surface); padding: 1rem; border-radius: 12px; border: 1px solid var(--surface-border); }
       .g-tbl { width: 100%; border-collapse: collapse; min-width: 900px; }
-      .g-tm { width: 70px; text-align: center; font-weight: 800; background: #f8f9fa; border: 1px solid #ddd; font-size: 0.85rem; }
-      .g-hd-r { background: #2A1508; color: #f5e6c8; padding: 12px; font-size: 0.8rem; text-align: center; border: 1px solid #3d2618; }
-      .g-c { border: 1px solid #eee; height: 55px; padding: 4px; vertical-align: middle; }
-      .g-in { padding: 6px 10px; border-radius: 6px; font-size: 0.78rem; font-weight: 700; display: flex; align-items: center; height: 100%; background: #e8f5e9; border-left: 4px solid #4caf50; }
-      .g-oven { background: #fff0f0 !important; border-left: 4px solid #ef5350 !important; font-style: italic; opacity: 0.9; }
-      .g-rest,.g-cool { background: #e3f2fd !important; border-left: 4px solid #2196f3 !important; font-style: italic; opacity: 0.9; }
-      .g-rise { background: #fffde7 !important; border-left: 4px solid #fbc02d !important; font-style: italic; opacity: 0.9; }
-      .g-cold-neg { background: #1565c0 !important; color: white !important; border-left: 4px solid #0d47a1 !important; font-style: italic; opacity: 0.9; }
-      .g-clean { background: #f5f5f5 !important; border-left: 4px solid #9e9e9e !important; color: #757575; font-size: 0.72rem; }
-      .route-tactique { margin-top: 1.5rem; background: #fdfaf4; padding: 1.2rem; border-radius: 15px; border: 1px solid #e9dfc6; }
-      .route-tactique h3 { margin: 0 0 1rem 0; font-size: 1.1rem; color: #1e293b; border-bottom: 2px solid #6366f1; padding-bottom: 5px; display: inline-block; }
-      .route-step { display: flex; gap: 12px; margin-bottom: 8px; font-size: 0.9rem; font-weight: 600; }
-      .step-num { width: 22px; height: 22px; background: #2a1508; color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 0.75rem; flex-shrink:0; }
+      .g-tm { width: 70px; text-align: center; font-weight: 800; background: var(--bg-alt); border: 1px solid var(--surface-border); font-size: 0.85rem; color: var(--text); }
+      .g-hd-r { background: var(--primary); color: var(--text-inverse); padding: 12px; font-size: 0.8rem; text-align: center; border: 1px solid var(--surface-border); }
+      .g-c { border: 1px solid var(--surface-border); height: 55px; padding: 4px; vertical-align: middle; }
+      .g-in { padding: 6px 10px; border-radius: 6px; font-size: 0.78rem; font-weight: 700; display: flex; align-items: center; height: 100%; background: var(--success-light); border-left: 4px solid var(--success); color: var(--text); }
+      .g-oven { background: var(--danger-light) !important; border-left: 4px solid var(--danger) !important; font-style: italic; opacity: 0.9; }
+      .g-rest,.g-cool { background: rgba(59, 130, 246, 0.1) !important; border-left: 4px solid var(--info) !important; font-style: italic; opacity: 0.9; }
+      .g-rise { background: var(--warning-light) !important; border-left: 4px solid var(--warning) !important; font-style: italic; opacity: 0.9; }
+      .g-cold-neg { background: var(--accent) !important; color: white !important; border-left: 4px solid var(--accent-dark) !important; font-style: italic; opacity: 0.9; }
+      .g-clean { background: var(--surface-border) !important; border-left: 4px solid var(--text-muted) !important; color: var(--text-muted); font-size: 0.72rem; }
+      .route-tactique { margin-top: 1.5rem; background: var(--bg-alt); padding: 1.2rem; border-radius: 15px; border: 1px solid var(--surface-border); }
+      .route-tactique h3 { margin: 0 0 1rem 0; font-size: 1.1rem; color: var(--primary); border-bottom: 2px solid var(--accent); padding-bottom: 5px; display: inline-block; }
+      .route-step { display: flex; gap: 12px; margin-bottom: 8px; font-size: 0.9rem; font-weight: 600; color: var(--text); }
+      .step-num { width: 22px; height: 22px; background: var(--primary); color: var(--text-inverse); border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 0.75rem; flex-shrink:0; }
     `;
     document.head.appendChild(s);
   }

@@ -1207,48 +1207,80 @@ function renderCostAnalysis() {
 function updateComparator() {
   const container = $('#comparatorBody');
   const verdict = $('#comparatorVerdict');
+  const breakdown = $('#comparatorBreakdown');
+  const healthIcon = $('#comparatorHealthIcon');
+  const healthLabel = $('#comparatorHealthLabel');
+  
   if (!container) return;
 
   const current = calcFullCost(APP.margin);
   const base = APP.baselineCosts || current;
 
+  // 1. Core KPIs Table
   const rows = [
-    { label: t('ui.kpi.total_material'), key: 'totalMaterial', unit: '€' },
-    { label: t('ui.kpi.per_portion'), key: 'costPerPortion', unit: '€' },
-    { label: t('ui.kpi.suggested_price'), key: 'sellingPrice', unit: '€' },
-    { label: t('ui.kpi.margin_portion'), key: 'marginPerPortion', unit: '€' }
+    { label: t('ui.kpi.total_material') || 'Coût Matières (Total)', key: 'totalMaterial', unit: '€' },
+    { label: t('ui.kpi.per_portion') || 'Coût par Portion', key: 'costPerPortion', unit: '€' },
+    { label: t('ui.kpi.suggested_price') || 'Prix de Vente Conseillé', key: 'sellingPrice', unit: '€' },
+    { label: t('ui.kpi.margin_portion') || 'Marge par Portion', key: 'marginPerPortion', unit: '€' }
   ];
 
   container.innerHTML = rows.map(row => {
     const valA = base[row.key] || 0;
     const valB = current[row.key] || 0;
     const diff = valB - valA;
-    const diffColor = (row.key === 'marginPerPortion' || row.key === 'sellingPrice')
+    const diffColor = (row.key === 'marginPerPortion' || row.key === 'sellingPrice' || row.key === 'marginPct')
       ? (diff >= 0 ? 'var(--success)' : 'var(--danger)')
       : (diff <= 0 ? 'var(--success)' : 'var(--danger)');
 
     return `
       <tr style="border-bottom:1px solid var(--surface-border);">
         <td style="padding:0.8rem 0.5rem; font-weight:600;">${row.label}</td>
-        <td style="padding:0.8rem 0.5rem; color:var(--text-muted);">${valA.toFixed(2)} ${row.unit}</td>
+        <td style="padding:0.8rem 0.5rem; color:var(--text-muted);">${valA.toFixed(2)}${row.unit}</td>
         <td style="padding:0.8rem 0.5rem; font-weight:700;">
-          ${valB.toFixed(2)} ${row.unit}
-          <div style="font-size:0.75rem; color:${diffColor};">${diff > 0 ? '+' : ''}${diff.toFixed(2)} ${row.unit}</div>
+          ${valB.toFixed(2)}${row.unit}
+          <div style="font-size:0.75rem; color:${diffColor}; font-weight:800;">
+            ${diff > 0 ? '+' : ''}${diff.toFixed(2)}${row.unit}
+          </div>
         </td>
       </tr>
     `;
   }).join('');
 
-  const diffTotal = current.totalMaterial - base.totalMaterial;
-  if (Math.abs(diffTotal) < 0.01) {
-    verdict.textContent = "Versions identiques. Modifiez les ingrédients pour comparer !";
+  // 2. Cost Breakdown Analysis
+  if (breakdown) {
+    const matPct = (current.totalMaterial / current.totalFullCost * 100) || 0;
+    const laborPct = (current.laborCost / current.totalFullCost * 100) || 0;
+    const otherPct = 100 - matPct - laborPct;
+    
+    breakdown.innerHTML = `
+      <div style="display:flex; justify-content:space-between; margin-bottom:0.3rem;"><span>Matières</span> <strong>${matPct.toFixed(1)}%</strong></div>
+      <div style="display:flex; justify-content:space-between; margin-bottom:0.3rem;"><span>Main d'œuvre</span> <strong>${laborPct.toFixed(1)}%</strong></div>
+      <div style="display:flex; justify-content:space-between;"><span>Frais / Énergie</span> <strong>${otherPct.toFixed(1)}%</strong></div>
+    `;
+  }
+
+  // 3. Health Indicator & Verdict
+  const diffMargin = current.marginPerPortion - base.marginPerPortion;
+  const diffMaterial = current.totalMaterial - base.totalMaterial;
+  
+  if (Math.abs(diffMargin) < 0.01 && Math.abs(diffMaterial) < 0.01) {
+    healthIcon.textContent = '⚖️';
+    healthLabel.textContent = 'Statut Quo';
+    healthLabel.style.color = 'var(--text-muted)';
+    verdict.textContent = "Aucun changement détecté. Modifiez les quantités ou les prix pour voir l'impact en temps réel.";
     verdict.style.color = "var(--text-muted)";
-  } else if (diffTotal < 0) {
-    verdict.textContent = `✅ Économie de ${Math.abs(diffTotal).toFixed(2)}€ sur le coût matière total !`;
-    verdict.style.color = "var(--success)";
+  } else if (diffMargin > 0) {
+    healthIcon.textContent = '🚀';
+    healthLabel.textContent = 'Rentable';
+    healthLabel.style.color = 'var(--success)';
+    verdict.innerHTML = `L'optimisation actuelle augmente votre profit de <span style="color:var(--success)">+${diffMargin.toFixed(2)}€</span> par portion. <br><small>Continuez ainsi pour maximiser vos marges.</small>`;
+    verdict.style.color = "var(--text)";
   } else {
-    verdict.textContent = `⚠️ Surcoût de ${diffTotal.toFixed(2)}€ par rapport à la référence.`;
-    verdict.style.color = "var(--danger)";
+    healthIcon.textContent = '📉';
+    healthLabel.textContent = 'Alerte';
+    healthLabel.style.color = 'var(--danger)';
+    verdict.innerHTML = `Attention : Cette variation réduit votre marge de <span style="color:var(--danger)">${diffMargin.toFixed(2)}€</span> par portion. <br><small>Vérifiez le coût des nouveaux ingrédients ou ajustez votre prix de vente.</small>`;
+    verdict.style.color = "var(--text)";
   }
 }
 
@@ -1588,6 +1620,7 @@ function loadRecipe(id) {
 
   APP.recipe = JSON.parse(JSON.stringify(recipe));
   APP.margin = recipe.margin || 70;
+  APP.baselineCosts = null;
 
   populateStep1();
 
@@ -2490,6 +2523,7 @@ function newRecipe() {
     advanced: null
   };
   APP.margin = 70;
+  APP.baselineCosts = null;
 
   // Reset initialization state for advanced inputs
   ['advLaborRate', 'advFixedCharges', 'advProductions', 'advEnergy', 'advAmortization'].forEach(id => {
@@ -5171,7 +5205,7 @@ function renderAnnualCalendar() {
         for (let d = 1; d <= 31; d++) {
             if (d > daysInMonth) { html += `<div></div>`; continue; }
             const date = new Date(currentYear, m, d);
-            const dateStr = date.toISOString().split('T')[0];
+            const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
             const mmDd = dateStr.slice(5);
             const isWE = date.getDay() === 0 || date.getDay() === 6;
             const holidayRange = zoneHolidays[currentZone] || zoneHolidays.C;
