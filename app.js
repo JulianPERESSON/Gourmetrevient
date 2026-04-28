@@ -1783,6 +1783,10 @@ const LIBRARY_SORT_ORDER = [
   'Tarte Gourmande',
   'Tarte', 
   'Classique',
+  'Classique Boutique',
+  'Dessert Boutique',
+  'Petits Gâteaux',
+  'Petits Fours',
   'Pâtisserie Régionale',
   'Pâtisserie Toulousaine',
   'Pâte à choux', 
@@ -1793,8 +1797,14 @@ const LIBRARY_SORT_ORDER = [
   'Meringue',
   'Feuilletage',
   'Pâte levée',
+  'Pâte levée feuilletée',
+  'Pâtes levées feuilletées',
   'Brioche', 
   'Viennoiserie', 
+  'Viennoiseries',
+  'Viennoiserie (PLF)',
+  'Viennoiseries (PLF)',
+  'Boulangerie',
   'Chocolaterie',
   'Confiserie'
 ];
@@ -4136,17 +4146,27 @@ function renderStats() {
   const container = document.getElementById('mgmtViewDashboard');
   if (!container || container.style.display === 'none') return;
 
-  if (APP.savedRecipes.length === 0) {
-    // Optional: seed demo if empty, or show empty state
-    // seedDemoData(); 
-  }
+  const saved = APP.savedRecipes || [];
+  const library = typeof RECIPES !== 'undefined' ? RECIPES : [];
+  let recipes = [...saved, ...library];
 
-  let recipes = APP.savedRecipes;
-  if (!recipes || recipes.length === 0) {
-    // Show empty state if no recipes
+  if (recipes.length === 0) {
     const grid = document.querySelector('.stats-main-grid');
-    if (grid) grid.style.opacity = '0.5';
+    if (grid) {
+      grid.style.opacity = '0.5';
+      grid.style.pointerEvents = 'none';
+    }
+    const insightText = document.getElementById('statsInsightText');
+    if (insightText) insightText.innerHTML = "Créez vos premières recettes pour activer l'analyse stratégique.";
+    const vigilanceList = document.getElementById('statsVigilanceList');
+    if (vigilanceList) vigilanceList.innerHTML = '<div style="text-align:center; padding:1rem; color:var(--text-muted); font-size:0.8rem;">Aucune donnée à analyser.</div>';
     return;
+  } else {
+    const grid = document.querySelector('.stats-main-grid');
+    if (grid) {
+      grid.style.opacity = '1';
+      grid.style.pointerEvents = 'auto';
+    }
   }
 
   // Calculate full data for all recipes
@@ -4175,7 +4195,8 @@ function renderStats() {
   }
 
   if (filteredResults.length === 0) {
-    // Handle case where category has no recipes (unlikely but safe)
+    const vigilanceList = document.getElementById('statsVigilanceList');
+    if (vigilanceList) vigilanceList.innerHTML = '<div style="text-align:center; padding:1rem; color:var(--text-muted); font-size:0.8rem;">Aucune recette dans cette catégorie.</div>';
     return;
   }
 
@@ -4449,8 +4470,10 @@ function renderV2Alerts(results) {
 
   if (problematic.length === 0) {
     container.innerHTML = `
-      <div style="text-align:center; padding:2rem; color:var(--text-muted); font-size:0.85rem;">
-        ✅ Toutes vos marges sont au-dessus de ${threshold}%.
+      <div style="text-align:center; padding:1.5rem; background:rgba(34,197,94,0.05); border-radius:15px; border:1px dashed rgba(34,197,94,0.2);">
+        <div style="font-size:1.5rem; margin-bottom:0.5rem;">🎉</div>
+        <div style="color:#166534; font-weight:700; font-size:0.85rem;">Tout est sous contrôle</div>
+        <div style="color:#166534; font-size:0.75rem; opacity:0.8;">Toutes vos marges sont au-dessus de ${threshold}%.</div>
       </div>`;
     return;
   }
