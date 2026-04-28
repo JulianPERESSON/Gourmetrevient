@@ -1028,14 +1028,15 @@
         </div>
       </div>
 
-      <!-- 2. Gestion & Rentabilité -->
+      <!-- 2. Pilotage & Outils -->
       <div class="nav-dropdown">
-        <button class="nav-dropdown-trigger">📈 <span data-i18n="nav.category.analysis">Gestion & Rentabilité</span> <span class="nav-arrow">▼</span></button>
+        <button class="nav-dropdown-trigger">📈 <span data-i18n="nav.category.analysis">Pilotage & Outils</span> <span class="nav-arrow">▼</span></button>
         <div class="nav-dropdown-content">
           <button class="nav-link nav-dropdown-link" id="navStats">📊 <span data-i18n="nav.stats">Dashboard & Statistiques</span></button>
           <button class="nav-link nav-dropdown-link" id="navCatalogue">🌐 <span data-i18n="nav.catalogue">E-Catalogue Client</span></button>
           <button class="nav-link nav-dropdown-link" id="navCRM">🤝 <span data-i18n="nav.crm">Commandes & CRM</span></button>
-          <button class="nav-link nav-dropdown-link" id="navComparator">⚖️ <span data-i18n="nav.comparator">Comparateur de Prix</span></button>
+
+          <button class="nav-link nav-dropdown-link" id="navProTools">🛠️ <span data-i18n="mgmt.tab.protools">Outils Métier</span></button>
         </div>
       </div>
 
@@ -1292,29 +1293,7 @@
       </section>
 
       <div class="mgmt-container hero-mgmt-overlap">
-        <!-- KPI Dashboard Row -->
-        <div class="mgmt-kpi-row">
-          <div class="mgmt-kpi-card kpi-accent">
-            <span class="mgmt-kpi-icon">📋</span>
-            <div class="mgmt-kpi-value" id="mgmtKpiRecipes">0</div>
-            <div class="mgmt-kpi-label" data-i18n="mgmt.kpi.recipes">Recettes Actives</div>
-          </div>
-          <div class="mgmt-kpi-card kpi-success">
-            <span class="mgmt-kpi-icon">📈</span>
-            <div class="mgmt-kpi-value" id="mgmtKpiMargin">—</div>
-            <div class="mgmt-kpi-label" data-i18n="mgmt.kpi.margin">Marge Moyenne</div>
-          </div>
-          <div class="mgmt-kpi-card kpi-danger">
-            <span class="mgmt-kpi-icon">📉</span>
-            <div class="mgmt-kpi-value" id="mgmtKpiWaste">0 €</div>
-            <div class="mgmt-kpi-label" data-i18n="mgmt.kpi.waste">Pertes Cumulées</div>
-          </div>
-          <div class="mgmt-kpi-card kpi-info">
-            <span class="mgmt-kpi-icon">🎯</span>
-            <div class="mgmt-kpi-value" id="mgmtKpiAllergens">0</div>
-            <div class="mgmt-kpi-label" data-i18n="mgmt.kpi.allergens">Allergènes Détectés</div>
-          </div>
-        </div>
+
 
         <!-- Premium Pill Tabs for ERP Hub -->
         <div class="mgmt-tabs-premium">
@@ -1326,10 +1305,7 @@
             <span class="tab-pill-emoji">📅</span>
             <span data-i18n="mgmt.tab.production">Planning Prod</span>
           </button>
-          <button class="mgmt-tab-pill" id="mgmtTabShopping" onclick="switchMgmtTab('shopping')">
-            <span class="tab-pill-emoji">🛒</span>
-            <span data-i18n="mgmt.tab.shopping">Appro & Besoins</span>
-          </button>
+
           <button class="mgmt-tab-pill" id="mgmtTabQuality" onclick="switchMgmtTab('quality')">
             <span class="tab-pill-emoji">🧼</span>
             <span data-i18n="mgmt.tab.quality">Qualité & Pertes</span>
@@ -1648,6 +1624,32 @@
               </div>
             </div>
 
+            <!-- Vitrine Label Card -->
+            <div class="protools-card" onclick="openVitrineLabels()">
+              <div class="protools-card-icon" style="background:rgba(236,72,153,0.1); color:#ec4899;">🏷️</div>
+              <div class="protools-card-body">
+                <h3>Étiquettes de Vitrine</h3>
+                <p>Créez des étiquettes de vente élégantes avec prix, allergènes simplifiés et votre logo.</p>
+              </div>
+              <div class="protools-card-footer">
+                <span class="protools-tag">Marketing & Vente</span>
+                <span class="protools-arrow">→</span>
+              </div>
+            </div>
+
+            <!-- Supply Management Card -->
+            <div class="protools-card" onclick="switchMgmtTab('shopping')">
+              <div class="protools-card-icon" style="background:rgba(59,130,246,0.1); color:#3b82f6;">🛒</div>
+              <div class="protools-card-body">
+                <h3 data-i18n="mgmt.tab.shopping">Approvisionnement</h3>
+                <p data-i18n="mgmt.shopping.desc">Gérez vos besoins matières, planifiez vos commandes et optimisez vos stocks.</p>
+              </div>
+              <div class="protools-card-footer">
+                <span class="protools-tag">Logistique</span>
+                <span class="protools-arrow">→</span>
+              </div>
+            </div>
+
             <!-- Foisonnement Calculator Card -->
             <div class="protools-card" onclick="openFoisonnement()">
               <div class="protools-card-icon" style="background:rgba(245,158,11,0.1); color:#f59e0b;">💨</div>
@@ -1670,6 +1672,19 @@
               </div>
               <div class="protools-card-footer">
                 <span class="protools-tag">Géométrie 3D</span>
+                <span class="protools-arrow">→</span>
+              </div>
+            </div>
+
+            <!-- Inflation Analysis Card -->
+            <div class="protools-card" onclick="window.openInflationComparator()" id="inflCompCard">
+               <div class="protools-card-icon" style="background:rgba(239,68,68,0.1); color:var(--danger);">📈</div>
+               <div class="protools-card-body">
+                  <h3>Analyse Inflation</h3>
+                  <p>Simulez la hausse des prix matières premières et comparez l'impact sur vos marges actuelles.</p>
+               </div>
+               <div class="protools-card-footer">
+                <span class="protools-tag">Simulation Crise</span>
                 <span class="protools-arrow">→</span>
               </div>
             </div>
@@ -1696,29 +1711,6 @@
             </div>
           </div>
 
-          <!-- KPI Row -->
-          <div class="stats-kpi-grid-v2" style="display:grid; grid-template-columns: repeat(4, 1fr); gap:1rem; margin-bottom:2rem;">
-             <div class="v2-kpi-card">
-               <span class="v2-kpi-label">📈 <span data-i18n="stats.kpi.avg_margin">Marge Moyenne</span></span>
-               <span class="v2-kpi-value" id="v2KpiAvgMargin">0%</span>
-               <div class="v2-kpi-footer">Cible: > 70%</div>
-             </div>
-             <div class="v2-kpi-card success">
-               <span class="v2-kpi-label">💎 <span data-i18n="stats.kpi.best_recipe">Star Performeur</span></span>
-               <span class="v2-kpi-value" id="v2KpiBestRecipe" style="font-size:1.4rem;">...</span>
-               <div class="v2-kpi-footer">Top rentabilité</div>
-             </div>
-             <div class="v2-kpi-card info">
-               <span class="v2-kpi-label">⚖️ <span data-i18n="stats.kpi.avg_cost">Coût Moyen</span></span>
-               <span class="v2-kpi-value" id="v2KpiAvgCost" style="font-size:1.8rem;">0.00 €</span>
-               <div class="v2-kpi-footer">Par portion</div>
-             </div>
-             <div class="v2-kpi-card">
-               <span class="v2-kpi-label">🏷️ <span data-i18n="stats.kpi.avg_price">Prix Moyen</span></span>
-               <span class="v2-kpi-value" id="v2KpiAvgPrice" style="font-size:1.8rem;">0.00 €</span>
-               <div class="v2-kpi-footer">Vente HT</div>
-             </div>
-          </div>
 
           <div class="stats-main-grid" style="display:grid; grid-template-columns: 1fr 340px; gap:2rem;">
             <div class="stats-col-left" style="display:flex; flex-direction:column; gap:2rem;">
@@ -1765,10 +1757,7 @@
                </div>
 
                <div style="display:grid; grid-template-columns:1fr; gap:1rem;">
-                  <button class="mgmt-glass-card" style="padding:1.2rem; text-align:left; cursor:pointer;" onclick="switchMgmtTab('boston')">
-                     <h3 style="font-size:0.95rem; margin:0 0 0.3rem 0;">🌀 Matrice BCG</h3>
-                     <p style="font-size:0.75rem; color:var(--text-muted); margin:0;">Équilibre du catalogue.</p>
-                  </button>
+
                   <button class="mgmt-glass-card" style="padding:1.2rem; text-align:left; cursor:pointer;" onclick="switchMgmtTab('inflation')">
                      <h3 style="font-size:0.95rem; margin:0 0 0.3rem 0;">🔥 Simulateur Inflation</h3>
                      <p style="font-size:0.75rem; color:var(--text-muted); margin:0;">Impact hausse matières.</p>
@@ -4366,8 +4355,7 @@
     }
 
     function showStats() {
-      showMgmt();
-      switchMgmtTab('dashboard');
+      showMgmt('dashboard');
     }
 
     const headerBrand = document.getElementById('headerBrand');
@@ -4383,8 +4371,18 @@
     }
 
     function showProTools() {
-      showMgmt();
-      switchMgmtTab('protools');
+      showMgmt('protools');
+    }
+
+    function openPriceComparator() {
+      if (typeof APP !== 'undefined' && !APP.baselineCosts && typeof calcFullCost === 'function') {
+        APP.baselineCosts = JSON.parse(JSON.stringify(calcFullCost(APP.margin)));
+      }
+      const modal = document.getElementById('comparatorModal');
+      if (modal) {
+        modal.style.display = 'flex';
+        if (typeof updateComparator === 'function') updateComparator();
+      }
     }
 
 
@@ -4517,7 +4515,7 @@
   <!-- Core Scripts -->
   <script src="./data.js?v=2.2.6"></script>
   <script src="./i18n.js?v=3.6.2"></script>
-  <script src="./app.js?v=2.6.2"></script>
+  <script src="./app.js?v=2.6.3"></script>
   <script src="./pro-features.js?v=1.0.8"></script>
   <script src="./equipment.js?v=2.1.1"></script>
   <script src="./lab-logic.js?v=2.1.1"></script>
@@ -4592,16 +4590,7 @@
           'navShopping': () => showMgmt('shopping'),
           'navWaste': () => showMgmt('quality'),
           'navTrace': () => showHygiene('trace'),
-          'navComparator': () => {
-            if (typeof APP !== 'undefined' && !APP.baselineCosts && typeof calcFullCost === 'function') {
-                APP.baselineCosts = JSON.parse(JSON.stringify(calcFullCost(APP.margin)));
-            }
-            const modal = document.getElementById('comparatorModal');
-            if (modal) {
-                modal.style.display = 'flex';
-                if (typeof updateComparator === 'function') updateComparator();
-            }
-          },
+          'navComparator': openPriceComparator,
           'navProTools': showProTools, 'mLinkProTools': showProTools,
           'navCrmClients': () => showCRM('clients'),
           'navCrmOrders': () => showCRM('orders'),
@@ -4755,7 +4744,7 @@
           { id: 'mLinkScheduler', icon: '🎓', label: 'nav.scheduler', action: showScheduler }
         ];
       } else if (category === 'pilotage') {
-        moreMenuTitle.textContent = "📈 Gestion & Rentabilité";
+        moreMenuTitle.textContent = "📈 Pilotage & Outils";
         items = [
           { id: 'mLinkStats', icon: '📊', label: 'nav.stats', action: showStats },
           { id: 'mLinkCatalogue', icon: '🌐', label: 'nav.catalogue', action: generateECatalogue },
@@ -4772,9 +4761,9 @@
           { id: 'mLinkAbout', icon: '📖', label: 'nav.about', action: showAPropos }
         ];
       } else if (category === 'more') {
-        moreMenuTitle.textContent = "🧰 Outils Pro";
+        moreMenuTitle.textContent = "🧰 Outils Métier";
         items = [
-          { id: 'mLinkProTools', icon: '🧰', label: 'nav.protools', action: showProTools }
+          { id: 'mLinkProTools', icon: '🧰', label: 'mgmt.tab.protools', action: showProTools }
         ];
       }
 
@@ -5194,7 +5183,7 @@
   <!-- ======================================================== -->
   <!-- ANALYTICS INTERACTIF + PWA OFFLINE MANAGER               -->
   <!-- ======================================================== -->
-  <script src="./analytics-interactive.js?v=3.0.0"></script>
+  <script src="./analytics-interactive.js?v=3.0.1"></script>
 
   <script>
     // ── Gestion des raccourcis PWA (URL params) ──────────────────────────────
