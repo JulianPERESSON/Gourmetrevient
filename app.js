@@ -2945,7 +2945,7 @@ function checkAuth() {
         $('#btnAuthSubmit').textContent = t('auth.btn.continue');
         $('#btnAuthSubmit').style.display = 'block';
         $('#genderSelection').style.display = 'none';
-        if ($('#subscribePrompt')) $('#subscribePrompt').style.display = 'block';
+        if ($('#subscribePrompt')) $('#subscribePrompt').style.display = 'none';
       }
       $('#authError').style.display = 'none';
     };
