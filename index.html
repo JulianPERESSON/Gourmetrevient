@@ -14,11 +14,19 @@
   <link rel="alternate" hreflang="es" href="https://julianperesson.github.io/Gourmetrevient/?lang=es" />
   <link rel="alternate" hreflang="x-default" href="https://julianperesson.github.io/Gourmetrevient/" />
   <link rel="manifest" href="./manifest.json?v=1.0.1" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧁</text></svg>">
   <meta name="theme-color" content="#10b981" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="GourmetRev" />
   <link rel="apple-touch-icon" href="./img/macaron.jpg" />
+
+  <!-- 🔐 CYBERSÉCURITÉ : Headers de protection -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://js.stripe.com 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; connect-src 'self' https://hogfrddigcojdmjjpbno.supabase.co https://api.stripe.com; frame-src https://js.stripe.com; object-src 'none'; upgrade-insecure-requests;">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="X-Frame-Options" content="DENY">
+  <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), payment=(self)">
 
   <!-- Cache Control: Force version check -->
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
@@ -56,8 +64,12 @@
   <link rel="stylesheet" href="./css/master-converter.css?v=2.1.0" />
   <link rel="stylesheet" href="./css/premium-effects.css?v=2.1.0" />
   <link rel="stylesheet" href="./css/commercial-features.css?v=2.1.0" />
+  <link rel="stylesheet" href="./css/auth-premium.css" />
+  <link rel="stylesheet" href="./css/rgpd-banner.css" />
   <!-- Libraries for new features -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Supabase SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.43.2"></script>
   <!-- Chart.js Zoom Plugin (nécessite hammer.js) -->
   <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1/dist/chartjs-plugin-zoom.min.js"></script>
@@ -925,8 +937,7 @@
 
         <div class="form-group" id="pinGroup">
           <label data-i18n="auth.label.pin">Code PIN</label>
-          <input type="password" id="authPin" class="form-input" placeholder="••••" maxlength="4" autocomplete="off"
-            inputmode="numeric">
+          <input type="password" id="authPin" class="form-input" placeholder="••••••••" autocomplete="off">
         </div>
 
         <!-- Info message for registration -->
@@ -956,39 +967,18 @@
 
         <button id="btnAuthSubmit" class="btn btn-primary btn-full" style="margin-top: 1.5rem;"
           data-i18n="auth.btn.login">Se connecter</button>
+
+        <!-- CTA Abonnement — visible uniquement en mode inscription -->
+        <div id="subscribePrompt" style="display:none; margin-top:1.25rem; padding:1rem 1.25rem; background:linear-gradient(135deg, rgba(99,102,241,0.08), rgba(16,185,129,0.08)); border:1px solid rgba(99,102,241,0.2); border-radius:var(--radius-sm); text-align:center;">
+          <div style="font-size:1.1rem; margin-bottom:0.3rem;">👨‍🍳 <strong style="color:var(--primary);">Pro Chef</strong></div>
+          <div style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:0.85rem;">Recettes illimitées · Cloud · CRM · Analytics — <strong>14,99 €/mois</strong></div>
+          <button onclick="window.GourmetBilling.checkout('pro_monthly')" class="btn btn-primary btn-full" style="font-size:0.9rem; padding:0.75rem;">
+            ✨ S'abonner au plan Pro
+          </button>
+          <div style="font-size:0.72rem; color:var(--text-muted); margin-top:0.6rem;">Paiement sécurisé par Stripe · Résiliable à tout moment</div>
+        </div>
       </div>
     </div>
-
-    <!-- SEO & Public Content (Visible to Search Engines) -->
-    <div class="public-marketing-container">
-      <section class="marketing-intro">
-        <h2 data-i18n="auth.marketing.title">L'outil de gestion indispensable pour les Artisans Pâtissiers</h2>
-        <p data-i18n="auth.marketing.desc">GourmetRevient vous accompagne dans la rentabilité de votre entreprise, de la
-          création de la fiche technique à l'agencement de votre laboratoire.</p>
-
-        <div class="marketing-grid">
-          <div class="marketing-item">
-            <span class="m-icon" aria-hidden="true">💰</span>
-            <h3 data-i18n="auth.marketing.feat1.title">Calcul du Coût de Revient</h3>
-            <p data-i18n="auth.marketing.feat1.desc">Maîtrisez vos marges en calculant précisément le coût matière de
-              chaque ingrédient et le prix de vente conseillé.</p>
-          </div>
-          <div class="marketing-item">
-            <span class="m-icon" aria-hidden="true">📐</span>
-            <h3 data-i18n="auth.marketing.feat2.title">Agencement Labo 2D</h3>
-            <p data-i18n="auth.marketing.feat2.desc">Optimisez votre espace de travail avec notre outil de placement
-              automatique du matériel professionnel.</p>
-          </div>
-          <div class="marketing-item">
-            <span class="m-icon" aria-hidden="true">📅</span>
-            <h3 data-i18n="auth.marketing.feat3.title">Planning & Équipe</h3>
-            <p data-i18n="auth.marketing.feat3.desc">Gérez les présences et les congés de votre brigade avec un
-              calendrier visuel intelligent adapté à votre zone scolaire.</p>
-          </div>
-        </div>
-      </section>
-    </div>
-  </div>
 
   <!-- Header -->
   <header class="app-header">
@@ -3419,10 +3409,16 @@
     <!-- ADMIN USER MANAGEMENT -->
     <section id="appAdmin" style="display:none; padding: 2rem 1.5rem; max-width: 1200px; margin: 0 auto;">
       <div class="card">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2rem;">
-          <h2 class="dash-greeting" data-i18n="admin.title">Gestion des <span class="accent">Utilisateurs</span></h2>
-          <div style="font-size: 0.9rem; color: var(--text-muted);" data-i18n="admin.subtitle">Accès réservé
-            Administrateur</div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2rem; flex-wrap:wrap; gap:1rem;">
+          <div>
+            <h2 class="dash-greeting" data-i18n="admin.title">Gestion des <span class="accent">Utilisateurs</span></h2>
+            <div style="font-size: 0.85rem; color: var(--text-muted); margin-top:0.2rem;" data-i18n="admin.subtitle">Accès réservé Administrateur</div>
+          </div>
+          <div style="display:flex; gap:0.75rem;">
+            <a href="legal.html" target="_blank" class="btn btn-sm btn-outline" style="display:flex; align-items:center; gap:0.5rem; text-decoration:none;">
+              <span>⚖️</span> <span data-i18n="admin.link.legal">Mentions Légales</span>
+            </a>
+          </div>
         </div>
 
         <div class="table-container" style="overflow-x:auto;">
@@ -4515,6 +4511,12 @@
   <!-- Core Scripts -->
   <script src="./data.js?v=2.2.6"></script>
   <script src="./i18n.js?v=3.6.2"></script>
+  <script src="./security.js"></script>
+  <script src="./supabase-config.js"></script>
+  <script src="./auth-ui.js"></script>
+  <script src="./billing.js"></script>
+  <script src="./cloud-sync.js"></script>
+  <script src="./rgpd-banner.js"></script>
   <script src="./app.js?v=2.6.3"></script>
   <script src="./pro-features.js?v=1.0.8"></script>
   <script src="./equipment.js?v=2.1.1"></script>

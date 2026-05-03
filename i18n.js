@@ -24,10 +24,10 @@ const TRANSLATIONS = {
         'auth.desc.gender': 'Choisissez votre avatar pour personnaliser votre espace.',
         'auth.label.username': "Nom d'utilisateur",
         'auth.placeholder.username': 'Votre prénom',
-        'auth.label.pin': 'Code PIN',
+        'auth.label.pin': 'Mot de passe',
         'auth.btn.login': 'Se connecter',
         'auth.btn.continue': 'Continuer',
-        'auth.register.info': 'Par défaut, votre code PIN sera <strong>0000</strong>. Vous pourrez le modifier à tout moment dans votre <strong>profil</strong>.',
+        'auth.register.info': 'Choisissez un mot de passe robuste (min 8 caractères, majuscule, chiffre et symbole) pour sécuriser vos données.',
         'auth.marketing.title': "L'outil de gestion indispensable pour les Artisans Pâtissiers",
         'auth.marketing.desc': "GourmetRevient vous accompagne dans la rentabilité de votre entreprise, de la création de la fiche technique à l'agencement de votre laboratoire.",
         'auth.marketing.feat1.title': "💰 Calcul du Coût de Revient",
@@ -42,7 +42,7 @@ const TRANSLATIONS = {
         'auth.error.default': 'Identifiants incorrects.',
         'auth.error.empty': 'Veuillez entrer un nom.',
         'auth.error.unknown': 'Utilisateur inconnu. Veuillez vous inscrire.',
-        'auth.error.pin': 'Code PIN incorrect.',
+        'auth.error.pin': 'Mot de passe incorrect.',
         'auth.error.banned': 'Ce compte a été suspendu par un administrateur.',
         'auth.error.taken': "Ce nom d'utilisateur est déjà pris.",
 
@@ -108,7 +108,7 @@ const TRANSLATIONS = {
         'nav.comparator': 'Comparateur Multi-Périodes',
         'nav.catalogue': 'E-Catalogue Client',
         'nav.crm': 'Clients & Ventes (CRM)',
-        'nav.category.analysis': "Croissance & Analyse",
+        'nav.category.analysis': "Pilotage & Outils",
 
         // Library & Search
         'search.placeholder': 'Rechercher une recette...',
@@ -715,9 +715,9 @@ const TRANSLATIONS = {
         'modal.off.desc': "Recherchez un ingrédient via la base de données universelle.",
         'modal.off.close': "Annuler",
         'modal.pin.title': '🔑 Sécurité du compte',
-        'modal.pin.desc': 'Modifiez votre code PIN pour sécuriser vos recettes personnelles.',
-        'modal.pin.new': 'Nouveau Code PIN (4 chiffres)',
-        'modal.pin.confirm': 'Confirmez le nouveau PIN',
+        'modal.pin.desc': 'Modifiez votre mot de passe pour sécuriser vos recettes personnelles.',
+        'modal.pin.new': 'Nouveau Mot de passe',
+        'modal.pin.confirm': 'Confirmez le mot de passe',
         'modal.pin.email': 'Email (Optionnel)',
         'modal.pin.role': 'Mon Rôle par défaut',
         'modal.pin.gender': 'Changer mon genre',
@@ -734,6 +734,7 @@ const TRANSLATIONS = {
 
         // Admin
         'admin.title': 'Gestion des <span class="accent">Utilisateurs</span>',
+        'admin.link.legal': 'Mentions Légales',
         'admin.subtitle': 'Accès réservé Administrateur',
         'admin.col.user': 'Utilisateur',
         'admin.col.email': 'Email',
@@ -757,8 +758,8 @@ const TRANSLATIONS = {
         'toast.recipe.name_required': 'Veuillez indiquer un nom de recette.',
         'toast.recipe.saved': 'Recette sauvegardée !',
         'toast.profile.updated': 'Profil mis à jour !',
-        'toast.pin.short': 'Le PIN doit faire 4 chiffres.',
-        'toast.pin.mismatch': 'Les codes PIN ne correspondent pas.',
+        'toast.pin.short': 'Le mot de passe doit contenir au moins 8 caractères, une majuscule, un chiffre et un symbole.',
+        'toast.pin.mismatch': 'Les mots de passe ne correspondent pas.',
         'toast.pdf.preparing': 'Préparation du PDF :',
         'toast.pdf.done': 'Fiche technique téléchargée !',
         'toast.pdf.error': "Erreur lors de l'export.",
@@ -1692,7 +1693,7 @@ const TRANSLATIONS = {
         'nav.catalogue': 'Client E-Catalogue',
         'nav.crm': 'Clients & Sales (CRM)',
         'nav.category.mgmt': "Steering & Lab",
-        'nav.category.analysis': "Growth & Analysis",
+        'nav.category.analysis': "Steering & Tools",
 
         // Library & Search
         'search.placeholder': 'Search for a recipe...',
@@ -2418,6 +2419,7 @@ const TRANSLATIONS = {
         'modal.admin.delete': '🗑️ Delete account',
 
         'admin.title': 'Manage <span class="accent">Users</span>',
+        'admin.link.legal': 'Legal Mentions',
         'admin.subtitle': 'Administrator access only',
         'admin.col.user': 'User',
         'admin.col.email': 'Email',
@@ -3272,7 +3274,7 @@ const TRANSLATIONS = {
         'nav.inflation': 'Simulador de Inflación',
         'nav.comparator': 'Comparador Multi-Período',
         'nav.catalogue': 'E-Catálogo de Clientes',
-        'nav.category.analysis': 'Análisis y Rendimiento',
+        'nav.category.analysis': 'Pilotaje y Herramientas',
 
         // Gestión Pro
         'mgmt.hero.badge': '💎 Excelencia Operativa',
@@ -4032,6 +4034,7 @@ const TRANSLATIONS = {
         'modal.admin.delete': '🗑️ Eliminar cuenta',
 
         'admin.title': 'Gestión de <span class="accent">Usuarios</span>',
+        'admin.link.legal': 'Avisos Legales',
         'admin.subtitle': 'Acceso reservado para Administradores',
         'admin.col.user': 'Usuario',
         'admin.col.email': 'Email',

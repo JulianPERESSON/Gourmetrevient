@@ -164,7 +164,10 @@ window.hydratePremiumDashboard = function () {
     }
     
     const welcomeNameEl = document.getElementById('welcomeUserName');
-    if (welcomeNameEl) welcomeNameEl.textContent = currUser;
+    if (welcomeNameEl) {
+        const displayName = currUser.replace(/[\s-]*2503.*$/i, '');
+        welcomeNameEl.textContent = displayName;
+    }
 
     // 2. Metrics Calculation
     let totalMargin = 0;

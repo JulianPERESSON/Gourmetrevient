@@ -3,7 +3,7 @@
 // Stratégie : Cache-First pour assets statiques + Offline Queue pour mutations
 // =============================================================================
 
-const CACHE_VERSION = '3.0.6';
+const CACHE_VERSION = '3.1.0'; // Sécurité + RGPD
 const CACHE_STATIC  = `gourmet-static-v${CACHE_VERSION}`;
 const CACHE_RUNTIME = `gourmet-runtime-v${CACHE_VERSION}`;
 const SYNC_TAG      = 'gourmet-sync-recipes';
@@ -31,6 +31,11 @@ const PRECACHE_ASSETS = [
   './commercial-features.js',
   './manifest.json',
   './analytics-interactive.js',
+  './security.js',
+  './supabase-config.js',
+  './auth-ui.js',
+  './rgpd-banner.js',
+  './legal.html',
   './css/premium-branding.css',
   './css/creative-tools.css',
   './css/master-converter.css',

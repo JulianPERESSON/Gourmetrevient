@@ -83,7 +83,7 @@ const RECIPES = [
   {
     id: 'paris-brest',
     name: 'Paris-Brest',
-    category: 'Pâte à choux',
+    category: 'Petits Gâteaux',
     portions: 10,
     prepTime: 30,
     cookTime: 35,
@@ -142,7 +142,7 @@ const RECIPES = [
   {
     id: 'saint-honore',
     name: 'Saint-Honoré',
-    category: 'Choux & Feuilletage',
+    category: 'Entremets',
     portions: 10,
     prepTime: 50,
     cookTime: 40,
@@ -253,7 +253,7 @@ const RECIPES = [
   {
     id: 'eclair',
     name: 'Éclair au chocolat',
-    category: 'Pâte à choux',
+    category: 'Petits Gâteaux',
     portions: 10,
     prepTime: 25,
     cookTime: 30,
@@ -282,7 +282,7 @@ const RECIPES = [
   {
     id: 'baba-au-rhum',
     name: 'Baba au rhum',
-    category: 'Pâte levée',
+    category: 'Viennoiserie',
     portions: 10,
     prepTime: 50,
     cookTime: 25,
@@ -312,7 +312,7 @@ const RECIPES = [
   {
     id: 'macaron',
     name: 'Macaron',
-    category: 'Meringue',
+    category: 'Petits Fours',
     portions: 10,
     prepTime: 60,
     cookTime: 14,
@@ -424,7 +424,7 @@ const RECIPES = [
   {
     id: 'eclair-cafe',
     name: 'Éclair au café',
-    category: 'Pâte à choux',
+    category: 'Petits Gâteaux',
     portions: 10,
     prepTime: 60,
     cookTime: 30,
@@ -453,7 +453,7 @@ const RECIPES = [
   {
     id: 'baba-cointreau-poire',
     name: 'Verrine Baba Cointreau Poires Spéculoos',
-    category: 'Dessert à l\'assiette',
+    category: 'Dessert Boutique',
     portions: 10,
     prepTime: 75,
     cookTime: 15,
@@ -512,7 +512,7 @@ const RECIPES = [
   {
     id: 'tarte-fruits-rouges-fleur',
     name: 'Tarte Fleur Fruits Rouges',
-    category: 'Tarte Fruits',
+    category: 'Tarte Signature',
     portions: 10,
     prepTime: 95,
     cookTime: 25,
@@ -540,7 +540,7 @@ const RECIPES = [
   {
     id: 'tarte-praline-fleur',
     name: 'Tarte Praliné Fleur',
-    category: 'Tarte Gourmande',
+    category: 'Tarte Signature',
     portions: 10,
     prepTime: 85,
     cookTime: 20,
@@ -567,7 +567,7 @@ const RECIPES = [
   {
     id: 'tarte-framboise-pistache-fleur',
     name: 'Tarte Framboise Pistache Fleur',
-    category: 'Tarte Fruits',
+    category: 'Tarte Signature',
     portions: 10,
     prepTime: 120,
     cookTime: 30,
@@ -644,7 +644,7 @@ const RECIPES = [
   {
     id: 'flan-patissier',
     name: 'Flan Pâtissier',
-    category: 'Classique',
+    category: 'Classique Boutique',
     portions: 10,
     prepTime: 40,
     cookTime: 50,
@@ -672,7 +672,7 @@ const RECIPES = [
   {
     id: 'religieuse-chocolat',
     name: 'Religieuse au Chocolat',
-    category: 'Pâte à choux',
+    category: 'Petits Gâteaux',
     portions: 10,
     prepTime: 35,
     cookTime: 35,
@@ -805,7 +805,7 @@ const RECIPES = [
   {
     id: 'kouign-amann',
     name: 'Kouign-Amann',
-    category: 'Viennoiserie',
+    category: 'Viennoiserie (PLF)',
     portions: 10,
     prepTime: 120,
     cookTime: 30,
@@ -831,7 +831,7 @@ const RECIPES = [
   {
     id: 'tropezienne',
     name: 'Tarte Tropézienne',
-    category: 'Brioche',
+    category: 'Viennoiserie',
     portions: 10,
     prepTime: 120,
     cookTime: 20,
@@ -911,7 +911,7 @@ const RECIPES = [
   {
     id: 'salambo',
     name: 'Salambo',
-    category: 'Pâte à choux',
+    category: 'Petits Gâteaux',
     portions: 10,
     prepTime: 25,
     cookTime: 35,
@@ -1123,7 +1123,7 @@ const RECIPES = [
   {
     id: 'brioche-feuilletee',
     name: 'Brioche Feuilletée (Suisse)',
-    category: 'Viennoiserie',
+    category: 'Viennoiserie (PLF)',
     portions: 10,
     prepTime: 220,
     cookTime: 18,
@@ -1392,7 +1392,7 @@ const VIENNOISERIES = [
   {
     id: 'croissant',
     name: 'Croissant',
-    category: 'Viennoiserie',
+    category: 'Viennoiserie (PLF)',
     portions: 10,
     prepTime: 20,
     cookTime: 12,
@@ -1419,7 +1419,7 @@ const VIENNOISERIES = [
   {
     id: 'crabe-art-boulanger',
     name: 'Mister Crabe 🦀🎀',
-    category: 'Pâte à pain',
+    category: 'Boulangerie',
     portions: 1,
     prepTime: 120,
     cookTime: 25,
@@ -1443,7 +1443,7 @@ const VIENNOISERIES = [
   {
     id: 'pain-au-chocolat',
     name: 'Chocolatine',
-    category: 'Viennoiserie',
+    category: 'Viennoiserie (PLF)',
     portions: 10,
     prepTime: 180,
     cookTime: 18,

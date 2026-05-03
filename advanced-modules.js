@@ -502,19 +502,7 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
       `);
 
-      proToolsGrid.insertAdjacentHTML('beforeend', `
-        <div class="protools-card" onclick="openVitrineLabels()" id="vitrineProCard">
-          <div class="protools-card-icon" style="background:rgba(99,102,241,0.10); color:var(--accent-dark);">🏷️</div>
-          <div class="protools-card-body">
-            <h3>Étiquettes Vitrine</h3>
-            <p>Générez des étiquettes élégantes avec QR code pour votre vitrine. Le client scanne pour voir allergènes et composition.</p>
-          </div>
-          <div class="protools-card-footer">
-            <span class="protools-tag">Marketing</span>
-            <span class="protools-arrow">→</span>
-          </div>
-        </div>
-      `);
+
     }
     
     // Check margin alerts after everything is loaded
@@ -560,16 +548,20 @@ window.openVitrineLabels = function() {
         <button class="btn btn-sm btn-outline" onclick="toggleAllVitrineCheckboxes(false)">❌ Tout désélectionner</button>
       </div>
       
-      <div id="vitrineRecipeList" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(250px, 1fr)); gap:0.8rem; margin-bottom:1.5rem;">
+      <div id="vitrineRecipeList" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:1rem; margin-bottom:2rem;">
         ${allRecipes.map((r, i) => {
-          const costs = typeof calcFullCost === 'function' ? calcFullCost(r.margin || 70, r) : {};
-          const price = typeof applySmartPricing === 'function' ? applySmartPricing(costs.sellPriceHT || 0) : (costs.sellPriceHT || 0).toFixed(2);
+          const margin = r.margin || (typeof APP !== 'undefined' && APP.margin) || 75;
+          const costs = typeof calcFullCost === 'function' ? calcFullCost(margin, r) : {};
+          const rawPrice = costs.sellingPrice || 0;
+          const priceTTC = rawPrice * 1.055; 
+          const smartPrice = typeof applySmartPricing === 'function' ? applySmartPricing(priceTTC) : priceTTC;
+          const displayPrice = smartPrice.toFixed(2).replace('.', ',');
           return `
-            <label style="display:flex; align-items:center; gap:0.6rem; padding:0.7rem; background:var(--bg-alt); border-radius:var(--radius-sm); cursor:pointer; border:1px solid var(--surface-border); transition:all 0.2s;">
-              <input type="checkbox" class="vitrine-check" value="${i}" checked style="width:18px; height:18px; accent-color:var(--accent);">
-              <div>
-                <div style="font-weight:700; font-size:0.85rem;">${r.name}</div>
-                <div style="font-size:0.75rem; color:var(--text-muted);">${price} € · ${r.category || ''}</div>
+            <label class="vitrine-item-card" style="display:flex; align-items:center; gap:0.8rem; padding:1rem; background:var(--surface); border-radius:12px; cursor:pointer; border:1px solid var(--surface-border); transition:all 0.2s;">
+              <input type="checkbox" class="vitrine-check" value="${i}" checked style="width:20px; height:20px; accent-color:var(--accent);">
+              <div style="flex:1;">
+                <div style="font-weight:700; font-size:0.9rem; color:var(--text);">${r.name}</div>
+                <div style="font-size:0.8rem; color:var(--text-muted); font-weight:600;">${displayPrice} € TTC <span style="opacity:0.6; font-weight:400; margin-left:4px;">· ${r.category || ''}</span></div>
               </div>
             </label>`;
         }).join('')}
@@ -603,18 +595,21 @@ window.generateVitrineLabels = function() {
   const allRecipes = [...savedRecs, ...libRecs];
   const shopName = localStorage.getItem('gourmet_current_user') || 'Mon Atelier';
   
-  const ALLERGEN_MAP = {
-    'gluten': ['farine', 'blé', 'semoule', 'maïzena', 'fondant', 'spéculoos', 'biscuit'],
-    'œufs': ['œuf', 'oeuf', 'jaune', 'blanc'],
-    'lait': ['lait', 'beurre', 'crème', 'mascarpone', 'fromage'],
-    'fruits à coque': ['amande', 'noisette', 'pistache', 'noix', 'praliné'],
-    'soja': ['lécithine', 'soja'],
-  };
-  
   function detectAllergens(recipe) {
     const allergens = new Set();
+    const ALLERGEN_MAP = {
+      'Gluten': ['farine', 'blé', 'ble', 'semoule', 'maïzena', 'fondant', 'spéculoos', 'biscuit', 'seigle', 'orge', 'avoine'],
+      'Œufs': ['œuf', 'oeuf', 'jaune', 'blanc', 'albumine'],
+      'Lait': ['lait', 'beurre', 'crème', 'creme', 'mascarpone', 'fromage', 'yaourt', 'lacto', 'caséine'],
+      'Fruits à coque': ['amande', 'noisette', 'pistache', 'noix', 'praliné', 'pignon', 'pecan', 'macadamia', 'cajou'],
+      'Soja': ['lécithine', 'soja', 'tonka'],
+      'Arachides': ['arachide', 'cacahuète', 'beurre de cacahuète'],
+      'Sésame': ['sésame', 'sesame', 'tahini'],
+      'Poissons': ['poisson', 'gélatine de poisson'],
+      'Sulfites': ['vin', 'sirop d\'érable', 'fruits confits', 'vinaigre']
+    };
     (recipe.ingredients || []).forEach(ing => {
-      const name = ing.name.toLowerCase();
+      const name = (ing.name || '').toLowerCase();
       for (const [allergen, keywords] of Object.entries(ALLERGEN_MAP)) {
         if (keywords.some(k => name.includes(k))) allergens.add(allergen);
       }
@@ -622,51 +617,21 @@ window.generateVitrineLabels = function() {
     return [...allergens];
   }
   
-  // Simple QR Code generator using Canvas (minimal — encodes a short URL as a visual pattern)
-  function generateMiniQR(text) {
-    // We'll generate a simple data-matrix like pattern as a visual QR placeholder
-    // For production, you'd use a proper QR library
-    const canvas = document.createElement('canvas');
-    canvas.width = 100;
-    canvas.height = 100;
-    const ctx = canvas.getContext('2d');
-    
-    // White background
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, 100, 100);
-    
-    // Draw finder patterns (corners)
-    function drawFinder(x, y) {
-      ctx.fillStyle = '#000';
-      ctx.fillRect(x, y, 21, 21);
-      ctx.fillStyle = '#fff';
-      ctx.fillRect(x+3, y+3, 15, 15);
-      ctx.fillStyle = '#000';
-      ctx.fillRect(x+6, y+6, 9, 9);
-    }
-    drawFinder(4, 4);
-    drawFinder(75, 4);
-    drawFinder(4, 75);
-    
-    // Generate semi-random data modules from the text hash
-    let hash = 0;
-    for (let i = 0; i < text.length; i++) {
-      hash = ((hash << 5) - hash) + text.charCodeAt(i);
-      hash |= 0;
-    }
-    
-    ctx.fillStyle = '#000';
-    for (let row = 0; row < 10; row++) {
-      for (let col = 0; col < 10; col++) {
-        if ((row < 3 && col < 3) || (row < 3 && col > 6) || (row > 6 && col < 3)) continue;
-        const bit = ((hash >> ((row * 10 + col) % 31)) & 1);
-        if (bit) {
-          ctx.fillRect(4 + col * 9.2, 4 + row * 9.2, 7, 7);
-        }
-      }
-    }
-    
-    return canvas.toDataURL('image/png');
+  // Function to update placeholders with real QR codes using the library
+  function renderRealQRs() {
+    document.querySelectorAll('.vitrine-qr-target').forEach(el => {
+      if (el.dataset.rendered === '1') return;
+      el.innerHTML = '';
+      new QRCode(el, {
+        text: el.dataset.url,
+        width: 60,
+        height: 60,
+        colorDark: "#1a1b1e",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.H
+      });
+      el.dataset.rendered = '1';
+    });
   }
   
   let labelsHTML = '';
@@ -676,50 +641,72 @@ window.generateVitrineLabels = function() {
     const r = allRecipes[idx];
     if (!r) return;
     
-    const costs = typeof calcFullCost === 'function' ? calcFullCost(r.margin || 70, r) : {};
-    const price = typeof applySmartPricing === 'function' ? applySmartPricing(costs.sellPriceHT || 0) : (costs.sellPriceHT || 0).toFixed(2);
+    const margin = r.margin || (typeof APP !== 'undefined' && APP.margin) || 75;
+    const costs = typeof calcFullCost === 'function' ? calcFullCost(margin, r) : {};
+    
+    // Calculate Public Price (TTC) with 5.5% VAT
+    const priceHT = costs.sellingPrice || 0;
+    const priceTTC = priceHT * 1.055;
+    
+    // Applying the new Bakery-Smart pricing
+    const smartPrice = typeof applySmartPricing === 'function' ? applySmartPricing(priceTTC) : priceTTC;
+    const finalPrice = smartPrice.toFixed(2).replace('.', ',');
+    
     const allergens = detectAllergens(r);
-    const qrData = `https://gourmetrevient.github.io/?product=${encodeURIComponent(r.id || r.name)}`;
-    const qrImage = generateMiniQR(qrData);
+    const qrData = `https://julianperesson.github.io/Gourmetrevient/?product=${encodeURIComponent(r.name)}`;
     const nutri = typeof calculateNutriScore === 'function' ? calculateNutriScore(r) : null;
+    
+    const portions = parseInt(r.portions) || 10;
+    const isSingle = portions <= 1;
     
     labelsHTML += `
       <div class="vitrine-label" style="
-        width: 280px; min-height: 160px; padding: 16px 18px; 
-        background: #fdfbf7; border: 2px solid #e8ddd0; border-radius: 12px;
-        display: flex; flex-direction: column; gap: 6px; page-break-inside: avoid;
+        width: 320px; min-height: 180px; padding: 20px; 
+        background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px;
+        display: flex; flex-direction: column; gap: 8px; page-break-inside: avoid;
         font-family: 'Inter', sans-serif; position: relative; overflow: hidden;
-        box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+        box-shadow: 0 4px 20px rgba(0,0,0,0.06); margin-bottom: 1rem;
       ">
-        <div style="position:absolute; top:0; left:0; right:0; height:3px; background:linear-gradient(90deg, #6366f1, #818cf8, #6366f1);"></div>
+        <div style="position:absolute; top:0; left:0; right:0; height:4px; background:linear-gradient(90deg, #10b981, #3b82f6);"></div>
         
         <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-          <div style="flex:1;">
-            <div style="font-size:0.6rem; text-transform:uppercase; letter-spacing:0.15em; color:#a0917a; font-weight:600;">${r.category || 'Pâtisserie'}</div>
-            <div style="font-size:1.1rem; font-weight:800; color:#1a1b1e; line-height:1.2; margin-top:2px; font-family:'Outfit',sans-serif;">${r.name}</div>
+          <div style="flex:1; padding-right:10px;">
+            <div style="font-size:0.65rem; text-transform:uppercase; letter-spacing:0.12em; color:#64748b; font-weight:700; margin-bottom:2px;">${r.category || 'Pâtisserie'}</div>
+            <div style="font-size:1.25rem; font-weight:800; color:#0f172a; line-height:1.2; font-family:'Outfit',sans-serif;">${r.name}</div>
           </div>
-          <img src="${qrImage}" alt="QR" style="width:52px; height:52px; border-radius:4px; border:1px solid #e8ddd0; flex-shrink:0; margin-left:8px;">
+          <div class="vitrine-qr-target" data-url="${qrData}" style="width:60px; height:60px; flex-shrink:0; background:#f8fafc; border-radius:8px; border:1px solid #f1f5f9; display:flex; align-items:center; justify-content:center;"></div>
         </div>
         
-        <div style="font-size:1.6rem; font-weight:200; color:#1a1b1e; letter-spacing:0.08em; font-family:'Outfit',sans-serif;">
-          ${price} <span style="font-size:0.8rem; font-weight:600;">€</span>
-          ${nutri ? `<span style="display:inline-flex; align-items:center; margin-left:8px; vertical-align:middle;">
-            <span style="width:22px; height:22px; border-radius:50%; background:${nutri.color}; color:white; display:inline-flex; align-items:center; justify-content:center; font-weight:900; font-size:0.65rem;">${nutri.grade}</span>
-          </span>` : ''}
+        <div style="display:flex; align-items:baseline; gap:6px; margin: 4px 0;">
+          <div style="font-size:2rem; font-weight:200; color:#0f172a; font-family:'Outfit',sans-serif;">${finalPrice}</div>
+          <div style="font-size:1rem; font-weight:700; color:#0f172a;">€</div>
+          <div style="font-size:0.7rem; color:#94a3b8; font-weight:600; margin-left:2px;">TTC</div>
+          
+          ${!isSingle ? `<div style="font-size:0.75rem; color:#64748b; font-weight:600; margin-left:5px;">/ la part</div>` : ''}
+          
+          ${nutri ? `
+            <div style="margin-left:auto; display:flex; align-items:center; background:#f8fafc; padding:4px 8px; border-radius:20px; border:1px solid #f1f5f9;">
+              <span style="font-size:0.6rem; font-weight:800; color:#64748b; text-transform:uppercase; margin-right:6px;">Nutri</span>
+              <span style="width:22px; height:22px; border-radius:50%; background:${nutri.color}; color:white; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:0.7rem;">${nutri.grade}</span>
+            </div>
+          ` : ''}
         </div>
         
-        ${allergens.length > 0 ? `
-          <div style="font-size:0.65rem; color:#b91c1c; font-weight:600; line-height:1.4; padding:4px 6px; background:rgba(239,68,68,0.05); border-radius:6px;">
-            ⚠️ Allergènes : <strong>${allergens.join(', ')}</strong>
-          </div>
-        ` : `
-          <div style="font-size:0.65rem; color:#10b981; font-weight:600;">
-            ✅ Aucun allergène majeur détecté
-          </div>
-        `}
+        <div style="margin-top:auto;">
+          ${allergens.length > 0 ? `
+            <div style="font-size:0.7rem; color:#dc2626; font-weight:700; line-height:1.4; padding:6px 10px; background:#fef2f2; border-radius:8px; border:1px solid #fee2e2;">
+              ⚠️ Allergènes : <span style="font-weight:600;">${allergens.join(', ')}</span>
+            </div>
+          ` : `
+            <div style="font-size:0.7rem; color:#059669; font-weight:700; padding:6px 10px; background:#ecfdf5; border-radius:8px; border:1px solid #d1fae5; display:flex; align-items:center; gap:6px;">
+              <span style="font-size:1rem;">✓</span> Aucun allergène majeur
+            </div>
+          `}
+        </div>
         
-        <div style="font-size:0.55rem; color:#a0917a; text-align:right; margin-top:auto;">
-          ${shopName} · Scannez pour en savoir plus
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px; padding-top:8px; border-top:1px dashed #e2e8f0;">
+           <div style="font-size:0.6rem; color:#94a3b8; font-weight:600;">${shopName}</div>
+           <div style="font-size:0.55rem; color:#64748b; font-style:italic;">Scannez pour la composition</div>
         </div>
       </div>
     `;
@@ -728,11 +715,16 @@ window.generateVitrineLabels = function() {
   const preview = document.getElementById('vitrinePreview');
   if (preview) {
     preview.innerHTML = `
-      <div style="font-weight:700; margin-bottom:1rem; font-size:0.9rem;">Aperçu — ${checks.length} étiquette(s)</div>
-      <div id="vitrinePrintZone" style="display:flex; flex-wrap:wrap; gap:1rem; justify-content:center;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+        <div style="font-weight:800; font-size:1rem; color:var(--primary);">Aperçu de vos étiquettes (${checks.length})</div>
+        <div style="font-size:0.75rem; color:var(--text-muted);">Prêtes pour impression laser ou jet d'encre</div>
+      </div>
+      <div id="vitrinePrintZone" style="display:flex; flex-wrap:wrap; gap:1.5rem; justify-content:center; padding:1rem; background:rgba(0,0,0,0.02); border-radius:12px;">
         ${labelsHTML}
       </div>
     `;
+    // Generate real QRs after DOM is ready
+    setTimeout(renderRealQRs, 100);
   }
   
   showToast(`${checks.length} étiquette(s) générée(s) !`, 'success');

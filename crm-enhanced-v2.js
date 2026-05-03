@@ -19,11 +19,17 @@ let _invoiceLines       = [];
 let _invoiceType        = 'devis';
 let _inflCompChartInstance = null;
 
+// Helper to escape HTML and prevent XSS
+function _escHtml(str) {
+    if (typeof str !== 'string') return String(str || '');
+    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+}
+
 // ============================================================================
 // 1. 📄 GÉNÉRATEUR DE DEVIS / FACTURES PDF
 // ============================================================================
 
-window.openInvoiceGenerator = function(orderId = null) {
+function openInvoiceGenerator(orderId = null) {
     // Pre-load the CRM data
     if (typeof loadCrm === 'function') loadCrm();
 
@@ -673,14 +679,14 @@ function _injectSeasonalForecastInDashboard() {
 
 const LOT_TRACE_KEY = 'gourmet_lot_traceability';
 
-window.getLotTraceData = function() {
+function getLotTraceData() {
     return JSON.parse(localStorage.getItem(LOT_TRACE_KEY) || '[]');
-};
-window.saveLotTraceData = function(data) {
+}
+function saveLotTraceData(data) {
     localStorage.setItem(LOT_TRACE_KEY, JSON.stringify(data));
-};
+}
 
-window.openLotTraceability = function() {
+function openLotTraceability() {
     let modal = document.getElementById('lotTraceabilityModal');
     if (!modal) {
         modal = document.createElement('div');
@@ -844,7 +850,7 @@ window.simulateProductRecall = function() {
 
 const HACCP_REMINDER_KEY = 'gourmet_haccp_reminders';
 
-window.openHACCPReminderSettings = function() {
+function openHACCPReminderSettings() {
     let modal = document.getElementById('haccpReminderModal');
     if (!modal) {
         modal = document.createElement('div');
@@ -999,10 +1005,15 @@ window.renderBreakevenGauge = function() {
     if (!container) return;
 
     // Get fixed costs config (from BP config panel)
-    const rent     = parseFloat(document.getElementById('bpRent')?.value)     || 1500;
-    const salaries = parseFloat(document.getElementById('bpSalaries')?.value) || 5000;
-    const energy   = parseFloat(document.getElementById('bpEnergy')?.value)   || 800;
-    const other    = parseFloat(document.getElementById('bpOther')?.value)    || 400;
+    const rEl = document.getElementById('bpRent');
+    const sEl = document.getElementById('bpSalaries');
+    const eEl = document.getElementById('bpEnergy');
+    const oEl = document.getElementById('bpOther');
+    
+    const rent     = parseFloat(rEl ? rEl.value : 1500) || 1500;
+    const salaries = parseFloat(sEl ? sEl.value : 5000) || 5000;
+    const energy   = parseFloat(eEl ? eEl.value : 800)  || 800;
+    const other    = parseFloat(oEl ? oEl.value : 400)  || 400;
     const totalFixed = rent + salaries + energy + other;
 
     // Get CRM revenue for current month
@@ -1100,7 +1111,7 @@ function _injectBreakevenGaugeWidget() {
 // 8. 📈 SIMULATEUR D'INFLATION MULTI-PÉRIODES
 // ============================================================================
 
-window.openInflationComparator = function() {
+function openInflationComparator() {
     let modal = document.getElementById('inflationComparatorModal');
     if (!modal) {
         modal = document.createElement('div');
@@ -1109,60 +1120,109 @@ window.openInflationComparator = function() {
         document.body.appendChild(modal);
     }
 
-    // Destroy previous chart instance before rebuilding the modal DOM
     if (_inflCompChartInstance) { _inflCompChartInstance.destroy(); _inflCompChartInstance = null; }
 
     const recipes = [...((window.APP && window.APP.savedRecipes) || []), ...(typeof RECIPES !== 'undefined' ? RECIPES : [])];
+    
+    // Internal state for tabs
+    window._inflCompActiveTab = window._inflCompActiveTab || 'inflation';
 
-    modal.innerHTML = `
-    <div class="modal-content glass-panel" style="max-width:920px; width:95%; max-height:92vh; overflow-y:auto;">
-      <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1.5rem;">
+    const renderHeader = () => `
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1rem;">
         <div>
-          <h3 style="margin:0;">📈 Comparateur d'Inflation Multi-Périodes</h3>
-          <p style="margin:6px 0 0; font-size:0.82rem; color:var(--text-secondary);">Simulez l'érosion de vos marges à différents niveaux d'inflation des matières premières.</p>
+          <h3 style="margin:0;">📈 Analyse Stratégique : Inflation & Achats</h3>
+          <p style="margin:6px 0 0; font-size:0.82rem; color:var(--text-secondary);">Protégez vos marges face à la hausse des coûts et optimisez vos approvisionnements.</p>
         </div>
         <button class="btn-icon" onclick="document.getElementById('inflationComparatorModal').style.display='none';">✕</button>
       </div>
-
-      <!-- Controls bar -->
-      <div style="display:grid; grid-template-columns:2fr 1fr 1fr auto; gap:0.8rem; margin-bottom:1.5rem; align-items:flex-end; background:var(--bg-alt); padding:1rem; border-radius:14px; border:1px solid var(--surface-border);">
-        <div class="form-group" style="margin:0;">
-          <label class="form-label" style="font-size:0.78rem;">🍰 Recette à analyser</label>
-          <select id="inflCompRecipe" class="form-input">
-            <option value="">— Toutes les recettes (${recipes.length}) —</option>
-            ${recipes.map((r, i) => `<option value="${i}">${_escHtml(r.name)}</option>`).join('')}
-          </select>
-        </div>
-        <div class="form-group" style="margin:0;">
-          <label class="form-label" style="font-size:0.78rem;">📉 Scénario A — Hausse (%)</label>
-          <input type="number" id="inflComp3M" class="form-input" value="5" min="0" max="200" step="0.5">
-        </div>
-        <div class="form-group" style="margin:0;">
-          <label class="form-label" style="font-size:0.78rem;">🔥 Scénario B — Hausse (%)</label>
-          <input type="number" id="inflComp6M" class="form-input" value="15" min="0" max="200" step="0.5">
-        </div>
-        <button class="btn btn-primary" onclick="runInflationComparison()" style="height:44px; padding:0 1.4rem; white-space:nowrap; border-radius:12px;">
-          🔍 Analyser
+      
+      <!-- Tabs -->
+      <div style="display:flex; gap:10px; margin-bottom:1.5rem; border-bottom:1px solid var(--surface-border); padding-bottom:10px;">
+        <button class="tab-btn ${window._inflCompActiveTab === 'inflation' ? 'active' : ''}" 
+                onclick="window._inflCompActiveTab='inflation'; openInflationComparator()" 
+                style="background:none; border:none; padding:8px 16px; cursor:pointer; font-weight:700; color:${window._inflCompActiveTab === 'inflation' ? 'var(--accent)' : 'var(--text-muted)'}; border-bottom:2px solid ${window._inflCompActiveTab === 'inflation' ? 'var(--accent)' : 'transparent'}">
+          📉 Simulateur Inflation
+        </button>
+        <button class="tab-btn ${window._inflCompActiveTab === 'suppliers' ? 'active' : ''}" 
+                onclick="window._inflCompActiveTab='suppliers'; openInflationComparator()" 
+                style="background:none; border:none; padding:8px 16px; cursor:pointer; font-weight:700; color:${window._inflCompActiveTab === 'suppliers' ? 'var(--accent)' : 'var(--text-muted)'}; border-bottom:2px solid ${window._inflCompActiveTab === 'suppliers' ? 'var(--accent)' : 'transparent'}">
+          🤝 Optimisation Achats
         </button>
       </div>
+    `;
 
-      <!-- Table + Chart are both rendered inside inflCompResults by runInflationComparison() -->
-      <div id="inflCompResults">
-        <div style="text-align:center; padding:3rem 1rem; color:var(--text-muted);">
-          <div style="font-size:3rem; margin-bottom:0.8rem;">📊</div>
-          <p>Cliquez sur <strong>🔍 Analyser</strong> pour voir l'impact sur vos marges.</p>
-        </div>
-      </div>
-    </div>`;
+    if (window._inflCompActiveTab === 'inflation') {
+        modal.innerHTML = `
+        <div class="modal-content glass-panel" style="max-width:920px; width:95%; max-height:92vh; overflow-y:auto;">
+          ${renderHeader()}
+          <!-- Controls bar -->
+          <div style="display:grid; grid-template-columns:2fr 1fr 1fr auto; gap:0.8rem; margin-bottom:1.5rem; align-items:flex-end; background:var(--bg-alt); padding:1rem; border-radius:14px; border:1px solid var(--surface-border);">
+            <div class="form-group" style="margin:0;">
+              <label class="form-label" style="font-size:0.78rem;">🍰 Recette à analyser</label>
+              <select id="inflCompRecipe" class="form-input">
+                <option value="">— Toutes les recettes (${recipes.length}) —</option>
+                ${recipes.map((r, i) => `<option value="${i}">${_escHtml(r.name)}</option>`).join('')}
+              </select>
+            </div>
+            <div class="form-group" style="margin:0;">
+              <label class="form-label" style="font-size:0.78rem;">📉 Scénario A — Hausse (%)</label>
+              <input type="number" id="inflComp3M" class="form-input" value="5" min="0" max="200" step="0.5">
+            </div>
+            <div class="form-group" style="margin:0;">
+              <label class="form-label" style="font-size:0.78rem;">🔥 Scénario B — Hausse (%)</label>
+              <input type="number" id="inflComp6M" class="form-input" value="15" min="0" max="200" step="0.5">
+            </div>
+            <button class="btn btn-primary" onclick="runInflationComparison()" style="height:44px; padding:0 1.4rem; white-space:nowrap; border-radius:12px;">
+              🔍 Analyser
+            </button>
+          </div>
+          <div id="inflCompResults"></div>
+        </div>`;
+        setTimeout(runInflationComparison, 100);
+    } else {
+        // Render Supplier Optimization Tab
+        const inv = (window.APP && window.APP.inventory) || [];
+        const alerts = inv.map(item => {
+            const alert = typeof checkSupplierPriceAlert === 'function' ? checkSupplierPriceAlert(item.name, item.price) : null;
+            return alert ? { ...item, alert } : null;
+        }).filter(Boolean);
+
+        modal.innerHTML = `
+        <div class="modal-content glass-panel" style="max-width:850px; width:95%; max-height:92vh; overflow-y:auto;">
+          ${renderHeader()}
+          <div style="background:rgba(16,185,129,0.05); border:1px solid rgba(16,185,129,0.2); padding:1rem; border-radius:12px; margin-bottom:1.5rem; display:flex; gap:1rem; align-items:center;">
+             <div style="font-size:2rem;">💡</div>
+             <div>
+               <h4 style="margin:0; color:#10b981;">Opportunités d'économies détectées</h4>
+               <p style="margin:4px 0 0; font-size:0.8rem; color:var(--text-secondary);">Nous comparons vos prix d'achat actuels avec les meilleures offres fournisseurs répertoriées.</p>
+             </div>
+          </div>
+          
+          <div style="display:grid; gap:10px;">
+            ${alerts.length === 0 ? '<div style="text-align:center; padding:3rem; color:var(--text-muted);">Aucune meilleure offre trouvée pour vos ingrédients actuels.</div>' : 
+              alerts.map(a => `
+                <div style="background:var(--bg-alt); padding:1rem; border-radius:14px; border:1px solid var(--surface-border); display:flex; justify-content:space-between; align-items:center;">
+                  <div>
+                    <div style="font-weight:700; font-size:1rem;">${_escHtml(a.name)}</div>
+                    <div style="font-size:0.82rem; color:var(--text-muted);">Prix actuel : <strong>${a.price.toFixed(2)}€</strong> / ${a.unit || 'kg'}</div>
+                  </div>
+                  <div style="text-align:right;">
+                    <div style="color:#10b981; font-weight:900; font-size:1.1rem;">-${a.alert.saving}%</div>
+                    <div style="font-size:0.75rem; color:var(--text-muted);">chez <strong>${_escHtml(a.alert.supplier)}</strong> (${a.alert.price.toFixed(2)}€)</div>
+                  </div>
+                </div>
+              `).join('')
+            }
+          </div>
+        </div>`;
+    }
 
     modal.style.display = 'flex';
-    // Auto-run: show results immediately on open
-    setTimeout(runInflationComparison, 200);
 };
 
 // (variable déclarée en haut du fichier)
 
-window.runInflationComparison = function() {
+function runInflationComparison() {
     const recipeIdxEl = document.getElementById('inflCompRecipe');
     const pct3mEl     = document.getElementById('inflComp3M');
     const pct6mEl     = document.getElementById('inflComp6M');
@@ -1287,14 +1347,7 @@ window.runInflationComparison = function() {
     });
 };
 
-// ============================================================================
-// UTILITAIRES INTERNES
-// ============================================================================
-
-function _escHtml(str) {
-    if (typeof str !== 'string') return String(str || '');
-    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
-}
+// Utilitaires déplacés en haut du fichier
 
 // ============================================================================
 // INJECTION DANS LA NAVIGATION & INIT
@@ -1320,7 +1373,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (proToolsGrid) {
             if (!document.getElementById('invoiceProCard')) {
                 proToolsGrid.insertAdjacentHTML('afterbegin', `
-                  <div class="protools-card" onclick="openInvoiceGenerator()" id="invoiceProCard">
+                  <div class="protools-card" onclick="window.openInvoiceGenerator()" id="invoiceProCard">
                     <div class="protools-card-icon" style="background:rgba(99,102,241,0.10); color:var(--accent-dark);">📄</div>
                     <div class="protools-card-body">
                       <h3>Devis & Factures PDF</h3>
@@ -1335,7 +1388,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (!document.getElementById('lotTraceCard')) {
                 proToolsGrid.insertAdjacentHTML('afterbegin', `
-                  <div class="protools-card" onclick="openLotTraceability()" id="lotTraceCard">
+                  <div class="protools-card" onclick="window.openLotTraceability()" id="lotTraceCard">
                     <div class="protools-card-icon" style="background:rgba(239,68,68,0.08); color:var(--danger);">🔬</div>
                     <div class="protools-card-body">
                       <h3>Traçabilité des Lots</h3>
@@ -1350,7 +1403,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (!document.getElementById('inflCompCard')) {
                 proToolsGrid.insertAdjacentHTML('afterbegin', `
-                  <div class="protools-card" onclick="openInflationComparator()" id="inflCompCard">
+                  <div class="protools-card" onclick="window.openInflationComparator()" id="inflCompCard">
                     <div class="protools-card-icon" style="background:rgba(99,102,241,0.1); color:#6366f1;">📈</div>
                     <div class="protools-card-body">
                       <h3>Inflation Multi-Périodes</h3>
@@ -1403,7 +1456,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
 });
 
-// Make functions available for nav menu
-window.openInflationComparator = window.openInflationComparator;
-window.openLotTraceability     = window.openLotTraceability;
-window.openInvoiceGenerator    = window.openInvoiceGenerator;
+// Export functions to window for safety net and UI access
+window.openInflationComparator = openInflationComparator;
+window.openLotTraceability     = openLotTraceability;
+window.openInvoiceGenerator    = openInvoiceGenerator;
+window.openHACCPReminderSettings = openHACCPReminderSettings;
+window.runInflationComparison  = runInflationComparison;
+window.getLotTraceData         = getLotTraceData;
+window.saveLotTraceData        = saveLotTraceData;

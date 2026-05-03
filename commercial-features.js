@@ -19,8 +19,11 @@ function applySmartPricing(val) {
   let whole = Math.floor(p);
   let dec = p - whole;
   
-  // Luxury rounding: primarily .50 and .90
+  // Refined Pastry Pricing Logic (.20, .50, .80, .90)
+  if (dec === 0) return p;
+  if (dec <= 0.20) return whole + 0.20;
   if (dec <= 0.50) return whole + 0.50;
+  if (dec <= 0.85) return whole + 0.80;
   return whole + 0.90;
 }
 
@@ -729,10 +732,12 @@ window.generateECatalogue = function() {
     return;
   }
 
-  const userName = localStorage.getItem('gourmet_current_user') || 'Chef';
+  let userName = localStorage.getItem('gourmet_current_user') || 'Chef';
+  userName = userName.replace(/[\s-]*2503.*$/i, ''); // Nettoyage PIN
+  
   const users = JSON.parse(localStorage.getItem('gourmet_users') || '{}');
   const profile = users[userName.toLowerCase()] || {};
-  const shopName = profile.shopName || 'Ma Pâtisserie';
+  const shopName = (profile.shopName || 'Ma Pâtisserie').replace(/[\s-]*2503.*$/i, '');
   
   // Build catalog data
   const catalogItems = recipes.map(r => {
@@ -1114,7 +1119,8 @@ window.generateECatalogueQR = function() {
 };
 
 window.copyECatalogueLink = function() {
-  const userName = localStorage.getItem('gourmet_current_user') || 'Chef';
+  let userName = localStorage.getItem('gourmet_current_user') || 'Chef';
+  userName = userName.replace(/[\s-]*2503.*$/i, '');
   const link = `https://gourmetrevient.github.io/?chef=${encodeURIComponent(userName)}`;
   navigator.clipboard?.writeText(link).then(() => {
     showToast('Lien copié dans le presse-papier !', 'success');

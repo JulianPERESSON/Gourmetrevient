@@ -447,37 +447,6 @@ body.auth-pending .app-main {
   animation: fadeUp 0.6s ease-out;
 }
 
-.auth-tabs {
-  display: flex;
-  background: var(--bg-alt);
-  padding: 0.3rem;
-  border-radius: var(--radius-sm);
-  margin-bottom: 2rem;
-}
-
-.auth-tab {
-  flex: 1;
-  padding: 0.7rem;
-  font-size: 0.9rem;
-  font-weight: 700;
-  color: var(--text-secondary);
-  border-radius: var(--radius-sm);
-  transition: all var(--transition);
-  border: none;
-  background: none;
-  cursor: pointer;
-}
-
-.auth-tab:hover:not(.active) {
-  color: var(--primary);
-  background: rgba(255, 255, 255, 0.5);
-}
-
-.auth-tab.active {
-  background: var(--surface);
-  color: var(--accent);
-  box-shadow: var(--shadow-sm);
-}
 
 .device-notice {
   display: flex;

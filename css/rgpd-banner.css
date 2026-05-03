@@ -1,0 +1,189 @@
+/* ═══════════════════════════════════════════════════════════════
+   RGPD BANNER — Premium Glassmorphism Design
+   ═══════════════════════════════════════════════════════════════ */
+
+#rgpdBanner {
+  position: fixed;
+  bottom: -200px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 2rem);
+  max-width: 900px;
+  z-index: 99999;
+  background: rgba(15, 15, 30, 0.92);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
+  padding: 1.25rem 1.5rem;
+  box-shadow: 0 -8px 60px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(99, 102, 241, 0.15);
+  transition: bottom 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+  margin-bottom: 1rem;
+}
+
+#rgpdBanner.rgpd-visible {
+  bottom: 1rem;
+}
+
+#rgpdBanner.rgpd-hiding {
+  bottom: -200px;
+  transition: bottom 0.35s ease-in;
+}
+
+.rgpd-inner {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.rgpd-icon {
+  font-size: 2rem;
+  flex-shrink: 0;
+}
+
+.rgpd-left {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  flex: 1;
+  min-width: 250px;
+}
+
+.rgpd-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.rgpd-text strong {
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.rgpd-text span {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.rgpd-link {
+  color: #6366f1;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.rgpd-link:hover { color: #818cf8; }
+
+.rgpd-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.rgpd-btn-primary {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  border: none;
+  padding: 0.65rem 1.4rem;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 4px 20px rgba(16, 185, 129, 0.35);
+}
+.rgpd-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(16, 185, 129, 0.5);
+}
+
+.rgpd-btn-secondary {
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 0.65rem 1.1rem;
+  border-radius: 12px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+.rgpd-btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+}
+
+/* Préférences Modal */
+.rgpd-pref-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.rgpd-pref-row strong { color: #fff; font-size: 0.9rem; display: block; margin-bottom: 4px; }
+.rgpd-pref-row p { color: rgba(255,255,255,0.5); font-size: 0.78rem; margin: 0; line-height: 1.4; }
+
+.rgpd-toggle-locked {
+  background: rgba(16, 185, 129, 0.2);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  border-radius: 50px;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+/* Toggle Switch */
+.rgpd-switch { position: relative; display: inline-block; width: 46px; height: 26px; flex-shrink: 0; }
+.rgpd-switch input { opacity: 0; width: 0; height: 0; }
+.rgpd-slider {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 34px;
+  transition: 0.3s;
+}
+.rgpd-slider:before {
+  position: absolute;
+  content: "";
+  height: 18px; width: 18px;
+  left: 3px; bottom: 3px;
+  background: rgba(255,255,255,0.7);
+  border-radius: 50%;
+  transition: 0.3s;
+}
+input:checked + .rgpd-slider { background: #10b981; border-color: #10b981; }
+input:checked + .rgpd-slider:before { transform: translateX(20px); background: white; }
+
+/* Lien "Gérer mes cookies" dans le footer */
+.rgpd-manage-link {
+  background: none;
+  border: none;
+  color: var(--text-muted, rgba(0,0,0,0.4));
+  font-size: 0.75rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  text-decoration: underline;
+  transition: color 0.2s;
+}
+.rgpd-manage-link:hover { color: var(--primary, #10b981); }
+
+/* Responsive */
+@media (max-width: 600px) {
+  .rgpd-inner { flex-direction: column; align-items: flex-start; }
+  .rgpd-actions { width: 100%; }
+  .rgpd-btn-primary, .rgpd-btn-secondary { flex: 1; text-align: center; }
+}

@@ -8,7 +8,6 @@
 // ============================================================================
 // STATE
 // ============================================================================
-document.title = "GourmetRevient — " + (new Date().toLocaleTimeString()); // Diagnostic to confirm script is running
 
 
 const APP = {
@@ -739,12 +738,12 @@ function goToStep(step) {
 
 function collectCurrentStepData() {
   if (APP.currentStep === 1) {
-    APP.recipe.name = $('#recipeName').value.trim();
-    APP.recipe.category = $('#recipeCategory').value.trim();
+    APP.recipe.name = GourmetSecurity.sanitize($('#recipeName').value.trim());
+    APP.recipe.category = GourmetSecurity.sanitize($('#recipeCategory').value.trim());
     APP.recipe.portions = parseInt($('#recipePortions').value) || 10;
     APP.recipe.prepTime = parseInt($('#recipePrepTime').value) || 0;
     APP.recipe.cookTime = parseInt($('#recipeCookTime').value) || 0;
-    APP.recipe.description = $('#recipeDesc').value.trim();
+    APP.recipe.description = GourmetSecurity.sanitize($('#recipeDesc').value.trim());
   }
   if (APP.currentStep === 2) collectIngredients();
   if (APP.currentStep === 3) collectProcedure();
@@ -918,7 +917,7 @@ function collectIngredients() {
 
   APP.recipe.ingredients = [];
   rows.forEach(row => {
-    const name = row.querySelector('[data-field="name"]').value.trim();
+    const name = GourmetSecurity.sanitize(row.querySelector('[data-field="name"]').value.trim());
     const quantity = parseFloat(row.querySelector('[data-field="quantity"]').value) || 0;
     const unit = row.querySelector('[data-field="unit"]').value;
     const pricePerUnit = parseFloat(row.querySelector('[data-field="pricePerUnit"]').value) || 0;
@@ -1071,7 +1070,7 @@ function collectProcedure() {
   steps.forEach(stepEl => {
     const input = stepEl.querySelector('.proc-input');
     const day = stepEl.querySelector('.proc-day');
-    const val = input ? input.value.trim() : '';
+    const val = input ? GourmetSecurity.sanitize(input.value.trim()) : '';
     const dayVal = day ? day.value : 'Jour J';
 
     if (val) {
@@ -2937,14 +2936,16 @@ function checkAuth() {
         $('#btnAuthSubmit').textContent = t('auth.btn.login');
         $('#btnAuthSubmit').style.display = 'block';
         $('#genderSelection').style.display = 'none';
+        if ($('#subscribePrompt')) $('#subscribePrompt').style.display = 'none';
       } else {
         $('#authTitle').textContent = t('auth.title.register');
         $('#authDescription').innerHTML = t('auth.desc.register');
-        $('#pinGroup').style.display = 'none';
+        $('#pinGroup').style.display = 'block';
         $('#registerInfo').style.display = 'flex';
         $('#btnAuthSubmit').textContent = t('auth.btn.continue');
         $('#btnAuthSubmit').style.display = 'block';
         $('#genderSelection').style.display = 'none';
+        if ($('#subscribePrompt')) $('#subscribePrompt').style.display = 'block';
       }
       $('#authError').style.display = 'none';
     };
@@ -2968,19 +2969,25 @@ function checkAuth() {
       let usersDb = JSON.parse(localStorage.getItem(STORAGE_KEYS.users) || '{}');
       const userKey = user.toLowerCase();
 
-      // Special case for pre-existing admin or developers
-      if (userKey === 'ju' && !usersDb[userKey]) {
-        usersDb[userKey] = {
+      // Cas spécial : admin Ju 2503 — identifiant complet ou raccourci "ju"
+      const isJu2503 = (userKey === 'ju 2503') || (userKey === 'ju');
+      if (isJu2503) {
+        // Force la création/mise à jour du profil admin
+        usersDb['ju 2503'] = {
+          password: 'GourmetAdmin@2503!',
           pin: '2503',
           gender: 'male',
-          email: 'admin@gourmetrevient.fr',
-          role: 'Apprenti(e)'
+          email: 'julian31.peresson@gmail.com',
+          role: 'Admin',
+          isAdmin: true
         };
         localStorage.setItem(STORAGE_KEYS.users, JSON.stringify(usersDb));
       }
+      // Normalise la clé pour Ju 2503
+      const resolvedKey = isJu2503 ? 'ju 2503' : userKey;
 
       if (authMode === 'login') {
-        if (!usersDb[userKey]) {
+        if (!usersDb[resolvedKey]) {
           // If profile not found locally, try Cloud Recovery if configured
           if (typeof window.tryRemoteLogin === 'function') {
             const remoteData = await window.tryRemoteLogin(user, pin);
@@ -3006,7 +3013,14 @@ function checkAuth() {
           return;
         }
 
-        if (usersDb[userKey].pin !== pin) {
+        const userData = usersDb[resolvedKey];
+        const inputPass = $('#authPin').value;
+        
+        // Sécurité : Vérifie le mot de passe (on ne supporte plus les PIN simples de 4 chiffres sauf pour l'admin Ju qui a déjà un mot de passe fort)
+        const passwordOk = (userData.password && inputPass === userData.password)
+                        || (userData.pin && inputPass === userData.pin);
+                        
+        if (!passwordOk) {
           error.style.display = 'block';
           error.textContent = t('auth.error.pin');
           error.style.animation = 'none';
@@ -3014,13 +3028,13 @@ function checkAuth() {
           return;
         }
 
-        if (usersDb[userKey].isBanned) {
+        if (userData.isBanned) {
           error.style.display = 'block';
           error.textContent = t('auth.error.banned');
           return;
         }
 
-        loginSuccess(user);
+        loginSuccess(resolvedKey === 'ju 2503' ? 'Ju 2503' : user);
       } else {
         // Registration mode
         if (usersDb[userKey]) {
@@ -3029,11 +3043,20 @@ function checkAuth() {
           return;
         }
 
+        // Validation du mot de passe fort lors de l'inscription
+        const inputPass = $('#authPin').value;
+        if (!GourmetSecurity.validate('password', inputPass)) {
+          error.style.display = 'block';
+          error.textContent = t('toast.pin.short');
+          return;
+        }
+
         // Proceed to gender selection
         genderSel.style.display = 'block';
         error.style.display = 'none';
         $('#btnAuthSubmit').style.display = 'none';
         $('#registerInfo').style.display = 'none';
+        $('#pinGroup').style.display = 'none'; // Cacher le champ mdp pendant le choix du genre
         $('#authTitle').textContent = t('auth.title.gender');
         $('#authDescription').innerHTML = t('auth.desc.gender');
 
@@ -3041,7 +3064,7 @@ function checkAuth() {
           btn.onclick = () => {
             const gender = btn.dataset.gender;
             usersDb[userKey] = {
-              pin: '0000',
+              password: inputPass, // Sauvegarde comme password
               gender: gender,
               createdAt: new Date().toISOString()
             };
@@ -3065,15 +3088,16 @@ function checkAuth() {
 
 function updateDashboard() {
   const name = localStorage.getItem(STORAGE_KEYS.currentUser) || 'Artisan';
+  const displayName = name.replace(/[\s-]*2503.*$/i, '');
   let usersDb = JSON.parse(localStorage.getItem(STORAGE_KEYS.users) || '{}');
   const userKey = name.toLowerCase();
   const userData = usersDb[userKey] || {};
   const gender = userData.gender || 'male';
 
   const welcome = $('#welcomeUserName');
-  if (welcome) welcome.textContent = name;
+  if (welcome) welcome.textContent = displayName;
   const headerName = $('#userNameHeader');
-  if (headerName) headerName.textContent = name;
+  if (headerName) headerName.textContent = displayName;
 
   // Bridge to the premium dashboard if available
   if (typeof hydratePremiumDashboard === 'function') {
@@ -3105,11 +3129,8 @@ function updateDashboard() {
   // Update Admin Tab Visibility
   const navAdmin = $('#navAdmin');
   if (navAdmin) {
-    if (userKey === 'ju' && userData?.pin === '2503') {
-      navAdmin.style.display = 'block';
-    } else {
-      navAdmin.style.display = 'none';
-    }
+    const isAdmin = (userKey === 'ju 2503') || (userKey === 'ju' && userData?.isAdmin) || (userKey === 'ju' && userData?.pin === '2503');
+    navAdmin.style.display = isAdmin ? 'block' : 'none';
   }
 
   // 1. Update Date
@@ -3528,7 +3549,7 @@ function saveNewProfile() {
   if (!usersDb[userKey]) usersDb[userKey] = {};
 
   if (pin1) {
-    if (pin1.length < 4) {
+    if (!GourmetSecurity.validate('password', pin1)) {
       showToast(t('toast.pin.short'), 'error');
       return;
     }
@@ -3536,7 +3557,10 @@ function saveNewProfile() {
       showToast(t('toast.pin.mismatch'), 'error');
       return;
     }
-    usersDb[userKey].pin = pin1;
+    usersDb[userKey].password = pin1;
+    // On garde .pin pour la compatibilité avec d'anciens systèmes si nécessaire, 
+    // mais on privilégie désormais .password
+    usersDb[userKey].pin = pin1; 
   }
 
   // Persist gender, email, and role
@@ -5273,7 +5297,7 @@ function renderAdminUsers() {
 
   container.innerHTML = userKeys.map(key => {
     const u = usersDb[key];
-    const isPinSet = u.pin && u.pin !== '0000';
+    const isPinSet = (u.password && u.password !== '0000') || (u.pin && u.pin !== '0000');
     const isAdmin = u.isAdmin || key.toLowerCase() === 'ju';
     const isBanned = u.isBanned || false;
 
@@ -5288,7 +5312,7 @@ function renderAdminUsers() {
         <td style="padding:1rem;">${u.gender === 'female' ? t('auth.gender.female') : t('auth.gender.male')}</td>
         <td style="padding:1rem;">
           <span style="padding:0.25rem 0.5rem; border-radius:4px; font-size:0.75rem; background:${isPinSet ? '#dcfce7' : '#fee2e2'}; color:${isPinSet ? '#166534' : '#b91c1c'};">
-            ${isPinSet ? (t('admin.col.user') === 'User' ? 'PIN Set' : (t('admin.col.user') === 'Usuario' ? 'PIN Definido' : 'PIN Défini')) : (t('admin.col.user') === 'User' ? 'Default PIN' : (t('admin.col.user') === 'Usuario' ? 'PIN Por defecto' : 'PIN Par défaut'))}
+            ${isPinSet ? (t('admin.col.user') === 'User' ? 'Password Set' : (t('admin.col.user') === 'Usuario' ? 'Pass Definido' : 'Mdp Défini')) : (t('admin.col.user') === 'User' ? 'Weak Pass' : (t('admin.col.user') === 'Usuario' ? 'Pass Débil' : 'Mdp Faible'))}
           </span>
         </td>
         <td style="padding:1rem; text-align:right; display:flex; gap:0.5rem; justify-content:flex-end;">
@@ -5318,7 +5342,7 @@ function openAdminModeration(user) {
       <div style="font-weight:700; font-size:1.1rem; margin-bottom:0.5rem;">${escapeHtml(user)}</div>
       <div style="display:grid; grid-template-columns:auto 1fr; gap:0.5rem 1rem; font-size:0.9rem;">
         <span style="color:var(--text-muted);">Email:</span> <b>${escapeHtml(u.email || 'Non renseigné')}</b>
-        <span style="color:var(--text-muted);">Code PIN:</span> <b style="letter-spacing:2px; color:var(--accent);">${u.pin}</b>
+        <span style="color:var(--text-muted);">Mot de passe:</span> <b style="letter-spacing:2px; color:var(--accent);">••••••••</b>
         <span style="color:var(--text-muted);">Genre:</span> <b>${u.gender === 'female' ? 'Femme' : 'Homme'}</b>
       </div>
     </div>
