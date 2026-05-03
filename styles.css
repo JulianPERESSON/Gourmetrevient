@@ -435,6 +435,11 @@ body.auth-pending .app-main {
   pointer-events: none;
 }
 
+/* Hide redundant auth button while keeping logic active */
+.auth-nav-btn, #authFloatingZone {
+  display: none !important;
+}
+
 .auth-card {
   background: var(--surface);
   border-radius: var(--radius-xl);
