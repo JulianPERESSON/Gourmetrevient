@@ -11,15 +11,11 @@
 const SUPABASE_URL = 'https://hogfrddigcojdmjjpbno.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_9iePEQdGSdnjXaw4I1s0Nw_wyitVBla';
 
-// Création du client global
-// On l'attache à window.supabase (en écrasant la lib) pour que TOUS les scripts du projet y aient accès directement via 'supabase'
-window.supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// Instance globale utilisée par toute l'application
+var supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// Alias pour le module de facturation
-window.supabaseClient = window.supabase;
-
-// On crée aussi une variable locale pour les scripts qui l'utiliseraient sans le préfixe window
-var supabase = window.supabase;
+// Alias pour le module de facturation (billing.js)
+window.supabaseClient = supabase;
 
 /**
  * Fonctions utilitaires pour le projet

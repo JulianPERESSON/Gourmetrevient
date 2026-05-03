@@ -69,7 +69,7 @@
   <!-- Libraries for new features -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <!-- Supabase SDK -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.43.2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <!-- Chart.js Zoom Plugin (nécessite hammer.js) -->
   <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1/dist/chartjs-plugin-zoom.min.js"></script>
@@ -909,76 +909,56 @@
   <div id="chocolateRainContainer"></div>
   <!-- Auth Overlay -->
   <div id="authOverlay" class="auth-overlay">
-    <div class="auth-card">
-      <div class="auth-logo" aria-label="Logo GourmetRevient">🧁</div>
-      <h2 id="authTitle" data-i18n="auth.title.welcome">Bienvenue</h2>
+    <div class="auth-container">
+      <div class="auth-box glass-panel" style="width: 100%; max-width: 420px; padding: 2.5rem; border-radius: var(--radius-xl); box-shadow: var(--shadow-xl); border: 1px solid var(--surface-border); background: var(--surface); position: relative; z-index: 2;">
+        
+        <div class="auth-logo" aria-label="Logo GourmetRevient" style="font-size: 3rem; margin-bottom: 1.5rem; text-align: center;">🧁</div>
+        <h2 id="authTitle" data-i18n="auth.title.welcome" style="text-align: center; margin-bottom: 1.5rem;">Bienvenue</h2>
 
-      <!-- Auth Tabs -->
-      <div class="auth-tabs">
-        <button id="tabLogin" class="auth-tab active" data-mode="login" data-i18n="auth.tab.login">Se connecter</button>
-        <button id="tabRegister" class="auth-tab" data-mode="register" data-i18n="auth.tab.register">S'inscrire</button>
-      </div>
-
-      <div id="authFormContent">
-        <div class="device-notice">
-          <span class="notice-icon">💻</span>
-          <p data-i18n="auth.device.notice">Pour une expérience optimale et une saisie facilitée, nous vous recommandons
-            d'utiliser <strong>un
-              ordinateur</strong>.</p>
-        </div>
-        <p id="authDescription" data-i18n="auth.desc.login">Veuillez entrer vos identifiants pour accéder au calculateur
-          GourmetRevient.</p>
-
-        <div class="form-group">
-          <label data-i18n="auth.label.username">Nom d'utilisateur</label>
-          <input type="text" id="authUsername" class="form-input" placeholder="Votre prénom"
-            data-i18n-placeholder="auth.placeholder.username" autocomplete="off">
+        <!-- Auth Tabs -->
+        <div class="auth-tabs" style="display: flex; gap: 1rem; margin-bottom: 2rem; border-bottom: 1px solid var(--surface-border);">
+          <button id="tabLogin" class="auth-tab active" data-mode="login" data-i18n="auth.tab.login" style="flex: 1; padding: 0.8rem; background: none; border: none; cursor: pointer; border-bottom: 2px solid var(--primary); font-weight: 700;">Se connecter</button>
+          <button id="tabRegister" class="auth-tab" data-mode="register" data-i18n="auth.tab.register" style="flex: 1; padding: 0.8rem; background: none; border: none; cursor: pointer; color: var(--text-muted);">S'inscrire</button>
         </div>
 
-        <div class="form-group" id="pinGroup">
-          <label data-i18n="auth.label.pin">Code PIN</label>
-          <input type="password" id="authPin" class="form-input" placeholder="••••••••" autocomplete="off">
-        </div>
+        <div id="authFormContent">
+          <p id="authDescription" data-i18n="auth.desc.login" style="text-align: center; color: var(--text-secondary); margin-bottom: 2rem;">Veuillez entrer vos identifiants pour accéder au calculateur GourmetRevient.</p>
 
-        <!-- Info message for registration -->
-        <div id="registerInfo" class="info-box" style="display: none; margin-bottom: 1.5rem; text-align: left;">
-          <div class="info-icon">💡</div>
-          <div class="info-text" data-i18n="auth.register.info">
-            Par défaut, votre code PIN sera <strong>0000</strong>. Vous pourrez le modifier à tout moment dans votre
-            <strong>profil</strong>.
+          <div class="form-group" style="margin-bottom: 1.2rem;">
+            <label data-i18n="auth.label.username" style="display: block; margin-bottom: 0.5rem; font-size: 0.9rem; font-weight: 600;">Nom d'utilisateur</label>
+            <input type="text" id="authUsername" class="form-input" style="width: 100%;" placeholder="Votre prénom" data-i18n-placeholder="auth.placeholder.username" autocomplete="off">
           </div>
-        </div>
 
-        <div id="genderSelection" style="display: none; margin-top: 1.5rem; animation: fadeUp 0.4s ease-out;">
-          <label data-i18n="auth.gender.question"
-            style="display: block; text-align: left; margin-bottom: 0.8rem; font-size: 0.9rem; font-weight: 700; color: var(--text-secondary);">Quel
-            est votre genre ?</label>
-          <div style="display: flex; gap: 1rem;">
-            <button class="btn btn-outline btn-full gender-btn" data-gender="male" style="flex: 1; padding: 1rem;">👨‍🍳
-              <span data-i18n="auth.gender.male">Homme</span></button>
-            <button class="btn btn-outline btn-full gender-btn" data-gender="female"
-              style="flex: 1; padding: 1rem;">👩‍🍳
-              <span data-i18n="auth.gender.female">Femme</span></button>
+          <div class="form-group" id="pinGroup" style="margin-bottom: 1.2rem;">
+            <label data-i18n="auth.label.pin" style="display: block; margin-bottom: 0.5rem; font-size: 0.9rem; font-weight: 600;">Code PIN</label>
+            <input type="password" id="authPin" class="form-input" style="width: 100%;" placeholder="••••••••" autocomplete="off">
           </div>
-        </div>
 
-        <div id="authError" class="auth-error" style="display: none;" data-i18n="auth.error.default">Identifiants
-          incorrects.</div>
+          <div id="registerInfo" class="info-box" style="display: none; margin-bottom: 1.5rem; padding: 1rem; background: var(--bg-alt); border-radius: var(--radius-sm); border-left: 4px solid var(--primary);">
+            <p style="margin: 0; font-size: 0.85rem;" data-i18n="auth.register.info">Par défaut, votre code PIN sera <strong>0000</strong>. Vous pourrez le modifier ultérieurement.</p>
+          </div>
 
-        <button id="btnAuthSubmit" class="btn btn-primary btn-full" style="margin-top: 1.5rem;"
-          data-i18n="auth.btn.login">Se connecter</button>
+          <div id="genderSelection" style="display: none; margin-top: 1.5rem;">
+            <label style="display: block; margin-bottom: 0.8rem; font-size: 0.9rem; font-weight: 700;">Quel est votre genre ?</label>
+            <div style="display: flex; gap: 1rem;">
+              <button class="btn btn-outline gender-btn" data-gender="male" style="flex: 1;">👨‍🍳 Homme</button>
+              <button class="btn btn-outline gender-btn" data-gender="female" style="flex: 1;">👩‍🍳 Femme</button>
+            </div>
+          </div>
 
-        <!-- CTA Abonnement — visible uniquement en mode inscription -->
-        <div id="subscribePrompt" style="display:none; margin-top:1.25rem; padding:1rem 1.25rem; background:linear-gradient(135deg, rgba(99,102,241,0.08), rgba(16,185,129,0.08)); border:1px solid rgba(99,102,241,0.2); border-radius:var(--radius-sm); text-align:center;">
-          <div style="font-size:1.1rem; margin-bottom:0.3rem;">👨‍🍳 <strong style="color:var(--primary);">Pro Chef</strong></div>
-          <div style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:0.85rem;">Recettes illimitées · Cloud · CRM · Analytics — <strong>14,99 €/mois</strong></div>
-          <button onclick="window.GourmetBilling.checkout('pro_monthly')" class="btn btn-primary btn-full" style="font-size:0.9rem; padding:0.75rem;">
-            ✨ S'abonner au plan Pro
-          </button>
-          <div style="font-size:0.72rem; color:var(--text-muted); margin-top:0.6rem;">Paiement sécurisé par Stripe · Résiliable à tout moment</div>
+          <div id="authError" class="auth-error" style="display: none; color: var(--error); font-size: 0.85rem; margin-top: 1rem; text-align: center;">Identifiants incorrects.</div>
+
+          <button id="btnAuthSubmit" class="btn btn-primary btn-full" style="width: 100%; margin-top: 1.5rem;">Se connecter</button>
+
+          <!-- CTA Abonnement -->
+          <div id="subscribePrompt" style="display:none; margin-top:1.5rem; padding:1.2rem; background:var(--bg-alt); border:1px dashed var(--primary); border-radius:var(--radius); text-align:center;">
+             <p style="font-size:0.9rem; margin-bottom:0.8rem;">💎 <strong>Devenez Pro Chef</strong> pour débloquer toutes les fonctionnalités.</p>
+             <button onclick="window.GourmetBilling.checkout('pro_monthly')" class="btn btn-primary btn-sm">✨ S'abonner</button>
+          </div>
         </div>
       </div>
     </div>
+  </div>
 
   <!-- Header -->
   <header class="app-header">
@@ -4513,7 +4493,6 @@
   <script src="./i18n.js?v=3.6.2"></script>
   <script src="./security.js"></script>
   <script src="./supabase-config.js"></script>
-  <script src="./auth-ui.js"></script>
   <script src="./billing.js"></script>
   <script src="./cloud-sync.js"></script>
   <script src="./rgpd-banner.js"></script>
