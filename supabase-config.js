@@ -12,7 +12,10 @@ const SUPABASE_URL = 'https://hogfrddigcojdmjjpbno.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_9iePEQdGSdnjXaw4I1s0Nw_wyitVBla';
 
 // Création du client global (clé anon publique — sans privilèges admin)
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// On utilise 'var' pour garantir que la variable est accessible par TOUS les autres scripts .js du projet
+var supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// On garde aussi ce nom pour le module billing.js
 window.supabaseClient = supabase;
 
 /**
