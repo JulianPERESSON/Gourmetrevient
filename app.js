@@ -2861,26 +2861,7 @@ function bindEvents() {
   });
 
   // Admin Moderation
-  const adminUserModalClose = $('#adminUserModalClose');
-  if (adminUserModalClose) adminUserModalClose.addEventListener('click', () => {
-    const m = $('#adminUserModal');
-    if (m) m.style.display = 'none';
-  });
-
-  const btnAdminToggle = $('#btnAdminToggle');
-  if (btnAdminToggle) btnAdminToggle.addEventListener('click', toggleAdminStatus);
-
-  const btnBanToggle = $('#btnBanToggle');
-  if (btnBanToggle) btnBanToggle.addEventListener('click', toggleBanStatus);
-
-  const btnDeleteUserModal = $('#btnDeleteUserModal');
-  if (btnDeleteUserModal) btnDeleteUserModal.addEventListener('click', () => {
-    if (selectedModerationUser && confirm(`Voulez-vous vraiment supprimer le compte de ${selectedModerationUser} ?`)) {
-      deleteUser(selectedModerationUser);
-      const m = $('#adminUserModal');
-      if (m) m.style.display = 'none';
-    }
-  });
+  // Les événements de modération admin sont désormais gérés par des onclick directs dans le HTML
 
   const adminModal = $('#adminUserModal');
   if (adminModal) {
@@ -5418,6 +5399,18 @@ function deleteUser(user) {
       renderAdminUsers();
       showToast(t('admin.user.deleted', { name: user }), 'info');
     }
+  }
+}
+
+function closeAdminModeration() {
+  const m = $('#adminUserModal');
+  if (m) m.style.display = 'none';
+}
+
+function promptDeleteAdminUser() {
+  if (selectedModerationUser && confirm(`Voulez-vous vraiment supprimer le compte de ${selectedModerationUser} ?`)) {
+    deleteUser(selectedModerationUser);
+    closeAdminModeration();
   }
 }
 

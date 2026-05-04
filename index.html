@@ -3964,7 +3964,7 @@
     <div class="modal-card">
       <div class="modal-header">
         <h3 data-i18n="modal.admin.title">Modération de l'utilisateur</h3>
-        <button id="adminUserModalClose">✕</button>
+        <button id="adminUserModalClose" onclick="closeAdminModeration()">✕</button>
       </div>
       <div class="modal-body">
         <div id="adminUserDetail" style="margin-bottom:1.5rem;">
@@ -3976,13 +3976,13 @@
           <h4 style="font-size:0.9rem; color:var(--text-muted); text-transform:uppercase;"
             data-i18n="modal.admin.actions">Actions Administrateur</h4>
           <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.8rem;">
-            <button class="btn btn-outline" id="btnAdminToggle" style="font-size:0.85rem;"
+            <button class="btn btn-outline" id="btnAdminToggle" onclick="toggleAdminStatus()" style="font-size:0.85rem;"
               data-i18n="modal.admin.toggle">Rendre Admin</button>
-            <button class="btn btn-outline" id="btnBanToggle"
+            <button class="btn btn-outline" id="btnBanToggle" onclick="toggleBanStatus()"
               style="color:var(--danger); border-color:var(--danger); font-size:0.85rem;" data-i18n="modal.admin.ban">🚫
               Bannir</button>
           </div>
-          <button class="btn btn-danger btn-full" id="btnDeleteUserModal" style="margin-top:0.5rem;"
+          <button class="btn btn-danger btn-full" id="btnDeleteUserModal" onclick="promptDeleteAdminUser()" style="margin-top:0.5rem;"
             data-i18n="modal.admin.delete">🗑️ Supprimer le
             compte</button>
         </div>
