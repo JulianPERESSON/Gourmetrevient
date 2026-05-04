@@ -1,6 +1,6 @@
 /**
- * GOURMETREVIENT — Module Onboarding Expert v8.6
- * Correction : Visibilité totale du Chef, Parallaxe douce et Harmonisation des couleurs
+ * GOURMETREVIENT — Module Onboarding Expert v8.8
+ * Correction : Suppression du cadre vert et affichage bord-à-bord
  */
 
 const GourmetOnboarding = {
@@ -218,8 +218,7 @@ const GourmetOnboarding = {
       const rect = card.getBoundingClientRect();
       const x = (e.clientX - rect.left) / rect.width - 0.5;
       const y = (e.clientY - rect.top) / rect.height - 0.5;
-      // Parallaxe plus douce (12 au lieu de 25)
-      char.style.transform = `scale(1.08) translateX(${x * 12}px) translateY(${y * 12}px)`;
+      char.style.transform = `scale(1.1) translateX(${x * 12}px) translateY(${y * 12}px)`;
     });
   },
 
@@ -246,7 +245,7 @@ const GourmetOnboarding = {
         
         #onboarding-card { 
           position: fixed; background: #1e293b; border: 1px solid rgba(255, 255, 255, 0.1); 
-          border-radius: 24px; padding: 0; width: 580px; max-width: calc(100vw - 40px); 
+          border-radius: 24px; padding: 0; width: 620px; max-width: calc(100vw - 40px); 
           box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7); pointer-events: all; 
           z-index: 10001; transition: all 0.6s cubic-bezier(0.19, 1, 0.22, 1); 
           opacity: 0; transform: scale(0.9); color: white; display: flex; overflow: hidden;
@@ -254,12 +253,12 @@ const GourmetOnboarding = {
         #onboarding-card.visible { opacity: 1; transform: scale(1); }
         
         .ob-character-container {
-          width: 200px; position: relative; display: flex; align-items: center; justify-content: center;
-          background: #e2f4e6; overflow: hidden; flex-shrink: 0; /* Vert assorti à l'image */
+          width: 250px; position: relative; display: flex; overflow: hidden; flex-shrink: 0;
+          background: #e2f4e6; /* Fond de secours assorti */
         }
         .ob-character-img {
-          width: 90%; height: 90%; object-fit: contain; /* Tête aux pieds sans coupe */
-          transition: transform 0.2s ease-out;
+          width: 100%; height: 100%; object-fit: cover;
+          object-position: top center; /* Priorité à la tête */
           will-change: transform;
         }
         
@@ -285,7 +284,7 @@ const GourmetOnboarding = {
       <div id="onboarding-spotlight"></div>
       <div id="onboarding-card">
         <div class="ob-character-container">
-          <img src="./personnage.jpg?v=3.3.0" id="ob-char" class="ob-character-img" alt="Chef">
+          <img src="./personnage.jpg?v=3.4.0" id="ob-char" class="ob-character-img" alt="Chef">
         </div>
         <div class="ob-content">
           <span class="ob-icon" id="ob-icon"></span>
@@ -373,7 +372,7 @@ const GourmetOnboarding = {
       spotlight.style.height = (rect.height + 20) + 'px';
       
       const cardHeight = card.offsetHeight || 350;
-      const cardWidth = card.offsetWidth || 580;
+      const cardWidth = card.offsetWidth || 620;
       
       let top = rect.bottom + 40;
       if (top + cardHeight > window.innerHeight) {

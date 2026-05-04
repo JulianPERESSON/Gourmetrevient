@@ -3,7 +3,7 @@
 // Stratégie : Cache-First pour assets statiques + Offline Queue pour mutations
 // =============================================================================
 
-const CACHE_VERSION = '8.7.0'; // Ultra-Compact Header fix
+const CACHE_VERSION = '8.8.0'; // Borderless character fix
 const CACHE_STATIC  = `gourmet-static-v${CACHE_VERSION}`;
 const CACHE_RUNTIME = `gourmet-runtime-v${CACHE_VERSION}`;
 const SYNC_TAG      = 'gourmet-sync-recipes';
