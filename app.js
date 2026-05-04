@@ -2981,7 +2981,7 @@ function checkAuth() {
           role: 'Admin',
           isAdmin: true
         };
-        localStorage.setItem(STORAGE_KEYS.users, JSON.stringify(usersDb));
+        localStorage.setItem(STORAGE_KEYS.users, JSON.stringify(usersDb)); if (window.GourmetCloud && window.GourmetCloud.syncUsersToCloud) GourmetCloud.syncUsersToCloud();
       }
       // Normalise la clé pour Ju 2503
       const resolvedKey = isJu2503 ? 'ju 2503' : userKey;
@@ -2994,7 +2994,7 @@ function checkAuth() {
             if (remoteData) {
               // Account Found in Cloud!
               usersDb[userKey] = remoteData.profile;
-              localStorage.setItem(STORAGE_KEYS.users, JSON.stringify(usersDb));
+              localStorage.setItem(STORAGE_KEYS.users, JSON.stringify(usersDb)); if (window.GourmetCloud && window.GourmetCloud.syncUsersToCloud) GourmetCloud.syncUsersToCloud();
               
               // Hydrate data recovered from cloud
               localStorage.setItem(`gourmetrevient_recipes_${userKey}`, JSON.stringify(remoteData.recipes));
@@ -3068,7 +3068,7 @@ function checkAuth() {
               gender: gender,
               createdAt: new Date().toISOString()
             };
-            localStorage.setItem(STORAGE_KEYS.users, JSON.stringify(usersDb));
+            localStorage.setItem(STORAGE_KEYS.users, JSON.stringify(usersDb)); if (window.GourmetCloud && window.GourmetCloud.syncUsersToCloud) GourmetCloud.syncUsersToCloud();
             loginSuccess(user);
           };
         });
@@ -3568,7 +3568,7 @@ function saveNewProfile() {
   usersDb[userKey].email = email;
   usersDb[userKey].role = $('#profileRole').value;
 
-  localStorage.setItem(STORAGE_KEYS.users, JSON.stringify(usersDb));
+  localStorage.setItem(STORAGE_KEYS.users, JSON.stringify(usersDb)); if (window.GourmetCloud && window.GourmetCloud.syncUsersToCloud) GourmetCloud.syncUsersToCloud();
   showToast(t('toast.profile.updated'), 'success');
   hidePinModal();
   updateDashboard();
@@ -5372,7 +5372,7 @@ function toggleAdminStatus() {
   let usersDb = JSON.parse(localStorage.getItem(STORAGE_KEYS.users) || '{}');
 
   usersDb[userKey].isAdmin = !usersDb[userKey].isAdmin;
-  localStorage.setItem(STORAGE_KEYS.users, JSON.stringify(usersDb));
+  localStorage.setItem(STORAGE_KEYS.users, JSON.stringify(usersDb)); if (window.GourmetCloud && window.GourmetCloud.syncUsersToCloud) GourmetCloud.syncUsersToCloud();
 
   openAdminModeration(selectedModerationUser);
   renderAdminUsers();
@@ -5385,7 +5385,7 @@ function toggleBanStatus() {
   let usersDb = JSON.parse(localStorage.getItem(STORAGE_KEYS.users) || '{}');
 
   usersDb[userKey].isBanned = !usersDb[userKey].isBanned;
-  localStorage.setItem(STORAGE_KEYS.users, JSON.stringify(usersDb));
+  localStorage.setItem(STORAGE_KEYS.users, JSON.stringify(usersDb)); if (window.GourmetCloud && window.GourmetCloud.syncUsersToCloud) GourmetCloud.syncUsersToCloud();
 
   openAdminModeration(selectedModerationUser);
   renderAdminUsers();
@@ -5400,7 +5400,7 @@ function deleteUser(user) {
     // 1. Remove from database
     let usersDb = JSON.parse(localStorage.getItem(STORAGE_KEYS.users) || '{}');
     delete usersDb[userKey];
-    localStorage.setItem(STORAGE_KEYS.users, JSON.stringify(usersDb));
+    localStorage.setItem(STORAGE_KEYS.users, JSON.stringify(usersDb)); if (window.GourmetCloud && window.GourmetCloud.syncUsersToCloud) GourmetCloud.syncUsersToCloud();
 
     // 2. Remove user specific data
     localStorage.removeItem(`gourmetrevient_recipes_${userKey}`);
