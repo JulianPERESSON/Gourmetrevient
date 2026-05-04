@@ -3,7 +3,7 @@
 // Stratégie : Cache-First pour assets statiques + Offline Queue pour mutations
 // =============================================================================
 
-const CACHE_VERSION = '3.1.9'; // Onboarding v2.4 (Readability fix)
+const CACHE_VERSION = '3.2.0'; // Onboarding v3.0 (Character upgrade)
 const CACHE_STATIC  = `gourmet-static-v${CACHE_VERSION}`;
 const CACHE_RUNTIME = `gourmet-runtime-v${CACHE_VERSION}`;
 const SYNC_TAG      = 'gourmet-sync-recipes';
