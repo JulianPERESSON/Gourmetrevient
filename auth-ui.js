@@ -18,7 +18,10 @@ const AuthUI = (() => {
       _currentUser = session?.user || null;
       _updateUI(_currentUser);
 
-      if (event === 'SIGNED_IN')  console.info('%c[Auth] ✅ Connecté :', 'color:#10b981', _currentUser?.email);
+      if (event === 'SIGNED_IN') {
+        console.info('%c[Auth] ✅ Connecté :', 'color:#10b981', _currentUser?.email);
+        window.dispatchEvent(new CustomEvent('gourmet:authSuccess', { detail: { user: _currentUser } }));
+      }
       if (event === 'SIGNED_OUT') console.info('%c[Auth] 👋 Déconnecté', 'color:#f59e0b');
       if (event === 'TOKEN_REFRESHED') console.info('%c[Auth] 🔄 Token rafraîchi', 'color:#6366f1');
     });
@@ -313,6 +316,7 @@ const AuthUI = (() => {
         </div>
       </div>
       <hr class="auth-menu-divider">
+      <button onclick="AuthUI.replayOnboarding()" class="auth-menu-item" style="color:var(--primary, #10b981); font-weight:700;">✨ Relancer le guide</button>
       <button onclick="AuthUI.exportData()" class="auth-menu-item">📤 Exporter mes données</button>
       <button onclick="AuthUI.openLegal()" class="auth-menu-item">⚖️ Mentions légales</button>
       <hr class="auth-menu-divider">
@@ -355,14 +359,18 @@ const AuthUI = (() => {
     window.open('./legal.html', '_blank');
   }
 
-  function togglePwd() {
-    const inp = document.getElementById('authPassword');
-    if (inp) inp.type = inp.type === 'password' ? 'text' : 'password';
+  function replayOnboarding() {
+    document.getElementById('authUserMenu')?.remove();
+    if (window.GourmetOnboarding) {
+      window.GourmetOnboarding.start();
+    } else {
+      if (typeof showToast === 'function') showToast('Le guide est en cours de chargement...', 'info');
+    }
   }
 
   function getCurrentUser() { return _currentUser; }
 
-  return { init, showModal, switchTab, handleSubmit, handleForgotPassword, logout, exportData, openLegal, togglePwd, getCurrentUser };
+  return { init, showModal, switchTab, handleSubmit, handleForgotPassword, logout, exportData, openLegal, togglePwd, replayOnboarding, getCurrentUser };
 
 })();
 

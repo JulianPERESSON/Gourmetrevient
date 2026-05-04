@@ -1,6 +1,6 @@
 /**
- * GOURMETREVIENT — Module Onboarding
- * Guide interactif pour les nouveaux utilisateurs (première connexion)
+ * GOURMETREVIENT — Module Onboarding Premium
+ * Guide interactif haute fidélité pour les nouveaux utilisateurs
  */
 
 const GourmetOnboarding = {
@@ -10,239 +10,196 @@ const GourmetOnboarding = {
 
   steps: [
     {
-      target: null, // écran d'accueil centré
-      icon: '🧁',
-      title: 'Bienvenue sur GourmetRevient !',
-      text: 'Votre outil professionnel pour calculer vos coûts de revient, gérer vos marges et piloter votre activité de pâtissier artisan.',
+      target: null,
+      icon: '✨',
+      title: 'Bienvenue Chef !',
+      text: 'GourmetRevient est votre nouvel allié pour piloter votre rentabilité. Laissez-nous vous montrer les outils essentiels en 1 minute.',
       position: 'center'
     },
     {
-      target: '[data-section="recettes"], #nav-recettes, .nav-item:first-child',
-      icon: '📋',
-      title: 'Vos Recettes',
-      text: 'Créez et gérez toutes vos fiches techniques. Chaque recette calcule automatiquement le coût matière, la marge et le prix de vente conseillé.',
+      target: '#nav-recettes, [data-section="recettes"]',
+      icon: '📖',
+      title: 'Le Grimoire Numérique',
+      text: 'C\'est ici que la magie opère. Créez vos recettes et voyez instantanément votre coût de revient se calculer ligne par ligne.',
       position: 'bottom'
     },
     {
-      target: '[data-section="inventaire"], #nav-inventaire',
+      target: '#nav-inventaire, [data-section="inventaire"]',
       icon: '📦',
-      title: 'Inventaire & Ingrédients',
-      text: 'Renseignez vos prix d\'achat fournisseurs. GourmetRevient met à jour vos coûts de revient automatiquement à chaque modification.',
+      title: 'Gestion des Stocks',
+      text: 'Mettez à jour vos prix d\'achat ici. Toutes vos recettes liées se recalculeront automatiquement. Un gain de temps colossal !',
       position: 'bottom'
     },
     {
-      target: '[data-section="stats"], #nav-stats, .nav-stats',
-      icon: '📊',
-      title: 'Cockpit de Pilotage',
-      text: 'Analysez vos performances en temps réel : marge par catégorie, matrice BCG, simulateur d\'inflation et tableau de bord quotidien.',
+      target: '#nav-stats, [data-section="stats"]',
+      icon: '📈',
+      title: 'Votre Cockpit',
+      text: 'Visualisez vos marges, repérez vos produits les plus rentables et protégez-vous contre l\'inflation grâce aux analyses prédictives.',
       position: 'bottom'
     },
     {
       target: '#btnSubscribePro, .btn-pro',
-      icon: '⭐',
-      title: 'Passer en mode Pro',
-      text: 'Débloquez la synchronisation Cloud, le CRM clients, les exports PDF et bien plus. Commencez gratuitement, passez Pro quand vous voulez.',
+      icon: '💎',
+      title: 'Libérez le potentiel Pro',
+      text: 'Accédez au Cloud, au CRM clients et aux exports PDF premium. Idéal pour passer du stade artisanal au stade entrepreneurial.',
       position: 'bottom'
     },
     {
       target: null,
       icon: '🚀',
-      title: 'C\'est parti !',
-      text: 'GourmetRevient est prêt. Commencez par créer votre première recette ou explorez la bibliothèque des 61 recettes intégrées.',
+      title: 'Prêt pour l\'enfournement ?',
+      text: 'Votre laboratoire numérique est prêt. Commencez par explorer les 61 recettes de démonstration ou créez votre premier chef-d\'œuvre.',
       position: 'center'
     }
   ],
 
-  /**
-   * Démarre l'onboarding si c'est la première connexion
-   */
   init() {
-    const done = localStorage.getItem(this.STORAGE_KEY);
-    if (done) return;
-    // Délai court pour laisser l'UI se charger
-    setTimeout(() => this.start(), 1500);
+    if (localStorage.getItem(this.STORAGE_KEY)) return;
+    setTimeout(() => this.start(), 2000);
   },
 
-  /**
-   * Force le démarrage (pour re-voir le tour)
-   */
   start() {
     this.currentStep = 0;
     this._buildOverlay();
     this._showStep(0);
+    window.addEventListener('resize', () => this._showStep(this.currentStep));
   },
 
   _buildOverlay() {
-    // Nettoyer si déjà présent
-    const existing = document.getElementById('onboarding-overlay');
-    if (existing) existing.remove();
+    if (document.getElementById('onboarding-overlay')) document.getElementById('onboarding-overlay').remove();
 
     this.overlay = document.createElement('div');
     this.overlay.id = 'onboarding-overlay';
     this.overlay.innerHTML = `
       <style>
         #onboarding-overlay {
-          position: fixed; inset: 0; z-index: 99999;
-          pointer-events: none;
+          position: fixed; inset: 0; z-index: 10000;
+          pointer-events: none; font-family: 'Inter', system-ui, sans-serif;
         }
         #onboarding-backdrop {
           position: fixed; inset: 0;
-          background: rgba(0,0,0,0.65);
-          backdrop-filter: blur(3px);
-          pointer-events: all;
+          background: radial-gradient(circle at center, rgba(15, 23, 42, 0.4) 0%, rgba(15, 23, 42, 0.8) 100%);
+          backdrop-filter: blur(4px);
+          pointer-events: all; transition: opacity 0.5s ease;
         }
         #onboarding-spotlight {
           position: fixed;
-          border-radius: 16px;
-          box-shadow: 0 0 0 9999px rgba(0,0,0,0.65);
-          transition: all 0.4s cubic-bezier(.4,0,.2,1);
-          pointer-events: none;
-          display: none;
+          border-radius: 12px;
+          box-shadow: 0 0 0 9999px rgba(15, 23, 42, 0.75);
+          transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+          pointer-events: none; z-index: 10001;
+          outline: 2px solid var(--primary, #10b981);
+          outline-offset: 4px;
         }
         #onboarding-card {
           position: fixed;
-          background: linear-gradient(135deg, #1e293b, #0f172a);
-          border: 1px solid rgba(99,102,241,0.3);
-          border-radius: 20px;
-          padding: 2rem;
-          max-width: 380px;
-          width: calc(100vw - 3rem);
-          box-shadow: 0 25px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(99,102,241,0.1);
+          background: rgba(30, 41, 59, 0.8);
+          backdrop-filter: blur(16px);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: 24px;
+          padding: 2.5rem;
+          width: 400px;
+          max-width: calc(100vw - 40px);
+          box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
           pointer-events: all;
-          z-index: 100000;
-          transition: all 0.4s cubic-bezier(.4,0,.2,1);
-          animation: onboardFadeIn 0.3s ease;
+          z-index: 10002;
+          transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
         }
-        @keyframes onboardFadeIn {
-          from { opacity:0; transform: scale(0.92) translateY(10px); }
-          to   { opacity:1; transform: scale(1)   translateY(0); }
+        .ob-icon {
+          font-size: 3rem; margin-bottom: 1.5rem; display: block;
+          filter: drop-shadow(0 0 10px rgba(16, 185, 129, 0.3));
         }
-        #onboarding-card .ob-icon {
-          font-size: 2.5rem; margin-bottom: 0.75rem; display: block;
-          animation: obBounce 1s ease infinite alternate;
+        .ob-title {
+          color: white; font-size: 1.5rem; font-weight: 800;
+          margin-bottom: 0.75rem; letter-spacing: -0.02em;
         }
-        @keyframes obBounce { from { transform: translateY(0); } to { transform: translateY(-6px); } }
-        #onboarding-card h3 {
-          font-family: 'Inter', sans-serif;
-          color: #f1f5f9; font-size: 1.15rem; font-weight: 800;
-          margin-bottom: 0.6rem; line-height: 1.3;
-        }
-        #onboarding-card p {
-          color: #94a3b8; font-size: 0.88rem; line-height: 1.6; margin-bottom: 1.5rem;
+        .ob-text {
+          color: #94a3b8; font-size: 1rem; line-height: 1.6; margin-bottom: 2rem;
         }
         .ob-footer {
-          display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+          display: flex; align-items: center; justify-content: space-between;
         }
-        .ob-dots { display: flex; gap: 6px; }
-        .ob-dot {
-          width: 8px; height: 8px; border-radius: 50%;
-          background: rgba(255,255,255,0.2); transition: all 0.3s;
+        .ob-progress-container {
+          flex: 1; margin-right: 2rem;
         }
-        .ob-dot.active { background: #6366f1; width: 22px; border-radius: 4px; }
-        .ob-btns { display: flex; gap: 0.5rem; }
+        .ob-progress-bar {
+          height: 6px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden;
+        }
+        .ob-progress-fill {
+          height: 100%; background: linear-gradient(90deg, #10b981, #6366f1);
+          transition: width 0.5s ease;
+        }
         .ob-btn {
-          padding: 0.5rem 1.1rem; border-radius: 10px; font-size: 0.82rem;
-          font-weight: 700; cursor: pointer; border: none; font-family: 'Inter', sans-serif;
-          transition: all 0.2s;
+          padding: 0.75rem 1.5rem; border-radius: 12px; font-weight: 700;
+          cursor: pointer; border: none; transition: all 0.2s;
         }
-        .ob-btn-skip {
-          background: transparent; color: #64748b;
-          border: 1px solid rgba(255,255,255,0.1);
-        }
-        .ob-btn-skip:hover { color: #94a3b8; }
         .ob-btn-next {
-          background: linear-gradient(135deg, #6366f1, #8b5cf6);
-          color: #fff;
-          box-shadow: 0 4px 15px rgba(99,102,241,0.35);
+          background: #10b981; color: white;
+          box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
         }
-        .ob-btn-next:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(99,102,241,0.5); }
-        .ob-btn-finish {
-          background: linear-gradient(135deg, #10b981, #059669);
-          color: #fff;
-          box-shadow: 0 4px 15px rgba(16,185,129,0.35);
-        }
-        .ob-btn-finish:hover { transform: translateY(-1px); }
-        .ob-progress-text {
-          font-size: 0.72rem; color: #475569; font-family: 'Inter', sans-serif;
+        .ob-btn-next:hover { transform: scale(1.05); background: #059669; }
+        .ob-skip {
+          background: transparent; color: #64748b; font-size: 0.875rem;
+          margin-top: 1rem; cursor: pointer; border: none; display: block;
+          text-align: center; width: 100%;
         }
       </style>
       <div id="onboarding-backdrop"></div>
       <div id="onboarding-spotlight"></div>
       <div id="onboarding-card">
         <span class="ob-icon" id="ob-icon"></span>
-        <h3 id="ob-title"></h3>
-        <p id="ob-text"></p>
+        <h3 class="ob-title" id="ob-title"></h3>
+        <p class="ob-text" id="ob-text"></p>
         <div class="ob-footer">
-          <div>
-            <div class="ob-dots" id="ob-dots"></div>
-            <div class="ob-progress-text" id="ob-progress"></div>
+          <div class="ob-progress-container">
+            <div class="ob-progress-bar"><div class="ob-progress-fill" id="ob-progress"></div></div>
           </div>
-          <div class="ob-btns">
-            <button class="ob-btn ob-btn-skip" id="ob-skip">Passer</button>
-            <button class="ob-btn ob-btn-next" id="ob-next">Suivant →</button>
-          </div>
+          <button class="ob-btn ob-btn-next" id="ob-next">Suivant</button>
         </div>
+        <button class="ob-skip" id="ob-skip">Passer la visite</button>
       </div>
     `;
     document.body.appendChild(this.overlay);
 
-    document.getElementById('ob-skip').addEventListener('click', () => this.finish());
-    document.getElementById('ob-next').addEventListener('click', () => this.next());
+    document.getElementById('ob-next').onclick = () => this.next();
+    document.getElementById('ob-skip').onclick = () => this.finish();
   },
 
   _showStep(idx) {
     const step = this.steps[idx];
-    const total = this.steps.length;
     const card = document.getElementById('onboarding-card');
     const spotlight = document.getElementById('onboarding-spotlight');
+    const progress = document.getElementById('ob-progress');
 
-    // Content
-    document.getElementById('ob-icon').textContent = step.icon;
-    document.getElementById('ob-title').textContent = step.title;
-    document.getElementById('ob-text').textContent = step.text;
-    document.getElementById('ob-progress').textContent = `${idx + 1} / ${total}`;
+    document.getElementById('ob-icon').innerText = step.icon;
+    document.getElementById('ob-title').innerText = step.title;
+    document.getElementById('ob-text').innerText = step.text;
+    progress.style.width = ((idx + 1) / this.steps.length * 100) + '%';
 
-    // Dots
-    const dotsEl = document.getElementById('ob-dots');
-    dotsEl.innerHTML = this.steps.map((_, i) =>
-      `<div class="ob-dot ${i === idx ? 'active' : ''}"></div>`
-    ).join('');
-
-    // Last step button
     const nextBtn = document.getElementById('ob-next');
-    if (idx === total - 1) {
-      nextBtn.textContent = '✅ Commencer !';
-      nextBtn.className = 'ob-btn ob-btn-finish';
-    } else {
-      nextBtn.textContent = 'Suivant →';
-      nextBtn.className = 'ob-btn ob-btn-next';
-    }
+    nextBtn.innerText = idx === this.steps.length - 1 ? 'C\'est parti !' : 'Suivant';
 
-    // Spotlight on target
     const target = step.target ? document.querySelector(step.target) : null;
-    if (target) {
+    if (target && target.offsetParent !== null) {
       const rect = target.getBoundingClientRect();
-      const pad = 8;
-      spotlight.style.display = 'block';
-      spotlight.style.left = (rect.left - pad) + 'px';
-      spotlight.style.top = (rect.top - pad) + 'px';
-      spotlight.style.width = (rect.width + pad * 2) + 'px';
-      spotlight.style.height = (rect.height + pad * 2) + 'px';
+      spotlight.style.opacity = '1';
+      spotlight.style.left = (rect.left - 8) + 'px';
+      spotlight.style.top = (rect.top - 8) + 'px';
+      spotlight.style.width = (rect.width + 16) + 'px';
+      spotlight.style.height = (rect.height + 16) + 'px';
 
-      // Position card near target
-      const cardW = 380;
-      const cardH = 220;
-      let top = rect.bottom + 16;
-      let left = rect.left;
-      if (top + cardH > window.innerHeight) top = rect.top - cardH - 16;
-      if (left + cardW > window.innerWidth - 16) left = window.innerWidth - cardW - 16;
-      left = Math.max(16, left);
-      card.style.top = top + 'px';
-      card.style.left = left + 'px';
-      card.style.transform = '';
+      // Smart positioning
+      let cardTop = rect.bottom + 24;
+      let cardLeft = rect.left + (rect.width / 2) - 200;
+
+      if (cardTop + 300 > window.innerHeight) cardTop = rect.top - 320;
+      cardLeft = Math.max(20, Math.min(cardLeft, window.innerWidth - 420));
+
+      card.style.top = cardTop + 'px';
+      card.style.left = cardLeft + 'px';
+      card.style.transform = 'none';
     } else {
-      // Center card
-      spotlight.style.display = 'none';
+      spotlight.style.opacity = '0';
       card.style.top = '50%';
       card.style.left = '50%';
       card.style.transform = 'translate(-50%, -50%)';
@@ -250,8 +207,8 @@ const GourmetOnboarding = {
   },
 
   next() {
-    if (this.currentStep < this.steps.length - 1) {
-      this.currentStep++;
+    this.currentStep++;
+    if (this.currentStep < this.steps.length) {
       this._showStep(this.currentStep);
     } else {
       this.finish();
@@ -259,25 +216,11 @@ const GourmetOnboarding = {
   },
 
   finish() {
-    localStorage.setItem(this.STORAGE_KEY, '1');
-    const overlay = document.getElementById('onboarding-overlay');
-    if (overlay) {
-      overlay.style.opacity = '0';
-      overlay.style.transition = 'opacity 0.4s ease';
-      setTimeout(() => overlay.remove(), 400);
-    }
-    if (typeof showToast === 'function') {
-      showToast('🚀 Bienvenue ! Votre espace est prêt.', 'success');
-    }
-  },
-
-  /**
-   * Réinitialise l'onboarding (pour tests ou menu "Aide")
-   */
-  reset() {
-    localStorage.removeItem(this.STORAGE_KEY);
-    this.start();
+    localStorage.setItem(this.STORAGE_KEY, 'true');
+    this.overlay.style.opacity = '0';
+    setTimeout(() => this.overlay.remove(), 500);
   }
 };
 
 window.GourmetOnboarding = GourmetOnboarding;
+
