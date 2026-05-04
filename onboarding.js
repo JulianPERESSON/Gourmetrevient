@@ -1,6 +1,6 @@
 /**
- * GOURMETREVIENT — Module Onboarding Premium v2.1
- * Fix: Alignement précis & support des menus déroulants
+ * GOURMETREVIENT — Module Onboarding Premium v2.2
+ * Fix: Visibilité des cibles & alignement précis
  */
 
 const GourmetOnboarding = {
@@ -18,21 +18,24 @@ const GourmetOnboarding = {
       position: 'center'
     },
     {
-      target: '#navRecettes, #mLinkRecettes',
+      // Vise le menu "L'Atelier" sur desktop ou le lien direct sur mobile
+      target: '.nav-dropdown:nth-child(2) .nav-dropdown-trigger, #mLinkRecettes',
       icon: '📖',
       title: 'Le Grimoire Numérique',
       text: 'C\'est ici que vous créez vos fiches techniques. Le coût de revient se calcule en temps réel selon vos ingrédients.',
       position: 'bottom'
     },
     {
-      target: '#navInventaire, #mLinkInv',
+      // Vise le menu "Labo & Sécurité"
+      target: '.nav-dropdown:nth-child(4) .nav-dropdown-trigger, #mLinkInv',
       icon: '📦',
       title: 'Gestion des Stocks',
       text: 'Mettez à jour vos prix d\'achat ici. Vos recettes se recalculeront instantanément. Un gain de temps magique !',
       position: 'bottom'
     },
     {
-      target: '#navStats, #mLinkStats',
+      // Vise le menu "Pilotage"
+      target: '.nav-dropdown:nth-child(3) .nav-dropdown-trigger, #mLinkStats',
       icon: '📈',
       title: 'Analyses & Marges',
       text: 'Visualisez vos bénéfices, repérez les produits "Stars" et protégez votre labo contre l\'inflation.',
@@ -62,8 +65,17 @@ const GourmetOnboarding = {
   start() {
     this.currentStep = 0;
     this._buildOverlay();
+    // Forcer la navbar au premier plan
+    const nav = document.querySelector('.header, .top-nav, nav');
+    if (nav) nav.style.zIndex = '10005';
+    
     this._showStep(0);
-    window.addEventListener('resize', () => this._updateSpotlight());
+    window.addEventListener('resize', () => this._updateSpotlight(this._getCurrentTarget()));
+  },
+
+  _getCurrentTarget() {
+    const step = this.steps[this.currentStep];
+    return step.target ? document.querySelector(step.target) : null;
   },
 
   _buildOverlay() {
@@ -74,19 +86,18 @@ const GourmetOnboarding = {
     this.overlay.innerHTML = `
       <style>
         #onboarding-overlay { position: fixed; inset: 0; z-index: 10000; pointer-events: none; font-family: 'Inter', sans-serif; }
-        #onboarding-backdrop { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(4px); pointer-events: all; transition: opacity 0.5s; }
-        #onboarding-spotlight { position: fixed; border-radius: 12px; box-shadow: 0 0 0 9999px rgba(15, 23, 42, 0.75); transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1); pointer-events: none; z-index: 10001; outline: 3px solid #10b981; outline-offset: 4px; animation: obPulse 2s infinite; }
-        @keyframes obPulse { 0%, 100% { outline-offset: 4px; opacity: 1; } 50% { outline-offset: 10px; opacity: 0.6; } }
-        #onboarding-card { position: fixed; background: rgba(30, 41, 59, 0.9); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 24px; padding: 2.2rem; width: 400px; max-width: calc(100vw - 40px); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); pointer-events: all; z-index: 10002; transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1); opacity: 0; transform: scale(0.9); }
+        #onboarding-backdrop { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(2px); pointer-events: all; transition: opacity 0.5s; }
+        #onboarding-spotlight { position: fixed; border-radius: 12px; box-shadow: 0 0 0 9999px rgba(15, 23, 42, 0.75); transition: all 0.3s ease; pointer-events: none; z-index: 10001; outline: 3px solid #10b981; outline-offset: 4px; }
+        #onboarding-card { position: fixed; background: rgba(30, 41, 59, 0.95); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 24px; padding: 2rem; width: 380px; max-width: calc(100vw - 40px); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); pointer-events: all; z-index: 10002; transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1); opacity: 0; transform: scale(0.9); }
         #onboarding-card.visible { opacity: 1; transform: scale(1); }
-        .ob-icon { font-size: 3rem; margin-bottom: 1rem; display: block; }
-        .ob-title { color: white; font-size: 1.5rem; font-weight: 800; margin-bottom: 0.8rem; }
-        .ob-text { color: #cbd5e1; font-size: 1rem; line-height: 1.6; margin-bottom: 2rem; }
+        .ob-icon { font-size: 2.5rem; margin-bottom: 0.8rem; display: block; }
+        .ob-title { color: white; font-size: 1.4rem; font-weight: 800; margin-bottom: 0.6rem; }
+        .ob-text { color: #cbd5e1; font-size: 0.95rem; line-height: 1.5; margin-bottom: 1.5rem; }
         .ob-footer { display: flex; align-items: center; justify-content: space-between; }
-        .ob-progress-bar { flex: 1; height: 6px; background: rgba(255,255,255,0.1); border-radius: 10px; margin-right: 2rem; overflow: hidden; }
-        .ob-progress-fill { height: 100%; background: #10b981; transition: width 0.5s; }
-        .ob-btn { padding: 0.7rem 1.5rem; border-radius: 12px; font-weight: 800; cursor: pointer; border: none; background: #10b981; color: white; }
-        .ob-skip { background: transparent; color: #94a3b8; font-size: 0.85rem; margin-top: 1rem; cursor: pointer; border: none; display: block; width: 100%; text-align: center; text-decoration: underline; }
+        .ob-progress-bar { flex: 1; height: 4px; background: rgba(255,255,255,0.1); border-radius: 10px; margin-right: 1.5rem; overflow: hidden; }
+        .ob-progress-fill { height: 100%; background: #10b981; transition: width 0.3s; }
+        .ob-btn { padding: 0.6rem 1.2rem; border-radius: 10px; font-weight: 800; cursor: pointer; border: none; background: #10b981; color: white; font-size: 0.9rem; }
+        .ob-skip { background: transparent; color: #94a3b8; font-size: 0.8rem; margin-top: 0.8rem; cursor: pointer; border: none; display: block; width: 100%; text-align: center; text-decoration: underline; }
       </style>
       <div id="onboarding-backdrop"></div>
       <div id="onboarding-spotlight"></div>
@@ -119,27 +130,21 @@ const GourmetOnboarding = {
 
     const target = step.target ? document.querySelector(step.target) : null;
     
-    // Si la cible est dans un dropdown, on l'ouvre
-    if (target && target.closest('.nav-dropdown')) {
-      target.closest('.nav-dropdown').classList.add('active');
-    }
-
     if (target) {
       target.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      // On rafraîchit la position plusieurs fois pour suivre le scroll/l'ouverture du menu
       let counts = 0;
       clearInterval(this.refreshTimer);
       this.refreshTimer = setInterval(() => {
         this._updateSpotlight(target);
-        if (counts++ > 20) {
+        if (counts++ > 10) {
           clearInterval(this.refreshTimer);
           card.classList.add('visible');
         }
-      }, 50);
+      }, 100);
     } else {
       clearInterval(this.refreshTimer);
       this._updateSpotlight(null);
-      setTimeout(() => card.classList.add('visible'), 100);
+      setTimeout(() => card.classList.add('visible'), 200);
     }
   },
 
@@ -150,20 +155,20 @@ const GourmetOnboarding = {
     if (target && target.offsetParent !== null) {
       const rect = target.getBoundingClientRect();
       spotlight.style.opacity = '1';
-      spotlight.style.left = (rect.left - 8) + 'px';
-      spotlight.style.top = (rect.top - 8) + 'px';
-      spotlight.style.width = (rect.width + 16) + 'px';
-      spotlight.style.height = (rect.height + 16) + 'px';
+      spotlight.style.left = (rect.left - 6) + 'px';
+      spotlight.style.top = (rect.top - 6) + 'px';
+      spotlight.style.width = (rect.width + 12) + 'px';
+      spotlight.style.height = (rect.height + 12) + 'px';
 
-      let top = rect.bottom + 25;
-      let left = rect.left + (rect.width / 2) - 200;
-      if (top + 300 > window.innerHeight) top = rect.top - 350;
-      left = Math.max(20, Math.min(left, window.innerWidth - 420));
+      let top = rect.bottom + 20;
+      let left = rect.left + (rect.width / 2) - 190;
+      if (top + 250 > window.innerHeight) top = rect.top - 300;
+      left = Math.max(15, Math.min(left, window.innerWidth - 400));
 
       card.style.top = top + 'px';
       card.style.left = left + 'px';
       card.style.transform = 'none';
-    } else if (!target) {
+    } else {
       spotlight.style.opacity = '0';
       card.style.top = '50%';
       card.style.left = '50%';
@@ -172,8 +177,6 @@ const GourmetOnboarding = {
   },
 
   next() {
-    // Fermer les dropdowns avant de passer à la suite
-    document.querySelectorAll('.nav-dropdown').forEach(d => d.classList.remove('active'));
     this.currentStep++;
     if (this.currentStep < this.steps.length) this._showStep(this.currentStep);
     else this.finish();
@@ -181,6 +184,8 @@ const GourmetOnboarding = {
 
   finish() {
     localStorage.setItem(this.STORAGE_KEY, 'true');
+    const nav = document.querySelector('.header, .top-nav, nav');
+    if (nav) nav.style.zIndex = ''; // Restaurer le z-index
     this.overlay.style.opacity = '0';
     setTimeout(() => this.overlay.remove(), 500);
   }
