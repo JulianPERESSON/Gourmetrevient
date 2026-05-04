@@ -1,6 +1,6 @@
 /**
- * GOURMETREVIENT — Module Onboarding Premium v2.3
- * Fix: Opacité & Transparence du Spotlight
+ * GOURMETREVIENT — Module Onboarding Premium v2.4
+ * Fix: Lisibilité maximale & Transparence cristalline
  */
 
 const GourmetOnboarding = {
@@ -62,8 +62,7 @@ const GourmetOnboarding = {
   start() {
     this.currentStep = 0;
     this._buildOverlay();
-    const nav = document.querySelector('.header, .top-nav, nav');
-    if (nav) nav.style.zIndex = '10005';
+    // On ne touche plus au z-index de la navbar pour éviter les conflits
     this._showStep(0);
     window.addEventListener('resize', () => this._updateSpotlight(this._getCurrentTarget()));
   },
@@ -80,10 +79,10 @@ const GourmetOnboarding = {
     this.overlay.id = 'onboarding-overlay';
     this.overlay.innerHTML = `
       <style>
-        #onboarding-overlay { position: fixed; inset: 0; z-index: 10000; pointer-events: none; font-family: 'Inter', sans-serif; }
-        #onboarding-backdrop { position: fixed; inset: 0; background: transparent; backdrop-filter: blur(3px); pointer-events: all; transition: opacity 0.5s; }
-        #onboarding-spotlight { position: fixed; border-radius: 12px; box-shadow: 0 0 0 9999px rgba(15, 23, 42, 0.85); transition: all 0.3s ease; pointer-events: none; z-index: 10001; outline: 3px solid #10b981; outline-offset: 4px; background: transparent; }
-        #onboarding-card { position: fixed; background: rgba(30, 41, 59, 0.98); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 24px; padding: 2rem; width: 380px; max-width: calc(100vw - 40px); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6); pointer-events: all; z-index: 10002; transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1); opacity: 0; transform: scale(0.9); }
+        #onboarding-overlay { position: fixed; inset: 0; z-index: 9998; pointer-events: none; font-family: 'Inter', sans-serif; }
+        #onboarding-backdrop { position: fixed; inset: 0; background: transparent; pointer-events: all; transition: opacity 0.5s; z-index: 9999; }
+        #onboarding-spotlight { position: fixed; border-radius: 12px; box-shadow: 0 0 0 9999px rgba(15, 23, 42, 0.65); transition: all 0.3s ease; pointer-events: none; z-index: 10000; outline: 3px solid #10b981; outline-offset: 4px; background: transparent; }
+        #onboarding-card { position: fixed; background: #1e293b; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 24px; padding: 2rem; width: 380px; max-width: calc(100vw - 40px); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); pointer-events: all; z-index: 10001; transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1); opacity: 0; transform: scale(0.9); color: white; }
         #onboarding-card.visible { opacity: 1; transform: scale(1); }
         .ob-icon { font-size: 2.5rem; margin-bottom: 0.8rem; display: block; }
         .ob-title { color: white; font-size: 1.4rem; font-weight: 800; margin-bottom: 0.6rem; }
@@ -179,8 +178,6 @@ const GourmetOnboarding = {
 
   finish() {
     localStorage.setItem(this.STORAGE_KEY, 'true');
-    const nav = document.querySelector('.header, .top-nav, nav');
-    if (nav) nav.style.zIndex = '';
     this.overlay.style.opacity = '0';
     setTimeout(() => this.overlay.remove(), 500);
   }
