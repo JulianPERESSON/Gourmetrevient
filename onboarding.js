@@ -1,6 +1,6 @@
 /**
- * GOURMETREVIENT — Module Onboarding Expert v6.3
- * Parcours intégral de TOUS les menus avec descriptions exactes
+ * GOURMETREVIENT — Module Onboarding Expert v7.0
+ * Expérience vivante : Effet machine à écrire, Spotlight pulsant et animations de saut
  */
 
 const GourmetOnboarding = {
@@ -8,6 +8,7 @@ const GourmetOnboarding = {
   currentStep: 0,
   overlay: null,
   refreshTimer: null,
+  typingTimer: null,
 
   steps: [
     {
@@ -167,10 +168,8 @@ const GourmetOnboarding = {
     const dropdowns = document.querySelectorAll('.nav-dropdown');
     const el = dropdowns[index];
     if (!el) return;
-
     const trigger = el.querySelector('.nav-dropdown-trigger');
     const content = el.querySelector('.nav-dropdown-content');
-
     if (open) {
       el.classList.add('active');
       if (trigger) trigger.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
@@ -183,7 +182,6 @@ const GourmetOnboarding = {
       }
     } else {
       el.classList.remove('active');
-      if (trigger) trigger.dispatchEvent(new MouseEvent('mouseleave', { bubbles: true }));
       if (content) {
         content.style.display = '';
         content.style.opacity = '';
@@ -215,14 +213,23 @@ const GourmetOnboarding = {
 
   _buildOverlay() {
     if (document.getElementById('onboarding-overlay')) document.getElementById('onboarding-overlay').remove();
-
     this.overlay = document.createElement('div');
     this.overlay.id = 'onboarding-overlay';
     this.overlay.innerHTML = `
       <style>
         #onboarding-overlay { position: fixed; inset: 0; z-index: 9998; pointer-events: none; font-family: 'Inter', sans-serif; }
         #onboarding-backdrop { position: fixed; inset: 0; background: transparent; pointer-events: all; transition: opacity 0.5s; z-index: 9999; }
-        #onboarding-spotlight { position: fixed; border-radius: 12px; box-shadow: 0 0 0 9999px rgba(15, 23, 42, 0.65); transition: all 0.6s cubic-bezier(0.19, 1, 0.22, 1); pointer-events: none; z-index: 10000; outline: 3px solid #10b981; outline-offset: 4px; background: transparent; }
+        
+        #onboarding-spotlight { 
+          position: fixed; border-radius: 12px; box-shadow: 0 0 0 9999px rgba(15, 23, 42, 0.65); 
+          transition: all 0.6s cubic-bezier(0.19, 1, 0.22, 1); pointer-events: none; z-index: 10000; 
+          outline: 3px solid #10b981; outline-offset: 4px; background: transparent;
+          animation: obPulse 2s infinite ease-in-out;
+        }
+        @keyframes obPulse {
+          0%, 100% { outline-color: #10b981; outline-width: 3px; outline-offset: 4px; }
+          50% { outline-color: #34d399; outline-width: 5px; outline-offset: 6px; }
+        }
         
         #onboarding-card { 
           position: fixed; background: #1e293b; border: 1px solid rgba(255, 255, 255, 0.1); 
@@ -240,22 +247,22 @@ const GourmetOnboarding = {
         .ob-character-img {
           width: 100%; height: 90%; object-fit: contain;
           animation: obWiggle 4s ease-in-out infinite;
+          transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
+        .ob-character-img.jump { transform: translateY(-30px) scale(1.1); }
         @keyframes obWiggle {
           0%, 100% { transform: rotate(-1deg) translateY(0); }
           50% { transform: rotate(1deg) translateY(-5px); }
         }
         
-        .ob-content { flex: 1; padding: 2.2rem; display: flex; flex-direction: column; justify-content: center; position: relative; transition: opacity 0.3s; }
-        .ob-content.fading { opacity: 0; }
+        .ob-content { flex: 1; padding: 2.2rem; display: flex; flex-direction: column; justify-content: center; position: relative; }
         .ob-content::before {
           content: ''; position: absolute; left: -12px; top: 50%; transform: translateY(-50%);
           border-top: 12px solid transparent; border-bottom: 12px solid transparent; border-right: 12px solid #1e293b;
         }
-
         .ob-icon { font-size: 2.5rem; margin-bottom: 0.8rem; display: block; }
         .ob-title { color: white; font-size: 1.5rem; font-weight: 800; margin-bottom: 0.8rem; line-height: 1.2; }
-        .ob-text { color: #cbd5e1; font-size: 1rem; line-height: 1.6; margin-bottom: 2rem; }
+        .ob-text { color: #cbd5e1; font-size: 1rem; line-height: 1.6; margin-bottom: 2rem; min-height: 3.2rem; }
         .ob-footer { display: flex; align-items: center; justify-content: space-between; margin-top: auto; }
         .ob-progress-bar { flex: 1; height: 6px; background: rgba(255,255,255,0.1); border-radius: 10px; margin-right: 2rem; overflow: hidden; }
         .ob-progress-fill { height: 100%; background: #10b981; transition: width 0.3s; }
@@ -267,9 +274,9 @@ const GourmetOnboarding = {
       <div id="onboarding-spotlight"></div>
       <div id="onboarding-card">
         <div class="ob-character-container">
-          <img src="./personnage.jpg?v=3.2.0" class="ob-character-img" alt="Chef">
+          <img src="./personnage.jpg?v=3.2.0" id="ob-char" class="ob-character-img" alt="Chef">
         </div>
-        <div class="ob-content" id="ob-inner-content">
+        <div class="ob-content">
           <span class="ob-icon" id="ob-icon"></span>
           <h3 class="ob-title" id="ob-title"></h3>
           <p class="ob-text" id="ob-text"></p>
@@ -286,19 +293,37 @@ const GourmetOnboarding = {
     document.getElementById('ob-skip').onclick = () => this.finish();
   },
 
+  _typeWriter(element, text, speed = 25) {
+    element.innerHTML = '';
+    let i = 0;
+    clearInterval(this.typingTimer);
+    this.typingTimer = setInterval(() => {
+      if (i < text.length) {
+        element.innerHTML += text.charAt(i);
+        i++;
+      } else {
+        clearInterval(this.typingTimer);
+      }
+    }, speed);
+  },
+
   _showStep(idx) {
     const step = this.steps[idx];
     const card = document.getElementById('onboarding-card');
-    const inner = document.getElementById('ob-inner-content');
+    const char = document.getElementById('ob-char');
     
-    inner.classList.add('fading');
-    
+    // Animation du personnage (petit saut)
+    if (char) {
+      char.classList.add('jump');
+      setTimeout(() => char.classList.remove('jump'), 400);
+    }
+
     if (step.action) step.action.call(this);
 
     setTimeout(() => {
       document.getElementById('ob-icon').innerText = step.icon;
       document.getElementById('ob-title').innerText = step.title;
-      document.getElementById('ob-text').innerText = step.text;
+      this._typeWriter(document.getElementById('ob-text'), step.text);
       document.getElementById('ob-progress').style.width = ((idx + 1) / this.steps.length * 100) + '%';
       document.getElementById('ob-next').innerText = idx === this.steps.length - 1 ? 'C\'est parti ! ✨' : 'Suivant';
 
@@ -311,15 +336,11 @@ const GourmetOnboarding = {
         clearInterval(this.refreshTimer);
         this.refreshTimer = setInterval(() => {
           this._updateSpotlight(target);
-          if (counts++ > 25) { 
-            clearInterval(this.refreshTimer);
-            inner.classList.remove('fading');
-          }
+          if (counts++ > 25) clearInterval(this.refreshTimer);
         }, 50);
       } else {
         clearInterval(this.refreshTimer);
         this._updateSpotlight(null);
-        setTimeout(() => inner.classList.remove('fading'), 200);
       }
     }, 200); 
   },
@@ -327,22 +348,18 @@ const GourmetOnboarding = {
   _updateSpotlight(target) {
     const spotlight = document.getElementById('onboarding-spotlight');
     const card = document.getElementById('onboarding-card');
-    
     if (target && target.offsetParent !== null) {
       const rect = target.getBoundingClientRect();
       if (rect.height === 0 || rect.width === 0) return;
-
       spotlight.style.opacity = '1';
       spotlight.style.left = (rect.left - 10) + 'px';
       spotlight.style.top = (rect.top - 10) + 'px';
       spotlight.style.width = (rect.width + 20) + 'px';
       spotlight.style.height = (rect.height + 20) + 'px';
-
       let top = rect.bottom + 30;
       let left = rect.left + (rect.width / 2) - 300; 
       if (top + 350 > window.innerHeight) top = rect.top - 400;
       left = Math.max(20, Math.min(left, window.innerWidth - 620));
-
       card.style.top = top + 'px';
       card.style.left = left + 'px';
       card.style.transform = 'none';
