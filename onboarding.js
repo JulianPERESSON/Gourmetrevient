@@ -1,6 +1,6 @@
 /**
- * GOURMETREVIENT — Module Onboarding Expert v8.8
- * Correction : Suppression du cadre vert et affichage bord-à-bord
+ * GOURMETREVIENT — Module Onboarding Expert v8.9
+ * Correction : Rétablissement du cadre (spotlight) interactif pour les étapes d'action
  */
 
 const GourmetOnboarding = {
@@ -254,11 +254,11 @@ const GourmetOnboarding = {
         
         .ob-character-container {
           width: 250px; position: relative; display: flex; overflow: hidden; flex-shrink: 0;
-          background: #e2f4e6; /* Fond de secours assorti */
+          background: #e2f4e6;
         }
         .ob-character-img {
           width: 100%; height: 100%; object-fit: cover;
-          object-position: top center; /* Priorité à la tête */
+          object-position: top center;
           will-change: transform;
         }
         
@@ -328,13 +328,15 @@ const GourmetOnboarding = {
 
     if (step.requireClick) {
       nextBtn.classList.add('disabled');
-      spotlight.style.opacity = '0';
+      // On garde le spotlight mais on rend le backdrop non-bloquant
+      spotlight.style.opacity = '1';
       backdrop.style.opacity = '0';
       backdrop.style.pointerEvents = 'none';
       
       const targetEl = document.querySelector(step.requireClick);
       if (targetEl) {
         const handler = () => {
+          // On remet le backdrop bloquant après le clic
           backdrop.style.opacity = '1';
           backdrop.style.pointerEvents = 'all';
           targetEl.removeEventListener('click', handler);
@@ -361,6 +363,11 @@ const GourmetOnboarding = {
     }, 200); 
   },
 
+  _getCurrentTarget() {
+    const step = this.steps[this.currentStep];
+    return step && step.target ? document.querySelector(step.target) : null;
+  },
+
   _updateSpotlight(target) {
     const spotlight = document.getElementById('onboarding-spotlight');
     const card = document.getElementById('onboarding-card');
@@ -370,6 +377,7 @@ const GourmetOnboarding = {
       spotlight.style.top = (rect.top - 10) + 'px';
       spotlight.style.width = (rect.width + 20) + 'px';
       spotlight.style.height = (rect.height + 20) + 'px';
+      spotlight.style.opacity = '1';
       
       const cardHeight = card.offsetHeight || 350;
       const cardWidth = card.offsetWidth || 620;
