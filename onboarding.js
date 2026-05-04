@@ -96,8 +96,8 @@ const GourmetOnboarding = {
           background: linear-gradient(180deg, #334155 0%, #1e293b 100%); border-radius: 30px 0 0 30px; overflow: hidden;
         }
         .ob-character-img {
-          width: 200px; height: 200px; object-fit: cover; object-position: top; border-radius: 50%; 
-          margin-bottom: -20px; border: 5px solid #10b981; box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+          width: 220px; height: 220px; object-fit: contain; background-color: #c9f2c9; border-radius: 50%; 
+          border: 5px solid #10b981; box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
           animation: obWiggle 3s ease-in-out infinite;
         }
         @keyframes obWiggle {
