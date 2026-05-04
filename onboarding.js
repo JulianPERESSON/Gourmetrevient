@@ -1,6 +1,6 @@
 /**
- * GOURMETREVIENT — Module Onboarding Expert v8.2
- * Correctif : Suppression des bords sombres lors de la parallaxe (Zoom + Fond assorti)
+ * GOURMETREVIENT — Module Onboarding Expert v8.3
+ * Correctif : Autorisation des clics sur les éléments cibles (Action Requise)
  */
 
 const GourmetOnboarding = {
@@ -218,7 +218,6 @@ const GourmetOnboarding = {
       const rect = card.getBoundingClientRect();
       const x = (e.clientX - rect.left) / rect.width - 0.5;
       const y = (e.clientY - rect.top) / rect.height - 0.5;
-      // On utilise un scale(1.15) pour avoir de la marge de manoeuvre sans voir le fond
       char.style.transform = `scale(1.15) translateX(${x * 20}px) translateY(${y * 20}px) rotate(${x * 3}deg)`;
     });
   },
@@ -238,6 +237,8 @@ const GourmetOnboarding = {
           outline: 3px solid #10b981; outline-offset: 4px; background: transparent;
           animation: obPulse 2s infinite ease-in-out;
         }
+        #onboarding-spotlight.allow-clicks { pointer-events: none !important; }
+        
         @keyframes obPulse {
           0%, 100% { outline-color: #10b981; outline-width: 3px; outline-offset: 4px; }
           50% { outline-color: #34d399; outline-width: 5px; outline-offset: 6px; }
@@ -254,13 +255,12 @@ const GourmetOnboarding = {
         
         .ob-character-container {
           width: 220px; position: relative; display: flex; align-items: flex-end; justify-content: center;
-          background: #e1f4e5; /* Fond vert clair assorti à la photo */
-          overflow: hidden; flex-shrink: 0;
+          background: #e1f4e5; overflow: hidden; flex-shrink: 0;
         }
         .ob-character-img {
           width: 100%; height: 100%; object-fit: cover;
           transition: transform 0.1s ease-out;
-          transform: scale(1.15); /* Zoom par défaut */
+          transform: scale(1.15);
           will-change: transform;
         }
         
@@ -323,15 +323,24 @@ const GourmetOnboarding = {
     const step = this.steps[idx];
     const card = document.getElementById('onboarding-card');
     const nextBtn = document.getElementById('ob-next');
+    const spotlight = document.getElementById('onboarding-spotlight');
+    const backdrop = document.getElementById('onboarding-backdrop');
+    
     if (step.action) step.action.call(this);
+
     if (step.requireClick) {
       nextBtn.classList.add('disabled');
       nextBtn.innerText = 'Action Requise 👆';
+      spotlight.classList.add('allow-clicks');
+      backdrop.style.pointerEvents = 'none'; // On laisse passer les clics au travers
+      
       const targetEl = document.querySelector(step.requireClick);
       if (targetEl) {
         const handler = () => {
           nextBtn.classList.remove('disabled');
           nextBtn.innerText = 'Suivant';
+          spotlight.classList.remove('allow-clicks');
+          backdrop.style.pointerEvents = 'all';
           targetEl.removeEventListener('click', handler);
           this.next();
         };
@@ -339,8 +348,11 @@ const GourmetOnboarding = {
       }
     } else {
       nextBtn.classList.remove('disabled');
+      spotlight.classList.remove('allow-clicks');
+      backdrop.style.pointerEvents = 'all';
       nextBtn.innerText = idx === this.steps.length - 1 ? 'C\'est parti ! ✨' : 'Suivant';
     }
+
     setTimeout(() => {
       document.getElementById('ob-icon').innerText = step.icon;
       document.getElementById('ob-title').innerText = step.title;
