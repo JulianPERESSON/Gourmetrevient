@@ -1,6 +1,6 @@
 /**
- * GOURMETREVIENT — Module Onboarding Expert v8.4
- * Correction radicale : Clics libres, Centrage forcé et Design épuré
+ * GOURMETREVIENT — Module Onboarding Expert v8.6
+ * Correction : Visibilité totale du Chef, Parallaxe douce et Harmonisation des couleurs
  */
 
 const GourmetOnboarding = {
@@ -139,14 +139,14 @@ const GourmetOnboarding = {
     {
       target: '#navHygiene',
       icon: '🧼',
-      title: 'Hygiène & HACCP',
+      title: 'Hygiène & HACCP Pro',
       text: 'Suivez vos protocoles de nettoyage et de sécurité alimentaire.',
       action: function() { this._toggleDropdown(2, true); }
     },
     {
       target: '#navLabo',
       icon: '📐',
-      title: 'Matériel & Outillage',
+      title: 'Matériel & Outillage (2D)',
       text: 'Aménagement de votre laboratoire en 2D et gestion du petit matériel.',
       action: function() { this._toggleDropdown(2, true); }
     },
@@ -218,7 +218,8 @@ const GourmetOnboarding = {
       const rect = card.getBoundingClientRect();
       const x = (e.clientX - rect.left) / rect.width - 0.5;
       const y = (e.clientY - rect.top) / rect.height - 0.5;
-      char.style.transform = `scale(1.2) translateX(${x * 25}px) translateY(${y * 25}px)`;
+      // Parallaxe plus douce (12 au lieu de 25)
+      char.style.transform = `scale(1.08) translateX(${x * 12}px) translateY(${y * 12}px)`;
     });
   },
 
@@ -253,12 +254,12 @@ const GourmetOnboarding = {
         #onboarding-card.visible { opacity: 1; transform: scale(1); }
         
         .ob-character-container {
-          width: 200px; position: relative; display: flex; align-items: flex-end; justify-content: center;
-          background: #e1f4e5; overflow: hidden; flex-shrink: 0;
+          width: 200px; position: relative; display: flex; align-items: center; justify-content: center;
+          background: #e2f4e6; overflow: hidden; flex-shrink: 0; /* Vert assorti à l'image */
         }
         .ob-character-img {
-          width: 100%; height: 100%; object-fit: cover;
-          transform: scale(1.2);
+          width: 90%; height: 90%; object-fit: contain; /* Tête aux pieds sans coupe */
+          transition: transform 0.2s ease-out;
           will-change: transform;
         }
         
@@ -284,7 +285,7 @@ const GourmetOnboarding = {
       <div id="onboarding-spotlight"></div>
       <div id="onboarding-card">
         <div class="ob-character-container">
-          <img src="./personnage.jpg?v=3.2.0" id="ob-char" class="ob-character-img" alt="Chef">
+          <img src="./personnage.jpg?v=3.3.0" id="ob-char" class="ob-character-img" alt="Chef">
         </div>
         <div class="ob-content">
           <span class="ob-icon" id="ob-icon"></span>
@@ -328,8 +329,8 @@ const GourmetOnboarding = {
 
     if (step.requireClick) {
       nextBtn.classList.add('disabled');
-      spotlight.style.opacity = '0'; // On cache le spotlight pour laisser cliquer
-      backdrop.style.opacity = '0'; // On cache le fond pour laisser cliquer
+      spotlight.style.opacity = '0';
+      backdrop.style.opacity = '0';
       backdrop.style.pointerEvents = 'none';
       
       const targetEl = document.querySelector(step.requireClick);
@@ -379,7 +380,6 @@ const GourmetOnboarding = {
         top = rect.top - cardHeight - 40;
       }
       
-      // Sécurité : On s'assure que la carte ne touche jamais le haut de l'écran
       top = Math.max(80, Math.min(top, window.innerHeight - cardHeight - 30));
       
       let left = rect.left + (rect.width / 2) - (cardWidth / 2);
