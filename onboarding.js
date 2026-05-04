@@ -92,13 +92,12 @@ const GourmetOnboarding = {
         #onboarding-card.visible { opacity: 1; transform: scale(1); }
         
         .ob-character-container {
-          width: 180px; position: relative; display: flex; align-items: flex-end; justify-content: center;
-          background: linear-gradient(180deg, #334155 0%, #1e293b 100%); border-radius: 30px 0 0 30px; overflow: hidden;
+          width: 220px; position: relative; display: flex; align-items: center; justify-content: center;
+          background: #c9f2c9; border-radius: 30px 0 0 30px; overflow: hidden;
         }
         .ob-character-img {
-          width: 220px; height: 220px; object-fit: contain; background-color: #c9f2c9; border-radius: 50%; 
-          border: 5px solid #10b981; box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
-          animation: obWiggle 3s ease-in-out infinite;
+          width: 100%; height: 90%; object-fit: contain;
+          animation: obWiggle 4s ease-in-out infinite;
         }
         @keyframes obWiggle {
           0%, 100% { transform: rotate(-2deg) translateY(0); }
