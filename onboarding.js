@@ -1,6 +1,6 @@
 /**
- * GOURMETREVIENT — Module Onboarding Expert v8.9
- * Correction : Rétablissement du cadre (spotlight) interactif pour les étapes d'action
+ * GOURMETREVIENT — Module Onboarding Mascotte v9.0
+ * Style : "Carrément sur le site" (Mascotte flottante et Glassmorphism)
  */
 
 const GourmetOnboarding = {
@@ -218,7 +218,7 @@ const GourmetOnboarding = {
       const rect = card.getBoundingClientRect();
       const x = (e.clientX - rect.left) / rect.width - 0.5;
       const y = (e.clientY - rect.top) / rect.height - 0.5;
-      char.style.transform = `scale(1.1) translateX(${x * 12}px) translateY(${y * 12}px)`;
+      char.style.transform = `scale(1.15) translateX(${x * 15}px) translateY(${y * 15}px)`;
     });
   },
 
@@ -232,7 +232,7 @@ const GourmetOnboarding = {
         #onboarding-backdrop { position: fixed; inset: 0; background: transparent; pointer-events: all; transition: opacity 0.4s; z-index: 9999; }
         
         #onboarding-spotlight { 
-          position: fixed; border-radius: 12px; box-shadow: 0 0 0 9999px rgba(15, 23, 42, 0.7); 
+          position: fixed; border-radius: 12px; box-shadow: 0 0 0 9999px rgba(15, 23, 42, 0.65); 
           transition: all 0.6s cubic-bezier(0.19, 1, 0.22, 1); pointer-events: none; z-index: 10000; 
           outline: 3px solid #10b981; outline-offset: 4px; background: transparent;
           animation: obPulse 2s infinite ease-in-out;
@@ -244,35 +244,39 @@ const GourmetOnboarding = {
         }
         
         #onboarding-card { 
-          position: fixed; background: #1e293b; border: 1px solid rgba(255, 255, 255, 0.1); 
-          border-radius: 24px; padding: 0; width: 620px; max-width: calc(100vw - 40px); 
-          box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7); pointer-events: all; 
+          position: fixed; background: rgba(30, 41, 59, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+          border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 28px; padding: 0; width: 640px; max-width: calc(100vw - 40px); 
+          box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.6), inset 0 0 0 1px rgba(255,255,255,0.1); pointer-events: all; 
           z-index: 10001; transition: all 0.6s cubic-bezier(0.19, 1, 0.22, 1); 
-          opacity: 0; transform: scale(0.9); color: white; display: flex; overflow: hidden;
+          opacity: 0; transform: scale(0.9); color: white; display: flex; overflow: visible; /* Sortie de cadre autorisée */
         }
         #onboarding-card.visible { opacity: 1; transform: scale(1); }
         
         .ob-character-container {
-          width: 250px; position: relative; display: flex; overflow: hidden; flex-shrink: 0;
-          background: #e2f4e6;
+          width: 260px; position: relative; display: flex; align-items: flex-end; justify-content: center;
+          background: transparent; overflow: visible; flex-shrink: 0;
+          margin-top: -60px; /* Le personnage dépasse en haut */
+          margin-left: -20px; /* Le personnage dépasse à gauche */
+          filter: drop-shadow(0 20px 30px rgba(0,0,0,0.4));
         }
         .ob-character-img {
-          width: 100%; height: 100%; object-fit: cover;
-          object-position: top center;
+          width: 110%; height: 115%; object-fit: contain; 
+          object-position: bottom center;
           will-change: transform;
         }
         
-        .ob-content { flex: 1; padding: 2rem; display: flex; flex-direction: column; justify-content: center; position: relative; }
-        .ob-icon { font-size: 2.2rem; margin-bottom: 0.8rem; display: block; }
-        .ob-title { color: white; font-size: 1.4rem; font-weight: 800; margin-bottom: 0.6rem; line-height: 1.2; }
-        .ob-text { color: #cbd5e1; font-size: 0.95rem; line-height: 1.5; margin-bottom: 1.8rem; min-height: 3rem; }
+        .ob-content { flex: 1; padding: 2.5rem; display: flex; flex-direction: column; justify-content: center; position: relative; }
+        .ob-icon { font-size: 2.5rem; margin-bottom: 1rem; display: block; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.2)); }
+        .ob-title { color: white; font-size: 1.6rem; font-weight: 800; margin-bottom: 0.8rem; line-height: 1.2; letter-spacing: -0.02em; }
+        .ob-text { color: #e2e8f0; font-size: 1.05rem; line-height: 1.6; margin-bottom: 2rem; min-height: 4rem; text-shadow: 0 1px 2px rgba(0,0,0,0.1); }
         .ob-footer { display: flex; align-items: center; justify-content: space-between; margin-top: auto; }
-        .ob-progress-bar { flex: 1; height: 5px; background: rgba(255,255,255,0.1); border-radius: 10px; margin-right: 1.5rem; overflow: hidden; }
-        .ob-progress-fill { height: 100%; background: #10b981; transition: width 0.3s; }
-        .ob-btn { padding: 0.7rem 1.5rem; border-radius: 12px; font-weight: 800; cursor: pointer; border: none; background: #10b981; color: white; font-size: 0.95rem; transition: all 0.2s; }
-        .ob-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3); }
+        .ob-progress-bar { flex: 1; height: 6px; background: rgba(255,255,255,0.15); border-radius: 10px; margin-right: 2rem; overflow: hidden; }
+        .ob-progress-fill { height: 100%; background: linear-gradient(90deg, #10b981, #34d399); transition: width 0.3s; }
+        .ob-btn { padding: 0.8rem 1.8rem; border-radius: 14px; font-weight: 800; cursor: pointer; border: none; background: #10b981; color: white; font-size: 1rem; transition: all 0.2s; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4); }
+        .ob-btn:hover { transform: translateY(-2px) scale(1.05); background: #34d399; }
         .ob-btn.disabled { opacity: 0; pointer-events: none; }
-        .ob-skip { background: transparent; color: #94a3b8; font-size: 0.8rem; margin-top: 1.2rem; cursor: pointer; border: none; display: block; width: 100%; text-align: center; text-decoration: underline; opacity: 0.6; }
+        .ob-skip { background: transparent; color: #94a3b8; font-size: 0.85rem; margin-top: 1.5rem; cursor: pointer; border: none; display: block; width: 100%; text-align: center; text-decoration: none; opacity: 0.7; transition: opacity 0.2s; }
+        .ob-skip:hover { opacity: 1; }
         
         .confetti { position: fixed; width: 10px; height: 10px; z-index: 10002; top: -10px; border-radius: 2px; animation: confettiFall 3s ease-in forwards; }
         @keyframes confettiFall {
@@ -284,7 +288,7 @@ const GourmetOnboarding = {
       <div id="onboarding-spotlight"></div>
       <div id="onboarding-card">
         <div class="ob-character-container">
-          <img src="./personnage.jpg?v=3.4.0" id="ob-char" class="ob-character-img" alt="Chef">
+          <img src="./personnage.jpg?v=3.5.0" id="ob-char" class="ob-character-img" alt="Mascotte">
         </div>
         <div class="ob-content">
           <span class="ob-icon" id="ob-icon"></span>
@@ -294,7 +298,7 @@ const GourmetOnboarding = {
             <div class="ob-progress-bar"><div class="ob-progress-fill" id="ob-progress"></div></div>
             <button class="ob-btn" id="ob-next">Suivant</button>
           </div>
-          <button class="ob-skip" id="ob-skip">Quitter la visite</button>
+          <button class="ob-skip" id="ob-skip">Passer l'introduction</button>
         </div>
       </div>
     `;
@@ -328,7 +332,6 @@ const GourmetOnboarding = {
 
     if (step.requireClick) {
       nextBtn.classList.add('disabled');
-      // On garde le spotlight mais on rend le backdrop non-bloquant
       spotlight.style.opacity = '1';
       backdrop.style.opacity = '0';
       backdrop.style.pointerEvents = 'none';
@@ -336,7 +339,6 @@ const GourmetOnboarding = {
       const targetEl = document.querySelector(step.requireClick);
       if (targetEl) {
         const handler = () => {
-          // On remet le backdrop bloquant après le clic
           backdrop.style.opacity = '1';
           backdrop.style.pointerEvents = 'all';
           targetEl.removeEventListener('click', handler);
@@ -349,7 +351,7 @@ const GourmetOnboarding = {
       spotlight.style.opacity = '1';
       backdrop.style.opacity = '1';
       backdrop.style.pointerEvents = 'all';
-      nextBtn.innerText = idx === this.steps.length - 1 ? 'Terminer ✨' : 'Suivant';
+      nextBtn.innerText = idx === this.steps.length - 1 ? 'C\'est parti ! 🚀' : 'Suivant';
     }
 
     setTimeout(() => {
@@ -379,18 +381,18 @@ const GourmetOnboarding = {
       spotlight.style.height = (rect.height + 20) + 'px';
       spotlight.style.opacity = '1';
       
-      const cardHeight = card.offsetHeight || 350;
-      const cardWidth = card.offsetWidth || 620;
+      const cardHeight = card.offsetHeight || 380;
+      const cardWidth = card.offsetWidth || 640;
       
-      let top = rect.bottom + 40;
+      let top = rect.bottom + 60;
       if (top + cardHeight > window.innerHeight) {
-        top = rect.top - cardHeight - 40;
+        top = rect.top - cardHeight - 60;
       }
       
-      top = Math.max(80, Math.min(top, window.innerHeight - cardHeight - 30));
+      top = Math.max(100, Math.min(top, window.innerHeight - cardHeight - 30));
       
       let left = rect.left + (rect.width / 2) - (cardWidth / 2);
-      left = Math.max(20, Math.min(left, window.innerWidth - cardWidth - 20));
+      left = Math.max(40, Math.min(left, window.innerWidth - cardWidth - 40));
       
       card.style.top = top + 'px';
       card.style.left = left + 'px';
@@ -405,13 +407,13 @@ const GourmetOnboarding = {
   },
 
   _launchConfetti() {
-    for (let i = 0; i < 120; i++) {
+    for (let i = 0; i < 150; i++) {
       const c = document.createElement('div');
       c.className = 'confetti';
       c.style.left = Math.random() * 100 + 'vw';
-      c.style.backgroundColor = ['#f2d74e', '#95c3de', '#ff9a91', '#10b981'][Math.floor(Math.random() * 4)];
+      c.style.backgroundColor = ['#f2d74e', '#95c3de', '#ff9a91', '#10b981', '#ffffff'][Math.floor(Math.random() * 5)];
       c.style.animationDelay = Math.random() * 2 + 's';
-      c.style.width = Math.random() * 8 + 4 + 'px';
+      c.style.width = Math.random() * 10 + 5 + 'px';
       c.style.height = c.style.width;
       document.body.appendChild(c);
       setTimeout(() => c.remove(), 4000);
