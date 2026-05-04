@@ -1,6 +1,6 @@
 /**
- * GOURMETREVIENT — Module Onboarding Expert v8.0
- * Expérience Interactive Totale : Parallaxe, Confettis et Actions Requises
+ * GOURMETREVIENT — Module Onboarding Expert v8.1
+ * Correctifs : Centrage intelligent et fond photo unifié
  */
 
 const GourmetOnboarding = {
@@ -24,7 +24,7 @@ const GourmetOnboarding = {
       icon: '💡',
       title: 'L\'Atelier Créatif',
       text: 'Essayez d\'ouvrir ce menu vous-même en cliquant sur "Atelier" pour voir la suite !',
-      action: function() { this._toggleDropdown(0, false); }, // On le ferme pour forcer l'utilisateur
+      action: function() { this._toggleDropdown(0, false); },
       requireClick: '.nav-dropdown:nth-child(3) .nav-dropdown-trigger'
     },
     {
@@ -218,7 +218,7 @@ const GourmetOnboarding = {
       const rect = card.getBoundingClientRect();
       const x = (e.clientX - rect.left) / rect.width - 0.5;
       const y = (e.clientY - rect.top) / rect.height - 0.5;
-      char.style.transform = `translateX(${x * 20}px) translateY(${y * 20}px) rotate(${x * 5}deg)`;
+      char.style.transform = `translateX(${x * 15}px) translateY(${y * 15}px) rotate(${x * 3}deg)`;
     });
   },
 
@@ -247,25 +247,21 @@ const GourmetOnboarding = {
           border-radius: 30px; padding: 0; width: 600px; max-width: calc(100vw - 40px); 
           box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6); pointer-events: all; 
           z-index: 10001; transition: all 0.6s cubic-bezier(0.19, 1, 0.22, 1); 
-          opacity: 0; transform: scale(0.9); color: white; display: flex; overflow: visible;
+          opacity: 0; transform: scale(0.9); color: white; display: flex; overflow: hidden;
         }
         #onboarding-card.visible { opacity: 1; transform: scale(1); }
         
         .ob-character-container {
-          width: 220px; position: relative; display: flex; align-items: center; justify-content: center;
-          background: #c9f2c9; border-radius: 30px 0 0 30px; overflow: hidden; flex-shrink: 0;
+          width: 220px; position: relative; display: flex; align-items: flex-end; justify-content: center;
+          background: transparent; overflow: hidden; flex-shrink: 0;
         }
         .ob-character-img {
-          width: 100%; height: 90%; object-fit: contain;
+          width: 100%; height: 100%; object-fit: contain;
           transition: transform 0.1s ease-out;
           will-change: transform;
         }
         
         .ob-content { flex: 1; padding: 2.2rem; display: flex; flex-direction: column; justify-content: center; position: relative; }
-        .ob-content::before {
-          content: ''; position: absolute; left: -12px; top: 50%; transform: translateY(-50%);
-          border-top: 12px solid transparent; border-bottom: 12px solid transparent; border-right: 12px solid #1e293b;
-        }
         .ob-icon { font-size: 2.5rem; margin-bottom: 0.8rem; display: block; }
         .ob-title { color: white; font-size: 1.5rem; font-weight: 800; margin-bottom: 0.8rem; line-height: 1.2; }
         .ob-text { color: #cbd5e1; font-size: 1rem; line-height: 1.6; margin-bottom: 2rem; min-height: 3.2rem; }
@@ -277,8 +273,7 @@ const GourmetOnboarding = {
         .ob-btn.disabled { opacity: 0.3; pointer-events: none; filter: grayscale(1); }
         .ob-skip { background: transparent; color: #94a3b8; font-size: 0.85rem; margin-top: 1.5rem; cursor: pointer; border: none; display: block; width: 100%; text-align: center; text-decoration: underline; opacity: 0.6; }
         
-        /* Effet Confettis */
-        .confetti { position: fixed; width: 10px; height: 10px; background-color: #f2d74e; z-index: 10002; top: -10px; border-radius: 2px; animation: confettiFall 3s ease-in forwards; }
+        .confetti { position: fixed; width: 10px; height: 10px; z-index: 10002; top: -10px; border-radius: 2px; animation: confettiFall 3s ease-in forwards; }
         @keyframes confettiFall {
           0% { transform: translateY(0) rotate(0); opacity: 1; }
           100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
@@ -328,7 +323,6 @@ const GourmetOnboarding = {
     
     if (step.action) step.action.call(this);
 
-    // Gestion de l'action requise
     if (step.requireClick) {
       nextBtn.classList.add('disabled');
       nextBtn.innerText = 'Action Requise 👆';
@@ -338,7 +332,7 @@ const GourmetOnboarding = {
           nextBtn.classList.remove('disabled');
           nextBtn.innerText = 'Suivant';
           targetEl.removeEventListener('click', handler);
-          this.next(); // On passe automatiquement à la suite après le clic
+          this.next();
         };
         targetEl.addEventListener('click', handler);
       }
@@ -381,12 +375,25 @@ const GourmetOnboarding = {
       spotlight.style.top = (rect.top - 10) + 'px';
       spotlight.style.width = (rect.width + 20) + 'px';
       spotlight.style.height = (rect.height + 20) + 'px';
+      
+      const cardHeight = card.offsetHeight || 380;
+      const cardWidth = card.offsetWidth || 600;
+      
       let top = rect.bottom + 30;
-      let left = rect.left + (rect.width / 2) - 300; 
-      if (top + 350 > window.innerHeight) top = rect.top - 400;
-      left = Math.max(20, Math.min(left, window.innerWidth - 620));
+      // Si pas de place en bas, on met en haut de l'élément
+      if (top + cardHeight > window.innerHeight) {
+        top = rect.top - cardHeight - 30;
+      }
+      
+      // Sécurité anti-débordement haut/bas écran
+      top = Math.max(20, Math.min(top, window.innerHeight - cardHeight - 20));
+      
+      let left = rect.left + (rect.width / 2) - (cardWidth / 2);
+      left = Math.max(20, Math.min(left, window.innerWidth - cardWidth - 20));
+      
       card.style.top = top + 'px';
       card.style.left = left + 'px';
+      card.style.transform = 'none';
       card.classList.add('visible');
     } else if (target === null) {
       spotlight.style.opacity = '0';
