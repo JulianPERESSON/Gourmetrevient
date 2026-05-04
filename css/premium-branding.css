@@ -1629,39 +1629,55 @@ h1, h2, h3 {
 
 @media (min-width: 769px) and (max-width: 1360px) {
   .app-header {
-    padding: 0 1rem !important;
-    gap: 0.6rem !important;
+    padding: 0 0.8rem !important;
+    gap: 0.5rem !important;
+    justify-content: space-between !important;
   }
   
+  .header-brand {
+    flex-shrink: 0 !important;
+  }
+
   .header-brand h1 span {
-    display: none !important; /* Cache "Revient" pour gagner de la place */
+    display: none !important;
   }
 
   .header-nav {
     gap: 0.2rem !important;
+    justify-content: center !important;
+  }
+
+  /* MODE ULTRA-COMPACT : On cache le texte des 3 menus principaux pour sauver le profil */
+  .nav-dropdown-trigger span:not(.nav-arrow) {
+    display: none !important;
   }
 
   .nav-link, .nav-dropdown-trigger {
     padding: 0.4rem 0.6rem !important;
-    font-size: 0.85rem !important;
+    font-size: 1rem !important; /* On garde l'emoji bien visible */
   }
 
-  /* Compact mode for very tight screens (Small laptops) */
-  @media (max-width: 1200px) {
-    .nav-dropdown-trigger span:not(.nav-arrow),
-    .nav-link span {
-       display: none !important; /* Garde uniquement l'emoji */
-    }
-    
-    #btnSavedRecipes span,
-    #btnSubscribePro span,
-    #userNameHeader {
-      display: none !important; /* Icon-only mode */
-    }
-    
-    .header-actions {
-      gap: 8px !important;
-    }
+  /* Gel de la zone de profil pour qu'elle ne disparaisse JAMAIS */
+  .header-actions {
+    flex-shrink: 0 !important;
+    gap: 5px !important;
+    margin-left: auto !important;
+  }
+
+  #btnSavedRecipes span,
+  #btnSubscribePro span,
+  #userNameHeader {
+    display: none !important;
+  }
+  
+  #userProfileArea {
+    display: flex !important;
+    gap: 8px !important;
+  }
+
+  /* Correction toggle thème */
+  .theme-toggle-btn span {
+    font-size: 1.1rem !important;
   }
 }
 
