@@ -1,6 +1,6 @@
 /**
- * GOURMETREVIENT — Module Onboarding Expert v4.0
- * Navigation immersive, explications détaillées et personnage dynamique
+ * GOURMETREVIENT — Module Onboarding Expert v5.0
+ * Exploration détaillée des menus et navigation immersive
  */
 
 const GourmetOnboarding = {
@@ -17,66 +17,103 @@ const GourmetOnboarding = {
       text: 'Je suis votre assistant Gourmet. Je vais vous montrer comment transformer votre passion en une entreprise rentable et organisée. Suivez-moi !',
       position: 'center'
     },
+    // --- MENU 1 : L'ATELIER ---
     {
-      target: '.nav-dropdown:nth-child(2) .nav-dropdown-trigger, #mLinkRecettes',
+      target: '.nav-dropdown:nth-child(2) .nav-dropdown-trigger',
+      icon: '💡',
+      title: 'L\'Atelier Créatif',
+      text: 'C\'est ici que la magie opère. Cliquez pour découvrir vos outils de création.',
+      action: function() { this._toggleDropdown(0, true); }
+    },
+    {
+      target: '#navRecettes',
       icon: '📖',
-      title: 'Le Grimoire Numérique',
-      text: 'Tout commence ici. Créez vos fiches techniques avec une précision chirurgicale. Chaque gramme compte pour votre marge.',
-      position: 'bottom',
-      action: () => document.querySelector('#navRecettes')?.click()
+      title: 'Calculateur de Recettes',
+      text: 'Le cœur de l\'app. Saisissez vos ingrédients et obtenez instantanément votre coût de revient et votre marge brute.',
+      action: function() { this._toggleDropdown(0, true); }
     },
     {
-      target: '#recipeContainer, .recipe-grid',
-      icon: '⚖️',
-      title: 'Calcul de Coût en Direct',
-      text: 'GourmetRevient calcule automatiquement votre coût de revient, votre marge et votre prix de vente conseillé. Finies les erreurs de calcul !',
-      position: 'bottom'
+      target: '#navAssembly',
+      icon: '🏗️',
+      title: 'Simulateur de Montage',
+      text: 'Visualisez vos entremets en coupe avant de les produire. Ajustez les épaisseurs de couches pour un équilibre parfait.',
+      action: function() { this._toggleDropdown(0, true); }
     },
     {
-      target: '.nav-dropdown:nth-child(4) .nav-dropdown-trigger, #mLinkInv',
-      icon: '📦',
-      title: 'Stocks & Ingrédients',
-      text: 'Gérez votre économat. Une hausse de prix chez votre fournisseur ? Mettez-la à jour ici, et toutes vos recettes se recalculeront instantanément.',
-      position: 'bottom',
-      action: () => document.querySelector('#navInventaire')?.click()
+      target: '#navConverter',
+      icon: '📏',
+      title: 'Convertisseur de Moules',
+      text: 'Passez d\'un cercle de 18cm à un cadre de 40x60 en un clic. Toutes vos quantités s\'adaptent automatiquement.',
+      action: function() { this._toggleDropdown(0, true); }
     },
+    // --- MENU 2 : PILOTAGE ---
     {
-      target: '.nav-dropdown:nth-child(3) .nav-dropdown-trigger, #mLinkStats',
+      target: '.nav-dropdown:nth-child(3) .nav-dropdown-trigger',
       icon: '📈',
-      title: 'Tableau de Bord Stratégique',
-      text: 'Analysez vos performances. Quels sont vos produits les plus rentables ? Où part votre budget ? Prenez des décisions basées sur des chiffres réels.',
-      position: 'bottom',
-      action: () => document.querySelector('#navStats')?.click()
+      title: 'Pilotage & Outils',
+      text: 'Gérez votre rentabilité comme un vrai chef d\'entreprise.',
+      action: function() { this._toggleDropdown(0, false); this._toggleDropdown(1, true); }
     },
     {
-      target: '#userMenuTrigger, .auth-status',
-      icon: '☁️',
-      title: 'Sécurité & Cloud',
-      text: 'Vos données sont précieuses. Grâce au Cloud, retrouvez votre laboratoire sur votre téléphone, tablette ou ordinateur, partout dans le monde.',
-      position: 'bottom'
+      target: '#navStats',
+      icon: '📊',
+      title: 'Dashboard Analytique',
+      text: 'Suivez l\'évolution de vos prix et vos marges globales. Identifiez vos produits "stars" et ceux à optimiser.',
+      action: function() { this._toggleDropdown(1, true); }
     },
     {
-      target: '#navCRM, .nav-dropdown:nth-child(5)',
+      target: '#navCRM',
       icon: '🤝',
-      title: 'Gestion Clients & Commandes',
-      text: 'Suivez vos clients et vos commandes passées. Un véritable mini-CRM pour ne plus jamais oublier une livraison.',
-      position: 'bottom'
+      title: 'Commandes & CRM',
+      text: 'Centralisez vos commandes clients et suivez votre historique de production.',
+      action: function() { this._toggleDropdown(1, true); }
     },
+    // --- MENU 3 : LABO ---
+    {
+      target: '.nav-dropdown:nth-child(4) .nav-dropdown-trigger',
+      icon: '🛡️',
+      title: 'Labo & Sécurité',
+      text: 'Organisation, hygiène et gestion des stocks.',
+      action: function() { this._toggleDropdown(1, false); this._toggleDropdown(2, true); }
+    },
+    {
+      target: '#navInventaire',
+      icon: '📦',
+      title: 'Inventaire des Stocks',
+      text: 'Mettez à jour vos prix d\'achat une seule fois ici, et l\'ensemble de vos recettes se mettra à jour partout.',
+      action: function() { this._toggleDropdown(2, true); }
+    },
+    {
+      target: '#navHygiene',
+      icon: '🧼',
+      title: 'Hygiène & HACCP',
+      text: 'Gérez vos fiches de traçabilité et vos contrôles sanitaires directement dans l\'outil.',
+      action: function() { this._toggleDropdown(2, true); }
+    },
+    // --- FIN ---
     {
       target: '#btnSubscribePro, .btn-pro',
       icon: '💎',
       title: 'Devenez un Chef Pro',
-      text: 'Débloquez l\'export PDF personnalisé, le mode hors-ligne avancé et le support prioritaire pour booster votre croissance.',
-      position: 'bottom'
+      text: 'Débloquez l\'export PDF personnalisé, le mode hors-ligne avancé et le support prioritaire.',
+      action: function() { this._toggleDropdown(2, false); }
     },
     {
       target: null,
       icon: '🚀',
       title: 'À vous de jouer !',
-      text: 'La visite est terminée, mais votre aventure commence. Créez votre première recette et maîtrisez votre rentabilité dès aujourd\'hui !',
+      text: 'Votre laboratoire numérique est prêt. Bonne réussite dans vos créations !',
       position: 'center'
     }
   ],
+
+  _toggleDropdown(index, open) {
+    const dropdowns = document.querySelectorAll('.nav-dropdown');
+    if (dropdowns[index]) {
+      if (open) dropdowns[index].classList.add('active');
+      else dropdowns[index].classList.remove('active');
+    }
+  },
 
   init() {
     if (localStorage.getItem(this.STORAGE_KEY)) return;
@@ -172,8 +209,7 @@ const GourmetOnboarding = {
     const card = document.getElementById('onboarding-card');
     card.classList.remove('visible');
 
-    // Exécuter l'action associée à l'étape (navigation forcée)
-    if (step.action) step.action();
+    if (step.action) step.action.call(this);
 
     setTimeout(() => {
       document.getElementById('ob-icon').innerText = step.icon;
@@ -200,7 +236,7 @@ const GourmetOnboarding = {
         this._updateSpotlight(null);
         setTimeout(() => card.classList.add('visible'), 200);
       }
-    }, 300); // Petit délai pour laisser le temps à l'interface de changer
+    }, 400); 
   },
 
   _updateSpotlight(target) {
@@ -210,10 +246,10 @@ const GourmetOnboarding = {
     if (target && target.offsetParent !== null) {
       const rect = target.getBoundingClientRect();
       spotlight.style.opacity = '1';
-      spotlight.style.left = (rect.left - 6) + 'px';
-      spotlight.style.top = (rect.top - 6) + 'px';
-      spotlight.style.width = (rect.width + 12) + 'px';
-      spotlight.style.height = (rect.height + 12) + 'px';
+      spotlight.style.left = (rect.left - 10) + 'px';
+      spotlight.style.top = (rect.top - 10) + 'px';
+      spotlight.style.width = (rect.width + 20) + 'px';
+      spotlight.style.height = (rect.height + 20) + 'px';
 
       let top = rect.bottom + 30;
       let left = rect.left + (rect.width / 2) - 300; 
@@ -239,10 +275,10 @@ const GourmetOnboarding = {
 
   finish() {
     localStorage.setItem(this.STORAGE_KEY, 'true');
+    document.querySelectorAll('.nav-dropdown').forEach(d => d.classList.remove('active'));
     this.overlay.style.opacity = '0';
     setTimeout(() => this.overlay.remove(), 500);
   }
 };
 
 window.GourmetOnboarding = GourmetOnboarding;
-
