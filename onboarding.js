@@ -1,6 +1,6 @@
 /**
- * GOURMETREVIENT — Module Onboarding Expert v5.1
- * Correction du ciblage dynamique et navigation immersive
+ * GOURMETREVIENT — Module Onboarding Expert v5.2
+ * Force-Open Dropdowns & Robust Targeting
  */
 
 const GourmetOnboarding = {
@@ -19,10 +19,10 @@ const GourmetOnboarding = {
     },
     // --- MENU 1 : L'ATELIER ---
     {
-      target: '.nav-dropdown:nth-child(2) .nav-dropdown-trigger',
+      target: '.nav-dropdown:nth-child(3) .nav-dropdown-trigger',
       icon: '💡',
       title: 'L\'Atelier Créatif',
-      text: 'C\'est ici que la magie opère. Cliquez pour découvrir vos outils de création.',
+      text: 'C\'est ici que la magie opère. Découvrez vos outils de création.',
       action: function() { this._toggleDropdown(0, true); }
     },
     {
@@ -48,7 +48,7 @@ const GourmetOnboarding = {
     },
     // --- MENU 2 : PILOTAGE ---
     {
-      target: '.nav-dropdown:nth-child(3) .nav-dropdown-trigger',
+      target: '.nav-dropdown:nth-child(4) .nav-dropdown-trigger',
       icon: '📈',
       title: 'Pilotage & Outils',
       text: 'Gérez votre rentabilité comme un vrai chef d\'entreprise.',
@@ -70,7 +70,7 @@ const GourmetOnboarding = {
     },
     // --- MENU 3 : LABO ---
     {
-      target: '.nav-dropdown:nth-child(4) .nav-dropdown-trigger',
+      target: '.nav-dropdown:nth-child(5) .nav-dropdown-trigger',
       icon: '🛡️',
       title: 'Labo & Sécurité',
       text: 'Organisation, hygiène et gestion des stocks.',
@@ -109,21 +109,31 @@ const GourmetOnboarding = {
 
   _toggleDropdown(index, open) {
     const dropdowns = document.querySelectorAll('.nav-dropdown');
-    if (dropdowns[index]) {
-      if (open) {
-        dropdowns[index].classList.add('active');
-        const content = dropdowns[index].querySelector('.nav-dropdown-content');
-        if (content) {
-          content.style.display = 'block';
-          content.style.opacity = '1';
-          content.style.visibility = 'visible';
-          content.style.pointerEvents = 'all';
-          content.style.transform = 'translateY(0)';
-        }
-      } else {
-        dropdowns[index].classList.remove('active');
-        const content = dropdowns[index].querySelector('.nav-dropdown-content');
-        if (content) content.style.display = '';
+    const el = dropdowns[index];
+    if (!el) return;
+
+    const trigger = el.querySelector('.nav-dropdown-trigger');
+    const content = el.querySelector('.nav-dropdown-content');
+
+    if (open) {
+      el.classList.add('active');
+      if (trigger) trigger.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
+      if (content) {
+        content.style.setProperty('display', 'block', 'important');
+        content.style.setProperty('opacity', '1', 'important');
+        content.style.setProperty('visibility', 'visible', 'important');
+        content.style.setProperty('transform', 'translateY(0)', 'important');
+        content.style.setProperty('pointer-events', 'all', 'important');
+        content.style.zIndex = '10002';
+      }
+    } else {
+      el.classList.remove('active');
+      if (trigger) trigger.dispatchEvent(new MouseEvent('mouseleave', { bubbles: true }));
+      if (content) {
+        content.style.display = '';
+        content.style.opacity = '';
+        content.style.visibility = '';
+        content.style.transform = '';
       }
     }
   },
@@ -228,7 +238,6 @@ const GourmetOnboarding = {
 
     if (step.action) step.action.call(this);
 
-    // Attendre un peu plus longtemps que l'UI se mette à jour
     setTimeout(() => {
       document.getElementById('ob-icon').innerText = step.icon;
       document.getElementById('ob-title').innerText = step.title;
@@ -244,7 +253,7 @@ const GourmetOnboarding = {
         clearInterval(this.refreshTimer);
         this.refreshTimer = setInterval(() => {
           this._updateSpotlight(target);
-          if (counts++ > 20) { // On recalcule 20 fois pour "suivre" l'animation d'ouverture
+          if (counts++ > 25) { 
             clearInterval(this.refreshTimer);
             card.classList.add('visible');
           }
@@ -254,7 +263,7 @@ const GourmetOnboarding = {
         this._updateSpotlight(null);
         setTimeout(() => card.classList.add('visible'), 200);
       }
-    }, 600); // Délai de 600ms pour laisser le temps au menu de s'ouvrir complètement
+    }, 700); 
   },
 
   _updateSpotlight(target) {
@@ -263,8 +272,7 @@ const GourmetOnboarding = {
     
     if (target && target.offsetParent !== null) {
       const rect = target.getBoundingClientRect();
-      // Si l'élément a une hauteur de 0, c'est qu'il est encore masqué
-      if (rect.height === 0) return;
+      if (rect.height === 0 || rect.width === 0) return;
 
       spotlight.style.opacity = '1';
       spotlight.style.left = (rect.left - 10) + 'px';
