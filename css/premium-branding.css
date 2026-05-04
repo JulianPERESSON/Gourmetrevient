@@ -1622,3 +1622,46 @@ h1, h2, h3 {
 .waste-entry-amount { text-align: right; }
 .waste-entry-loss { font-weight: 900; color: #ef4444; font-size: 1.05rem; }
 .waste-entry-qty { font-size: 0.7rem; color: var(--text-muted); }
+
+/* ============================================================= */
+/* RESPONSIVE REFINEMENTS — LAPTOP & COMPACT DESKTOPS            */
+/* ============================================================= */
+
+@media (min-width: 769px) and (max-width: 1360px) {
+  .app-header {
+    padding: 0 1rem !important;
+    gap: 0.6rem !important;
+  }
+  
+  .header-brand h1 span {
+    display: none !important; /* Cache "Revient" pour gagner de la place */
+  }
+
+  .header-nav {
+    gap: 0.2rem !important;
+  }
+
+  .nav-link, .nav-dropdown-trigger {
+    padding: 0.4rem 0.6rem !important;
+    font-size: 0.85rem !important;
+  }
+
+  /* Compact mode for very tight screens (Small laptops) */
+  @media (max-width: 1200px) {
+    .nav-dropdown-trigger span:not(.nav-arrow),
+    .nav-link span {
+       display: none !important; /* Garde uniquement l'emoji */
+    }
+    
+    #btnSavedRecipes span,
+    #btnSubscribePro span,
+    #userNameHeader {
+      display: none !important; /* Icon-only mode */
+    }
+    
+    .header-actions {
+      gap: 8px !important;
+    }
+  }
+}
+
