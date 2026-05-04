@@ -1,6 +1,6 @@
 /**
- * GOURMETREVIENT — Module Onboarding Expert v6.1
- * Transitions ultra-fluides et enchaînements rapides
+ * GOURMETREVIENT — Module Onboarding Expert v6.2
+ * Mouvements "Smooth Glide" sans téléportation
  */
 
 const GourmetOnboarding = {
@@ -222,13 +222,13 @@ const GourmetOnboarding = {
       <style>
         #onboarding-overlay { position: fixed; inset: 0; z-index: 9998; pointer-events: none; font-family: 'Inter', sans-serif; }
         #onboarding-backdrop { position: fixed; inset: 0; background: transparent; pointer-events: all; transition: opacity 0.5s; z-index: 9999; }
-        #onboarding-spotlight { position: fixed; border-radius: 12px; box-shadow: 0 0 0 9999px rgba(15, 23, 42, 0.65); transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); pointer-events: none; z-index: 10000; outline: 3px solid #10b981; outline-offset: 4px; background: transparent; }
+        #onboarding-spotlight { position: fixed; border-radius: 12px; box-shadow: 0 0 0 9999px rgba(15, 23, 42, 0.65); transition: all 0.6s cubic-bezier(0.19, 1, 0.22, 1); pointer-events: none; z-index: 10000; outline: 3px solid #10b981; outline-offset: 4px; background: transparent; }
         
         #onboarding-card { 
           position: fixed; background: #1e293b; border: 1px solid rgba(255, 255, 255, 0.1); 
           border-radius: 30px; padding: 0; width: 600px; max-width: calc(100vw - 40px); 
           box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6); pointer-events: all; 
-          z-index: 10001; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); 
+          z-index: 10001; transition: all 0.6s cubic-bezier(0.19, 1, 0.22, 1); 
           opacity: 0; transform: scale(0.9); color: white; display: flex; overflow: visible;
         }
         #onboarding-card.visible { opacity: 1; transform: scale(1); }
@@ -246,14 +246,14 @@ const GourmetOnboarding = {
           50% { transform: rotate(1deg) translateY(-5px); }
         }
         
-        .ob-content { flex: 1; padding: 2.2rem; display: flex; flex-direction: column; justify-content: center; position: relative; transition: opacity 0.2s; }
+        .ob-content { flex: 1; padding: 2.2rem; display: flex; flex-direction: column; justify-content: center; position: relative; transition: opacity 0.3s; }
         .ob-content.fading { opacity: 0; }
         .ob-content::before {
           content: ''; position: absolute; left: -12px; top: 50%; transform: translateY(-50%);
           border-top: 12px solid transparent; border-bottom: 12px solid transparent; border-right: 12px solid #1e293b;
         }
 
-        .ob-icon { font-size: 2.5rem; margin-bottom: 0.8rem; display: block; transition: transform 0.3s; }
+        .ob-icon { font-size: 2.5rem; margin-bottom: 0.8rem; display: block; }
         .ob-title { color: white; font-size: 1.5rem; font-weight: 800; margin-bottom: 0.8rem; line-height: 1.2; }
         .ob-text { color: #cbd5e1; font-size: 1rem; line-height: 1.6; margin-bottom: 2rem; }
         .ob-footer { display: flex; align-items: center; justify-content: space-between; margin-top: auto; }
@@ -291,7 +291,7 @@ const GourmetOnboarding = {
     const card = document.getElementById('onboarding-card');
     const inner = document.getElementById('ob-inner-content');
     
-    // Animation de sortie rapide
+    // On ne cache plus la carte, on fait juste un fondu du texte
     inner.classList.add('fading');
     
     if (step.action) step.action.call(this);
@@ -305,27 +305,26 @@ const GourmetOnboarding = {
 
       const target = step.target ? document.querySelector(step.target) : null;
       
+      // On force l'affichage de la carte avant de bouger si c'est la 1ère étape
+      if (idx === 0) card.classList.add('visible');
+
       if (target) {
         target.scrollIntoView({ behavior: 'smooth', block: 'center' });
         let counts = 0;
         clearInterval(this.refreshTimer);
         this.refreshTimer = setInterval(() => {
           this._updateSpotlight(target);
-          if (counts++ > 15) { 
+          if (counts++ > 20) { 
             clearInterval(this.refreshTimer);
-            card.classList.add('visible');
             inner.classList.remove('fading');
           }
-        }, 30); // Plus rapide (30ms)
+        }, 50);
       } else {
         clearInterval(this.refreshTimer);
         this._updateSpotlight(null);
-        setTimeout(() => {
-          card.classList.add('visible');
-          inner.classList.remove('fading');
-        }, 100);
+        setTimeout(() => inner.classList.remove('fading'), 200);
       }
-    }, 250); // Délai réduit à 250ms pour plus de nervosité
+    }, 200); 
   },
 
   _updateSpotlight(target) {
@@ -350,11 +349,13 @@ const GourmetOnboarding = {
       card.style.top = top + 'px';
       card.style.left = left + 'px';
       card.style.transform = 'none';
+      card.classList.add('visible');
     } else if (target === null) {
       spotlight.style.opacity = '0';
       card.style.top = '50%';
       card.style.left = '50%';
       card.style.transform = 'translate(-50%, -50%)';
+      card.classList.add('visible');
     }
   },
 
@@ -367,6 +368,7 @@ const GourmetOnboarding = {
   finish() {
     localStorage.setItem(this.STORAGE_KEY, 'true');
     this._closeAllDropdowns();
+    document.getElementById('onboarding-card').classList.remove('visible');
     this.overlay.style.opacity = '0';
     setTimeout(() => this.overlay.remove(), 500);
   }
