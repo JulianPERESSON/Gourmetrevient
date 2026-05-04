@@ -1,6 +1,6 @@
 /**
- * GOURMETREVIENT — Module Onboarding Expert v7.0
- * Expérience vivante : Effet machine à écrire, Spotlight pulsant et animations de saut
+ * GOURMETREVIENT — Module Onboarding Expert v8.0
+ * Expérience Interactive Totale : Parallaxe, Confettis et Actions Requises
  */
 
 const GourmetOnboarding = {
@@ -23,8 +23,9 @@ const GourmetOnboarding = {
       target: '.nav-dropdown:nth-child(3) .nav-dropdown-trigger',
       icon: '💡',
       title: 'L\'Atelier Créatif',
-      text: 'C\'est ici que vous concevez vos créations culinaires.',
-      action: function() { this._toggleDropdown(0, true); }
+      text: 'Essayez d\'ouvrir ce menu vous-même en cliquant sur "Atelier" pour voir la suite !',
+      action: function() { this._toggleDropdown(0, false); }, // On le ferme pour forcer l'utilisateur
+      requireClick: '.nav-dropdown:nth-child(3) .nav-dropdown-trigger'
     },
     {
       target: '#navRecettes',
@@ -73,8 +74,9 @@ const GourmetOnboarding = {
       target: '.nav-dropdown:nth-child(4) .nav-dropdown-trigger',
       icon: '📈',
       title: 'Pilotage & Outils',
-      text: 'Analysez la santé financière de votre laboratoire.',
-      action: function() { this._closeAllDropdowns(); this._toggleDropdown(1, true); }
+      text: 'Ouvrez ce menu pour découvrir vos outils de gestion.',
+      action: function() { this._closeAllDropdowns(); },
+      requireClick: '.nav-dropdown:nth-child(4) .nav-dropdown-trigger'
     },
     {
       target: '#navStats',
@@ -109,8 +111,9 @@ const GourmetOnboarding = {
       target: '.nav-dropdown:nth-child(5) .nav-dropdown-trigger',
       icon: '🛡️',
       title: 'Labo & Sécurité',
-      text: 'Gérez l\'organisation et la sécurité de votre espace de travail.',
-      action: function() { this._closeAllDropdowns(); this._toggleDropdown(2, true); }
+      text: 'Cliquez sur ce menu pour accéder à l\'organisation du laboratoire.',
+      action: function() { this._closeAllDropdowns(); },
+      requireClick: '.nav-dropdown:nth-child(5) .nav-dropdown-trigger'
     },
     {
       target: '#navPlanning',
@@ -204,11 +207,19 @@ const GourmetOnboarding = {
     this._buildOverlay();
     this._showStep(0);
     window.addEventListener('resize', () => this._updateSpotlight(this._getCurrentTarget()));
+    this._initParallax();
   },
 
-  _getCurrentTarget() {
-    const step = this.steps[this.currentStep];
-    return step.target ? document.querySelector(step.target) : null;
+  _initParallax() {
+    document.addEventListener('mousemove', (e) => {
+      const card = document.getElementById('onboarding-card');
+      const char = document.getElementById('ob-char');
+      if (!card || !char) return;
+      const rect = card.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / rect.width - 0.5;
+      const y = (e.clientY - rect.top) / rect.height - 0.5;
+      char.style.transform = `translateX(${x * 20}px) translateY(${y * 20}px) rotate(${x * 5}deg)`;
+    });
   },
 
   _buildOverlay() {
@@ -246,13 +257,8 @@ const GourmetOnboarding = {
         }
         .ob-character-img {
           width: 100%; height: 90%; object-fit: contain;
-          animation: obWiggle 4s ease-in-out infinite;
-          transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        .ob-character-img.jump { transform: translateY(-30px) scale(1.1); }
-        @keyframes obWiggle {
-          0%, 100% { transform: rotate(-1deg) translateY(0); }
-          50% { transform: rotate(1deg) translateY(-5px); }
+          transition: transform 0.1s ease-out;
+          will-change: transform;
         }
         
         .ob-content { flex: 1; padding: 2.2rem; display: flex; flex-direction: column; justify-content: center; position: relative; }
@@ -268,7 +274,15 @@ const GourmetOnboarding = {
         .ob-progress-fill { height: 100%; background: #10b981; transition: width 0.3s; }
         .ob-btn { padding: 0.8rem 1.8rem; border-radius: 14px; font-weight: 800; cursor: pointer; border: none; background: #10b981; color: white; font-size: 1rem; transition: all 0.2s; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3); }
         .ob-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(16, 185, 129, 0.4); }
+        .ob-btn.disabled { opacity: 0.3; pointer-events: none; filter: grayscale(1); }
         .ob-skip { background: transparent; color: #94a3b8; font-size: 0.85rem; margin-top: 1.5rem; cursor: pointer; border: none; display: block; width: 100%; text-align: center; text-decoration: underline; opacity: 0.6; }
+        
+        /* Effet Confettis */
+        .confetti { position: fixed; width: 10px; height: 10px; background-color: #f2d74e; z-index: 10002; top: -10px; border-radius: 2px; animation: confettiFall 3s ease-in forwards; }
+        @keyframes confettiFall {
+          0% { transform: translateY(0) rotate(0); opacity: 1; }
+          100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        }
       </style>
       <div id="onboarding-backdrop"></div>
       <div id="onboarding-spotlight"></div>
@@ -310,22 +324,34 @@ const GourmetOnboarding = {
   _showStep(idx) {
     const step = this.steps[idx];
     const card = document.getElementById('onboarding-card');
-    const char = document.getElementById('ob-char');
+    const nextBtn = document.getElementById('ob-next');
     
-    // Animation du personnage (petit saut)
-    if (char) {
-      char.classList.add('jump');
-      setTimeout(() => char.classList.remove('jump'), 400);
-    }
-
     if (step.action) step.action.call(this);
+
+    // Gestion de l'action requise
+    if (step.requireClick) {
+      nextBtn.classList.add('disabled');
+      nextBtn.innerText = 'Action Requise 👆';
+      const targetEl = document.querySelector(step.requireClick);
+      if (targetEl) {
+        const handler = () => {
+          nextBtn.classList.remove('disabled');
+          nextBtn.innerText = 'Suivant';
+          targetEl.removeEventListener('click', handler);
+          this.next(); // On passe automatiquement à la suite après le clic
+        };
+        targetEl.addEventListener('click', handler);
+      }
+    } else {
+      nextBtn.classList.remove('disabled');
+      nextBtn.innerText = idx === this.steps.length - 1 ? 'C\'est parti ! ✨' : 'Suivant';
+    }
 
     setTimeout(() => {
       document.getElementById('ob-icon').innerText = step.icon;
       document.getElementById('ob-title').innerText = step.title;
       this._typeWriter(document.getElementById('ob-text'), step.text);
       document.getElementById('ob-progress').style.width = ((idx + 1) / this.steps.length * 100) + '%';
-      document.getElementById('ob-next').innerText = idx === this.steps.length - 1 ? 'C\'est parti ! ✨' : 'Suivant';
 
       const target = step.target ? document.querySelector(step.target) : null;
       if (idx === 0) card.classList.add('visible');
@@ -350,7 +376,6 @@ const GourmetOnboarding = {
     const card = document.getElementById('onboarding-card');
     if (target && target.offsetParent !== null) {
       const rect = target.getBoundingClientRect();
-      if (rect.height === 0 || rect.width === 0) return;
       spotlight.style.opacity = '1';
       spotlight.style.left = (rect.left - 10) + 'px';
       spotlight.style.top = (rect.top - 10) + 'px';
@@ -362,21 +387,37 @@ const GourmetOnboarding = {
       left = Math.max(20, Math.min(left, window.innerWidth - 620));
       card.style.top = top + 'px';
       card.style.left = left + 'px';
-      card.style.transform = 'none';
       card.classList.add('visible');
     } else if (target === null) {
       spotlight.style.opacity = '0';
       card.style.top = '50%';
       card.style.left = '50%';
       card.style.transform = 'translate(-50%, -50%)';
-      card.classList.add('visible');
+    }
+  },
+
+  _launchConfetti() {
+    for (let i = 0; i < 100; i++) {
+      const c = document.createElement('div');
+      c.className = 'confetti';
+      c.style.left = Math.random() * 100 + 'vw';
+      c.style.backgroundColor = ['#f2d74e', '#95c3de', '#ff9a91', '#10b981'][Math.floor(Math.random() * 4)];
+      c.style.animationDelay = Math.random() * 2 + 's';
+      c.style.width = Math.random() * 10 + 5 + 'px';
+      c.style.height = c.style.width;
+      document.body.appendChild(c);
+      setTimeout(() => c.remove(), 5000);
     }
   },
 
   next() {
     this.currentStep++;
-    if (this.currentStep < this.steps.length) this._showStep(this.currentStep);
-    else this.finish();
+    if (this.currentStep < this.steps.length) {
+      this._showStep(this.currentStep);
+    } else {
+      this._launchConfetti();
+      setTimeout(() => this.finish(), 3000);
+    }
   },
 
   finish() {
