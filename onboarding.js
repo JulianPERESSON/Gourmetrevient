@@ -13,9 +13,9 @@ const GourmetOnboarding = {
   steps: [
     {
       target: null,
-      icon: '👨‍🍳',
-      title: 'Bienvenue Chef !',
-      text: 'Je vais vous présenter l\'intégralité de vos outils. Accrochez-vous, votre laboratoire est prêt !',
+      icon: '🏃‍♂️',
+      title: 'Bienvenue !',
+      text: 'Je suis Mr Bouvier-Gaz. Je vais vous présenter l\'intégralité de vos outils. Accrochez-vous, votre laboratoire est prêt !',
       position: 'center'
     },
     // --- MENU 1 : L'ATELIER ---

@@ -280,7 +280,7 @@ const TRANSLATIONS = {
         'dash.stat.alerts': 'Alertes',
         'dash.stat.rentability': 'Rentabilité',
         'dash.priority.title': 'Priorités du Jour',
-        'dash.ai.expert.title': 'Assistant Expert',
+        'dash.ai.expert.title': 'Mr Bouvier-Gaz 🏃‍♂️',
         'dash.greeting_prefix': 'Votre',
         'dash.subtitle': 'espace professionnel GourmetRevient',
         'dash.badge1': '✨ Projet GourmetRevient 2026',
