@@ -1034,7 +1034,7 @@
     <div class="header-actions" id="userProfileArea" style="display:none; align-items:center; gap:12px;">
       <button class="btn btn-outline btn-sm" id="btnSavedRecipes" title="Mes recettes sauvegardées"
         data-i18n-title="nav.my_recipes">
-        <span data-i18n="nav.my_recipes">📂 Mes Recettes</span>
+        📂 <span data-i18n="nav.my_recipes">Mes Recettes</span>
       </button>
       <button class="btn btn-primary btn-sm" id="btnSubscribePro" onclick="window.GourmetBilling.checkout('pro_monthly')" style="background: linear-gradient(135deg, #6366f1, #8b5cf6); border: none; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);">
         <span>💎 Devenir Pro</span>
@@ -3579,7 +3579,7 @@
       style="display:none; padding: 2rem 1.5rem; max-width: 1300px; margin: 0 auto;">
       <h3
         style="font-family:var(--font-heading); font-size:1.4rem; margin-bottom:1.5rem; display:flex; align-items:center; gap:0.6rem;">
-        📂 <span data-i18n="saved.title">📂 Mes Recettes</span> <small
+        <span data-i18n="saved.title">📂 Mes Recettes</span> <small
           style="font-weight:400; font-size:0.8rem; color:var(--text-muted); opacity:0.8;"
           data-i18n="saved.personal">(Personnel)</small>
       </h3>
@@ -3887,16 +3887,15 @@
       </div>
       <div class="modal-body">
         <p style="margin-bottom:1.5rem; font-size:0.9rem; color:var(--text-secondary);" data-i18n="modal.pin.desc">
-          Modifiez votre code PIN pour sécuriser vos recettes personnelles.
+          Modifiez votre mot de passe pour sécuriser vos recettes personnelles. (8 caractères min., majuscule, chiffre, caractère spécial)
         </p>
         <div class="form-group">
-          <label data-i18n="modal.pin.new">Nouveau Code PIN (4 chiffres)</label>
-          <input type="password" id="newPin" class="form-input" placeholder="••••" maxlength="4" inputmode="numeric">
+          <label data-i18n="modal.pin.new">Nouveau Mot de passe</label>
+          <input type="password" id="newPin" class="form-input" placeholder="••••••••">
         </div>
         <div class="form-group">
-          <label data-i18n="modal.pin.confirm">Confirmez le nouveau PIN</label>
-          <input type="password" id="confirmPin" class="form-input" placeholder="••••" maxlength="4"
-            inputmode="numeric">
+          <label data-i18n="modal.pin.confirm">Confirmez le Mot de passe</label>
+          <input type="password" id="confirmPin" class="form-input" placeholder="••••••••">
         </div>
         <div class="form-group">
           <label data-i18n="modal.pin.email">Email (Optionnel)</label>
