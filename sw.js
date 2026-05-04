@@ -3,7 +3,7 @@
 // Stratégie : Cache-First pour assets statiques + Offline Queue pour mutations
 // =============================================================================
 
-const CACHE_VERSION = '3.1.5'; // Onboarding v2 upgrade
+const CACHE_VERSION = '3.1.6'; // Onboarding v2.1 (Alignment fix)
 const CACHE_STATIC  = `gourmet-static-v${CACHE_VERSION}`;
 const CACHE_RUNTIME = `gourmet-runtime-v${CACHE_VERSION}`;
 const SYNC_TAG      = 'gourmet-sync-recipes';
@@ -104,6 +104,7 @@ self.addEventListener('install', (event) => {
 
 // ── ACTIVATE — Nettoyage anciens caches ─────────────────────────────────────
 self.addEventListener('activate', (event) => {
+  self.clients.claim(); // Force la prise de contrôle immédiate
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       const validCaches = [CACHE_STATIC, CACHE_RUNTIME];
