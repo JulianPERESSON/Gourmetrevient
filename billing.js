@@ -54,47 +54,50 @@ const GourmetBilling = {
         const priceId = this.CONFIG.pricing.pro[planKey === 'pro_monthly' ? 'monthly' : 'yearly'];
         console.log('🔄 Initialisation du paiement Stripe pour:', priceId);
 
-        const client = window.supabaseClient;
-
-        if (!client || !client.functions) {
-            alert("Erreur d'initialisation du module de paiement. Veuillez rafraîchir la page.");
-            return;
-        }
+        const toastFn = typeof showToast === 'function' ? showToast : (m) => console.log(m);
+        toastFn('Préparation du paiement sécurisé... ⏳', 'info');
 
         // Récupère l'utilisateur s'il est connecté (optionnel)
         let userEmail = null;
         let userId = null;
         try {
-            const { data: { user } } = await client.auth.getUser();
-            if (user) { userEmail = user.email; userId = user.id; }
-        } catch(e) { /* non connecté */ }
+            const client = window.supabaseClient || window.supabase;
+            if (client) {
+                const { data: { user } } = await client.auth.getUser();
+                if (user) { userEmail = user.email; userId = user.id; }
+            }
+        } catch(e) { /* non connecté, on continue quand même */ }
 
-        const toastFn = typeof showToast === 'function' ? showToast : (m) => console.log(m);
-        toastFn('Préparation du paiement sécurisé...', 'info');
+        // Appel direct à la Edge Function Supabase (plus fiable que le SDK)
+        const SUPABASE_URL = 'https://hogfrddigcojdmjjpbno.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_9iePEQdGSdnjXaw4I1s0Nw_wyitVBla';
+        const FUNCTION_URL = `${SUPABASE_URL}/functions/v1/create-checkout-session`;
 
         try {
-            const { data, error } = await client.functions.invoke('create-checkout-session', {
-                body: { priceId, userEmail, userId }
+            const response = await fetch(FUNCTION_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                    'apikey': SUPABASE_ANON_KEY
+                },
+                body: JSON.stringify({ priceId, userEmail, userId })
             });
 
-            if (error) {
-                console.error('Supabase Function Error:', error);
-                const errorMsg = error.message || "Erreur serveur";
-                toastFn(`Erreur : ${errorMsg}`, 'error');
-                return;
-            }
+            const data = await response.json();
 
             if (data?.url) {
-                window.location.href = data.url;
+                toastFn('Redirection vers le paiement sécurisé... 🔒', 'success');
+                setTimeout(() => { window.location.href = data.url; }, 500);
             } else if (data?.error) {
                 console.error('Stripe Logic Error:', data.error);
-                toastFn(`Stripe : ${data.error}`, 'error');
+                toastFn(`Erreur Stripe : ${data.error}`, 'error');
             } else {
                 throw new Error('URL de paiement non reçue');
             }
         } catch (err) {
             console.error('Erreur Checkout:', err);
-            toastFn(`Erreur technique : ${err.message || 'inconnue'}`, 'error');
+            toastFn(`Erreur technique : ${err.message || 'inconnue'}. Veuillez réessayer.`, 'error');
         }
     },
 
