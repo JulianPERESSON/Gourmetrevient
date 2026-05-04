@@ -5169,6 +5169,18 @@
   <!-- ANALYTICS INTERACTIF + PWA OFFLINE MANAGER               -->
   <!-- ======================================================== -->
   <script src="./analytics-interactive.js?v=3.0.1"></script>
+  <script src="./onboarding.js?v=1.0.0"></script>
+  <script>
+    // ── Onboarding : démarre automatiquement pour les nouveaux utilisateurs ──
+    window.addEventListener('gourmet:authSuccess', function() {
+      if (window.GourmetOnboarding) setTimeout(() => GourmetOnboarding.init(), 2000);
+    });
+    // Fallback si l'event n'existe pas encore
+    setTimeout(function() {
+      const isAuth = localStorage.getItem('gourmet_auth') === 'true';
+      if (isAuth && window.GourmetOnboarding) GourmetOnboarding.init();
+    }, 3000);
+  </script>
 
   <script>
     // ── Gestion des raccourcis PWA (URL params) ──────────────────────────────
