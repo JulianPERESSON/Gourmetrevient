@@ -1,6 +1,6 @@
 /**
- * GOURMETREVIENT — Module Onboarding Expert v6.2
- * Mouvements "Smooth Glide" sans téléportation
+ * GOURMETREVIENT — Module Onboarding Expert v6.3
+ * Parcours intégral de TOUS les menus avec descriptions exactes
  */
 
 const GourmetOnboarding = {
@@ -22,49 +22,49 @@ const GourmetOnboarding = {
       target: '.nav-dropdown:nth-child(3) .nav-dropdown-trigger',
       icon: '💡',
       title: 'L\'Atelier Créatif',
-      text: 'C\'est ici que vous concevez vos créations.',
+      text: 'C\'est ici que vous concevez vos créations culinaires.',
       action: function() { this._toggleDropdown(0, true); }
     },
     {
       target: '#navRecettes',
       icon: '📖',
       title: 'Calculateur de Recettes',
-      text: 'Gérez vos fiches techniques et calculez vos marges en temps réel.',
+      text: 'Créez vos fiches techniques et maîtrisez votre rentabilité au gramme près.',
       action: function() { this._toggleDropdown(0, true); }
     },
     {
       target: '#navChefsBrain',
       icon: '🧠',
       title: 'Cerveau du Chef',
-      text: 'Utilisez l\'intelligence artificielle pour générer des idées de recettes ou optimiser vos processus.',
+      text: 'Trouvez l\'accord parfait ! Ce dictionnaire expert vous suggère les meilleures associations de saveurs.',
       action: function() { this._toggleDropdown(0, true); }
     },
     {
       target: '#navAssembly',
       icon: '🏗️',
       title: 'Simulateur de Montage',
-      text: 'Concevez vos entremets en coupe et visualisez les couches.',
+      text: 'Visualisez vos entremets en coupe et ajustez vos épaisseurs de couches graphiquement.',
       action: function() { this._toggleDropdown(0, true); }
     },
     {
       target: '#navConverter',
       icon: '📏',
       title: 'Convertisseur de Moules',
-      text: 'Adaptez vos recettes à n\'importe quelle taille de moule instantanément.',
+      text: 'Adaptez vos quantités à n\'importe quel format de moule en un clic.',
       action: function() { this._toggleDropdown(0, true); }
     },
     {
       target: '#navPortfolio',
       icon: '🖼️',
       title: 'Portfolio Client',
-      text: 'Exposez vos plus belles créations pour vos clients.',
+      text: 'Une galerie visuelle pour présenter vos réalisations à vos clients.',
       action: function() { this._toggleDropdown(0, true); }
     },
     {
       target: '#navScheduler',
       icon: '🎓',
       title: 'Ordonnancement',
-      text: 'Planifiez vos étapes de production pour un examen ou un rush.',
+      text: 'Planifiez vos étapes de production pas à pas pour ne jamais être pris de court.',
       action: function() { this._toggleDropdown(0, true); }
     },
     // --- MENU 2 : PILOTAGE ---
@@ -72,35 +72,35 @@ const GourmetOnboarding = {
       target: '.nav-dropdown:nth-child(4) .nav-dropdown-trigger',
       icon: '📈',
       title: 'Pilotage & Outils',
-      text: 'Gérez la rentabilité de votre entreprise.',
+      text: 'Analysez la santé financière de votre laboratoire.',
       action: function() { this._closeAllDropdowns(); this._toggleDropdown(1, true); }
     },
     {
       target: '#navStats',
       icon: '📊',
-      title: 'Dashboard & Statistiques',
-      text: 'Analyse complète de vos performances et de vos marges.',
+      title: 'Dashboard Analytique',
+      text: 'Suivez vos prix, vos marges et l\'impact de l\'inflation sur votre catalogue.',
       action: function() { this._toggleDropdown(1, true); }
     },
     {
       target: '#navCatalogue',
       icon: '🌐',
-      title: 'E-Catalogue Client',
-      text: 'Votre boutique numérique pour présenter vos tarifs.',
+      title: 'E-Catalogue Pro',
+      text: 'Générez une vitrine numérique propre pour présenter vos tarifs aux clients.',
       action: function() { this._toggleDropdown(1, true); }
     },
     {
       target: '#navCRM',
       icon: '🤝',
       title: 'Commandes & CRM',
-      text: 'Suivez vos clients et gérez vos livraisons.',
+      text: 'Gérez votre base client et suivez l\'historique de chaque commande.',
       action: function() { this._toggleDropdown(1, true); }
     },
     {
       target: '#navProTools',
       icon: '🛠️',
       title: 'Outils Métier',
-      text: 'Calculateurs avancés et utilitaires de laboratoire.',
+      text: 'Des calculateurs spécifiques pour les professionnels de la pâtisserie.',
       action: function() { this._toggleDropdown(1, true); }
     },
     // --- MENU 3 : LABO ---
@@ -108,42 +108,42 @@ const GourmetOnboarding = {
       target: '.nav-dropdown:nth-child(5) .nav-dropdown-trigger',
       icon: '🛡️',
       title: 'Labo & Sécurité',
-      text: 'Organisation interne et normes sanitaires.',
+      text: 'Gérez l\'organisation et la sécurité de votre espace de travail.',
       action: function() { this._closeAllDropdowns(); this._toggleDropdown(2, true); }
     },
     {
       target: '#navPlanning',
       icon: '🌴',
       title: 'Équipe & Congés',
-      text: 'Gérez le planning de votre personnel.',
+      text: 'Organisez les plannings et suivez les absences de vos collaborateurs.',
       action: function() { this._toggleDropdown(2, true); }
     },
     {
       target: '#navInventaire',
       icon: '📦',
-      title: 'Inventaire des Stocks',
-      text: 'Gérez vos prix d\'achat et vos niveaux de stock.',
+      title: 'Stocks & Ingrédients',
+      text: 'Mettez à jour vos prix d\'achat une seule fois ici pour impacter toutes vos recettes.',
       action: function() { this._toggleDropdown(2, true); }
     },
     {
       target: '#navSuppliers',
       icon: '🏢',
       title: 'Fournisseurs',
-      text: 'Annuaire complet de vos partenaires commerciaux.',
+      text: 'Centralisez les contacts et les tarifs de tous vos partenaires.',
       action: function() { this._toggleDropdown(2, true); }
     },
     {
       target: '#navHygiene',
       icon: '🧼',
       title: 'Hygiène & HACCP',
-      text: 'Contrôles sanitaires et traçabilité obligatoire.',
+      text: 'Suivez vos protocoles de nettoyage et de sécurité alimentaire.',
       action: function() { this._toggleDropdown(2, true); }
     },
     {
       target: '#navLabo',
       icon: '📐',
       title: 'Matériel & Outillage',
-      text: 'Plans de laboratoire et inventaire matériel.',
+      text: 'Aménagement de votre laboratoire en 2D et gestion du petit matériel.',
       action: function() { this._toggleDropdown(2, true); }
     },
     // --- FIN ---
@@ -151,14 +151,14 @@ const GourmetOnboarding = {
       target: '#btnSubscribePro, .btn-pro',
       icon: '💎',
       title: 'Le Futur est Pro',
-      text: 'Débloquez l\'intégralité des fonctionnalités premium pour votre entreprise.',
+      text: 'Débloquez l\'intégralité des fonctionnalités premium pour booster votre croissance.',
       action: function() { this._closeAllDropdowns(); }
     },
     {
       target: null,
       icon: '🚀',
-      title: 'Prêt pour le service !',
-      text: 'Vous connaissez maintenant tout de GourmetRevient. À vous de créer !',
+      title: 'À vous de jouer !',
+      text: 'Votre laboratoire numérique est maintenant entre vos mains. Bonne réussite !',
       position: 'center'
     }
   ],
@@ -291,7 +291,6 @@ const GourmetOnboarding = {
     const card = document.getElementById('onboarding-card');
     const inner = document.getElementById('ob-inner-content');
     
-    // On ne cache plus la carte, on fait juste un fondu du texte
     inner.classList.add('fading');
     
     if (step.action) step.action.call(this);
@@ -304,8 +303,6 @@ const GourmetOnboarding = {
       document.getElementById('ob-next').innerText = idx === this.steps.length - 1 ? 'C\'est parti ! ✨' : 'Suivant';
 
       const target = step.target ? document.querySelector(step.target) : null;
-      
-      // On force l'affichage de la carte avant de bouger si c'est la 1ère étape
       if (idx === 0) card.classList.add('visible');
 
       if (target) {
@@ -314,7 +311,7 @@ const GourmetOnboarding = {
         clearInterval(this.refreshTimer);
         this.refreshTimer = setInterval(() => {
           this._updateSpotlight(target);
-          if (counts++ > 20) { 
+          if (counts++ > 25) { 
             clearInterval(this.refreshTimer);
             inner.classList.remove('fading');
           }
