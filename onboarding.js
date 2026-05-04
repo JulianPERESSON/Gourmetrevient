@@ -1,6 +1,6 @@
 /**
- * GOURMETREVIENT — Module Onboarding Premium v3.0 (Duolingo Style)
- * Guide interactif avec personnage personnalisé
+ * GOURMETREVIENT — Module Onboarding Expert v4.0
+ * Navigation immersive, explications détaillées et personnage dynamique
  */
 
 const GourmetOnboarding = {
@@ -12,44 +12,68 @@ const GourmetOnboarding = {
   steps: [
     {
       target: null,
-      icon: '✨',
-      title: 'Bienvenue Chef !',
-      text: 'Je suis ravi de vous accueillir ! GourmetRevient est votre nouvel allié pour piloter votre rentabilité. Laissez-moi vous guider.',
+      icon: '👨‍🍳',
+      title: 'Bienvenue dans votre Labo !',
+      text: 'Je suis votre assistant Gourmet. Je vais vous montrer comment transformer votre passion en une entreprise rentable et organisée. Suivez-moi !',
       position: 'center'
     },
     {
       target: '.nav-dropdown:nth-child(2) .nav-dropdown-trigger, #mLinkRecettes',
       icon: '📖',
       title: 'Le Grimoire Numérique',
-      text: 'C\'est ici que vous créez vos fiches techniques. Le coût de revient se calcule en temps réel selon vos ingrédients.',
+      text: 'Tout commence ici. Créez vos fiches techniques avec une précision chirurgicale. Chaque gramme compte pour votre marge.',
+      position: 'bottom',
+      action: () => document.querySelector('#navRecettes')?.click()
+    },
+    {
+      target: '#recipeContainer, .recipe-grid',
+      icon: '⚖️',
+      title: 'Calcul de Coût en Direct',
+      text: 'GourmetRevient calcule automatiquement votre coût de revient, votre marge et votre prix de vente conseillé. Finies les erreurs de calcul !',
       position: 'bottom'
     },
     {
       target: '.nav-dropdown:nth-child(4) .nav-dropdown-trigger, #mLinkInv',
       icon: '📦',
-      title: 'Gestion des Stocks',
-      text: 'Mettez à jour vos prix d\'achat ici. Vos recettes se recalculeront instantanément. Un gain de temps magique !',
-      position: 'bottom'
+      title: 'Stocks & Ingrédients',
+      text: 'Gérez votre économat. Une hausse de prix chez votre fournisseur ? Mettez-la à jour ici, et toutes vos recettes se recalculeront instantanément.',
+      position: 'bottom',
+      action: () => document.querySelector('#navInventaire')?.click()
     },
     {
       target: '.nav-dropdown:nth-child(3) .nav-dropdown-trigger, #mLinkStats',
       icon: '📈',
-      title: 'Analyses & Marges',
-      text: 'Visualisez vos bénéfices, repérez les produits "Stars" et protégez votre labo contre l\'inflation.',
+      title: 'Tableau de Bord Stratégique',
+      text: 'Analysez vos performances. Quels sont vos produits les plus rentables ? Où part votre budget ? Prenez des décisions basées sur des chiffres réels.',
+      position: 'bottom',
+      action: () => document.querySelector('#navStats')?.click()
+    },
+    {
+      target: '#userMenuTrigger, .auth-status',
+      icon: '☁️',
+      title: 'Sécurité & Cloud',
+      text: 'Vos données sont précieuses. Grâce au Cloud, retrouvez votre laboratoire sur votre téléphone, tablette ou ordinateur, partout dans le monde.',
+      position: 'bottom'
+    },
+    {
+      target: '#navCRM, .nav-dropdown:nth-child(5)',
+      icon: '🤝',
+      title: 'Gestion Clients & Commandes',
+      text: 'Suivez vos clients et vos commandes passées. Un véritable mini-CRM pour ne plus jamais oublier une livraison.',
       position: 'bottom'
     },
     {
       target: '#btnSubscribePro, .btn-pro',
       icon: '💎',
-      title: 'Potentiel Illimité',
-      text: 'Accédez au Cloud, au CRM et aux outils avancés. Votre passion mérite une gestion de haut vol.',
+      title: 'Devenez un Chef Pro',
+      text: 'Débloquez l\'export PDF personnalisé, le mode hors-ligne avancé et le support prioritaire pour booster votre croissance.',
       position: 'bottom'
     },
     {
       target: null,
       icon: '🚀',
-      title: 'Prêt pour le service ?',
-      text: 'Votre laboratoire numérique est opérationnel. Bonne réussite dans vos créations !',
+      title: 'À vous de jouer !',
+      text: 'La visite est terminée, mais votre aventure commence. Créez votre première recette et maîtrisez votre rentabilité dès aujourd\'hui !',
       position: 'center'
     }
   ],
@@ -84,7 +108,7 @@ const GourmetOnboarding = {
         
         #onboarding-card { 
           position: fixed; background: #1e293b; border: 1px solid rgba(255, 255, 255, 0.1); 
-          border-radius: 30px; padding: 0; width: 550px; max-width: calc(100vw - 40px); 
+          border-radius: 30px; padding: 0; width: 600px; max-width: calc(100vw - 40px); 
           box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6); pointer-events: all; 
           z-index: 10001; transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1); 
           opacity: 0; transform: scale(0.9); color: white; display: flex; overflow: visible;
@@ -93,15 +117,15 @@ const GourmetOnboarding = {
         
         .ob-character-container {
           width: 220px; position: relative; display: flex; align-items: center; justify-content: center;
-          background: #c9f2c9; border-radius: 30px 0 0 30px; overflow: hidden;
+          background: #c9f2c9; border-radius: 30px 0 0 30px; overflow: hidden; flex-shrink: 0;
         }
         .ob-character-img {
           width: 100%; height: 90%; object-fit: contain;
           animation: obWiggle 4s ease-in-out infinite;
         }
         @keyframes obWiggle {
-          0%, 100% { transform: rotate(-2deg) translateY(0); }
-          50% { transform: rotate(2deg) translateY(-5px); }
+          0%, 100% { transform: rotate(-1deg) translateY(0); }
+          50% { transform: rotate(1deg) translateY(-5px); }
         }
         
         .ob-content { flex: 1; padding: 2.2rem; display: flex; flex-direction: column; justify-content: center; position: relative; }
@@ -110,15 +134,15 @@ const GourmetOnboarding = {
           border-top: 12px solid transparent; border-bottom: 12px solid transparent; border-right: 12px solid #1e293b;
         }
 
-        .ob-icon { font-size: 2.2rem; margin-bottom: 0.8rem; }
-        .ob-title { color: white; font-size: 1.4rem; font-weight: 800; margin-bottom: 0.6rem; line-height: 1.2; }
-        .ob-text { color: #cbd5e1; font-size: 0.95rem; line-height: 1.5; margin-bottom: 1.5rem; }
+        .ob-icon { font-size: 2.5rem; margin-bottom: 0.8rem; }
+        .ob-title { color: white; font-size: 1.5rem; font-weight: 800; margin-bottom: 0.8rem; line-height: 1.2; }
+        .ob-text { color: #cbd5e1; font-size: 1rem; line-height: 1.6; margin-bottom: 2rem; }
         .ob-footer { display: flex; align-items: center; justify-content: space-between; margin-top: auto; }
-        .ob-progress-bar { flex: 1; height: 4px; background: rgba(255,255,255,0.1); border-radius: 10px; margin-right: 1.5rem; overflow: hidden; }
+        .ob-progress-bar { flex: 1; height: 6px; background: rgba(255,255,255,0.1); border-radius: 10px; margin-right: 2rem; overflow: hidden; }
         .ob-progress-fill { height: 100%; background: #10b981; transition: width 0.3s; }
-        .ob-btn { padding: 0.6rem 1.4rem; border-radius: 12px; font-weight: 800; cursor: pointer; border: none; background: #10b981; color: white; font-size: 0.9rem; transition: transform 0.2s; }
-        .ob-btn:hover { transform: scale(1.05); }
-        .ob-skip { background: transparent; color: #94a3b8; font-size: 0.8rem; margin-top: 1rem; cursor: pointer; border: none; display: block; width: 100%; text-align: center; text-decoration: underline; opacity: 0.6; }
+        .ob-btn { padding: 0.8rem 1.8rem; border-radius: 14px; font-weight: 800; cursor: pointer; border: none; background: #10b981; color: white; font-size: 1rem; transition: all 0.2s; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3); }
+        .ob-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(16, 185, 129, 0.4); }
+        .ob-skip { background: transparent; color: #94a3b8; font-size: 0.85rem; margin-top: 1.5rem; cursor: pointer; border: none; display: block; width: 100%; text-align: center; text-decoration: underline; opacity: 0.6; }
       </style>
       <div id="onboarding-backdrop"></div>
       <div id="onboarding-spotlight"></div>
@@ -148,30 +172,35 @@ const GourmetOnboarding = {
     const card = document.getElementById('onboarding-card');
     card.classList.remove('visible');
 
-    document.getElementById('ob-icon').innerText = step.icon;
-    document.getElementById('ob-title').innerText = step.title;
-    document.getElementById('ob-text').innerText = step.text;
-    document.getElementById('ob-progress').style.width = ((idx + 1) / this.steps.length * 100) + '%';
-    document.getElementById('ob-next').innerText = idx === this.steps.length - 1 ? 'Terminer ✨' : 'Suivant';
+    // Exécuter l'action associée à l'étape (navigation forcée)
+    if (step.action) step.action();
 
-    const target = step.target ? document.querySelector(step.target) : null;
-    
-    if (target) {
-      target.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      let counts = 0;
-      clearInterval(this.refreshTimer);
-      this.refreshTimer = setInterval(() => {
-        this._updateSpotlight(target);
-        if (counts++ > 10) {
-          clearInterval(this.refreshTimer);
-          card.classList.add('visible');
-        }
-      }, 100);
-    } else {
-      clearInterval(this.refreshTimer);
-      this._updateSpotlight(null);
-      setTimeout(() => card.classList.add('visible'), 200);
-    }
+    setTimeout(() => {
+      document.getElementById('ob-icon').innerText = step.icon;
+      document.getElementById('ob-title').innerText = step.title;
+      document.getElementById('ob-text').innerText = step.text;
+      document.getElementById('ob-progress').style.width = ((idx + 1) / this.steps.length * 100) + '%';
+      document.getElementById('ob-next').innerText = idx === this.steps.length - 1 ? 'C\'est parti ! ✨' : 'Suivant';
+
+      const target = step.target ? document.querySelector(step.target) : null;
+      
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        let counts = 0;
+        clearInterval(this.refreshTimer);
+        this.refreshTimer = setInterval(() => {
+          this._updateSpotlight(target);
+          if (counts++ > 15) {
+            clearInterval(this.refreshTimer);
+            card.classList.add('visible');
+          }
+        }, 100);
+      } else {
+        clearInterval(this.refreshTimer);
+        this._updateSpotlight(null);
+        setTimeout(() => card.classList.add('visible'), 200);
+      }
+    }, 300); // Petit délai pour laisser le temps à l'interface de changer
   },
 
   _updateSpotlight(target) {
@@ -186,10 +215,10 @@ const GourmetOnboarding = {
       spotlight.style.width = (rect.width + 12) + 'px';
       spotlight.style.height = (rect.height + 12) + 'px';
 
-      let top = rect.bottom + 20;
-      let left = rect.left + (rect.width / 2) - 275; // 275 = 550 / 2
-      if (top + 300 > window.innerHeight) top = rect.top - 350;
-      left = Math.max(15, Math.min(left, window.innerWidth - 570));
+      let top = rect.bottom + 30;
+      let left = rect.left + (rect.width / 2) - 300; 
+      if (top + 350 > window.innerHeight) top = rect.top - 400;
+      left = Math.max(20, Math.min(left, window.innerWidth - 620));
 
       card.style.top = top + 'px';
       card.style.left = left + 'px';
