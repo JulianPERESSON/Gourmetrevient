@@ -1,6 +1,6 @@
 /**
- * GOURMETREVIENT — Module Onboarding Expert v8.1
- * Correctifs : Centrage intelligent et fond photo unifié
+ * GOURMETREVIENT — Module Onboarding Expert v8.2
+ * Correctif : Suppression des bords sombres lors de la parallaxe (Zoom + Fond assorti)
  */
 
 const GourmetOnboarding = {
@@ -218,7 +218,8 @@ const GourmetOnboarding = {
       const rect = card.getBoundingClientRect();
       const x = (e.clientX - rect.left) / rect.width - 0.5;
       const y = (e.clientY - rect.top) / rect.height - 0.5;
-      char.style.transform = `translateX(${x * 15}px) translateY(${y * 15}px) rotate(${x * 3}deg)`;
+      // On utilise un scale(1.15) pour avoir de la marge de manoeuvre sans voir le fond
+      char.style.transform = `scale(1.15) translateX(${x * 20}px) translateY(${y * 20}px) rotate(${x * 3}deg)`;
     });
   },
 
@@ -253,11 +254,13 @@ const GourmetOnboarding = {
         
         .ob-character-container {
           width: 220px; position: relative; display: flex; align-items: flex-end; justify-content: center;
-          background: transparent; overflow: hidden; flex-shrink: 0;
+          background: #e1f4e5; /* Fond vert clair assorti à la photo */
+          overflow: hidden; flex-shrink: 0;
         }
         .ob-character-img {
-          width: 100%; height: 100%; object-fit: contain;
+          width: 100%; height: 100%; object-fit: cover;
           transition: transform 0.1s ease-out;
+          transform: scale(1.15); /* Zoom par défaut */
           will-change: transform;
         }
         
@@ -320,9 +323,7 @@ const GourmetOnboarding = {
     const step = this.steps[idx];
     const card = document.getElementById('onboarding-card');
     const nextBtn = document.getElementById('ob-next');
-    
     if (step.action) step.action.call(this);
-
     if (step.requireClick) {
       nextBtn.classList.add('disabled');
       nextBtn.innerText = 'Action Requise 👆';
@@ -340,16 +341,13 @@ const GourmetOnboarding = {
       nextBtn.classList.remove('disabled');
       nextBtn.innerText = idx === this.steps.length - 1 ? 'C\'est parti ! ✨' : 'Suivant';
     }
-
     setTimeout(() => {
       document.getElementById('ob-icon').innerText = step.icon;
       document.getElementById('ob-title').innerText = step.title;
       this._typeWriter(document.getElementById('ob-text'), step.text);
       document.getElementById('ob-progress').style.width = ((idx + 1) / this.steps.length * 100) + '%';
-
       const target = step.target ? document.querySelector(step.target) : null;
       if (idx === 0) card.classList.add('visible');
-
       if (target) {
         target.scrollIntoView({ behavior: 'smooth', block: 'center' });
         let counts = 0;
@@ -375,22 +373,13 @@ const GourmetOnboarding = {
       spotlight.style.top = (rect.top - 10) + 'px';
       spotlight.style.width = (rect.width + 20) + 'px';
       spotlight.style.height = (rect.height + 20) + 'px';
-      
       const cardHeight = card.offsetHeight || 380;
       const cardWidth = card.offsetWidth || 600;
-      
       let top = rect.bottom + 30;
-      // Si pas de place en bas, on met en haut de l'élément
-      if (top + cardHeight > window.innerHeight) {
-        top = rect.top - cardHeight - 30;
-      }
-      
-      // Sécurité anti-débordement haut/bas écran
+      if (top + cardHeight > window.innerHeight) top = rect.top - cardHeight - 30;
       top = Math.max(20, Math.min(top, window.innerHeight - cardHeight - 20));
-      
       let left = rect.left + (rect.width / 2) - (cardWidth / 2);
       left = Math.max(20, Math.min(left, window.innerWidth - cardWidth - 20));
-      
       card.style.top = top + 'px';
       card.style.left = left + 'px';
       card.style.transform = 'none';
