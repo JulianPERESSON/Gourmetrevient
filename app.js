@@ -2875,9 +2875,8 @@ function bindEvents() {
 
   const btnDeleteUserModal = $('#btnDeleteUserModal');
   if (btnDeleteUserModal) btnDeleteUserModal.addEventListener('click', () => {
-    const user = APP.adminSelectedUser;
-    if (user && confirm(`Voulez-vous vraiment supprimer le compte de ${user.username} ?`)) {
-      deleteUser(user.username);
+    if (selectedModerationUser && confirm(`Voulez-vous vraiment supprimer le compte de ${selectedModerationUser} ?`)) {
+      deleteUser(selectedModerationUser);
       const m = $('#adminUserModal');
       if (m) m.style.display = 'none';
     }
