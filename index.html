@@ -967,16 +967,22 @@
       <h1 title="GourmetRevient — Retour à l'accueil">Gourmet<span>Revient</span></h1>
     </div>
 
-    <div id="headerLangSwitcher" class="lang-switcher">
-      <button class="lang-switcher-btn active" onclick="setLanguage('fr')" title="Français">
-        <img src="https://flagcdn.com/w80/fr.png" class="lang-flag-img" alt="Français">
+    <div id="headerLangSwitcher" class="nav-dropdown lang-selector-dropdown" style="margin-right: 10px;">
+      <button class="nav-dropdown-trigger" id="currentLangBtn" style="padding: 0.4rem 0.6rem; background: var(--bg-alt); border-radius: 8px; border: 1px solid var(--surface-border); display: flex; align-items: center; gap: 8px;">
+        <img src="https://flagcdn.com/w80/fr.png" id="currentLangFlag" style="width:20px; border-radius:2px;" alt="Lang"> 
+        <span class="nav-arrow" style="font-size: 0.6rem;">▼</span>
       </button>
-      <button class="lang-switcher-btn" onclick="setLanguage('en')" title="English">
-        <img src="https://flagcdn.com/w80/gb.png" class="lang-flag-img" alt="English">
-      </button>
-      <button class="lang-switcher-btn" onclick="setLanguage('es')" title="Español">
-        <img src="https://flagcdn.com/w80/es.png" class="lang-flag-img" alt="Español">
-      </button>
+      <div class="nav-dropdown-content lang-dropdown-content" style="min-width: 140px;">
+        <button onclick="setLanguage('fr')" class="nav-dropdown-link" style="display: flex; align-items: center; gap: 10px; width: 100%; text-align: left;">
+          <img src="https://flagcdn.com/w80/fr.png" style="width:18px; border-radius:2px;" alt="FR"> Français
+        </button>
+        <button onclick="setLanguage('en')" class="nav-dropdown-link" style="display: flex; align-items: center; gap: 10px; width: 100%; text-align: left;">
+          <img src="https://flagcdn.com/w80/gb.png" style="width:18px; border-radius:2px;" alt="EN"> English
+        </button>
+        <button onclick="setLanguage('es')" class="nav-dropdown-link" style="display: flex; align-items: center; gap: 10px; width: 100%; text-align: left;">
+          <img src="https://flagcdn.com/w80/es.png" style="width:18px; border-radius:2px;" alt="ES"> Español
+        </button>
+      </div>
     </div>
 
     <div class="header-nav" id="mainNav" style="display:none; align-items:center; flex: 1; gap: 0.2rem;">

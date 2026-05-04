@@ -5102,6 +5102,13 @@ function applyLanguage(lang) {
         if (val) el.title = val;
     });
 
+    // Update flag in compact selector
+    const flagImg = document.getElementById('currentLangFlag');
+    if (flagImg) {
+        const flagMap = { 'fr': 'fr', 'en': 'gb', 'es': 'es' };
+        flagImg.src = `https://flagcdn.com/w80/${flagMap[lang] || lang}.png`;
+    }
+
     // Dispatch event for dynamic content
     document.dispatchEvent(new CustomEvent('languageChanged', { detail: { lang: currentLang } }));
 }
