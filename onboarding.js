@@ -15,7 +15,7 @@ const GourmetOnboarding = {
       target: null,
       icon: '🏃‍♂️',
       title: 'Bienvenue !',
-      text: 'Je suis Mr Bouvier-Gaz. Je vais vous présenter l\'intégralité de vos outils. Accrochez-vous, votre laboratoire est prêt !',
+      text: 'Bienvenue ! Je vais vous présenter l\'intégralité de vos outils. Accrochez-vous, votre laboratoire est prêt !',
       position: 'center'
     },
     // --- MENU 1 : L'ATELIER ---
@@ -218,7 +218,7 @@ const GourmetOnboarding = {
       const rect = card.getBoundingClientRect();
       const x = (e.clientX - rect.left) / rect.width - 0.5;
       const y = (e.clientY - rect.top) / rect.height - 0.5;
-      char.style.transform = `scale(1.15) translateX(${x * 15}px) translateY(${y * 15}px)`;
+      char.style.transform = `scale(1.1) translateX(${x * 5}px) translateY(${y * 5}px)`; // Mouvement divisé par 3
     });
   },
 
@@ -253,14 +253,14 @@ const GourmetOnboarding = {
         #onboarding-card.visible { opacity: 1; transform: scale(1); }
         
         .ob-character-container {
-          width: 260px; position: relative; display: flex; align-items: flex-end; justify-content: center;
+          width: 220px; position: relative; display: flex; align-items: flex-end; justify-content: center;
           background: transparent; overflow: visible; flex-shrink: 0;
-          margin-top: -60px; /* Le personnage dépasse en haut */
-          margin-left: -20px; /* Le personnage dépasse à gauche */
-          filter: drop-shadow(0 20px 30px rgba(0,0,0,0.4));
+          margin-top: -40px; /* Moins de dépassement */
+          margin-left: -15px;
+          filter: drop-shadow(0 15px 25px rgba(0,0,0,0.3));
         }
         .ob-character-img {
-          width: 110%; height: 115%; object-fit: contain; 
+          width: 100%; height: 105%; object-fit: contain; 
           object-position: bottom center;
           will-change: transform;
         }

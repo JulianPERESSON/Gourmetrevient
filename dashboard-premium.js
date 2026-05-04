@@ -119,10 +119,40 @@ function seedDemoData() {
     }
 }
 
+// =============================================================================
+// CATALOGUE DES ASTUCES DU CHEF (ROTATION)
+// =============================================================================
+const CHEF_TIPS = [
+    "Récupérez vos chutes de biscuits pour créer des fonds de verrines ou des entremets.",
+    "Utilisez vos blancs d'œufs excédentaires pour des meringues, financiers ou macarons.",
+    "Transformez vos restes de viennoiseries en pudding ou en bostocks gourmands.",
+    "Congelez vos parures de fruits pour réaliser des coulis ou des sorbets maison.",
+    "Le pain de la veille fait d'excellentes chapelures ou croûtons pour vos offres salées.",
+    "Optimisez vos fournées en regroupant les produits aux températures de cuisson proches.",
+    "Les zestes d'agrumes peuvent être séchés ou confits pour aromatiser vos sucres.",
+    "Utilisez vos surplus de ganache pour créer des truffes ou des inserts 'surprise'.",
+    "Réutilisez le sirop de vos fruits au sirop pour imbiber vos génoises et biscuits.",
+    "Pratiquez la rotation 'FIFO' (Premier Entré, Premier Sorti) pour limiter les pertes."
+];
 
+function rotateChefTip() {
+    const tipEl = document.getElementById('dashTipBody');
+    if (!tipEl) return;
+    const randomIndex = Math.floor(Math.random() * CHEF_TIPS.length);
+    const selectedTip = CHEF_TIPS[randomIndex];
+    const prefix = tipEl.querySelector('strong')?.outerHTML || "Astuce du Chef";
+    tipEl.innerHTML = `${prefix} — ${selectedTip}`;
+}
+
+// =============================================================================
+// INITIALIZATION
+// =============================================================================
 window.hydratePremiumDashboard = function () {
     // Force-seed demo data if missing every time hydrate runs, so soft reloads get the data
     seedDemoData();
+
+    // Trigger tip rotation
+    rotateChefTip();
 
     const hub = document.getElementById('hubSection');
     if (!hub || hub.style.display === 'none') return;
@@ -336,16 +366,20 @@ window.hydratePremiumDashboard = function () {
             });
         }
 
-        // Render only if content changed — prevents 10s interval flicker
-        const insight = insights[0];
-        const newHTML = insight
-            ? `<div class="ai-bubble"><p>${insight.text}</p><div class="ai-actions">${insight.tips.map(tip => `<span class="ai-tip">${tip}</span>`).join('')}</div></div>`
-            : `<div class="ai-bubble"><p>✅ Toutes vos recettes affichent une marge saine. Continuez !</p></div>`;
+        // Render dynamic insight
+        const insight = insights[0] || { text: "Analysez vos marges en temps réel pour optimiser votre rentabilité.", tips: ["💡 Activez le suivi des stocks"] };
+        const newHTML = `
+           <div class="ai-bubble">
+              <p>${insight.text}</p>
+           </div>
+           <div class="ai-tips">
+              ${(insight.tips || []).map(t => `<div class="ai-tip-pill">${t}</div>`).join('')}
+           </div>
+        `;
             
-        const contentHash = insight ? insight.text : 'all_good';
-        if (aiAdvice.dataset.insight !== contentHash) {
+        if (aiAdvice.dataset.insight !== insight.text) {
             aiAdvice.innerHTML = newHTML;
-            aiAdvice.dataset.insight = contentHash;
+            aiAdvice.dataset.insight = insight.text;
         }
     }
 

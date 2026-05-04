@@ -545,42 +545,86 @@ function renderDevis() {
     let tableRows = '';
     config.results.forEach((r, idx) => {
         // Find tier level label localized
-        const tierLevel = r.selected.level;
+        const tierLevel = r.selected?.level || 'Standard';
         const levelMap = { "Entrée de gamme": t('lab.tier.1'), "Intermédiaire": t('lab.tier.2'), "Professionnel": t('lab.tier.3'), "Premium": t('lab.tier.4') };
         const levelTrans = levelMap[tierLevel] || tierLevel;
+        const price = r.selected?.price || 0;
+        const lang = (typeof getLang === 'function') ? getLang() : 'fr';
+        const locale = lang === 'en' ? 'en-GB' : (lang === 'es' ? 'es-ES' : 'fr-FR');
 
         tableRows += `
             <tr class="ing-row">
                 <td>${idx + 1}</td>
-                <td><strong>${r.name || r.id}</strong> <span style="color:var(--text-muted);font-size:0.8rem">(${r.selected.brand} · ${levelTrans})</span></td>
-                <td style="text-align:right">${r.selected.price.toLocaleString(getLang() === 'en' ? 'en-GB' : (getLang() === 'es' ? 'es-ES' : 'fr-FR'))} €</td>
+                <td><strong>${r.name || r.id}</strong> <span style="color:var(--text-muted);font-size:0.8rem">(${r.selected?.brand || ''} · ${levelTrans})</span></td>
+                <td style="text-align:right">${price.toLocaleString(locale)} €</td>
             </tr>
         `;
     });
 
+    const totalVal = config.total || 0;
+    const langFinal = (typeof getLang === 'function') ? getLang() : 'fr';
+    const localeFinal = langFinal === 'en' ? 'en-GB' : (langFinal === 'es' ? 'es-ES' : 'fr-FR');
+
     container.innerHTML = `
-        <div class="card">
-            <h2 class="card-title">${t('devis.title')}</h2>
-            <p class="card-subtitle">${t('devis.config')}: ${modeLabel}</p>
-            <div style="margin-top:1.5rem">
-                <canvas id="planCanvasPreview" style="background:#f9fafb; border:1px solid var(--surface-border); border-radius:var(--radius-sm); max-width:100%; height:auto;"></canvas>
+        <div class="card devis-document" style="max-width: 900px; margin: 0 auto; padding: 2.5rem; background: white; border-radius: 1.5rem; box-shadow: 0 20px 50px rgba(0,0,0,0.08);">
+            
+            <!-- Header Pro -->
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 3rem; border-bottom: 2px solid var(--bg-alt); padding-bottom: 2rem;">
+                <div>
+                    <h1 style="margin:0; font-family:var(--font-heading); color:var(--primary); font-size: 1.8rem; letter-spacing: -0.02em;">Gourmet<span style="color:var(--accent)">Revient</span></h1>
+                    <p style="margin:5px 0 0 0; color:var(--text-muted); font-size:0.85rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em;">Expert en Rentabilité Pâtissière</p>
+                </div>
+                <div style="text-align:right;">
+                    <h2 style="margin:0; color:var(--text); font-size: 1.2rem; font-weight: 800;">${t('devis.title')}</h2>
+                    <p style="margin:5px 0 0 0; color:var(--accent); font-weight: 700; font-size:0.9rem;">Ref: #LAB-${Math.floor(Date.now()/100000)}</p>
+                </div>
+            </div>
+
+            <!-- Plan Preview Centré -->
+            <div style="margin-bottom: 3rem; text-align: center;">
+                <h3 style="font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin-bottom: 1rem;">Aperçu de l'Agencement</h3>
+                <div style="background: var(--bg-alt); padding: 15px; border-radius: 1rem; border: 1px solid var(--surface-border); display: inline-block; box-shadow: inset 0 2px 10px rgba(0,0,0,0.03);">
+                    <canvas id="planCanvasPreview" style="display: block; border-radius: 0.5rem; background: white; max-width: 100%; height: auto;"></canvas>
+                </div>
             </div>
             
-            <table style="width:100%; margin-top:1.5rem; text-align:left; border-collapse:collapse;" class="table">
-                <thead style="border-bottom:2px solid var(--surface-border); font-size:0.8rem; color:var(--text-muted); text-transform:uppercase;">
-                    <tr><th>${t('devis.col.idx')}</th><th>${t('devis.col.item')}</th><th style="text-align:right">${t('devis.col.price')}</th></tr>
-                </thead>
-                <tbody>
-                    ${tableRows}
-                </tbody>
-            </table>
-            
-            <div style="margin-top:1rem; padding-top:1rem; border-top:2px solid var(--primary); display:flex; justify-content:space-between; align-items:center; font-weight:800;">
-                <span>${t('devis.total')}</span>
-                <span style="font-size:1.4rem; color:var(--accent);">${config.total.toLocaleString(getLang() === 'en' ? 'en-GB' : (getLang() === 'es' ? 'es-ES' : 'fr-FR'))} € HT</span>
+            <!-- Table des Équipements -->
+            <div style="margin-bottom: 2.5rem;">
+                <table style="width:100%; border-collapse:collapse; text-align:left;">
+                    <thead>
+                        <tr style="border-bottom: 2px solid var(--primary);">
+                            <th style="padding: 12px 8px; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">${t('devis.col.idx')}</th>
+                            <th style="padding: 12px 8px; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">${t('devis.col.item')}</th>
+                            <th style="padding: 12px 8px; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; text-align: right;">${t('devis.col.price')}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${tableRows}
+                    </tbody>
+                </table>
             </div>
             
-            <button class="btn btn-primary btn-full" style="margin-top:1.5rem;" onclick="window.print()">${t('devis.print')}</button>
+            <!-- Récapitulatif -->
+            <div style="display: flex; justify-content: flex-end; margin-top: 2rem;">
+                <div style="width: 300px; background: var(--bg-alt); padding: 1.5rem; border-radius: 1rem;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.9rem;">
+                        <span style="color: var(--text-muted);">Sous-total HT</span>
+                        <span style="font-weight: 600;">${totalVal.toLocaleString(localeFinal)} €</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; border-top: 1px solid rgba(0,0,0,0.1); padding-top: 10px; margin-top: 5px;">
+                        <span style="font-weight: 800; font-size: 1.1rem; color: var(--primary);">TOTAL HT</span>
+                        <span style="font-weight: 800; font-size: 1.3rem; color: var(--accent);">${totalVal.toLocaleString(localeFinal)} €</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Footer & Bouton -->
+            <div style="margin-top: 4rem; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--bg-alt); padding-top: 2rem;">
+                <p style="margin:0; font-size: 0.8rem; color: var(--text-muted); max-width: 400px;">Ce devis est une estimation basée sur les tarifs moyens du marché professionnel en 2026. Prix hors taxes (HT).</p>
+                <button class="btn btn-primary" style="padding: 0.8rem 2rem; display: flex; align-items: center; gap: 10px; box-shadow: var(--shadow-accent);" onclick="window.print()">
+                    ${t('devis.print')}
+                </button>
+            </div>
         </div>
     `;
 

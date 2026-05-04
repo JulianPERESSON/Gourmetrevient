@@ -371,28 +371,13 @@ window.renderPredictiveMarginAlert = function() {
   const remaining = primary.affected.length > 3 ? ` +${primary.affected.length - 3} autres` : '';
 
   container.innerHTML = `
-    <div class="ai-bubble ai-bubble-warning">
-      <div class="ai-alert-header">
-        <span class="ai-alert-icon">⚠️</span>
-        <p><strong>Alerte Marge Prédictive</strong></p>
-      </div>
-      <p>Avec la hausse du ${primary.icon} ${primary.ingredient} (+${primary.change}%), 
-      <strong>${primary.affected.length} recette${primary.affected.length > 1 ? 's' : ''}</strong> 
-      ${primary.affected.length > 1 ? 'sont passées' : 'est passée'} sous la barre des ${MARGIN_THRESHOLD}% :</p>
-      <div class="ai-affected-list">
-        ${primary.affected.slice(0, 4).map(a => `
-          <div class="ai-affected-item">
-            <span class="ai-affected-name">${a.name}</span>
-            <span class="ai-affected-margin">${a.oldMargin}% → <strong class="text-danger">${a.newMargin}%</strong></span>
-          </div>
-        `).join('')}
-        ${remaining ? `<div class="ai-affected-more">${remaining}</div>` : ''}
-      </div>
-      <div class="ai-actions">
-        <span class="ai-tip" onclick="showMgmt && showMgmt(); switchMgmtTab && switchMgmtTab('inflation');" style="cursor:pointer;">🔥 Voir la simulation d'inflation</span>
-        <span class="ai-tip" onclick="showStats && showStats();" style="cursor:pointer;">📊 Voir les statistiques</span>
-      </div>
-    </div>
+     <div class="ai-bubble ai-bubble-warning">
+        <p>⚠️ <strong>Alerte Marge :</strong> La hausse du prix de <strong>${primary.ingredient}</strong> impacte ${primary.affected.length} recettes (dont ${affectedNames}${remaining}).</p>
+     </div>
+     <div class="ai-tips">
+        <div class="ai-tip-pill">💡 Ajuster vos prix de vente</div>
+        <div class="ai-tip-pill">💡 Utiliser l'OCR pour vos achats</div>
+     </div>
   `;
 };
 

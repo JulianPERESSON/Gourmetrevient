@@ -98,6 +98,14 @@ const TRANSLATIONS = {
         'nav.stats': 'Statistiques',
         'nav.mgmt': 'Gestion Pro',
         'nav.orders': 'Devis & Factures',
+        'devis.title': 'Mon Devis Personnalisé',
+        'devis.config': 'Configuration',
+        'devis.empty': 'Aucun équipement sélectionné. Veuillez ajuster votre budget.',
+        'devis.col.idx': '#',
+        'devis.col.item': 'Équipement',
+        'devis.col.price': 'Prix Estimé',
+        'devis.total': 'Total Estimé',
+        'devis.print': 'Imprimer le Devis',
         'nav.planning_prod': 'Planning',
         'nav.traceability': 'Traçabilité des Lots',
         'nav.waste': 'Pertes & Traçabilité',
@@ -280,7 +288,7 @@ const TRANSLATIONS = {
         'dash.stat.alerts': 'Alertes',
         'dash.stat.rentability': 'Rentabilité',
         'dash.priority.title': 'Priorités du Jour',
-        'dash.ai.expert.title': 'Mr Bouvier-Gaz 🏃‍♂️',
+        'dash.ai.expert.title': 'Assistant Expert',
         'dash.greeting_prefix': 'Votre',
         'dash.subtitle': 'espace professionnel GourmetRevient',
         'dash.badge1': '✨ Projet GourmetRevient 2026',
@@ -5112,6 +5120,7 @@ window.i18n = {
     t: t,
     setLanguage: applyLanguage
 };
+window.getLang = () => window.currentLang || localStorage.getItem('gourmet_lang') || DEFAULT_LANG;
 window.t = t;
 
 // Global alias for compatibility with HTML onclick attributes
