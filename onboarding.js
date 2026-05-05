@@ -244,10 +244,10 @@ const GourmetOnboarding = {
         }
         
         #onboarding-card { 
-          position: fixed; background: rgba(30, 41, 59, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+          position: fixed; top: 0; left: 0; background: rgba(30, 41, 59, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
           border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 28px; padding: 0; width: 640px; max-width: calc(100vw - 40px); 
           box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.6), inset 0 0 0 1px rgba(255,255,255,0.1); pointer-events: all; 
-          z-index: 10001; transition: all 0.6s cubic-bezier(0.19, 1, 0.22, 1); 
+          z-index: 10001; transition: transform 0.6s cubic-bezier(0.19, 1, 0.22, 1), opacity 0.6s ease; 
           opacity: 0; transform: scale(0.9); color: white; display: flex; overflow: visible; /* Sortie de cadre autorisée */
         }
         #onboarding-card.visible { opacity: 1; transform: scale(1); }
@@ -389,20 +389,24 @@ const GourmetOnboarding = {
         top = rect.top - cardHeight - 60;
       }
       
-      top = Math.max(100, Math.min(top, window.innerHeight - cardHeight - 30));
+      top = Math.max(80, Math.min(top, window.innerHeight - cardHeight - 20));
       
       let left = rect.left + (rect.width / 2) - (cardWidth / 2);
-      left = Math.max(40, Math.min(left, window.innerWidth - cardWidth - 40));
+      left = Math.max(20, Math.min(left, window.innerWidth - cardWidth - 20));
       
-      card.style.top = top + 'px';
-      card.style.left = left + 'px';
-      card.style.transform = 'none';
+      card.style.top = '0';
+      card.style.left = '0';
+      card.style.transform = `translate3d(${left}px, ${top}px, 0)`;
       card.classList.add('visible');
     } else {
       spotlight.style.opacity = '0';
-      card.style.top = '50%';
-      card.style.left = '50%';
-      card.style.transform = 'translate(-50%, -50%)';
+      const cardHeight = card.offsetHeight || 380;
+      const cardWidth = card.offsetWidth || 640;
+      const cTop = (window.innerHeight - cardHeight) / 2;
+      const cLeft = (window.innerWidth - cardWidth) / 2;
+      card.style.top = '0';
+      card.style.left = '0';
+      card.style.transform = `translate3d(${cLeft}px, ${cTop}px, 0)`;
     }
   },
 
