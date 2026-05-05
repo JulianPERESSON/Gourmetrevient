@@ -20,12 +20,12 @@ const GourmetOnboarding = {
     },
     // --- MENU 1 : L'ATELIER ---
     {
-      target: '.nav-dropdown:nth-child(3) .nav-dropdown-trigger',
+      target: '#mainNav .nav-dropdown:nth-child(3) .nav-dropdown-trigger',
       icon: '💡',
       title: 'L\'Atelier Créatif',
       text: 'Cliquez sur "L\'Atelier" pour débloquer les outils de création.',
       action: function() { this._toggleDropdown(0, false); },
-      requireClick: '.nav-dropdown:nth-child(3) .nav-dropdown-trigger'
+      requireClick: '#mainNav .nav-dropdown:nth-child(3) .nav-dropdown-trigger'
     },
     {
       target: '#navRecettes',
@@ -71,12 +71,12 @@ const GourmetOnboarding = {
     },
     // --- MENU 2 : PILOTAGE ---
     {
-      target: '.nav-dropdown:nth-child(4) .nav-dropdown-trigger',
+      target: '#mainNav .nav-dropdown:nth-child(4) .nav-dropdown-trigger',
       icon: '📈',
       title: 'Pilotage & Outils',
       text: 'Cliquez sur ce menu pour voir vos outils analytiques.',
       action: function() { this._closeAllDropdowns(); },
-      requireClick: '.nav-dropdown:nth-child(4) .nav-dropdown-trigger'
+      requireClick: '#mainNav .nav-dropdown:nth-child(4) .nav-dropdown-trigger'
     },
     {
       target: '#navStats',
@@ -108,12 +108,12 @@ const GourmetOnboarding = {
     },
     // --- MENU 3 : LABO ---
     {
-      target: '.nav-dropdown:nth-child(5) .nav-dropdown-trigger',
+      target: '#mainNav .nav-dropdown:nth-child(5) .nav-dropdown-trigger',
       icon: '🛡️',
       title: 'Labo & Sécurité',
       text: 'Cliquez ici pour accéder à la gestion du laboratoire.',
       action: function() { this._closeAllDropdowns(); },
-      requireClick: '.nav-dropdown:nth-child(5) .nav-dropdown-trigger'
+      requireClick: '#mainNav .nav-dropdown:nth-child(5) .nav-dropdown-trigger'
     },
     {
       target: '#navPlanning',
@@ -168,7 +168,7 @@ const GourmetOnboarding = {
   ],
 
   _toggleDropdown(index, open) {
-    const dropdowns = document.querySelectorAll('.nav-dropdown');
+    const dropdowns = document.querySelectorAll('#mainNav .nav-dropdown');
     const el = dropdowns[index];
     if (!el) return;
     const trigger = el.querySelector('.nav-dropdown-trigger');
