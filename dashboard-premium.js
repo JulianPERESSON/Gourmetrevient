@@ -35,14 +35,22 @@ function seedDemoData() {
         localStorage.setItem('gourmet_production_plan', JSON.stringify([...existingPlan, ...demoPlan]));
     }
 
-    // ── Ingredient Price Watch & Expiry (user-scoped key) ─────────────────────────
-    const invKey = `gourmet_inventory_${currUser}`;
-    let inv = JSON.parse(localStorage.getItem(invKey) || '[]');
+    // ── Ingredient Price Watch & Expiry (Unified key) ─────────────────────────
+    const globalInvKey = 'gourmet_inventory';
+    const userInvKey = `gourmet_inventory_${currUser}`;
+    
+    // Try to get data from user-specific key first, then global key
+    let userInv = JSON.parse(localStorage.getItem(userInvKey) || '[]');
+    let globalInv = JSON.parse(localStorage.getItem(globalInvKey) || '[]');
+    
+    // Merge both if they differ, prioritizing user-specific
+    let inv = userInv.length > 0 ? userInv : globalInv;
     const hasHistory = inv.some(item => item.priceHistory && item.priceHistory.length > 1);
     
-    if (!hasHistory || inv.length < 5) {
+    // Only seed if REALLY empty (less than 2 items and no history)
+    if (inv.length < 2 && !hasHistory) {
         const demoInv = [
-            { id: '901', name: 'Beurre AOP', unit: 'kg', price: 9.80, stock: 12, alertThreshold: 15, lastUpdate: new Date().toISOString(), expiryDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(), priceHistory: [
+            { id: '901', name: 'Beurre AOP', unit: 'kg', price: 9.80, stock: 12, alertThreshold: 15, lastUpdate: new Date().toISOString(), priceHistory: [
                 { date: '2026-03-01', price: 8.40, change: 0 }, { date: '2026-04-01', price: 9.80, change: 16 }
             ]},
             { id: '902', name: 'Farine T55', unit: 'kg', price: 1.10, stock: 45, alertThreshold: 10, lastUpdate: new Date().toISOString(), priceHistory: [
@@ -55,15 +63,16 @@ function seedDemoData() {
                 { date: '2026-03-01', price: 4.50, change: 0 }, { date: '2026-04-01', price: 4.20, change: -6 }
             ]},
         ];
-        // Merge demo to front of existing if not duplicating names
-        const names = new Set(inv.map(i => i.name));
-        demoInv.forEach(d => { if(!names.has(d.name)) inv.unshift(d); });
-        localStorage.setItem(invKey, JSON.stringify(inv));
+        inv = demoInv;
+        localStorage.setItem(userInvKey, JSON.stringify(inv));
+        // NEVER overwrite the global key with demo data if it's not the primary source
     }
 
     // ── Data Repair & Normalization ──────────────────────────────────
     let needsSave = false;
-    let currentInv = JSON.parse(localStorage.getItem(invKey) || '[]');
+    const invKey = `gourmet_inventory_${currUser}`;
+    let currentInv = JSON.parse(localStorage.getItem(invKey) || localStorage.getItem('gourmet_inventory') || '[]');
+    
     currentInv.forEach(item => {
         if (!item.lastUpdate) { item.lastUpdate = new Date().toISOString(); needsSave = true; }
         if (item.price === undefined && item.pricePerUnit !== undefined) { item.price = item.pricePerUnit; needsSave = true; }
@@ -71,10 +80,17 @@ function seedDemoData() {
         item.stock = parseFloat(item.stock) || 0;
         if (typeof item.id !== 'string') { item.id = String(item.id); needsSave = true; }
     });
+    
     if (needsSave) {
         localStorage.setItem(invKey, JSON.stringify(currentInv));
-        // Also trigger a global state update if available
-        if (typeof APP !== 'undefined' && APP.inventory) APP.inventory = currentInv;
+        localStorage.setItem('gourmet_inventory', JSON.stringify(currentInv));
+    }
+
+    // Only update APP.inventory if it's currently smaller than what's in storage (recovery)
+    if (typeof APP !== 'undefined' && APP.inventory) {
+        if (APP.inventory.length < currentInv.length) {
+             APP.inventory = currentInv;
+        }
     }
 
     // ── Upcoming Deliveries ──────────────────────────────────────────
@@ -161,18 +177,19 @@ window.hydratePremiumDashboard = function () {
     // 0. Context & Utils
     const lang = window.currentLang || localStorage.getItem('gourmet_lang') || 'fr';
     const currUser = localStorage.getItem('gourmet_current_user') || 'Chef';
+    const userSuffix = currUser ? `_${currUser.toLowerCase()}` : '';
     const recipes = (window.APP && window.APP.savedRecipes && window.APP.savedRecipes.length > 0)
         ? window.APP.savedRecipes
-        : JSON.parse(localStorage.getItem(`gourmetrevient_recipes_${currUser.toLowerCase()}`) || '[]');
+        : JSON.parse(localStorage.getItem(`gourmetrevient_recipes${userSuffix}`) || '[]');
     const inv = (window.APP && window.APP.inventory && window.APP.inventory.length > 0)
         ? window.APP.inventory
-        : JSON.parse(localStorage.getItem(`gourmet_inventory_${currUser.toLowerCase()}`) || '[]');
+        : JSON.parse(localStorage.getItem(`gourmet_inventory${userSuffix}`) || localStorage.getItem('gourmet_inventory') || '[]');
     const team = (window.APP && window.APP.teamMembers && window.APP.teamMembers.length > 0)
         ? window.APP.teamMembers
-        : JSON.parse(localStorage.getItem(`gourmet_team_members_${currUser.toLowerCase()}`) || '[]');
+        : JSON.parse(localStorage.getItem(`gourmet_team_members${userSuffix}`) || '[]');
     const leaves = (window.APP && window.APP.staffLeaves && window.APP.staffLeaves.length > 0)
         ? window.APP.staffLeaves
-        : JSON.parse(localStorage.getItem(`gourmet_staff_leaves_${currUser.toLowerCase()}`) || '[]');
+        : JSON.parse(localStorage.getItem(`gourmet_staff_leaves${userSuffix}`) || '[]');
     const haccpLogs = (window.APP && window.APP.haccpLogs)
         ? window.APP.haccpLogs
         : JSON.parse(localStorage.getItem('gourmet_haccp_logs') || '{"temp":[],"trace":[],"clean":[],"reception":[]}');

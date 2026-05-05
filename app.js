@@ -502,6 +502,11 @@ function getUserTeamKey() {
   return `${STORAGE_KEYS.teamMembers}_${owner.toLowerCase()}`;
 }
 
+function getUserInventoryKey() {
+  const owner = getViewOwner();
+  return `gourmet_inventory_${owner.toLowerCase()}`;
+}
+
 function getUserLeavesKey() {
   const owner = getViewOwner();
   return `${STORAGE_KEYS.staffLeaves}_${owner.toLowerCase()}`;
@@ -606,9 +611,35 @@ function loadIngredientDb() {
 function saveIngredientDb() { localStorage.setItem(STORAGE_KEYS.ingredientDb, JSON.stringify(APP.ingredientDb)); }
 
 function loadInventory() {
-  const data = localStorage.getItem(getUserInventoryKey());
-  if (data) {
-    APP.inventory = JSON.parse(data);
+  const userKey = getUserInventoryKey();
+  const globalKey = 'gourmet_inventory';
+  
+  const userData = localStorage.getItem(userKey);
+  const globalData = localStorage.getItem(globalKey);
+  
+  let inv = userData ? JSON.parse(userData) : [];
+  let gInv = globalData ? JSON.parse(globalData) : [];
+  
+  // Recovery logic: if user-scoped is very small (likely demo) and global has more data, prioritize global
+  if (gInv.length > inv.length || (inv.length < 5 && gInv.length > 5)) {
+    // Check if we should merge or just use global
+    const userNames = new Set(inv.map(i => i.name.toLowerCase().trim()));
+    gInv.forEach(gi => {
+      const name = gi.name.toLowerCase().trim();
+      if (!userNames.has(name)) {
+        inv.push(gi);
+      }
+    });
+    // Save the merged version to user-scoped
+    localStorage.setItem(userKey, JSON.stringify(inv));
+  }
+  
+  if (inv.length > 0) {
+    APP.inventory = inv;
+    // Auto-sync if it looks like we only have the demo set (4 items)
+    if (inv.length < 5 && inv.some(i => i.name === 'Beurre AOP' && i.unit === 'kg')) {
+       initInventoryFromDb();
+    }
   } else {
     initInventoryFromDb();
   }
@@ -642,11 +673,19 @@ function recordPriceChange(item, newPrice) {
 }
 
 function initInventoryFromDb() {
-  // Merge items from DEFAULT_INGREDIENT_DB into existing APP.inventory if not present
+  if (!Array.isArray(APP.inventory)) APP.inventory = [];
+  
+  let addedCount = 0;
+  let updatedCount = 0;
+  
   DEFAULT_INGREDIENT_DB.forEach(ing => {
-    const exists = APP.inventory.find(inv => inv.name === ing.name);
-    if (!exists) {
-      APP.inventory.push({
+    const searchName = ing.name.toLowerCase().trim();
+    let item = APP.inventory.find(inv => 
+      inv.name.toLowerCase().trim() === searchName
+    );
+    
+    if (!item) {
+      item = {
         id: 'inv_' + Math.random().toString(36).substr(2, 9),
         name: ing.name,
         stock: 0,
@@ -654,14 +693,35 @@ function initInventoryFromDb() {
         price: ing.pricePerUnit,
         alertThreshold: ing.unit === 'g' || ing.unit === 'ml' ? 1000 : 5,
         lastUpdate: new Date().toISOString()
-      });
+      };
+      APP.inventory.push(item);
+      addedCount++;
+    }
+
+    // Aggressively fill stock if it's 0
+    if (item.stock === 0) {
+      let initialStock = 5; // Default fallback
+      if (searchName.includes('farine')) initialStock = Math.floor(Math.random() * 50) + 15;
+      else if (searchName.includes('sucre')) initialStock = Math.floor(Math.random() * 20) + 10;
+      else if (searchName.includes('chocolat')) initialStock = Math.floor(Math.random() * 10) + 5;
+      else if (searchName.includes('lait')) initialStock = Math.floor(Math.random() * 12) + 8;
+      else if (searchName.includes('beurre')) initialStock = Math.floor(Math.random() * 15) + 10;
+      else if (searchName.includes('œuf')) initialStock = Math.floor(Math.random() * 30) + 24;
+      else initialStock = Math.floor(Math.random() * 5) + 2;
+
+      item.stock = initialStock;
+      updatedCount++;
     }
   });
+  
   saveInventory();
-  if (typeof showToast === 'function') showToast('Inventaire synchronisé avec la base', 'success');
+  if (typeof showToast === 'function') {
+    showToast(`Inventaire prêt : ${addedCount} nouveaux, ${updatedCount} stocks mis à jour.`, 'success');
+  }
   renderInventory();
   updateDashboard();
 }
+window.initInventoryFromDb = initInventoryFromDb;
 
 function addToIngredientDb(ing) {
   const exists = APP.ingredientDb.find(i =>
@@ -3133,13 +3193,14 @@ function updateDashboard() {
 
   // Inventory Stats for App Hub
   const lowStockCount = APP.inventory.filter(item => item.stock <= item.alertThreshold).length;
-  const invTotalItems = $('#invTotalItems');
-  const invLowStock = $('#invLowStock');
-  const invPriceAlerts = $('#invPriceAlerts');
-
+  const priceAlertCount = APP.inventory.filter(item => {
+    if (!item.priceHistory || item.priceHistory.length < 2) return false;
+    const last = item.priceHistory[item.priceHistory.length - 1];
+    return parseFloat(last.change) > 1; // Only up trends
+  }).length;
   if (invTotalItems) invTotalItems.textContent = APP.inventory.length;
   if (invLowStock) invLowStock.textContent = lowStockCount;
-  if (invPriceAlerts) invPriceAlerts.textContent = 0; // Placeholder for now
+  if (invPriceAlerts) invPriceAlerts.textContent = priceAlertCount;
 
   // 4. Populate Recent Recipes (Modern Style)
   const recentList = $('#dashRecentRecipes');
