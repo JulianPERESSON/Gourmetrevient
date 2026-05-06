@@ -968,8 +968,14 @@
          console.info('🛡️ Accès Admin Prioritaire activé.');
          localStorage.setItem('gourmet_auth', 'true');
          localStorage.setItem('gourmet_current_user', 'Ju 2503');
+         
+         // Supprime l'écran de chargement s'il est encore là
+         const splash = document.getElementById('splash-screen');
+         if (splash) splash.remove();
+
          document.getElementById('authManualOverlay').style.display = 'none';
          document.body.classList.remove('auth-pending');
+         
          if (typeof window.checkAuth === 'function') window.checkAuth();
          else location.reload();
          return;
@@ -996,10 +1002,17 @@
           btn.textContent = "Se connecter";
         } else {
           // Succès - On débloque tout
+          console.info('✅ Connexion réussie, déblocage immédiat.');
+          
+          // Supprime l'écran de chargement s'il est encore là
+          const splash = document.getElementById('splash-screen');
+          if (splash) splash.remove();
+
           document.getElementById('authManualOverlay').style.display = 'none';
           document.body.classList.remove('auth-pending');
+          
           if (typeof window.checkAuth === 'function') window.checkAuth();
-          else location.reload(); // Fallback ultime
+          else location.reload(); 
         }
       } catch (e) {
         err.textContent = "Erreur technique : " + e.message;
