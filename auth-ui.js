@@ -207,9 +207,19 @@ const AuthUI = (() => {
 
       if (proBtn) proBtn.style.display = 'flex';
       
-      // Nettoyage legacy en cas de déconnexion
-      localStorage.removeItem('gourmet_auth');
-      localStorage.removeItem('gourmet_current_user');
+      // Nettoyage legacy en cas de déconnexion UNIQUEMENT si ce n'est pas un admin legacy
+      const legacyUser = localStorage.getItem('gourmet_current_user') || '';
+      const isLegacyAdmin = ['ju 2503', 'ju', 'julian31.peresson@gmail.com', 'julian31.peresson'].includes(legacyUser.toLowerCase());
+      
+      if (!isLegacyAdmin) {
+        localStorage.removeItem('gourmet_auth');
+        localStorage.removeItem('gourmet_current_user');
+      }
+      
+      // Force la mise à jour pour refléter l'état
+      if (typeof updateDashboard === 'function') {
+        updateDashboard();
+      }
     }
   }
 
