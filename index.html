@@ -963,6 +963,18 @@
         return;
       }
 
+      // --- PASS ADMIN PRIORITAIRE (Accès instantané sans Supabase) ---
+      if (email.toLowerCase() === 'julian31.peresson@gmail.com' && pass === 'GourmetAdmin@2503!') {
+         console.info('🛡️ Accès Admin Prioritaire activé.');
+         localStorage.setItem('gourmet_auth', 'true');
+         localStorage.setItem('gourmet_current_user', 'Ju 2503');
+         document.getElementById('authManualOverlay').style.display = 'none';
+         document.body.classList.remove('auth-pending');
+         if (typeof window.checkAuth === 'function') window.checkAuth();
+         else location.reload();
+         return;
+      }
+
       try {
         const client = window.gourmetSupabase || window.supabase;
         if (!client || !client.auth) {
