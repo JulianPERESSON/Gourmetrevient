@@ -941,7 +941,7 @@
         
         <div style="margin-top: 10px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
            <p style="font-size: 0.85rem; color: rgba(255,255,255,0.7); margin-bottom: 10px;">Nouveau sur GourmetRevient ?</p>
-           <button onclick="AuthUI.showModal('signup')" class="auth-btn-secondary" style="width: 100%; border: 1px solid var(--accent); color: var(--accent);">Créer un compte / S'abonner</button>
+           <button onclick="openRegister()" class="auth-btn-secondary" style="width: 100%; border: 1px solid var(--accent); color: var(--accent);">Créer un compte / S'abonner</button>
         </div>
       </div>
       <p class="auth-legal-note">Seul l'administrateur et les abonnés Pro peuvent accéder au service.</p>
@@ -963,6 +963,12 @@
       }
 
       try {
+        if (!window.supabase || !window.supabase.auth) {
+          err.textContent = "Le système est encore en train de charger... Réessayez dans 2 secondes.";
+          err.style.display = "block";
+          return;
+        }
+
         btn.disabled = true;
         btn.textContent = "Connexion...";
         
@@ -986,6 +992,17 @@
         err.style.display = "block";
         btn.disabled = false;
         btn.textContent = "Se connecter";
+      }
+    async function openRegister() {
+      // Cache l'overlay actuel
+      const overlay = document.getElementById('authManualOverlay');
+      if (overlay) overlay.style.display = 'none';
+      
+      // Force l'affichage du modal AuthUI complet (qui gère l'inscription)
+      if (window.AuthUI && typeof window.AuthUI.showModal === 'function') {
+        window.AuthUI.showModal('signup');
+      } else {
+        alert("Le module d'inscription est encore en cours de chargement. Veuillez patienter quelques secondes.");
       }
     }
   </script>
