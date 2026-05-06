@@ -937,7 +937,7 @@
           <input type="password" id="authPasswordManual" placeholder="••••••••" class="auth-input">
         </div>
         <div id="authErrorManual" class="auth-error" style="display:none;"></div>
-        <button onclick="AuthUI.handleSubmitManual()" class="auth-btn-primary" style="margin-bottom: 1rem;">Se connecter</button>
+        <button onclick="loginDirect()" class="auth-btn-primary" style="margin-bottom: 1rem;">Se connecter</button>
         
         <div style="margin-top: 10px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
            <p style="font-size: 0.85rem; color: rgba(255,255,255,0.7); margin-bottom: 10px;">Nouveau sur GourmetRevient ?</p>
@@ -947,6 +947,48 @@
       <p class="auth-legal-note">Seul l'administrateur et les abonnés Pro peuvent accéder au service.</p>
     </div>
   </div>
+
+  <script>
+    // Fonction de secours ultra-robuste insérée directement dans le HTML
+    async function loginDirect() {
+      const btn = document.querySelector('#authManualOverlay .auth-btn-primary');
+      const email = document.getElementById('authEmailManual').value;
+      const pass = document.getElementById('authPasswordManual').value;
+      const err = document.getElementById('authErrorManual');
+
+      if (!email || !pass) {
+        err.textContent = "Veuillez remplir tous les champs.";
+        err.style.display = "block";
+        return;
+      }
+
+      try {
+        btn.disabled = true;
+        btn.textContent = "Connexion...";
+        
+        // Utilisation directe de l'instance supabase globale
+        const { data, error } = await window.supabase.auth.signInWithPassword({ email, password: pass });
+
+        if (error) {
+          err.textContent = error.message;
+          err.style.display = "block";
+          btn.disabled = false;
+          btn.textContent = "Se connecter";
+        } else {
+          // Succès - On débloque tout
+          document.getElementById('authManualOverlay').style.display = 'none';
+          document.body.classList.remove('auth-pending');
+          if (typeof window.checkAuth === 'function') window.checkAuth();
+          else location.reload(); // Fallback ultime
+        }
+      } catch (e) {
+        err.textContent = "Erreur technique : " + e.message;
+        err.style.display = "block";
+        btn.disabled = false;
+        btn.textContent = "Se connecter";
+      }
+    }
+  </script>
 
   <!-- Header -->
   <header class="app-header">
