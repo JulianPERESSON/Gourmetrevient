@@ -1034,6 +1034,30 @@
         alert("Le module d'inscription est encore en cours de chargement. Veuillez patienter quelques secondes.");
       }
     }
+
+    // --- DÉBLOCAGE AGRESSIF (Sécurité ultime) ---
+    setInterval(() => {
+      const isAuth = localStorage.getItem('gourmet_auth') === 'true';
+      if (isAuth) {
+        // Force la suppression des états de blocage
+        document.body.classList.remove('auth-pending');
+        const overlay = document.getElementById('authManualOverlay');
+        if (overlay) overlay.style.display = 'none';
+        
+        const splash = document.getElementById('splash-screen');
+        if (splash) splash.remove();
+
+        // Force l'affichage du contenu
+        ['appMain', 'hubSection', 'mainNav', 'userProfileArea', 'headerBrand'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) {
+            el.style.setProperty('display', (id === 'appMain' || id === 'hubSection') ? 'block' : 'flex', 'important');
+            el.style.setProperty('opacity', '1', 'important');
+            el.style.setProperty('visibility', 'visible', 'important');
+          }
+        });
+      }
+    }, 500);
   </script>
 
   <!-- Header -->
