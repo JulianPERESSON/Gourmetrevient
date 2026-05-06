@@ -2964,11 +2964,17 @@ function checkAuth() {
     if ($('#mobileNavBar')) $('#mobileNavBar').style.display = 'none';
     
     // On attend que AuthUI soit prêt pour afficher le modal
-    if (window.AuthUI && typeof window.AuthUI.showModal === 'function') {
-      window.AuthUI.showModal();
-    } else {
-      // Petit délai si AuthUI n'est pas encore injecté
-      setTimeout(checkAuth, 100);
+    const triggerModal = () => {
+      if (window.AuthUI && typeof window.AuthUI.showModal === 'function') {
+        window.AuthUI.showModal();
+      } else {
+        setTimeout(triggerModal, 200);
+      }
+    };
+    
+    // Si on est sur index.html (le dashboard), on force l'affichage
+    if (window.location.pathname.includes('index.html') || window.location.pathname.endsWith('/')) {
+        triggerModal();
     }
   }
 }

@@ -63,6 +63,7 @@ const AuthUI = (() => {
         _currentUser = null;
         if (typeof showToast === 'function') showToast('🚫 Accès non autorisé. Veuillez souscrire à un abonnement.', 'error');
         _updateUI(null);
+        showModal();
         return;
       }
 
@@ -76,6 +77,11 @@ const AuthUI = (() => {
       }
 
       _updateUI(_currentUser);
+      
+      // Si aucun utilisateur n'est connecté au chargement, on affiche le modal
+      if (!_currentUser && (window.location.pathname.includes('index.html') || window.location.pathname.endsWith('/'))) {
+        showModal();
+      }
 
       if (event === 'SIGNED_IN') {
         console.info('%c[Auth] ✅ Connecté :', 'color:#10b981', _currentUser?.email);
