@@ -2936,7 +2936,7 @@ function bindEvents() {
 // ============================================================================
 
 function checkAuth() {
-  const isAuth = localStorage.getItem('gourmet_auth') === 'true';
+  let isAuth = localStorage.getItem('gourmet_auth') === 'true';
   const currentUser = (localStorage.getItem(STORAGE_KEYS.currentUser) || '').toLowerCase();
   const WHITELIST = ['ju 2503', 'ju', 'julian31.peresson@gmail.com'];
   const isWhitelisted = WHITELIST.includes(currentUser);
@@ -2945,8 +2945,13 @@ function checkAuth() {
     console.warn('🚫 Accès refusé : session non autorisée pour', currentUser);
     localStorage.removeItem('gourmet_auth');
     localStorage.removeItem(STORAGE_KEYS.currentUser);
-    location.reload();
-    return;
+    isAuth = false;
+    
+    const error = $('#authError');
+    if (error) {
+      error.style.display = 'block';
+      error.textContent = '🚫 Vous ne faites pas partie de la liste blanche. Veuillez souscrire à un abonnement pour accéder au service.';
+    }
   }
 
   const overlay = $('#authOverlay');
