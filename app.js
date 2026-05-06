@@ -2954,6 +2954,9 @@ function checkAuth() {
     const appMain = document.getElementById('appMain');
     if (appMain) appMain.style.display = 'block';
 
+    // Allumer la lumière sur le Cockpit
+    if (typeof showHub === 'function') showHub();
+
     updateDashboard();
     loadSavedRecipes();
   } else {
