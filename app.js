@@ -2941,20 +2941,9 @@ function bindEvents() {
 
 function checkAuth() {
   const user = window.AuthUI?.getCurrentUser();
-  const isAuth = !!user;
-
-  if (isAuth) {
+  if (user) {
     document.body.classList.remove('auth-pending');
     if ($('#userProfileArea')) $('#userProfileArea').style.display = 'flex';
-    
-    if (window.innerWidth <= 768) {
-      if ($('#mainNav')) $('#mainNav').style.display = 'none';
-      if ($('#mobileNavBar')) $('#mobileNavBar').style.display = 'flex';
-    } else {
-      if ($('#mainNav')) $('#mainNav').style.display = 'flex';
-      if ($('#mobileNavBar')) $('#mobileNavBar').style.display = 'none';
-    }
-    
     updateDashboard();
     loadSavedRecipes();
   } else {
@@ -2963,18 +2952,11 @@ function checkAuth() {
     if ($('#mainNav')) $('#mainNav').style.display = 'none';
     if ($('#mobileNavBar')) $('#mobileNavBar').style.display = 'none';
     
-    // On attend que AuthUI soit prêt pour afficher le modal
-    const triggerModal = () => {
-      if (window.AuthUI && typeof window.AuthUI.showModal === 'function') {
-        window.AuthUI.showModal();
-      } else {
-        setTimeout(triggerModal, 200);
-      }
-    };
-    
-    // Si on est sur index.html (le dashboard), on force l'affichage
-    if (window.location.pathname.includes('index.html') || window.location.pathname.endsWith('/')) {
-        triggerModal();
+    // Si AuthUI est là, on montre le modal, sinon on attend un peu
+    if (window.AuthUI && typeof window.AuthUI.showModal === 'function') {
+      window.AuthUI.showModal();
+    } else {
+      setTimeout(checkAuth, 300);
     }
   }
 }
