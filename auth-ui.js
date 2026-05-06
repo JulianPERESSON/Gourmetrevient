@@ -147,7 +147,9 @@ const AuthUI = (() => {
       // Nettoyage spécial pour l'admin : forcer "Ju"
       if (isAdmin(user)) {
          name = 'Ju';
+         if(typeof showToast === 'function') showToast('Supabase: Admin reconnu', 'success');
       } else {
+         if(typeof showToast === 'function') showToast('Supabase: Utilisateur standard', 'info');
          // Prendre uniquement le prénom
          name = name.split(' ')[0];
          name = name.replace(/[\s-]*2503$/, '');
@@ -198,6 +200,7 @@ const AuthUI = (() => {
         updateDashboard();
       }
     } else {
+      if(typeof showToast === 'function') showToast('Supabase: AUCUNE session trouvée', 'warning');
       btn.className = 'auth-nav-btn auth-nav-btn--guest';
       btn.innerHTML = '<span class="auth-btn-icon">👤</span><span class="auth-btn-label">Connexion</span>';
       btn.onclick = showModal;
