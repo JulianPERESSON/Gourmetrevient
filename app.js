@@ -2982,7 +2982,12 @@ function loginSuccess(user) {
 function updateDashboard() {
   const name = localStorage.getItem(STORAGE_KEYS.currentUser) || 'Artisan';
   const displayName = name.replace(/[\s-]*2503.*$/i, '');
-  let usersDb = JSON.parse(localStorage.getItem(STORAGE_KEYS.users) || '{}');
+  let usersDb = {};
+  try {
+    usersDb = JSON.parse(localStorage.getItem(STORAGE_KEYS.users) || '{}');
+  } catch(e) {
+    console.error('Error parsing usersDb', e);
+  }
   const userKey = name.toLowerCase();
   const userData = usersDb[userKey] || {};
   const gender = userData.gender || 'male';
