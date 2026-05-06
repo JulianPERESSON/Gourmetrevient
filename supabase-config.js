@@ -12,7 +12,9 @@ const SUPABASE_URL = 'https://hogfrddigcojdmjjpbno.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_9iePEQdGSdnjXaw4I1s0Nw_wyitVBla';
 
 // Initialisation du client Supabase
-window.supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// On utilise 'supabase' (minuscule) qui est l'objet global exposé par le CDN
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+window.supabase = supabaseClient; // L'instance est maintenant accessible via window.supabase
 const supabase = window.supabase;
 
 // Alias pour le module de facturation (billing.js)
