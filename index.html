@@ -964,8 +964,9 @@
 
       try {
         if (!window.supabase || !window.supabase.auth) {
-          err.textContent = "Le système est encore en train de charger... Réessayez dans 2 secondes.";
-          err.style.display = "block";
+          btn.disabled = true;
+          btn.textContent = "Initialisation...";
+          setTimeout(loginDirect, 500); // Réessaie discrètement
           return;
         }
 
