@@ -2935,18 +2935,19 @@ function bindEvents() {
 // AUTHENTICATION
 // ============================================================================
 
-function checkAuth() {
-  let isAuth = localStorage.getItem('gourmet_auth') === 'true';
-  const currentUser = (localStorage.getItem(STORAGE_KEYS.currentUser) || '').toLowerCase();
+// ============================================================================
+// AUTHENTICATION — Bridged to AuthUI.js (Supabase)
+// ============================================================================
 
-  const overlay = $('#authOverlay');
+function checkAuth() {
+  // On utilise désormais Supabase via AuthUI
+  const user = window.AuthUI?.getCurrentUser();
+  const isAuth = !!user;
 
   if (isAuth) {
-    overlay.classList.add('hidden');
     document.body.classList.remove('auth-pending');
-    $('#userProfileArea').style.display = 'flex';
+    if ($('#userProfileArea')) $('#userProfileArea').style.display = 'flex';
     
-    // Proper responsive navigation switching
     if (window.innerWidth <= 768) {
       if ($('#mainNav')) $('#mainNav').style.display = 'none';
       if ($('#mobileNavBar')) $('#mobileNavBar').style.display = 'flex';
@@ -2958,152 +2959,21 @@ function checkAuth() {
     updateDashboard();
     loadSavedRecipes();
   } else {
-    overlay.classList.remove('hidden');
+    // Si pas connecté, on cache tout et on affiche le bouton de connexion via AuthUI
     document.body.classList.add('auth-pending');
-    $('#userProfileArea').style.display = 'none';
+    if ($('#userProfileArea')) $('#userProfileArea').style.display = 'none';
     if ($('#mainNav')) $('#mainNav').style.display = 'none';
     if ($('#mobileNavBar')) $('#mobileNavBar').style.display = 'none';
-
-    let authMode = 'login'; // 'login' or 'register'
-
-    const switchMode = (mode) => {
-      authMode = mode;
-      $$('.auth-tab').forEach(tab => tab.classList.toggle('active', tab.dataset.mode === mode));
-
-      if (mode === 'login') {
-        $('#authTitle').textContent = t('auth.title.secure');
-        $('#authDescription').innerHTML = t('auth.desc.login');
-        $('#pinGroup').style.display = 'block';
-        $('#registerInfo').style.display = 'none';
-        $('#btnAuthSubmit').textContent = t('auth.btn.login');
-        $('#btnAuthSubmit').style.display = 'block';
-        $('#genderSelection').style.display = 'none';
-        if ($('#subscribePrompt')) $('#subscribePrompt').style.display = 'none';
-      } else {
-        $('#authTitle').textContent = t('auth.title.register');
-        $('#authDescription').innerHTML = t('auth.desc.register');
-        $('#pinGroup').style.display = 'block';
-        $('#registerInfo').style.display = 'flex';
-        $('#btnAuthSubmit').textContent = t('auth.btn.continue');
-        $('#btnAuthSubmit').style.display = 'block';
-        $('#genderSelection').style.display = 'none';
-        if ($('#subscribePrompt')) $('#subscribePrompt').style.display = 'none';
-      }
-      $('#authError').style.display = 'none';
-    };
-
-    $$('.auth-tab').forEach(tab => {
-      tab.onclick = () => switchMode(tab.dataset.mode);
-    });
-
-    $('#btnAuthSubmit').onclick = async () => {
-      const user = $('#authUsername').value.trim();
-      const pin = $('#authPin').value;
-      const error = $('#authError');
-      const genderSel = $('#genderSelection');
-
-      if (user === '') {
-        error.style.display = 'block';
-        error.textContent = t('auth.error.empty');
-        return;
-      }
-
-      let usersDb = JSON.parse(localStorage.getItem(STORAGE_KEYS.users) || '{}');
-      const userKey = user.toLowerCase();
-
-      // Cas spécial : admin Ju 2503 — identifiant complet ou raccourci "ju"
-      const isJu2503 = (userKey === 'ju 2503') || (userKey === 'ju');
-      if (isJu2503) {
-        // Force la création/mise à jour du profil admin
-        usersDb['ju 2503'] = {
-          password: 'GourmetAdmin@2503!',
-          pin: '2503',
-          gender: 'male',
-          email: 'julian31.peresson@gmail.com',
-          role: 'Admin',
-          isAdmin: true
-        };
-        localStorage.setItem(STORAGE_KEYS.users, JSON.stringify(usersDb)); if (window.GourmetCloud && window.GourmetCloud.syncUsersToCloud) GourmetCloud.syncUsersToCloud();
-      }
-      // Normalise la clé pour Ju 2503
-      const resolvedKey = isJu2503 ? 'ju 2503' : userKey;
-
-      if (authMode === 'login') {
-        if (!usersDb[resolvedKey]) {
-          // If profile not found locally, try Cloud Recovery if configured
-          if (typeof window.tryRemoteLogin === 'function') {
-            const remoteData = await window.tryRemoteLogin(user, pin);
-            if (remoteData) {
-              // Account Found in Cloud!
-              usersDb[userKey] = remoteData.profile;
-              localStorage.setItem(STORAGE_KEYS.users, JSON.stringify(usersDb)); if (window.GourmetCloud && window.GourmetCloud.syncUsersToCloud) GourmetCloud.syncUsersToCloud();
-              
-              // Hydrate data recovered from cloud
-              localStorage.setItem(`gourmetrevient_recipes_${userKey}`, JSON.stringify(remoteData.recipes));
-              localStorage.setItem(`gourmetrevient_ingredient_db`, JSON.stringify(remoteData.ingredients));
-              
-              showToast(t('auth.sync.success') || "Données récupérées depuis le Cloud !", 'success');
-              loginSuccess(user);
-              return;
-            }
-          }
-          
-          error.style.display = 'block';
-          error.textContent = t('auth.error.unknown');
-          error.style.animation = 'none';
-          setTimeout(() => error.style.animation = 'shake 0.4s ease-in-out', 10);
-          return;
-        }
-
-        const userData = usersDb[resolvedKey];
-        const inputPass = $('#authPin').value;
-        
-        // Sécurité : Vérifie le mot de passe (on ne supporte plus les PIN simples de 4 chiffres sauf pour l'admin Ju qui a déjà un mot de passe fort)
-        const passwordOk = (userData.password && inputPass === userData.password)
-                        || (userData.pin && inputPass === userData.pin);
-                        
-        if (!passwordOk) {
-          error.style.display = 'block';
-          error.textContent = t('auth.error.pin');
-          error.style.animation = 'none';
-          setTimeout(() => error.style.animation = 'shake 0.4s ease-in-out', 10);
-          return;
-        }
-
-        if (userData.isBanned) {
-          error.style.display = 'block';
-          error.textContent = t('auth.error.banned');
-          return;
-        }
-
-        // Vérification whitelist locale
-        const LOCAL_WHITELIST = ['ju 2503', 'ju', 'julian31.peresson@gmail.com'];
-        if (!LOCAL_WHITELIST.includes(resolvedKey)) {
-          error.style.display = 'block';
-          error.textContent = '🚫 Vous ne faites pas partie de la liste blanche. Veuillez souscrire à un abonnement pour accéder au service.';
-          if ($('#subscribePrompt')) $('#subscribePrompt').style.display = 'block';
-          return;
-        }
-
-        loginSuccess(resolvedKey === 'ju 2503' ? 'Ju 2503' : user);
-      } else {
-        // Mode inscription — bloqué
-        error.style.display = 'block';
-        error.textContent = '🔒 Les inscriptions sont fermées. Souscrivez à un abonnement pour obtenir l\'accès.';
-        if ($('#subscribePrompt')) $('#subscribePrompt').style.display = 'block';
-        return;
-      }
-    };
-
-    function loginSuccess(user) {
-      localStorage.setItem('gourmet_auth', 'true');
-      localStorage.setItem(STORAGE_KEYS.currentUser, user);
-      location.reload();
-    }
-
-    $('#authUsername').onkeypress = (e) => { if (e.key === 'Enter') $('#btnAuthSubmit').click(); };
-    $('#authPin').onkeypress = (e) => { if (e.key === 'Enter') $('#btnAuthSubmit').click(); };
+    
+    // AuthUI gère l'affichage du bouton de connexion dans la nav ou en flottant
   }
+}
+
+function loginSuccess(user) {
+  // Cette fonction est conservée pour la compatibilité avec les anciens modules
+  // mais la session réelle est gérée par Supabase
+  localStorage.setItem('gourmet_auth', 'true');
+  location.reload();
 }
 
 function updateDashboard() {

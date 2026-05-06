@@ -15,9 +15,17 @@ const AuthUI = (() => {
   function isAuthorized(user) {
     if (!user) return false;
     const email = user.email?.toLowerCase();
-    const fullName = user.user_metadata?.full_name?.toLowerCase();
-    return WHITELIST.includes(email) ||
-           (fullName && (fullName.includes('ju 2503') || fullName.includes('ju2503') || fullName === 'ju'));
+    
+    // 1. Root Admin permanent
+    if (email === ADMIN_EMAIL) return true;
+
+    // 2. Liste blanche stricte (Emails uniquement)
+    const STRICT_WHITELIST = [
+      'ju2503@gmail.com', // Exemple d'email complet si besoin
+      'ju 2503'           // Gardé temporairement pour vos tests si vous utilisez cet identifiant comme email
+    ];
+
+    return STRICT_WHITELIST.includes(email);
   }
 
   function isAdmin(user) {
