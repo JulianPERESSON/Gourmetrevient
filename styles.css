@@ -407,6 +407,16 @@ h4 {
 }
 
 /* Auth blocking */
+body.auth-pending {
+  background: 
+    radial-gradient(circle at top right, rgba(99, 102, 241, 0.15), transparent 400px),
+    radial-gradient(circle at bottom left, rgba(16, 185, 129, 0.1), transparent 400px),
+    var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 body.auth-pending .app-header,
 body.auth-pending .app-main {
   display: none !important;

@@ -2959,13 +2959,16 @@ function checkAuth() {
     updateDashboard();
     loadSavedRecipes();
   } else {
-    // Si pas connecté, on cache tout et on affiche le bouton de connexion via AuthUI
+    // Si pas connecté, on cache tout et on affiche le nouveau modal de connexion
     document.body.classList.add('auth-pending');
     if ($('#userProfileArea')) $('#userProfileArea').style.display = 'none';
     if ($('#mainNav')) $('#mainNav').style.display = 'none';
     if ($('#mobileNavBar')) $('#mobileNavBar').style.display = 'none';
     
-    // AuthUI gère l'affichage du bouton de connexion dans la nav ou en flottant
+    // On lance le modal de connexion automatiquement
+    if (window.AuthUI) {
+      window.AuthUI.showModal();
+    }
   }
 }
 
