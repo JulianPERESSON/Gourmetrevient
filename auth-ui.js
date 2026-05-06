@@ -8,14 +8,34 @@
 const AuthUI = (() => {
 
   let _currentUser = null;
+  const WHITELIST = ['julian31.peresson@gmail.com', 'ju2503', 'ju 2503'];
+
+  function isAuthorized(user) {
+    if (!user) return true; // On laisse passer si pas de user (mode guest, mais l'UI gérera le blocage si besoin)
+    const email = user.email?.toLowerCase();
+    const fullName = user.user_metadata?.full_name?.toLowerCase();
+    return WHITELIST.includes(email) || 
+           (fullName && (fullName.includes('ju 2503') || fullName.includes('ju2503') || fullName === 'ju'));
+  }
 
   // ── INIT ─────────────────────────────────────────────────────────────────────
   async function init() {
     console.log('🔐 AuthUI : Initialisation...');
 
     // Écoute les changements de session (connexion / déconnexion)
-    supabase.auth.onAuthStateChange((event, session) => {
+    supabase.auth.onAuthStateChange(async (event, session) => {
       _currentUser = session?.user || null;
+
+      // Vérification Whitelist
+      if (_currentUser && !isAuthorized(_currentUser)) {
+        console.warn('🚫 Accès refusé : utilisateur non autorisé.', _currentUser.email);
+        await supabase.auth.signOut();
+        _currentUser = null;
+        if (typeof showToast === 'function') showToast('⚠️ Accès réservé à l\'administrateur.', 'error');
+        _updateUI(null);
+        return;
+      }
+
       _updateUI(_currentUser);
 
       if (event === 'SIGNED_IN') {
@@ -181,9 +201,9 @@ const AuthUI = (() => {
     document.getElementById('tabSignup').classList.toggle('active',  isSignup);
     document.getElementById('authSignupFields').style.display = isSignup ? 'block' : 'none';
     document.getElementById('authForgotZone').style.display   = isSignup ? 'none'  : 'block';
-    document.getElementById('authSubmitBtn').textContent      = isSignup ? 'Créer mon compte 🚀' : 'Se connecter';
-    document.getElementById('authModalTitle').textContent     = isSignup ? 'Rejoignez GourmetRevient !' : 'Bienvenue Chef !';
-    document.getElementById('authModalSubtitle').textContent  = isSignup ? 'Créez votre espace pâtissier sécurisé.' : 'Connectez-vous pour synchroniser vos recettes.';
+    document.getElementById('authSubmitBtn').textContent      = isSignup ? 'Création désactivée 🔒' : 'Se connecter';
+    document.getElementById('authModalTitle').textContent     = isSignup ? 'Accès Restreint' : 'Bienvenue Chef !';
+    document.getElementById('authModalSubtitle').textContent  = isSignup ? 'La création de compte est actuellement réservée.' : 'Connectez-vous pour synchroniser vos recettes.';
     document.getElementById('authError').style.display = 'none';
     document.getElementById('authSubmitBtn').dataset.tab = tab;
   }
@@ -211,7 +231,8 @@ const AuthUI = (() => {
 
     try {
       if (tab === 'signup') {
-        await _handleSignUp(email, pwd);
+        _showError('⚠️ La création de compte est temporairement désactivée par l\'administrateur.');
+        return;
       } else {
         await _handleLogin(email, pwd);
       }
@@ -227,6 +248,11 @@ const AuthUI = (() => {
       const msg = error.message.includes('Invalid login') ? 'Email ou mot de passe incorrect.' : error.message;
       _showError(msg);
     } else {
+      if (!isAuthorized(data.user)) {
+        await supabase.auth.signOut();
+        _showError('🚫 Votre compte n\'est pas autorisé à accéder à cette plateforme.');
+        return;
+      }
       document.getElementById('authModal')?.remove();
       if (typeof showToast === 'function') showToast(`✅ Bonjour ${data.user.email.split('@')[0]} !`, 'success');
     }
