@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="icon" type="image/png" href="favicon.png">
   <title>GourmetRevient — Calculateur professionnel de coût de recette</title>
+  <link rel="stylesheet" href="css/tool-guide.css">
   <meta name="description"
     content="Calculez le coût de revient de vos recettes, déterminez votre prix de vente et optimisez vos marges. Outil professionnel pour pâtissiers et restaurateurs." />
 
@@ -861,6 +862,50 @@
       display: flex;
       flex-direction: column-reverse; /* Bottom up assembly */
     }
+    .hub-pricewatch-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .pricewatch-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 15px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.3s ease;
+    }
+
+    .pricewatch-item:hover {
+      background: rgba(255, 255, 255, 0.1);
+      transform: translateX(5px);
+    }
+
+    .pw-label {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .pw-value {
+      font-size: 0.9rem;
+      font-weight: 800;
+      padding: 4px 8px;
+      border-radius: 8px;
+    }
+
+    .pricewatch-item.dangerous .pw-value { color: #ef4444; background: rgba(239, 68, 68, 0.1); }
+    .pricewatch-item.warning .pw-value { color: #f59e0b; background: rgba(245, 158, 11, 0.1); }
+    .pricewatch-item.success .pw-value { color: #10b981; background: rgba(16, 185, 129, 0.1); }
+
+    .pw-trend {
+      font-size: 1rem;
+    }
+
   </style>
 </head>
 
@@ -1313,7 +1358,21 @@
             <button class="hub-link-btn-sm" onclick="showInventaire()">Inventaire →</button>
           </div>
           <div class="hub-pricewatch-list" id="dashPriceWatch">
-            <p style="font-size:0.8rem; color:var(--cockpit-text-muted);">Chargement…</p>
+            <div class="pricewatch-item dangerous">
+              <span class="pw-label">Farine T45</span>
+              <span class="pw-value">+12%</span>
+              <span class="pw-trend">📈</span>
+            </div>
+            <div class="pricewatch-item warning">
+              <span class="pw-label">Beurre AOP</span>
+              <span class="pw-value">+5%</span>
+              <span class="pw-trend">↗️</span>
+            </div>
+            <div class="pricewatch-item success">
+              <span class="pw-label">Framboises</span>
+              <span class="pw-value">-2%</span>
+              <span class="pw-trend">📉</span>
+            </div>
           </div>
         </div>
 
@@ -5359,6 +5418,7 @@
     }
   </style>
 
+  <script src="tool-guide.js"></script>
 </body>
 
 </html>

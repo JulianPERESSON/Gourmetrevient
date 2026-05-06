@@ -1,0 +1,242 @@
+/* =============================================================
+   GOURMET REVIENT — CONTEXTUAL TOOL GUIDES
+   Premium Glassmorphism Help System
+   ============================================================= */
+
+/* Ensure containers are relative for positioning the '?' button */
+#hubSection, #appRecettes, #appInventaire, #appLaboratoire, #appMgmt, #appCRM {
+    position: relative !important;
+}
+
+.tool-help-trigger {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    width: 38px;
+    height: 38px;
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(99, 102, 241, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 1.1rem;
+    z-index: 999;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 15px rgba(30, 41, 59, 0.05);
+    animation: helpButtonPulse 3s infinite ease-in-out;
+}
+
+@keyframes helpButtonPulse {
+    0%, 100% { transform: scale(1); box-shadow: 0 4px 15px rgba(30, 41, 59, 0.05); }
+    50% { transform: scale(1.1); box-shadow: 0 8px 25px rgba(99, 102, 241, 0.2); border-color: var(--accent); }
+}
+
+.tool-help-trigger:hover {
+    animation: none;
+    transform: rotate(15deg) scale(1.15);
+    background: var(--vanilla);
+    border-color: var(--accent);
+    box-shadow: 0 8px 25px rgba(99, 102, 241, 0.15);
+}
+
+/* Tour Components */
+.tool-tour-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.6); /* Sombre mais pas de flou ici */
+    z-index: 99998;
+    transition: opacity 0.4s;
+}
+
+.tool-tour-spotlight {
+    position: fixed;
+    z-index: 99999;
+    border-radius: 16px;
+    box-shadow: 0 0 0 9999px rgba(15, 23, 42, 0.5);
+    outline: 4px solid #10b981;
+    outline-offset: 6px;
+    pointer-events: none;
+    transition: all 0.6s cubic-bezier(0.19, 1, 0.22, 1);
+    background: transparent;
+    animation: obPulse 2s infinite ease-in-out;
+}
+
+/* Modal Overlay Wrapper */
+.tool-guide-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 99997;
+    pointer-events: none;
+    display: block;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+.tool-guide-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Tour Bubble - Matching Onboarding Style */
+.tool-tour-bubble {
+    position: absolute;
+    width: 720px; /* Encore plus large */
+    max-width: calc(100vw - 40px);
+    background: rgba(30, 41, 59, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 32px;
+    box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.6), inset 0 0 0 1px rgba(255,255,255,0.1);
+    padding: 0;
+    z-index: 100000; 
+    display: flex;
+    overflow: visible;
+    opacity: 0;
+    transform: scale(0.9);
+    transition: transform 0.6s cubic-bezier(0.19, 1, 0.22, 1), opacity 0.6s ease;
+    color: white;
+    pointer-events: auto;
+}
+
+.tool-tour-overlay.active .tool-tour-bubble {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.tool-tour-mascot {
+    width: 240px; /* Plus large pour équilibrer */
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    background: transparent;
+    overflow: visible;
+    flex-shrink: 0;
+    margin-top: -50px;
+    margin-left: -20px;
+    filter: drop-shadow(0 15px 25px rgba(0,0,0,0.3));
+}
+
+.tool-tour-mascot img {
+    width: 100%;
+    height: 110%;
+    object-fit: contain;
+    object-position: bottom center;
+    will-change: transform;
+}
+
+.tool-tour-content {
+    flex: 1;
+    padding: 3rem; /* Plus d'espace interne */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+}
+
+.tool-tour-content h4 {
+    color: white;
+    font-size: 1.6rem;
+    font-weight: 800;
+    margin-bottom: 0.8rem;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    font-family: 'Inter', sans-serif;
+}
+
+.tool-tour-content p {
+    color: #e2e8f0;
+    font-size: 1.05rem;
+    line-height: 1.6;
+    margin-bottom: 2rem;
+    min-height: 4rem;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.tool-tour-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: auto;
+}
+
+/* Progress Bar */
+.tool-tour-progress-wrap {
+    flex: 1;
+    height: 6px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 10px;
+    margin-right: 2rem;
+    overflow: hidden;
+}
+
+.tool-tour-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #10b981, #34d399);
+    transition: width 0.3s;
+    width: 0%;
+}
+
+.tool-tour-btns {
+    display: flex;
+    gap: 10px;
+}
+
+.tool-tour-btns .btn {
+    padding: 0.8rem 1.8rem;
+    border-radius: 14px;
+    font-weight: 800;
+    cursor: pointer;
+    border: none;
+    font-size: 1rem;
+    transition: all 0.2s;
+}
+
+.btn-primary {
+    background: #10b981;
+    color: white;
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px) scale(1.05);
+    background: #34d399;
+}
+
+.btn-outline {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.3) !important;
+    color: #94a3b8;
+}
+
+.btn-outline:hover {
+    background: rgba(255,255,255,0.1);
+    color: white;
+}
+
+/* Arrow - Hidden for this style to match onboarding */
+.tool-tour-arrow {
+    display: none;
+}
+
+/* Highlight Effect */
+.tool-tour-highlight {
+    position: relative;
+    z-index: 10001 !important;
+    outline: 3px solid #10b981;
+    outline-offset: 4px;
+    box-shadow: 0 0 30px rgba(16, 185, 129, 0.4) !important;
+    pointer-events: none !important;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    animation: obPulse 2s infinite ease-in-out;
+}
+
+@keyframes obPulse {
+    0%, 100% { outline-color: #10b981; outline-width: 3px; }
+    50% { outline-color: #34d399; outline-width: 5px; }
+}
