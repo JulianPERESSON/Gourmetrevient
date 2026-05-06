@@ -2938,21 +2938,6 @@ function bindEvents() {
 function checkAuth() {
   let isAuth = localStorage.getItem('gourmet_auth') === 'true';
   const currentUser = (localStorage.getItem(STORAGE_KEYS.currentUser) || '').toLowerCase();
-  const WHITELIST = ['ju 2503', 'ju', 'julian31.peresson@gmail.com'];
-  const isWhitelisted = WHITELIST.includes(currentUser);
-
-  if (isAuth && !isWhitelisted) {
-    console.warn('🚫 Accès refusé : session non autorisée pour', currentUser);
-    localStorage.removeItem('gourmet_auth');
-    localStorage.removeItem(STORAGE_KEYS.currentUser);
-    isAuth = false;
-    
-    const error = $('#authError');
-    if (error) {
-      error.style.display = 'block';
-      error.textContent = '🚫 Vous ne faites pas partie de la liste blanche. Veuillez souscrire à un abonnement pour accéder au service.';
-    }
-  }
 
   const overlay = $('#authOverlay');
 
@@ -3091,19 +3076,19 @@ function checkAuth() {
           return;
         }
 
-        // Whitelist check for login
-        if (!WHITELIST.includes(resolvedKey)) {
-          error.style.display = 'block';
-          error.textContent = '🚫 Vous ne faites pas partie de la liste blanche. Veuillez souscrire à un abonnement pour accéder au service.';
-          return;
-        }
-
         loginSuccess(resolvedKey === 'ju 2503' ? 'Ju 2503' : user);
       } else {
-        // Registration mode - BLOCKED BY WHITELIST
-        error.style.display = 'block';
-        error.textContent = '🔒 La création de compte est actuellement réservée à l\'administrateur.';
-        return;
+        // Mode inscription — via PIN local
+        if (!user || user.length < 2) {
+          error.style.display = 'block';
+          error.textContent = 'Le nom doit contenir au moins 2 caractères.';
+          return;
+        }
+        if (!usersDb[userKey]) {
+          usersDb[userKey] = { pin: pin || '0000', gender: 'male', role: 'user', plan: 'free' };
+          localStorage.setItem(STORAGE_KEYS.users, JSON.stringify(usersDb));
+        }
+        loginSuccess(user);
       }
     };
 

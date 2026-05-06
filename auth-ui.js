@@ -8,14 +8,31 @@
 const AuthUI = (() => {
 
   let _currentUser = null;
-  const WHITELIST = ['julian31.peresson@gmail.com', 'ju2503', 'ju 2503'];
+  let _currentPlan = 'free'; // 'free' | 'pro' | 'admin'
+  const ADMIN_EMAIL = 'julian31.peresson@gmail.com';
 
-  function isAuthorized(user) {
-    if (!user) return true; // On laisse passer si pas de user (mode guest, mais l'UI gérera le blocage si besoin)
-    const email = user.email?.toLowerCase();
-    const fullName = user.user_metadata?.full_name?.toLowerCase();
-    return WHITELIST.includes(email) || 
-           (fullName && (fullName.includes('ju 2503') || fullName.includes('ju2503') || fullName === 'ju'));
+  function isAdmin(user) {
+    if (!user) return false;
+    return user.email?.toLowerCase() === ADMIN_EMAIL;
+  }
+
+  // ── VÉRIFICATION ABONNEMENT SUPABASE ────────────────────────────────────────
+  async function _checkSubscription(user) {
+    if (!user) return 'free';
+    if (isAdmin(user)) return 'admin';
+    try {
+      const { data, error } = await supabase
+        .from('subscriptions')
+        .select('plan_type, status, current_period_end')
+        .eq('user_id', user.id)
+        .single();
+      if (error || !data) return 'free';
+      if (data.status === 'active' || data.status === 'trialing') return data.plan_type || 'pro';
+      return 'free';
+    } catch(e) {
+      console.warn('[Auth] Impossible de vérifier l\'abonnement, mode gratuit appliqué.', e);
+      return 'free';
+    }
   }
 
   // ── INIT ─────────────────────────────────────────────────────────────────────
@@ -26,14 +43,13 @@ const AuthUI = (() => {
     supabase.auth.onAuthStateChange(async (event, session) => {
       _currentUser = session?.user || null;
 
-      // Vérification Whitelist
-      if (_currentUser && !isAuthorized(_currentUser)) {
-        console.warn('🚫 Accès refusé : utilisateur non autorisé.', _currentUser.email);
-        await supabase.auth.signOut();
-        _currentUser = null;
-        if (typeof showToast === 'function') showToast('⚠️ Vous ne faites pas partie de la liste blanche. Souscription requise.', 'error');
-        _updateUI(null);
-        return;
+      if (_currentUser) {
+        _currentPlan = await _checkSubscription(_currentUser);
+        window.GOURMET_PLAN = _currentPlan;
+        console.info(`[Auth] Plan actif : ${_currentPlan}`);
+      } else {
+        _currentPlan = 'free';
+        window.GOURMET_PLAN = 'free';
       }
 
       _updateUI(_currentUser);
@@ -201,9 +217,9 @@ const AuthUI = (() => {
     document.getElementById('tabSignup').classList.toggle('active',  isSignup);
     document.getElementById('authSignupFields').style.display = isSignup ? 'block' : 'none';
     document.getElementById('authForgotZone').style.display   = isSignup ? 'none'  : 'block';
-    document.getElementById('authSubmitBtn').textContent      = isSignup ? 'Création désactivée 🔒' : 'Se connecter';
-    document.getElementById('authModalTitle').textContent     = isSignup ? 'Accès Restreint' : 'Bienvenue Chef !';
-    document.getElementById('authModalSubtitle').textContent  = isSignup ? 'La création de compte est actuellement réservée.' : 'Connectez-vous pour synchroniser vos recettes.';
+    document.getElementById('authSubmitBtn').textContent      = isSignup ? 'Créer mon compte 🚀' : 'Se connecter';
+    document.getElementById('authModalTitle').textContent     = isSignup ? 'Créer un compte' : 'Bienvenue Chef !';
+    document.getElementById('authModalSubtitle').textContent  = isSignup ? 'Essai gratuit — Aucune carte requise.' : 'Connectez-vous pour synchroniser vos recettes.';
     document.getElementById('authError').style.display = 'none';
     document.getElementById('authSubmitBtn').dataset.tab = tab;
   }
@@ -231,8 +247,7 @@ const AuthUI = (() => {
 
     try {
       if (tab === 'signup') {
-        _showError('⚠️ La création de compte est temporairement désactivée par l\'administrateur.');
-        return;
+        await _handleSignUp(email, pwd);
       } else {
         await _handleLogin(email, pwd);
       }
@@ -248,13 +263,12 @@ const AuthUI = (() => {
       const msg = error.message.includes('Invalid login') ? 'Email ou mot de passe incorrect.' : error.message;
       _showError(msg);
     } else {
-      if (!isAuthorized(data.user)) {
-        await supabase.auth.signOut();
-        _showError('🚫 Vous ne faites pas partie de la liste blanche. Veuillez souscrire à un abonnement pour accéder au service.');
-        return;
-      }
+      const plan = await _checkSubscription(data.user);
+      _currentPlan = plan;
+      window.GOURMET_PLAN = plan;
       document.getElementById('authModal')?.remove();
-      if (typeof showToast === 'function') showToast(`✅ Bonjour ${data.user.email.split('@')[0]} !`, 'success');
+      const greeting = plan === 'admin' ? '👑' : plan === 'pro' ? '⭐' : '🆓';
+      if (typeof showToast === 'function') showToast(`${greeting} Bonjour ${data.user.email.split('@')[0]} ! Plan : ${plan.toUpperCase()}`, 'success');
     }
   }
 
@@ -395,8 +409,11 @@ const AuthUI = (() => {
   }
 
   function getCurrentUser() { return _currentUser; }
+  function getCurrentPlan() { return _currentPlan; }
+  function isPro() { return _currentPlan === 'pro' || _currentPlan === 'admin'; }
+  function isAdminUser() { return _currentPlan === 'admin'; }
 
-  return { init, showModal, switchTab, handleSubmit, handleForgotPassword, logout, exportData, openLegal, togglePwd, replayOnboarding, getCurrentUser };
+  return { init, showModal, switchTab, handleSubmit, handleForgotPassword, logout, exportData, openLegal, togglePwd, replayOnboarding, getCurrentUser, getCurrentPlan, isPro, isAdminUser };
 
 })();
 
