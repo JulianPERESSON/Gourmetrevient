@@ -2941,30 +2941,49 @@ function bindEvents() {
 
 function checkAuth() {
   const user = window.AuthUI?.getCurrentUser();
-  if (user) {
+  const isLegacyAuth = localStorage.getItem('gourmet_auth') === 'true';
+
+  if (user || isLegacyAuth) {
     console.info('🔓 Authentification confirmée, déverrouillage de l\'interface...');
+    const wasPending = document.body.classList.contains('auth-pending');
     document.body.classList.remove('auth-pending');
-    
-    // Affichage forcé de tous les blocs critiques
-    const elementsToShow = ['userProfileArea', 'mainNav', 'appMain', 'headerBrand', 'mobileNavBar'];
-    elementsToShow.forEach(id => {
+
+    // On s'assure que le menu et la zone utilisateur sont visibles dès qu'on est logué
+    ['mainNav', 'mobileNavBar', 'userProfileArea', 'headerBrand', 'appMain'].forEach(id => {
       const el = document.getElementById(id);
-      if (id === 'appMain' && el) el.style.display = 'block';
-      else if (el) el.style.display = 'flex';
+      if (el) {
+        const displayType = (id === 'appMain') ? 'block' : 'flex';
+        el.style.setProperty('display', displayType, 'important');
+      }
     });
 
-    // Force l'affichage du Cockpit (Hub)
-    const hub = document.getElementById('hubSection');
-    if (hub) {
-      hub.style.display = 'block';
-      hub.classList.add('active');
+    // On ne force l'affichage du Hub que si on vient de déverrouiller l'app
+    // ET qu'aucune autre vue n'est déjà active (évite le téléportage)
+    if (wasPending) {
+      const isAnyAppVisible = [
+        'appRecettes', 'appMgmt', 'appInventaire', 'appCRM', 'planningSection', 
+        'appLaboratoire', 'appPortfolio', 'appHygiene', 'appScheduler', 'appAdmin'
+      ].some(id => {
+        const el = document.getElementById(id);
+        if (!el) return false;
+        const display = window.getComputedStyle(el).display;
+        return display !== 'none';
+      });
+
+      if (!isAnyAppVisible) {
+        const hub = document.getElementById('hubSection');
+        if (hub) {
+          hub.style.display = 'block';
+          hub.classList.add('active');
+        }
+        if (typeof showHub === 'function') showHub();
+      }
     }
 
     // Cache l'overlay si présent
     const overlay = document.getElementById('authManualOverlay');
     if (overlay) overlay.style.display = 'none';
 
-    if (typeof showHub === 'function') showHub();
     updateDashboard();
     loadSavedRecipes();
   } else {
@@ -5366,7 +5385,8 @@ function init() {
   goToStep(0);
   renderLibraryRecipes();
   updateRandomTip();
-  if (typeof showHub === 'function') showHub();
+  // L'affichage du Hub est maintenant géré uniquement par checkAuth(wasPending)
+  // pour éviter de téléporter l'utilisateur s'il a déjà navigué ailleurs.
 
   // Optimized Dashboard Update
   const throttledDashboard = throttle(updateDashboard, 500);

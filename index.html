@@ -1020,7 +1020,7 @@
         btn.disabled = false;
         btn.textContent = "Se connecter";
       }
-    } // <-- ACCOLADE MANQUANTE ICI
+    }
 
     async function openRegister() {
       // Cache l'overlay actuel
@@ -1046,16 +1046,6 @@
         
         const splash = document.getElementById('splash-screen');
         if (splash) splash.remove();
-
-        // Force l'affichage du contenu
-        ['appMain', 'hubSection', 'mainNav', 'userProfileArea', 'headerBrand'].forEach(id => {
-          const el = document.getElementById(id);
-          if (el) {
-            el.style.setProperty('display', (id === 'appMain' || id === 'hubSection') ? 'block' : 'flex', 'important');
-            el.style.setProperty('opacity', '1', 'important');
-            el.style.setProperty('visibility', 'visible', 'important');
-          }
-        });
       }
     }, 500);
   </script>
@@ -4678,19 +4668,17 @@
           'navShopping': () => showMgmt('shopping'),
           'navWaste': () => showMgmt('quality'),
           'navTrace': () => showHygiene('trace'),
-          'navComparator': openPriceComparator,
+          'navComparator': typeof openPriceComparator === 'function' ? openPriceComparator : () => {},
           'navProTools': showProTools, 'mLinkProTools': showProTools,
           'navCrmClients': () => showCRM('clients'),
           'navCrmOrders': () => showCRM('orders'),
-          'navPlanningProd': () => showMgmt('production'),
-          'navShopping': () => showMgmt('shopping'),
           'navScheduler': showScheduler,
           'navInflation': () => showMgmt('inflation'),
-          'navCatalogue': generateECatalogue,
+          'navCatalogue': () => { if (typeof window.generateECatalogue === 'function') window.generateECatalogue(); },
           'navCRM': showCRM, 'mLinkCRM': showCRM,
-          'navChefsBrain': openChefsBrain,
-          'navAssembly': openAssemblySimulator,
-          'navConverter': openMasterConverter,
+          'navChefsBrain': () => { if (typeof window.openChefsBrain === 'function') window.openChefsBrain(); },
+          'navAssembly': () => { if (typeof window.openAssemblySimulator === 'function') window.openAssemblySimulator(); },
+          'navConverter': () => { if (typeof window.openMasterConverter === 'function') window.openMasterConverter(); },
           'navOmniSearch': () => { if (typeof showOmniSearch === 'function') showOmniSearch(); }
         };
 
@@ -4722,7 +4710,7 @@
     const mNavMore = document.getElementById('mNavMore');
     if (mNavMore) mNavMore.onclick = () => { openMobileCategory('more'); updateMobileNavActive('mNavMore'); };
 
-    if (document.getElementById('headerBrand')) document.getElementById('headerBrand').onclick = showHub;
+
   </script>
 
   <!-- RECIPE COMPARATOR MODAL -->
@@ -4825,9 +4813,9 @@
         moreMenuTitle.textContent = i18n.t('nav.category.atelier');
         items = [
           { id: 'mLinkRecettes', icon: '📖', label: 'nav.recipes', action: showRecettes },
-          { id: 'mLinkChefsBrain', icon: '🧠', label: 'nav.creative.brain', action: openChefsBrain },
-          { id: 'mLinkAssembly', icon: '🏗️', label: 'nav.creative.assembly', action: openAssemblySimulator },
-          { id: 'mLinkConverter', icon: '📏', label: 'nav.creative.converter', action: openMasterConverter },
+          { id: 'mLinkChefsBrain', icon: '🧠', label: 'nav.creative.brain', action: () => { if (typeof window.openChefsBrain === 'function') window.openChefsBrain(); } },
+          { id: 'mLinkAssembly', icon: '🏗️', label: 'nav.creative.assembly', action: () => { if (typeof window.openAssemblySimulator === 'function') window.openAssemblySimulator(); } },
+          { id: 'mLinkConverter', icon: '📏', label: 'nav.creative.converter', action: () => { if (typeof window.openMasterConverter === 'function') window.openMasterConverter(); } },
           { id: 'mLinkPortfolio', icon: '🖼️', label: 'nav.portfolio', action: showPortfolio },
           { id: 'mLinkScheduler', icon: '🎓', label: 'nav.scheduler', action: showScheduler }
         ];
@@ -4835,7 +4823,7 @@
         moreMenuTitle.textContent = "📈 Pilotage & Outils";
         items = [
           { id: 'mLinkStats', icon: '📊', label: 'nav.stats', action: showStats },
-          { id: 'mLinkCatalogue', icon: '🌐', label: 'nav.catalogue', action: generateECatalogue },
+          { id: 'mLinkCatalogue', icon: '🌐', label: 'nav.catalogue', action: () => { if (typeof window.generateECatalogue === 'function') window.generateECatalogue(); } },
           { id: 'mLinkCRM', icon: '🤝', label: 'nav.crm', action: showCRM }
         ];
       } else if (category === 'catalogue') {
