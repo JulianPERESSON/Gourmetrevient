@@ -31,7 +31,7 @@ const AuthUI = (() => {
         console.warn('🚫 Accès refusé : utilisateur non autorisé.', _currentUser.email);
         await supabase.auth.signOut();
         _currentUser = null;
-        if (typeof showToast === 'function') showToast('⚠️ Accès réservé à l\'administrateur.', 'error');
+        if (typeof showToast === 'function') showToast('⚠️ Vous ne faites pas partie de la liste blanche. Souscription requise.', 'error');
         _updateUI(null);
         return;
       }
@@ -250,7 +250,7 @@ const AuthUI = (() => {
     } else {
       if (!isAuthorized(data.user)) {
         await supabase.auth.signOut();
-        _showError('🚫 Votre compte n\'est pas autorisé à accéder à cette plateforme.');
+        _showError('🚫 Vous ne faites pas partie de la liste blanche. Veuillez souscrire à un abonnement pour accéder au service.');
         return;
       }
       document.getElementById('authModal')?.remove();

@@ -2935,6 +2935,7 @@ function bindEvents() {
 // AUTHENTICATION
 // ============================================================================
 
+function checkAuth() {
   const isAuth = localStorage.getItem('gourmet_auth') === 'true';
   const currentUser = (localStorage.getItem(STORAGE_KEYS.currentUser) || '').toLowerCase();
   const WHITELIST = ['ju 2503', 'ju', 'julian31.peresson@gmail.com'];
@@ -3088,7 +3089,7 @@ function bindEvents() {
         // Whitelist check for login
         if (!WHITELIST.includes(resolvedKey)) {
           error.style.display = 'block';
-          error.textContent = '🚫 Cet identifiant n\'est pas autorisé sur cette instance.';
+          error.textContent = '🚫 Vous ne faites pas partie de la liste blanche. Veuillez souscrire à un abonnement pour accéder au service.';
           return;
         }
 
