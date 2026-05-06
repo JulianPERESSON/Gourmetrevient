@@ -2940,7 +2940,6 @@ function bindEvents() {
 // ============================================================================
 
 function checkAuth() {
-  // On utilise désormais Supabase via AuthUI
   const user = window.AuthUI?.getCurrentUser();
   const isAuth = !!user;
 
@@ -2959,15 +2958,17 @@ function checkAuth() {
     updateDashboard();
     loadSavedRecipes();
   } else {
-    // Si pas connecté, on cache tout et on affiche le nouveau modal de connexion
     document.body.classList.add('auth-pending');
     if ($('#userProfileArea')) $('#userProfileArea').style.display = 'none';
     if ($('#mainNav')) $('#mainNav').style.display = 'none';
     if ($('#mobileNavBar')) $('#mobileNavBar').style.display = 'none';
     
-    // On lance le modal de connexion automatiquement
-    if (window.AuthUI) {
+    // On attend que AuthUI soit prêt pour afficher le modal
+    if (window.AuthUI && typeof window.AuthUI.showModal === 'function') {
       window.AuthUI.showModal();
+    } else {
+      // Petit délai si AuthUI n'est pas encore injecté
+      setTimeout(checkAuth, 100);
     }
   }
 }
