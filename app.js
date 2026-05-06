@@ -3119,6 +3119,18 @@ function updateDashboard() {
   const headerName = $('#userNameHeader');
   if (headerName) headerName.textContent = displayName;
 
+  // Gestion du plan pour l'utilisateur local
+  const isAdminLocal = ['ju 2503', 'ju', 'julian31.peresson@gmail.com'].includes(name.toLowerCase());
+  if (isAdminLocal) {
+    window.GOURMET_PLAN = 'admin';
+    const proBtn = document.getElementById('btnSubscribePro');
+    if (proBtn) {
+      proBtn.classList.add('btn-pro-active');
+      proBtn.innerHTML = '<span>⭐ Pro</span>';
+      proBtn.onclick = () => { if(typeof showToast === 'function') showToast('✨ Mode Administrateur Actif', 'info'); };
+    }
+  }
+
   // Bridge to the premium dashboard if available
   if (typeof hydratePremiumDashboard === 'function') {
     hydratePremiumDashboard();

@@ -125,6 +125,7 @@ const AuthUI = (() => {
   // ── MISE À JOUR UI ──────────────────────────────────────────────────────────
   function _updateUI(user) {
     const btn = document.getElementById('authMainBtn');
+    const proBtn = document.getElementById('btnSubscribePro');
     if (!btn) return;
 
     if (user) {
@@ -137,6 +138,20 @@ const AuthUI = (() => {
       btn.innerHTML = `<span class="auth-btn-icon">👨‍🍳</span><span class="auth-btn-label">${GourmetSecurity?.sanitize(name) || name}</span>`;
       btn.onclick = _showUserMenu;
 
+      // Style spécial pour le bouton Pro si l'utilisateur est déjà abonné
+      if (proBtn) {
+        if (_currentPlan === 'pro' || _currentPlan === 'admin') {
+          proBtn.classList.add('btn-pro-active');
+          proBtn.innerHTML = '<span>⭐ Pro</span>';
+          proBtn.onclick = () => { if(typeof showToast === 'function') showToast('✨ Vous profitez déjà de l\'accès complet !', 'info'); };
+        } else {
+          proBtn.classList.remove('btn-pro-active');
+          proBtn.innerHTML = '<span>💎 Devenir Pro</span>';
+          proBtn.onclick = () => window.GourmetBilling.checkout('pro_monthly');
+        }
+        proBtn.style.display = 'flex';
+      }
+
       // Synchronise l'identité avec le système multi-chef de app.js si disponible
       if (typeof window.currentUser !== 'undefined') {
         window.currentUser = name;
@@ -145,6 +160,8 @@ const AuthUI = (() => {
       btn.className = 'auth-nav-btn auth-nav-btn--guest';
       btn.innerHTML = '<span class="auth-btn-icon">👤</span><span class="auth-btn-label">Connexion</span>';
       btn.onclick = showModal;
+
+      if (proBtn) proBtn.style.display = 'flex';
     }
   }
 
