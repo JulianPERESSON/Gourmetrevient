@@ -2943,14 +2943,21 @@ function checkAuth() {
   const user = window.AuthUI?.getCurrentUser();
   if (user) {
     document.body.classList.remove('auth-pending');
-    if ($('#userProfileArea')) $('#userProfileArea').style.display = 'flex';
+    
+    // Affichage explicite des zones
+    const profile = document.getElementById('userProfileArea');
+    if (profile) profile.style.display = 'flex';
+    
+    const nav = document.getElementById('mainNav');
+    if (nav) nav.style.display = 'flex';
+    
+    const appMain = document.getElementById('appMain');
+    if (appMain) appMain.style.display = 'block';
+
     updateDashboard();
     loadSavedRecipes();
   } else {
     document.body.classList.add('auth-pending');
-    if ($('#userProfileArea')) $('#userProfileArea').style.display = 'none';
-    if ($('#mainNav')) $('#mainNav').style.display = 'none';
-    if ($('#mobileNavBar')) $('#mobileNavBar').style.display = 'none';
   }
 }
 
