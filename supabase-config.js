@@ -13,9 +13,9 @@ const SUPABASE_ANON_KEY = 'sb_publishable_9iePEQdGSdnjXaw4I1s0Nw_wyitVBla';
 
 // Initialisation du client Supabase
 // On utilise 'supabase' (minuscule) qui est l'objet global exposé par le CDN
-const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-window.supabase = supabaseClient; // L'instance est maintenant accessible via window.supabase
-const supabase = window.supabase;
+const gourmetSupabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+window.supabase = gourmetSupabase; // Pour la compatibilité
+window.gourmetSupabase = gourmetSupabase; // Nom unique sans conflit
 
 // Alias pour le module de facturation (billing.js)
 window.supabaseClient = supabase;

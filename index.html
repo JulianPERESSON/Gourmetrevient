@@ -964,18 +964,18 @@
       }
 
       try {
-        if (!window.supabase || !window.supabase.auth) {
+        const client = window.gourmetSupabase || window.supabase;
+        if (!client || !client.auth) {
           btn.disabled = true;
           btn.textContent = "Initialisation...";
-          setTimeout(loginDirect, 500); // Réessaie discrètement
+          setTimeout(loginDirect, 500);
           return;
         }
 
         btn.disabled = true;
         btn.textContent = "Connexion...";
         
-        // Utilisation directe de l'instance supabase globale
-        const { data, error } = await window.supabase.auth.signInWithPassword({ email, password: pass });
+        const { data, error } = await client.auth.signInWithPassword({ email, password: pass });
 
         if (error) {
           err.textContent = error.message;
