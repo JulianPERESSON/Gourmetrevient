@@ -456,7 +456,14 @@ const AuthUI = (() => {
     }
   }
 
-  function getCurrentUser() { return _currentUser; }
+  function getCurrentUser() { 
+    if (_currentUser) return _currentUser;
+    // Support du Pass Admin local
+    if (localStorage.getItem('gourmet_auth') === 'true' && localStorage.getItem('gourmet_current_user') === 'Ju 2503') {
+      return { email: 'julian31.peresson@gmail.com', user_metadata: { full_name: 'Julian Peresson' } };
+    }
+    return null; 
+  }
   function getCurrentPlan() { return _currentPlan; }
   function isPro() { return _currentPlan === 'pro' || _currentPlan === 'admin'; }
   function isAdminUser() { return _currentPlan === 'admin'; }
