@@ -3076,19 +3076,22 @@ function checkAuth() {
           return;
         }
 
-        loginSuccess(resolvedKey === 'ju 2503' ? 'Ju 2503' : user);
-      } else {
-        // Mode inscription — via PIN local
-        if (!user || user.length < 2) {
+        // Vérification whitelist locale
+        const LOCAL_WHITELIST = ['ju 2503', 'ju', 'julian31.peresson@gmail.com'];
+        if (!LOCAL_WHITELIST.includes(resolvedKey)) {
           error.style.display = 'block';
-          error.textContent = 'Le nom doit contenir au moins 2 caractères.';
+          error.textContent = '🚫 Vous ne faites pas partie de la liste blanche. Veuillez souscrire à un abonnement pour accéder au service.';
+          if ($('#subscribePrompt')) $('#subscribePrompt').style.display = 'block';
           return;
         }
-        if (!usersDb[userKey]) {
-          usersDb[userKey] = { pin: pin || '0000', gender: 'male', role: 'user', plan: 'free' };
-          localStorage.setItem(STORAGE_KEYS.users, JSON.stringify(usersDb));
-        }
-        loginSuccess(user);
+
+        loginSuccess(resolvedKey === 'ju 2503' ? 'Ju 2503' : user);
+      } else {
+        // Mode inscription — bloqué
+        error.style.display = 'block';
+        error.textContent = '🔒 Les inscriptions sont fermées. Souscrivez à un abonnement pour obtenir l\'accès.';
+        if ($('#subscribePrompt')) $('#subscribePrompt').style.display = 'block';
+        return;
       }
     };
 

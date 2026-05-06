@@ -8,8 +8,17 @@
 const AuthUI = (() => {
 
   let _currentUser = null;
-  let _currentPlan = 'free'; // 'free' | 'pro' | 'admin'
+  let _currentPlan = 'free';
   const ADMIN_EMAIL = 'julian31.peresson@gmail.com';
+  const WHITELIST = [ADMIN_EMAIL, 'ju2503', 'ju 2503'];
+
+  function isAuthorized(user) {
+    if (!user) return false;
+    const email = user.email?.toLowerCase();
+    const fullName = user.user_metadata?.full_name?.toLowerCase();
+    return WHITELIST.includes(email) ||
+           (fullName && (fullName.includes('ju 2503') || fullName.includes('ju2503') || fullName === 'ju'));
+  }
 
   function isAdmin(user) {
     if (!user) return false;
@@ -23,25 +32,31 @@ const AuthUI = (() => {
     try {
       const { data, error } = await supabase
         .from('subscriptions')
-        .select('plan_type, status, current_period_end')
+        .select('plan_type, status')
         .eq('user_id', user.id)
         .single();
       if (error || !data) return 'free';
       if (data.status === 'active' || data.status === 'trialing') return data.plan_type || 'pro';
       return 'free';
-    } catch(e) {
-      console.warn('[Auth] Impossible de vérifier l\'abonnement, mode gratuit appliqué.', e);
-      return 'free';
-    }
+    } catch(e) { return 'free'; }
   }
 
   // ── INIT ─────────────────────────────────────────────────────────────────────
   async function init() {
     console.log('🔐 AuthUI : Initialisation...');
 
-    // Écoute les changements de session (connexion / déconnexion)
     supabase.auth.onAuthStateChange(async (event, session) => {
       _currentUser = session?.user || null;
+
+      // Whitelist stricte — seuls les utilisateurs autorisés peuvent accéder
+      if (_currentUser && !isAuthorized(_currentUser)) {
+        console.warn('🚫 Accès refusé :', _currentUser.email);
+        await supabase.auth.signOut();
+        _currentUser = null;
+        if (typeof showToast === 'function') showToast('🚫 Accès non autorisé. Veuillez souscrire à un abonnement.', 'error');
+        _updateUI(null);
+        return;
+      }
 
       if (_currentUser) {
         _currentPlan = await _checkSubscription(_currentUser);
@@ -69,6 +84,7 @@ const AuthUI = (() => {
     _renderButton();
     _updateUI(_currentUser);
   }
+
 
   // ── BOUTON NAV ────────────────────────────────────────────────────────────────
   function _renderButton() {
@@ -217,9 +233,9 @@ const AuthUI = (() => {
     document.getElementById('tabSignup').classList.toggle('active',  isSignup);
     document.getElementById('authSignupFields').style.display = isSignup ? 'block' : 'none';
     document.getElementById('authForgotZone').style.display   = isSignup ? 'none'  : 'block';
-    document.getElementById('authSubmitBtn').textContent      = isSignup ? 'Créer mon compte 🚀' : 'Se connecter';
-    document.getElementById('authModalTitle').textContent     = isSignup ? 'Créer un compte' : 'Bienvenue Chef !';
-    document.getElementById('authModalSubtitle').textContent  = isSignup ? 'Essai gratuit — Aucune carte requise.' : 'Connectez-vous pour synchroniser vos recettes.';
+    document.getElementById('authSubmitBtn').textContent      = isSignup ? 'Création désactivée 🔒' : 'Se connecter';
+    document.getElementById('authModalTitle').textContent     = isSignup ? 'Accès Restreint' : 'Bienvenue Chef !';
+    document.getElementById('authModalSubtitle').textContent  = isSignup ? 'Les inscriptions sont actuellement fermées. Souscrivez à un abonnement pour obtenir l\'accès.' : 'Connectez-vous pour synchroniser vos recettes.';
     document.getElementById('authError').style.display = 'none';
     document.getElementById('authSubmitBtn').dataset.tab = tab;
   }
@@ -247,7 +263,8 @@ const AuthUI = (() => {
 
     try {
       if (tab === 'signup') {
-        await _handleSignUp(email, pwd);
+        _showError('🔒 Les inscriptions sont actuellement fermées. Contactez l\'administrateur ou souscrivez à un abonnement.');
+        return;
       } else {
         await _handleLogin(email, pwd);
       }
