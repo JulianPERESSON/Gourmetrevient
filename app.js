@@ -2942,21 +2942,22 @@ function bindEvents() {
 function checkAuth() {
   const user = window.AuthUI?.getCurrentUser();
   if (user) {
+    console.info('🔓 Authentification confirmée, déverrouillage de l\'interface...');
     document.body.classList.remove('auth-pending');
     
-    // Affichage explicite des zones
-    const profile = document.getElementById('userProfileArea');
-    if (profile) profile.style.display = 'flex';
-    
-    const nav = document.getElementById('mainNav');
-    if (nav) nav.style.display = 'flex';
-    
-    const appMain = document.getElementById('appMain');
-    if (appMain) appMain.style.display = 'block';
+    // Affichage forcé de tous les blocs critiques
+    const elementsToShow = ['userProfileArea', 'mainNav', 'appMain', 'headerBrand', 'mobileNavBar'];
+    elementsToShow.forEach(id => {
+      const el = document.getElementById(id);
+      if (id === 'appMain' && el) el.style.display = 'block';
+      else if (el) el.style.display = 'flex';
+    });
 
-    // Allumer la lumière sur le Cockpit
+    // Cache l'overlay si présent
+    const overlay = document.getElementById('authManualOverlay');
+    if (overlay) overlay.style.display = 'none';
+
     if (typeof showHub === 'function') showHub();
-
     updateDashboard();
     loadSavedRecipes();
   } else {
