@@ -2953,6 +2953,13 @@ function checkAuth() {
       else if (el) el.style.display = 'flex';
     });
 
+    // Force l'affichage du Cockpit (Hub)
+    const hub = document.getElementById('hubSection');
+    if (hub) {
+      hub.style.display = 'block';
+      hub.classList.add('active');
+    }
+
     // Cache l'overlay si présent
     const overlay = document.getElementById('authManualOverlay');
     if (overlay) overlay.style.display = 'none';
