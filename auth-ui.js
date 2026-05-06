@@ -30,7 +30,7 @@ const AuthUI = (() => {
 
   function isAdmin(user) {
     if (!user) return false;
-    return user.email?.toLowerCase() === ADMIN_EMAIL;
+    return user.email?.toLowerCase().trim() === ADMIN_EMAIL;
   }
 
   // ── VÉRIFICATION ABONNEMENT SUPABASE ────────────────────────────────────────
@@ -88,6 +88,11 @@ const AuthUI = (() => {
     // Vérification de la session existante au chargement
     const { data: { session } } = await supabase.auth.getSession();
     _currentUser = session?.user || null;
+    
+    if (_currentUser) {
+      _currentPlan = await _checkSubscription(_currentUser);
+      window.GOURMET_PLAN = _currentPlan;
+    }
 
     _renderButton();
     _updateUI(_currentUser);
@@ -139,8 +144,14 @@ const AuthUI = (() => {
     if (user) {
       let name = user.user_metadata?.full_name || user.email.split('@')[0];
       
-      // Nettoyage spécial pour l'admin : retirer le suffixe 2503
-      name = name.replace(/[\s-]*2503$/, '');
+      // Nettoyage spécial pour l'admin : forcer "Ju"
+      if (isAdmin(user)) {
+         name = 'Ju';
+      } else {
+         // Prendre uniquement le prénom
+         name = name.split(' ')[0];
+         name = name.replace(/[\s-]*2503$/, '');
+      }
 
       btn.className = 'auth-nav-btn auth-nav-btn--logged';
       btn.innerHTML = `<span class="auth-btn-icon">👨‍🍳</span><span class="auth-btn-label">${GourmetSecurity?.sanitize(name) || name}</span>`;
@@ -162,9 +173,29 @@ const AuthUI = (() => {
         proBtn.style.display = 'flex';
       }
 
-      // Synchronise l'identité avec le système multi-chef de app.js si disponible
+      // Synchronise l'identité avec le système multi-chef et le localStorage legacy
+      localStorage.setItem('gourmet_auth', 'true');
+      localStorage.setItem('gourmet_current_user', name);
+      
       if (typeof window.currentUser !== 'undefined') {
         window.currentUser = name;
+      }
+
+      // Mise à jour des champs legacy dans le DOM
+      const headerName = document.getElementById('userNameHeader');
+      if (headerName) headerName.textContent = name;
+      
+      const welcomeName = document.getElementById('welcomeUserName');
+      if (welcomeName) welcomeName.textContent = name;
+
+      const hAvatar = document.getElementById('headerAvatar');
+      const dAvatar = document.getElementById('dashAvatar');
+      if (hAvatar) hAvatar.textContent = '👨‍🍳';
+      if (dAvatar) dAvatar.textContent = '👨‍🍳';
+
+      // Force la mise à jour du dashboard global si disponible
+      if (typeof updateDashboard === 'function') {
+        updateDashboard();
       }
     } else {
       btn.className = 'auth-nav-btn auth-nav-btn--guest';
@@ -172,6 +203,10 @@ const AuthUI = (() => {
       btn.onclick = showModal;
 
       if (proBtn) proBtn.style.display = 'flex';
+      
+      // Nettoyage legacy en cas de déconnexion
+      localStorage.removeItem('gourmet_auth');
+      localStorage.removeItem('gourmet_current_user');
     }
   }
 

@@ -2993,7 +2993,7 @@ function updateDashboard() {
   if (headerName) headerName.textContent = displayName;
 
   // Gestion du plan pour l'utilisateur local
-  const isAdminLocal = ['ju 2503', 'ju', 'julian31.peresson@gmail.com'].includes(name.toLowerCase());
+  const isAdminLocal = ['ju 2503', 'ju', 'julian31.peresson@gmail.com', 'julian31.peresson'].includes(name.toLowerCase());
   if (isAdminLocal) {
     window.GOURMET_PLAN = 'admin';
     const proBtn = document.getElementById('btnSubscribePro');
