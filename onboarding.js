@@ -288,7 +288,7 @@ const GourmetOnboarding = {
       <div id="onboarding-spotlight"></div>
       <div id="onboarding-card">
         <div class="ob-character-container">
-          <img src="./personnage.jpg?v=3.5.0" id="ob-char" class="ob-character-img" alt="Mascotte">
+          <img src="personnage.png" id="ob-char" class="ob-character-img" alt="Mascotte">
         </div>
         <div class="ob-content">
           <span class="ob-icon" id="ob-icon"></span>

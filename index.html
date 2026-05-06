@@ -5251,6 +5251,44 @@
     })();
   </script>
 
+  <!-- Floating Support Button -->
+  <a href="mailto:contact@gourmetrevient.fr" class="floating-support" title="Besoin d'aide ?">
+    <span class="support-icon">💬</span>
+    <span class="support-text">Support</span>
+  </a>
+
+  <style>
+    .floating-support {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      background: white;
+      border: 1px solid rgba(99, 102, 241, 0.2);
+      padding: 0.6rem 1rem;
+      border-radius: 50px;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      text-decoration: none;
+      color: #1e293b;
+      font-weight: 600;
+      box-shadow: 0 10px 25px rgba(30, 41, 59, 0.1);
+      transition: all 0.3s ease;
+      z-index: 1000;
+      backdrop-filter: blur(10px);
+      font-size: 0.9rem;
+    }
+    .floating-support:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 35px rgba(99, 102, 241, 0.2);
+      border-color: #6366f1;
+    }
+    @media (max-width: 768px) {
+      .support-text { display: none; }
+      .floating-support { padding: 0.8rem; border-radius: 50%; bottom: 1rem; right: 1rem; }
+    }
+  </style>
+
 </body>
 
 </html>
