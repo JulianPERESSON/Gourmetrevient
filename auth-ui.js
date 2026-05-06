@@ -463,7 +463,7 @@ const AuthUI = (() => {
 
   // ── GESTION MANUELLE (Fallback Sécurité) ──────────────────────────────────
   async function handleSubmitManual() {
-    const btn = event?.target || document.querySelector('#authManualOverlay .auth-btn-primary');
+    const btn = document.querySelector('#authManualOverlay .auth-btn-primary');
     const email = document.getElementById('authEmailManual')?.value;
     const password = document.getElementById('authPasswordManual')?.value;
     const errorZone = document.getElementById('authErrorManual');
@@ -473,17 +473,23 @@ const AuthUI = (() => {
       return;
     }
 
-    if (btn) { btn.disabled = true; btn.textContent = 'Connexion...'; }
+    if (btn) { 
+      btn.disabled = true; 
+      btn.textContent = 'Connexion en cours...';
+      btn.style.opacity = '0.7';
+    }
 
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
     if (error) {
-      if (errorZone) { errorZone.textContent = error.message; errorZone.style.display = 'block'; }
-      if (btn) { btn.disabled = false; btn.textContent = 'Se connecter'; }
+      if (errorZone) { errorZone.textContent = 'Erreur : ' + error.message; errorZone.style.display = 'block'; }
+      if (btn) { btn.disabled = false; btn.textContent = 'Se connecter'; btn.style.opacity = '1'; }
     } else {
-       // Succès - Le rafraîchissement se fera via onAuthStateChange
+       // Succès
        const manualOverlay = document.getElementById('authManualOverlay');
        if (manualOverlay) manualOverlay.style.display = 'none';
+       document.body.classList.remove('auth-pending');
+       if (typeof window.checkAuth === 'function') window.checkAuth();
     }
   }
 
