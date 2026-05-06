@@ -937,9 +937,14 @@
           <input type="password" id="authPasswordManual" placeholder="••••••••" class="auth-input">
         </div>
         <div id="authErrorManual" class="auth-error" style="display:none;"></div>
-        <button onclick="AuthUI.handleSubmitManual()" class="auth-btn-primary">Se connecter</button>
+        <button onclick="AuthUI.handleSubmitManual()" class="auth-btn-primary" style="margin-bottom: 1rem;">Se connecter</button>
+        
+        <div style="margin-top: 10px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
+           <p style="font-size: 0.85rem; color: rgba(255,255,255,0.7); margin-bottom: 10px;">Nouveau sur GourmetRevient ?</p>
+           <button onclick="AuthUI.showModal('signup')" class="auth-btn-secondary" style="width: 100%; border: 1px solid var(--accent); color: var(--accent);">Créer un compte / S'abonner</button>
+        </div>
       </div>
-      <p class="auth-legal-note">Seul l'administrateur et les utilisateurs autorisés peuvent se connecter.</p>
+      <p class="auth-legal-note">Seul l'administrateur et les abonnés Pro peuvent accéder au service.</p>
     </div>
   </div>
 

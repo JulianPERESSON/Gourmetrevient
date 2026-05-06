@@ -177,6 +177,10 @@ const AuthUI = (() => {
 
   // ── MODAL PRINCIPALE ─────────────────────────────────────────────────────────
   function showModal(tab = 'login') {
+    // Si on ouvre le vrai modal, on cache l'overlay de bienvenue
+    const manualOverlay = document.getElementById('authManualOverlay');
+    if (manualOverlay) manualOverlay.style.display = 'none';
+
     if (document.getElementById('authModal')) return;
 
     const modal = document.createElement('div');
@@ -459,6 +463,7 @@ const AuthUI = (() => {
 
   // ── GESTION MANUELLE (Fallback Sécurité) ──────────────────────────────────
   async function handleSubmitManual() {
+    const btn = event?.target || document.querySelector('#authManualOverlay .auth-btn-primary');
     const email = document.getElementById('authEmailManual')?.value;
     const password = document.getElementById('authPasswordManual')?.value;
     const errorZone = document.getElementById('authErrorManual');
@@ -468,13 +473,17 @@ const AuthUI = (() => {
       return;
     }
 
+    if (btn) { btn.disabled = true; btn.textContent = 'Connexion...'; }
+
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
     if (error) {
       if (errorZone) { errorZone.textContent = error.message; errorZone.style.display = 'block'; }
+      if (btn) { btn.disabled = false; btn.textContent = 'Se connecter'; }
     } else {
        // Succès - Le rafraîchissement se fera via onAuthStateChange
-       document.getElementById('authManualOverlay').style.display = 'none';
+       const manualOverlay = document.getElementById('authManualOverlay');
+       if (manualOverlay) manualOverlay.style.display = 'none';
     }
   }
 
