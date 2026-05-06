@@ -919,7 +919,29 @@
 
   <!-- Chocolate Rain Container (for celebrations) -->
   <div id="chocolateRainContainer"></div>
-  <!-- L'authentification est désormais gérée dynamiquement par AuthUI.js -->
+  <!-- Formulaire de connexion forcé (Securité SaaS) -->
+  <div id="authManualOverlay" class="glass-modal-overlay">
+    <div class="glass-modal-content auth-modal-box">
+      <div class="auth-modal-header">
+        <div class="auth-modal-logo">🧁</div>
+        <h2>Bienvenue Chef !</h2>
+        <p>Connectez-vous pour accéder à vos recettes.</p>
+      </div>
+      <div class="auth-form">
+        <div class="auth-field">
+          <label>📧 Email</label>
+          <input type="email" id="authEmailManual" placeholder="chef@patisserie.fr" class="auth-input">
+        </div>
+        <div class="auth-field">
+          <label>🔑 Mot de passe</label>
+          <input type="password" id="authPasswordManual" placeholder="••••••••" class="auth-input">
+        </div>
+        <div id="authErrorManual" class="auth-error" style="display:none;"></div>
+        <button onclick="AuthUI.handleSubmitManual()" class="auth-btn-primary">Se connecter</button>
+      </div>
+      <p class="auth-legal-note">Seul l'administrateur et les utilisateurs autorisés peuvent se connecter.</p>
+    </div>
+  </div>
 
   <!-- Header -->
   <header class="app-header">

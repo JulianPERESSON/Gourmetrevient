@@ -2951,13 +2951,6 @@ function checkAuth() {
     if ($('#userProfileArea')) $('#userProfileArea').style.display = 'none';
     if ($('#mainNav')) $('#mainNav').style.display = 'none';
     if ($('#mobileNavBar')) $('#mobileNavBar').style.display = 'none';
-    
-    // Si AuthUI est là, on montre le modal, sinon on attend un peu
-    if (window.AuthUI && typeof window.AuthUI.showModal === 'function') {
-      window.AuthUI.showModal();
-    } else {
-      setTimeout(checkAuth, 300);
-    }
   }
 }
 

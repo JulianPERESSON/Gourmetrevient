@@ -63,7 +63,6 @@ const AuthUI = (() => {
         _currentUser = null;
         if (typeof showToast === 'function') showToast('🚫 Accès non autorisé. Veuillez souscrire à un abonnement.', 'error');
         _updateUI(null);
-        showModal();
         return;
       }
 
@@ -77,11 +76,6 @@ const AuthUI = (() => {
       }
 
       _updateUI(_currentUser);
-      
-      // Si aucun utilisateur n'est connecté au chargement, on affiche le modal
-      if (!_currentUser && (window.location.pathname.includes('index.html') || window.location.pathname.endsWith('/'))) {
-        showModal();
-      }
 
       if (event === 'SIGNED_IN') {
         console.info('%c[Auth] ✅ Connecté :', 'color:#10b981', _currentUser?.email);
@@ -153,6 +147,8 @@ const AuthUI = (() => {
       btn.onclick = _showUserMenu;
 
       // Style spécial pour le bouton Pro si l'utilisateur est déjà abonné
+      const manualOverlay = document.getElementById('authManualOverlay');
+      if (manualOverlay) manualOverlay.style.display = 'none';
       if (proBtn) {
         if (_currentPlan === 'pro' || _currentPlan === 'admin') {
           proBtn.classList.add('btn-pro-active');
@@ -461,7 +457,28 @@ const AuthUI = (() => {
   function isPro() { return _currentPlan === 'pro' || _currentPlan === 'admin'; }
   function isAdminUser() { return _currentPlan === 'admin'; }
 
-  return { init, showModal, switchTab, handleSubmit, handleForgotPassword, logout, exportData, openLegal, togglePwd, replayOnboarding, getCurrentUser, getCurrentPlan, isPro, isAdminUser };
+  // ── GESTION MANUELLE (Fallback Sécurité) ──────────────────────────────────
+  async function handleSubmitManual() {
+    const email = document.getElementById('authEmailManual')?.value;
+    const password = document.getElementById('authPasswordManual')?.value;
+    const errorZone = document.getElementById('authErrorManual');
+
+    if (!email || !password) {
+      if (errorZone) { errorZone.textContent = 'Veuillez remplir tous les champs.'; errorZone.style.display = 'block'; }
+      return;
+    }
+
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+
+    if (error) {
+      if (errorZone) { errorZone.textContent = error.message; errorZone.style.display = 'block'; }
+    } else {
+       // Succès - Le rafraîchissement se fera via onAuthStateChange
+       document.getElementById('authManualOverlay').style.display = 'none';
+    }
+  }
+
+  return { init, showModal, switchTab, handleSubmit, handleSubmitManual, handleForgotPassword, logout, exportData, openLegal, togglePwd, replayOnboarding, getCurrentUser, getCurrentPlan, isPro, isAdminUser };
 
 })();
 
