@@ -320,13 +320,10 @@ h4 {
 .header-brand .logo-icon {
   width: 36px;
   height: 36px;
-  background: linear-gradient(135deg, var(--accent), var(--accent-dark));
-  border-radius: var(--radius-sm);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.2rem;
-  box-shadow: var(--shadow-accent);
+  font-size: 1.8rem;
 }
 
 .header-brand h1 {
