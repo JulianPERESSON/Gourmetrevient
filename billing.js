@@ -112,9 +112,43 @@ const GourmetBilling = {
      * Ouvre le portail de gestion client Stripe
      */
     async openCustomerPortal() {
-        showToast("Ouverture du portail de gestion...", "info");
-        // Simulation d'appel Edge Function
-        console.log('🔄 Appel au portail de gestion Stripe');
+        const toastFn = typeof showToast === 'function' ? showToast : (m) => console.log(m);
+        toastFn("Ouverture du portail sécurisé... 🔒", "info");
+
+        const SUPABASE_URL = 'https://hogfrddigcojdmjjpbno.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_9iePEQdGSdnjXaw4I1s0Nw_wyitVBla';
+        const FUNCTION_URL = `${SUPABASE_URL}/functions/v1/create-portal-session`;
+
+        try {
+            const client = window.supabase;
+            const { data: { user } } = await client.auth.getUser();
+            
+            if (!user) {
+                toastFn("Vous devez être connecté pour gérer votre abonnement.", "error");
+                return;
+            }
+
+            const response = await fetch(FUNCTION_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                    'apikey': SUPABASE_ANON_KEY
+                },
+                body: JSON.stringify({ userId: user.id })
+            });
+
+            const data = await response.json();
+
+            if (data?.url) {
+                setTimeout(() => { window.location.href = data.url; }, 500);
+            } else {
+                throw new Error(data?.error || 'URL du portail non reçue');
+            }
+        } catch (err) {
+            console.error('Erreur Portail:', err);
+            toastFn(`Erreur : ${err.message}. Veuillez contacter le support.`, 'error');
+        }
     },
 
     /**
