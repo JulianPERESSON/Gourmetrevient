@@ -1097,6 +1097,14 @@
         return;
       }
 
+      // Validation email stricte pour éviter les "Bounces" Supabase
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        errorDiv.innerText = "Veuillez entrer une adresse email valide.";
+        errorDiv.style.display = 'block';
+        return;
+      }
+
       if (pass !== passConf) {
         errorDiv.innerText = "Les mots de passe ne correspondent pas.";
         errorDiv.style.display = 'block';

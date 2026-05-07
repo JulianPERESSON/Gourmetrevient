@@ -398,6 +398,10 @@ const AuthUI = (() => {
     const confirm  = document.getElementById('authPasswordConfirm')?.value;
 
     if (!firstName || !lastName) { _showError('Veuillez renseigner votre prénom et votre nom.'); return; }
+    
+    // Validation email stricte pour éviter les "Bounces" Supabase
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) { _showError('Veuillez entrer une adresse email valide.'); return; }
     if (password !== confirm) { _showError('Les mots de passe ne correspondent pas.'); return; }
     if (password.length < 8)  { _showError('Le mot de passe doit faire au moins 8 caractères.'); return; }
 
