@@ -120,11 +120,21 @@ const GourmetBilling = {
         const FUNCTION_URL = `${SUPABASE_URL}/functions/v1/create-portal-session`;
 
         try {
-            const client = window.supabase;
+            // Détection robuste du client Supabase
+            const client = window.gourmetSupabase || window.supabase;
+            if (!client) throw new Error("Client Supabase non initialisé");
+
             const { data: { user } } = await client.auth.getUser();
             
+            // Cas spécial : Authentification Admin Prioritaire (via localStorage)
+            const isAdminBypass = localStorage.getItem('gourmet_auth') === 'true';
+
             if (!user) {
-                toastFn("Vous devez être connecté pour gérer votre abonnement.", "error");
+                if (isAdminBypass) {
+                    toastFn("Le portail Stripe est désactivé en mode 'Admin Prioritaire'. Veuillez vous connecter avec un compte client réel pour le tester.", "warning");
+                } else {
+                    toastFn("Vous devez être connecté via Supabase pour gérer votre abonnement.", "error");
+                }
                 return;
             }
 
