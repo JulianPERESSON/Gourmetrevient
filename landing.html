@@ -4,421 +4,709 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/png" href="favicon.png">
-  <title>GourmetRevient — La plateforme SaaS des artisans pâtissiers</title>
-  <meta name="description" content="Calculez vos coûts de revient, gérez vos marges et optimisez votre rentabilité. La solution professionnelle pour artisans pâtissiers.">
+  <title>GourmetRevient — Le Copilote des Artisans Pâtissiers</title>
+  <meta name="description" content="Optimisez la rentabilité de votre pâtisserie avec GourmetRevient. Coûts de revient, HACCP, Planning et CRM. Conçu pour les artisans.">
 
-  <!-- SEO -->
-  <link rel="canonical" href="https://julianperesson.github.io/Gourmetrevient/landing.html">
-  <meta name="robots" content="index, follow">
-  <meta name="author" content="Julian Peresson — GourmetRevient">
-  <meta name="keywords" content="coût de revient pâtisserie, logiciel pâtissier, SaaS artisan pâtissier, calcul marge pâtisserie, gestion recettes">
-
-  <!-- Open Graph (Facebook, LinkedIn, WhatsApp) -->
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://julianperesson.github.io/Gourmetrevient/landing.html">
-  <meta property="og:title" content="GourmetRevient — La plateforme des artisans pâtissiers">
-  <meta property="og:description" content="Calculez. Optimisez. Rentabilisez. La solution SaaS pour piloter votre pâtisserie : coûts de revient, marges, CRM et planning de production.">
-  <meta property="og:image" content="https://julianperesson.github.io/Gourmetrevient/img/og-preview.svg">
-  <meta property="og:image:width" content="1200">
-  <meta property="og:image:height" content="630">
-  <meta property="og:locale" content="fr_FR">
-  <meta property="og:site_name" content="GourmetRevient">
-
-  <!-- Twitter Card -->
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="GourmetRevient — La plateforme des artisans pâtissiers">
-  <meta name="twitter:description" content="Calculez. Optimisez. Rentabilisez. La solution SaaS pour piloter votre pâtisserie.">
-  <meta name="twitter:image" content="https://julianperesson.github.io/Gourmetrevient/img/og-preview.png">
-
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --bg: #0a0a14;
-      --surface: #12121f;
-      --surface2: #1a1a2e;
-      --primary: #10b981;
-      --accent: #6366f1;
-      --gold: #f59e0b;
-      --text: #f1f5f9;
-      --muted: #94a3b8;
-      --border: rgba(255,255,255,0.08);
-      --r: 20px;
+      --primary: #4f46e5;
+      --primary-dark: #3730a3;
+      --primary-light: #eef2ff;
+      --secondary: #10b981;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --bg-white: #ffffff;
+      --bg-light: #f8fafc;
+      --border: #e2e8f0;
+      --radius: 16px;
+      --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --font-display: 'Plus Jakarta Sans', sans-serif;
+      --font-body: 'Outfit', sans-serif;
     }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
     html { scroll-behavior: smooth; }
-    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); overflow-x: hidden; }
+    
+    body { 
+      font-family: var(--font-body); 
+      background-color: var(--bg-white); 
+      color: var(--text-main);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
 
-    /* NAV */
+    h1, h2, h3, h4 { 
+      font-family: var(--font-display); 
+      font-weight: 800;
+      line-height: 1.2;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+
+    /* Navbar */
     nav {
-      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 1rem 2rem;
-      background: rgba(10,10,20,0.85);
-      backdrop-filter: blur(20px);
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(12px);
+      z-index: 1000;
       border-bottom: 1px solid var(--border);
+      height: 72px;
+      display: flex;
+      align-items: center;
     }
-    .nav-logo { font-weight: 900; font-size: 1.2rem; color: var(--text); display: flex; align-items: center; gap: .6rem; text-decoration: none; }
-    .nav-logo span { color: var(--primary); }
-    .nav-links { display: flex; gap: 1.5rem; align-items: center; }
-    .nav-links a { color: var(--muted); text-decoration: none; font-size: .88rem; font-weight: 500; transition: color .2s; }
-    .nav-links a:hover { color: var(--text); }
-    .btn { display: inline-block; padding: .65rem 1.5rem; border-radius: 12px; font-weight: 700; font-size: .88rem; text-decoration: none; cursor: pointer; border: none; transition: all .2s; }
-    .btn-primary { background: linear-gradient(135deg, var(--primary), #059669); color: #fff; box-shadow: 0 4px 20px rgba(16,185,129,.3); }
-    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(16,185,129,.4); }
-    .btn-accent { background: linear-gradient(135deg, var(--accent), #8b5cf6); color: #fff; box-shadow: 0 4px 20px rgba(99,102,241,.3); }
-    .btn-accent:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(99,102,241,.4); }
-    .btn-outline { background: transparent; color: var(--text); border: 1px solid var(--border); }
-    .btn-outline:hover { border-color: var(--primary); color: var(--primary); }
-    .btn-lg { padding: .9rem 2.2rem; font-size: 1rem; border-radius: 16px; }
 
-    /* HERO */
+    .nav-inner {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--primary-dark);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .nav-actions {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.75rem 1.5rem;
+      border-radius: var(--radius);
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      border: none;
+      font-size: 0.95rem;
+    }
+
+    .btn-primary {
+      background-color: var(--primary);
+      color: white;
+      box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);
+    }
+
+    .btn-primary:hover {
+      background-color: var(--primary-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3);
+    }
+
+    .btn-outline {
+      background-color: white;
+      color: var(--primary);
+      border: 1px solid var(--primary);
+    }
+
+    .btn-outline:hover {
+      background-color: var(--primary-light);
+      transform: translateY(-2px);
+    }
+
+    .btn-ghost {
+      color: var(--text-main);
+      padding: 0.5rem 1rem;
+    }
+
+    .btn-ghost:hover {
+      color: var(--primary);
+      background-color: var(--primary-light);
+    }
+
+    /* Animations */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .animate-fade-in {
+      animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      opacity: 0;
+    }
+
+    .delay-1 { animation-delay: 0.1s; }
+    .delay-2 { animation-delay: 0.2s; }
+    .delay-3 { animation-delay: 0.3s; }
+
+    /* Hero Section */
     .hero {
-      min-height: 100vh;
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      text-align: center; padding: 8rem 2rem 6rem;
-      position: relative; overflow: hidden;
+      padding: 180px 0 80px;
+      background: 
+        radial-gradient(circle at 10% 10%, rgba(79, 70, 229, 0.08), transparent 25%),
+        radial-gradient(circle at 90% 90%, rgba(16, 185, 129, 0.08), transparent 25%),
+        linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
     }
-    .hero::before {
-      content: ''; position: absolute; inset: 0;
-      background: radial-gradient(ellipse 80% 50% at 50% 0%, rgba(99,102,241,.15), transparent),
-                  radial-gradient(ellipse 60% 40% at 80% 80%, rgba(16,185,129,.1), transparent);
-    }
-    .hero-badge {
-      display: inline-flex; align-items: center; gap: .5rem;
-      background: rgba(99,102,241,.1); border: 1px solid rgba(99,102,241,.25);
-      color: #a5b4fc; border-radius: 50px; padding: .4rem 1rem; font-size: .78rem; font-weight: 700;
-      margin-bottom: 2rem; letter-spacing: .05em; text-transform: uppercase;
-    }
-    .hero h1 {
-      font-size: clamp(2.5rem, 7vw, 5rem); font-weight: 900; line-height: 1.1;
-      margin-bottom: 1.5rem;
-      background: linear-gradient(135deg, #fff 30%, #a5b4fc 70%, var(--primary) 100%);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    }
-    .hero p { font-size: clamp(1rem, 2.5vw, 1.25rem); color: var(--muted); max-width: 640px; margin: 0 auto 2.5rem; line-height: 1.7; }
-    .hero-cta { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin-bottom: 4rem; }
-    .hero-stats {
-      display: flex; gap: 3rem; justify-content: center; flex-wrap: wrap;
-      padding-top: 2rem; border-top: 1px solid var(--border);
-    }
-    .stat { text-align: center; }
-    .stat-num { font-size: 2rem; font-weight: 900; color: var(--primary); }
-    .stat-label { font-size: .78rem; color: var(--muted); margin-top: .25rem; }
 
-    /* FEATURES */
-    .section { padding: 6rem 2rem; max-width: 1200px; margin: 0 auto; }
-    .section-label { display: inline-block; background: rgba(16,185,129,.1); color: var(--primary); border: 1px solid rgba(16,185,129,.25); border-radius: 50px; padding: .3rem .9rem; font-size: .72rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 1rem; }
-    .section-title { font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 900; margin-bottom: 1rem; }
-    .section-sub { font-size: 1.05rem; color: var(--muted); max-width: 560px; line-height: 1.7; }
+    .hero h1 {
+      font-size: clamp(2.5rem, 6vw, 4rem);
+      max-width: 900px;
+      margin: 0 auto 1.5rem;
+      color: #0f172a;
+    }
+
+    .hero p {
+      font-size: 1.25rem;
+      max-width: 700px;
+      margin: 0 auto 2.5rem;
+      color: #475569;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-image: radial-gradient(var(--border) 1px, transparent 1px);
+      background-size: 40px 40px;
+      opacity: 0.3;
+      pointer-events: none;
+    }
+
+    .hero-dashboard {
+      margin-top: 5rem;
+      position: relative;
+      z-index: 10;
+      padding: 0 2rem;
+    }
+
+    .hero-dashboard-inner {
+      max-width: 1000px;
+      margin: 0 auto;
+      perspective: 2000px;
+    }
+
+    .hero-dashboard img {
+      width: 100%;
+      height: auto;
+      border-radius: 20px;
+      box-shadow: 
+        0 40px 100px -20px rgba(15, 23, 42, 0.25),
+        0 30px 60px -30px rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      transform: rotateX(8deg) scale(0.98);
+      transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .hero-dashboard:hover .app-mockup {
+      transform: rotateX(0deg) scale(1);
+    }
+
+    /* Styles Mockup App */
+    .app-mockup {
+      width: 100%;
+      height: 600px;
+      background: #f8fafc;
+      border-radius: 20px;
+      display: flex;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      box-shadow: 0 40px 100px -20px rgba(15, 23, 42, 0.2);
+      transform: rotateX(8deg) scale(0.98);
+      transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .mockup-sidebar {
+      width: 64px;
+      background: #1e293b;
+      padding: 20px 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .mockup-dot {
+      width: 32px;
+      height: 32px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 8px;
+    }
+
+    .mockup-main {
+      flex: 1;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .mockup-header {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .mockup-search { width: 200px; height: 32px; background: white; border-radius: 8px; border: 1px solid #e2e8f0; }
+    .mockup-profile { width: 32px; height: 32px; background: var(--primary-light); border-radius: 50%; }
+
+    .mockup-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+    }
+
+    .mockup-card {
+      background: white;
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .mockup-line-sm { width: 60%; height: 6px; background: #f1f5f9; border-radius: 4px; }
+    .mockup-value { font-weight: 800; font-size: 1.1rem; color: #1e293b; }
+    .mockup-trend { font-size: 0.7rem; color: #10b981; font-weight: 700; }
+
+    .mockup-charts-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.5fr 1fr;
+      gap: 20px;
+      flex: 1;
+    }
+
+    .mockup-chart-box {
+      background: white;
+      border-radius: 16px;
+      border: 1px solid #e2e8f0;
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .mockup-donut {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      border: 20px solid var(--primary-light);
+      margin: auto;
+      position: relative;
+    }
+    .mockup-donut::after {
+      content: '';
+      position: absolute;
+      inset: -20px;
+      border-radius: 50%;
+      border: 20px solid transparent;
+      border-top-color: #f59e0b;
+      border-right-color: #10b981;
+      transform: rotate(45deg);
+    }
+
+    .mockup-bars {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      justify-content: center;
+      height: 100%;
+    }
+
+    .mockup-bar-row {
+      height: 12px;
+      background: var(--primary-light);
+      border-radius: 6px;
+      position: relative;
+    }
+    .mockup-bar-fill {
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      background: var(--primary);
+      border-radius: 6px;
+    }
+
+    .mockup-text-block {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .mockup-text-line { height: 8px; background: #f1f5f9; border-radius: 4px; }
+
+    .hero-badge {
+      display: inline-block;
+      padding: 0.5rem 1rem;
+      background-color: var(--primary-light);
+      color: var(--primary-dark);
+      border-radius: 50px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      border: 1px solid rgba(79, 70, 229, 0.1);
+    }
+
+    .hero h1 {
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      color: var(--text-main);
+      margin-bottom: 1.5rem;
+      max-width: 900px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .hero p {
+      font-size: 1.25rem;
+      color: var(--text-muted);
+      margin-bottom: 2.5rem;
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .hero-ctas {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      margin-bottom: 4rem;
+    }
+
+    /* Features Grid */
+    .features {
+      padding: 100px 0;
+      background-color: var(--bg-white);
+    }
+
+    .section-header {
+      text-align: center;
+      margin-bottom: 4rem;
+    }
+
+    .section-header h2 {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .section-header p {
+      color: var(--text-muted);
+      font-size: 1.1rem;
+      max-width: 600px;
+      margin: 0 auto;
+    }
 
     .features-grid {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-top: 3.5rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 2rem;
     }
+
     .feature-card {
-      background: var(--surface); border: 1px solid var(--border); border-radius: var(--r);
-      padding: 1.75rem; transition: all .3s;
+      padding: 2.5rem;
+      background-color: var(--bg-light);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
     }
-    .feature-card:hover { border-color: rgba(99,102,241,.3); transform: translateY(-4px); box-shadow: 0 20px 60px rgba(0,0,0,.3); }
-    .feature-icon { font-size: 2rem; margin-bottom: 1rem; }
-    .feature-card h3 { font-size: 1rem; font-weight: 800; margin-bottom: .5rem; }
-    .feature-card p { color: var(--muted); font-size: .88rem; line-height: 1.6; }
 
-    /* PRICING */
-    .pricing-section { padding: 6rem 2rem; background: var(--surface); }
-    .pricing-inner { max-width: 1100px; margin: 0 auto; }
-    .pricing-grid {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem; margin-top: 3.5rem;
+    .feature-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow);
+      border-color: var(--primary);
     }
-    .pricing-card {
-      background: var(--bg); border: 1px solid var(--border); border-radius: var(--r);
-      padding: 2.25rem; position: relative; transition: all .3s;
-    }
-    .pricing-card:hover { transform: translateY(-4px); }
-    .pricing-card.featured { border-color: var(--primary); box-shadow: 0 0 0 1px var(--primary), 0 20px 60px rgba(16,185,129,.15); }
-    .pricing-badge {
-      position: absolute; top: -14px; left: 50%; transform: translateX(-50%);
-      background: linear-gradient(135deg, var(--primary), #059669);
-      color: #fff; padding: .3rem 1.1rem; border-radius: 50px;
-      font-size: .7rem; font-weight: 800; letter-spacing: .05em; white-space: nowrap;
-    }
-    .pricing-name { font-size: 1rem; font-weight: 700; color: var(--muted); margin-bottom: .75rem; }
-    .pricing-price { font-size: 3rem; font-weight: 900; margin-bottom: .25rem; }
-    .pricing-price span { font-size: 1rem; font-weight: 400; color: var(--muted); }
-    .pricing-desc { font-size: .82rem; color: var(--muted); margin-bottom: 1.75rem; }
-    .pricing-features { list-style: none; margin-bottom: 2rem; display: flex; flex-direction: column; gap: .6rem; }
-    .pricing-features li { display: flex; align-items: center; gap: .6rem; font-size: .88rem; color: var(--muted); }
-    .pricing-features li.yes { color: var(--text); }
-    .pricing-features li.yes::before { content: '✅'; flex-shrink: 0; }
-    .pricing-features li.no::before { content: '❌'; flex-shrink: 0; }
-    .pricing-cta { width: 100%; text-align: center; padding: .85rem; border-radius: 14px; font-weight: 800; font-size: .95rem; }
 
-    /* TESTIMONIALS */
-    .testimonials { padding: 6rem 2rem; max-width: 1100px; margin: 0 auto; }
-    .testimonials-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-top: 3.5rem; }
-    .testimonial-card {
-      background: var(--surface); border: 1px solid var(--border); border-radius: var(--r);
-      padding: 1.75rem;
+    .feature-icon {
+      width: 56px;
+      height: 56px;
+      background-color: white;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.75rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
     }
-    .testimonial-stars { color: var(--gold); font-size: 1rem; margin-bottom: .75rem; }
-    .testimonial-text { color: var(--muted); font-size: .9rem; line-height: 1.7; margin-bottom: 1.25rem; font-style: italic; }
-    .testimonial-author { display: flex; align-items: center; gap: .75rem; }
-    .testimonial-avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--primary)); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: .9rem; flex-shrink: 0; }
-    .testimonial-name { font-weight: 700; font-size: .88rem; }
-    .testimonial-role { color: var(--muted); font-size: .75rem; }
 
-    /* CTA FINAL */
-    .cta-section {
-      margin: 4rem 2rem; border-radius: 32px; padding: 5rem 2rem; text-align: center;
-      background: linear-gradient(135deg, rgba(99,102,241,.15), rgba(16,185,129,.1));
-      border: 1px solid rgba(99,102,241,.2);
+    .feature-card h3 {
+      font-size: 1.25rem;
+      margin-bottom: 1rem;
     }
-    .cta-section h2 { font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 900; margin-bottom: 1rem; }
-    .cta-section p { color: var(--muted); max-width: 480px; margin: 0 auto 2.5rem; line-height: 1.7; }
 
-    /* FOOTER */
-    footer { background: var(--surface); border-top: 1px solid var(--border); padding: 2rem; text-align: center; color: var(--muted); font-size: .78rem; }
-    footer a { color: var(--primary); text-decoration: none; }
+    .feature-card p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
 
-    /* ANIMATIONS */
-    @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
-    .float { animation: float 5s ease-in-out infinite; }
-    @keyframes fadeInUp { from { opacity:0; transform:translateY(30px); } to { opacity:1; transform:translateY(0); } }
-    .fadein { animation: fadeInUp .7s ease forwards; }
+    /* Demo Preview Section */
+    .demo-preview {
+      padding: 80px 0;
+      background-color: var(--bg-light);
+      border-radius: 32px;
+      margin: 40px auto;
+      text-align: center;
+    }
+
+    /* Footer */
+    footer {
+      padding: 60px 0 30px;
+      background-color: var(--primary-dark);
+      color: white;
+      text-align: center;
+    }
+
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .footer-links a {
+      color: rgba(255, 255, 255, 0.7);
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+
+    .footer-links a:hover {
+      color: white;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .hero-ctas {
+        flex-direction: column;
+        padding: 0 2rem;
+      }
+      .features-grid {
+        grid-template-columns: 1fr;
+      }
+    }
   </style>
 </head>
 <body>
 
-<!-- NAV -->
-<nav>
-  <a href="#" class="nav-logo">🧁 Gourmet<span>Revient</span></a>
-  <div class="nav-links">
-    <a href="#features">Fonctionnalités</a>
-    <a href="#pricing">Tarifs</a>
-    <a href="legal.html">Légal</a>
-    <a href="index.html" class="btn btn-primary">Accéder à l'app →</a>
-  </div>
-</nav>
-
-<!-- HERO -->
-<section class="hero">
-  <div class="hero-badge">🚀 Nouvelle version — v3.1 disponible</div>
-  <h1>Calculez.<br>Optimisez.<br>Rentabilisez.</h1>
-  <p>La plateforme SaaS pensée pour les artisans pâtissiers. Gérez vos coûts de revient, vos marges et votre équipe — depuis n'importe quel appareil.</p>
-  <div class="hero-cta">
-    <a href="index.html" class="btn btn-primary btn-lg">Essayer gratuitement →</a>
-    <a href="#features" class="btn btn-outline btn-lg">Voir les fonctionnalités</a>
-  </div>
-  <div class="hero-stats">
-    <div class="stat"><div class="stat-num">61</div><div class="stat-label">Recettes intégrées</div></div>
-    <div class="stat"><div class="stat-num">100%</div><div class="stat-label">Cloud & Hors-ligne</div></div>
-    <div class="stat"><div class="stat-num">PWA</div><div class="stat-label">Installable sur mobile</div></div>
-    <div class="stat"><div class="stat-num">RGPD</div><div class="stat-label">Conforme UE 2016/679</div></div>
-  </div>
-</section>
-
-<!-- FEATURES -->
-<div id="features">
-  <div class="section">
-    <div class="section-label">Fonctionnalités</div>
-    <h2 class="section-title">Tout ce dont vous avez besoin</h2>
-    <p class="section-sub">Un outil complet qui remplace tableur, calculatrice et planning — dans une interface ultra-fluide.</p>
-    <div class="features-grid">
-      <div class="feature-card">
-        <div class="feature-icon">📊</div>
-        <h3>Coût de revient en temps réel</h3>
-        <p>Calculez instantanément le coût matière, la marge brute et le prix de vente conseillé pour chaque recette.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon">☁️</div>
-        <h3>Synchronisation Cloud</h3>
-        <p>Vos recettes et données sont sécurisées sur Supabase (serveurs UE). Accédez à tout depuis votre téléphone, tablette ou ordinateur.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon">📅</div>
-        <h3>Planning de Production</h3>
-        <p>Planifiez vos productions avec un calendrier annuel intelligent, les vacances scolaires et les périodes clés de la pâtisserie.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon">🧑‍🤝‍🧑</div>
-        <h3>Gestion d'équipe (CRM)</h3>
-        <p>Suivez vos commandes clients, gérez votre équipe, les congés et les performances individuelles.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon">📈</div>
-        <h3>Dashboard Analytics</h3>
-        <p>Cockpit de pilotage avec matrice BCG, simulateur d'inflation et analyse de rentabilité par catégorie.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon">📱</div>
-        <h3>Application PWA Hors-Ligne</h3>
-        <p>Installez GourmetRevient comme une app native. Fonctionne même sans connexion — vos données sont toujours là.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon">🔬</div>
-        <h3>Outils Créatifs</h3>
-        <p>Simulateur d'assemblage d'entremets, convertisseur de moules, Brain des associations de saveurs.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon">🔒</div>
-        <h3>Sécurité & RGPD</h3>
-        <p>Données chiffrées TLS 1.3, stockage AES-256, conformité totale RGPD. Vos recettes vous appartiennent.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon">📄</div>
-        <h3>Export & Impression</h3>
-        <p>Exportez vos fiches techniques en PDF, vos bons d'économat en CSV et partagez un e-catalogue client en un clic.</p>
+  <nav>
+    <div class="container nav-inner">
+      <a href="#" class="logo">
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="32" height="32" rx="8" fill="#4F46E5"/>
+          <path d="M10 16L14 20L22 12" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Gourmet<span>Revient</span>
+      </a>
+      <div class="nav-actions">
+        <a href="index.html?action=login" class="btn btn-ghost">Connexion</a>
+        <a href="index.html?tab=signup" class="btn btn-primary">Inscription</a>
       </div>
     </div>
-  </div>
-</div>
+  </nav>
 
-<!-- PRICING -->
-<section class="pricing-section" id="pricing">
-  <div class="pricing-inner">
-    <div class="section-label">Tarifs</div>
-    <h2 class="section-title">Simple et transparent</h2>
-    <p class="section-sub">Commencez gratuitement. Passez Pro quand vous êtes prêt.</p>
-    <div class="pricing-grid">
-      <!-- Gratuit -->
-      <div class="pricing-card">
-        <div class="pricing-name">👩‍🍳 Amateur</div>
-        <div class="pricing-price">0€ <span>/mois</span></div>
-        <div class="pricing-desc">Pour découvrir et tester l'outil.</div>
-        <ul class="pricing-features">
-          <li class="yes">Jusqu'à 5 recettes personnelles</li>
-          <li class="yes">Bibliothèque de 61 recettes</li>
-          <li class="yes">Calculs de coût de base</li>
-          <li class="no">Synchronisation Cloud</li>
-          <li class="no">CRM & Clients</li>
-          <li class="no">Analytics avancées</li>
-        </ul>
-        <a href="index.html" class="btn btn-outline pricing-cta">Commencer gratuitement</a>
+  <section class="hero">
+    <div class="container">
+      <div class="hero-badge animate-fade-in">Indispensable pour Pâtissiers Artisans</div>
+      <h1 class="animate-fade-in delay-1">Ne laissez plus vos marges s'évaporer au four.</h1>
+      <p class="animate-fade-in delay-2">La plateforme tout-en-un pour piloter votre laboratoire : coût de revient précis, conformité HACCP simplifiée et gestion de production intelligente.</p>
+      
+      <div class="hero-ctas animate-fade-in delay-3">
+        <a href="index.html?tab=signup" class="btn btn-primary" style="padding: 1.1rem 3rem; font-size: 1.2rem; border-radius: 14px; font-weight: 700; background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%); box-shadow: 0 10px 25px -5px rgba(79, 70, 229, 0.4);">
+          S'inscrire (14 jours d'essai offerts)
+        </a>
+        <div style="margin-top: 1.5rem;">
+          <a href="index.html?action=login" class="btn btn-ghost" style="font-size: 1rem; font-weight: 600; color: var(--primary);">Déjà utilisateur ? Se connecter</a>
+        </div>
       </div>
-      <!-- Pro -->
-      <div class="pricing-card featured">
-        <div class="pricing-badge">⭐ RECOMMANDÉ</div>
-        <div class="pricing-name">👨‍🍳 Pro Chef</div>
-        <div class="pricing-price">14,99€ <span>/mois</span></div>
-        <div class="pricing-desc">Pour les artisans qui veulent piloter leur activité.</div>
-        <ul class="pricing-features">
-          <li class="yes">Recettes illimitées</li>
-          <li class="yes">Synchronisation Cloud multi-appareils</li>
-          <li class="yes">CRM Clients & Commandes</li>
-          <li class="yes">Dashboard Analytics complet</li>
-          <li class="yes">Export PDF & CSV</li>
-          <li class="yes">Planning de Production</li>
-        </ul>
-        <a href="index.html" onclick="if(window.GourmetBilling) GourmetBilling.checkout('pro_monthly')" class="btn btn-accent pricing-cta">S'abonner maintenant</a>
-      </div>
-      <!-- Atelier -->
-      <div class="pricing-card">
-        <div class="pricing-name">🏭 Atelier</div>
-        <div class="pricing-price">149€ <span>/an</span></div>
-        <div class="pricing-desc">2 mois offerts · Idéal pour les ateliers.</div>
-        <ul class="pricing-features">
-          <li class="yes">Tout le plan Pro Chef</li>
-          <li class="yes">Multi-utilisateurs (équipe)</li>
-          <li class="yes">Support prioritaire 48h</li>
-          <li class="yes">Accès anticipé nouvelles fonctions</li>
-          <li class="yes">Facture annuelle pour comptabilité</li>
-          <li class="yes">Onboarding personnalisé</li>
-        </ul>
-        <a href="mailto:julian31.peresson@gmail.com?subject=Offre Atelier GourmetRevient" class="btn btn-primary pricing-cta">Nous contacter</a>
-      </div>
-    </div>
-  </div>
-</section>
 
-<!-- TESTIMONIALS -->
-<div class="testimonials">
-  <div class="section-label">Témoignages</div>
-  <h2 class="section-title">Ils nous font confiance</h2>
-  <div class="testimonials-grid">
-    <div class="testimonial-card">
-      <div class="testimonial-stars">★★★★★</div>
-      <p class="testimonial-text">"Enfin un outil qui comprend les besoins réels d'un artisan pâtissier. Le calcul du coût de revient m'a permis d'augmenter mes marges de 15% en 2 mois."</p>
-      <div class="testimonial-author">
-        <div class="testimonial-avatar">S</div>
-        <div>
-          <div class="testimonial-name">Sophie M.</div>
-          <div class="testimonial-role">Pâtissière artisanale, Lyon</div>
+      <div class="hero-dashboard">
+        <div class="hero-dashboard-inner">
+          <!-- Mockup CSS-only du Dashboard Réel -->
+          <div class="app-mockup">
+            <div class="mockup-sidebar">
+              <div class="mockup-dot"></div>
+              <div class="mockup-dot"></div>
+              <div class="mockup-dot"></div>
+              <div class="mockup-dot" style="margin-top:auto"></div>
+            </div>
+            <div class="mockup-main">
+              <div class="mockup-header" style="align-items: center;">
+                <div style="font-weight: 800; font-size: 0.9rem; display: flex; align-items: center; gap: 8px;">
+                   <span style="font-size: 1.2rem;">📊</span> Cockpit de Pilotage Pro
+                </div>
+                <div style="display: flex; gap: 8px;">
+                  <div style="width: 40px; height: 20px; background: #eff6ff; border-radius: 4px;"></div>
+                  <div style="width: 40px; height: 20px; background: #eff6ff; border-radius: 4px;"></div>
+                  <div style="width: 40px; height: 20px; background: var(--primary); border-radius: 4px;"></div>
+                </div>
+              </div>
+
+              <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                 <div style="padding: 4px 12px; background: var(--primary); color: white; font-size: 0.6rem; border-radius: 50px; font-weight: 700;">Toutes</div>
+                 <div style="padding: 4px 12px; background: white; border: 1px solid #e2e8f0; font-size: 0.6rem; border-radius: 50px; color: #64748b;">Entremets</div>
+                 <div style="padding: 4px 12px; background: white; border: 1px solid #e2e8f0; font-size: 0.6rem; border-radius: 50px; color: #64748b;">Viennoiserie</div>
+                 <div style="padding: 4px 12px; background: white; border: 1px solid #e2e8f0; font-size: 0.6rem; border-radius: 50px; color: #64748b;">Macaron</div>
+              </div>
+
+              <div class="mockup-grid">
+                <div class="mockup-card">
+                  <div class="mockup-line-sm"></div>
+                  <div class="mockup-value">71.40%</div>
+                  <div class="mockup-trend">↑ 70% cible</div>
+                </div>
+                <div class="mockup-card">
+                  <div class="mockup-line-sm"></div>
+                  <div class="mockup-value">Matcha</div>
+                  <div class="mockup-trend">↑ 83% marge</div>
+                </div>
+                <div class="mockup-card">
+                  <div class="mockup-line-sm"></div>
+                  <div class="mockup-value">1.05 €</div>
+                  <div class="mockup-trend" style="color: #64748b;">→ Moyenne</div>
+                </div>
+                <div class="mockup-card">
+                  <div class="mockup-line-sm"></div>
+                  <div class="mockup-value">3.71 €</div>
+                  <div class="mockup-trend" style="color: #64748b;">→ Vente HT</div>
+                </div>
+                <div class="mockup-card">
+                  <div class="mockup-line-sm"></div>
+                  <div class="mockup-value">49</div>
+                  <div class="mockup-trend" style="color: #64748b;">→ Recettes</div>
+                </div>
+              </div>
+
+              <div class="mockup-charts-grid">
+                <div class="mockup-chart-box">
+                  <div style="font-weight: 700; font-size: 0.7rem;">Répartition des Marges</div>
+                  <div class="mockup-donut"></div>
+                </div>
+                <div class="mockup-chart-box">
+                  <div style="font-weight: 700; font-size: 0.7rem;">Top 5 Performance</div>
+                  <div class="mockup-bars">
+                    <div class="mockup-bar-row"><div class="mockup-bar-fill" style="width: 90%;"></div></div>
+                    <div class="mockup-bar-row"><div class="mockup-bar-fill" style="width: 80%;"></div></div>
+                    <div class="mockup-bar-row"><div class="mockup-bar-fill" style="width: 75%;"></div></div>
+                    <div class="mockup-bar-row"><div class="mockup-bar-fill" style="width: 65%;"></div></div>
+                  </div>
+                </div>
+                <div class="mockup-chart-box">
+                   <div style="font-weight: 700; font-size: 0.7rem;">Analyse Automatique</div>
+                   <div class="mockup-text-block">
+                     <div class="mockup-text-line" style="width: 100%;"></div>
+                     <div class="mockup-text-line" style="width: 100%;"></div>
+                     <div class="mockup-text-line" style="width: 80%;"></div>
+                     <div class="mockup-text-line" style="width: 100%; margin-top: 10px;"></div>
+                     <div class="mockup-text-line" style="width: 90%;"></div>
+                   </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
-    <div class="testimonial-card">
-      <div class="testimonial-stars">★★★★★</div>
-      <p class="testimonial-text">"Le planning de production et le CRM m'ont sauvé la mise pour les fêtes de fin d'année. Je ne pourrais plus m'en passer."</p>
-      <div class="testimonial-author">
-        <div class="testimonial-avatar">T</div>
-        <div>
-          <div class="testimonial-name">Thomas R.</div>
-          <div class="testimonial-role">Chef pâtissier, Bordeaux</div>
+  </section>
+
+
+  <section class="features" id="features">
+    <div class="container">
+      <div class="section-header">
+        <h2>Une suite d'outils professionnels</h2>
+        <p>Tout ce dont vous avez besoin pour gérer votre pâtisserie comme un chef d'entreprise.</p>
+      </div>
+
+      <div class="features-grid">
+        <!-- Feature 1: Coût de revient -->
+        <div class="feature-card">
+          <div class="feature-icon">📊</div>
+          <h3>Coût de Revient Précis</h3>
+          <p>Calculez le coût matière exact de vos recettes au gramme près. Suivez l'impact de l'inflation sur vos marges en temps réel.</p>
+        </div>
+
+        <!-- Feature 2: HACCP -->
+        <div class="feature-card">
+          <div class="feature-icon">🧼</div>
+          <h3>Conformité HACCP Pro</h3>
+          <p>Digitalisez vos relevés de température, plans de nettoyage et traçabilité. Soyez serein en cas de contrôle d'hygiène.</p>
+        </div>
+
+        <!-- Feature 3: Planning -->
+        <div class="feature-card">
+          <div class="feature-icon">📅</div>
+          <h3>Planning & Équipe</h3>
+          <p>Organisez vos fournées quotidiennes. Gérez les congés et les plannings de votre équipe en un coup d'œil.</p>
+        </div>
+
+        <!-- Feature 4: Cockpit -->
+        <div class="feature-card">
+          <div class="feature-icon">🚀</div>
+          <h3>Cockpit de Pilotage</h3>
+          <p>Analysez la performance de votre catalogue. Identifiez vos produits "Stars" et ceux à retravailler pour plus de rentabilité.</p>
+        </div>
+
+        <!-- Feature 5: Labo 2D -->
+        <div class="feature-card">
+          <div class="feature-icon">📐</div>
+          <h3>Agencement Labo (2D)</h3>
+          <p>Visualisez et optimisez l'agencement de votre matériel pour améliorer le flux de production et gagner du temps.</p>
+        </div>
+
+        <!-- Feature 6: CRM -->
+        <div class="feature-card">
+          <div class="feature-icon">🤝</div>
+          <h3>CRM & Commandes</h3>
+          <p>Gérez vos fichiers clients et vos commandes spéciales (mariages, anniversaires). Centralisez tous vos bons de commande.</p>
         </div>
       </div>
     </div>
-    <div class="testimonial-card">
-      <div class="testimonial-stars">★★★★★</div>
-      <p class="testimonial-text">"L'application fonctionne même sans internet, c'est parfait pour mon laboratoire. Et le design est vraiment premium."</p>
-      <div class="testimonial-author">
-        <div class="testimonial-avatar">A</div>
-        <div>
-          <div class="testimonial-name">Amandine L.</div>
-          <div class="testimonial-role">Gérante, Atelier pâtissier Paris</div>
-        </div>
+  </section>
+
+
+  <footer>
+    <div class="container">
+      <div class="footer-links">
+        <a href="legal.html">Mentions légales</a>
+        <a href="legal.html#confidentialite">Confidentialité</a>
+        <a href="mailto:julian31.peresson@gmail.com">Support</a>
       </div>
+      <p style="opacity: 0.6; font-size: 0.8rem;">© 2026 GourmetRevient. Conçu avec passion pour l'artisanat.</p>
     </div>
-  </div>
-</div>
+  </footer>
 
-<!-- CTA FINAL -->
-<div class="cta-section">
-  <h2>Prêt à rentabiliser votre passion ?</h2>
-  <p>Rejoignez GourmetRevient gratuitement. Aucune carte bancaire requise pour commencer.</p>
-  <a href="index.html" class="btn btn-primary btn-lg">Créer mon compte gratuitement →</a>
-</div>
-
-<!-- FOOTER -->
-<footer>
-  <p>© 2026 GourmetRevient — Julian Peresson · <a href="legal.html">Mentions légales & CGU</a> · <a href="index.html">Accéder à l'application</a> · Conforme RGPD (UE) 2016/679</p>
-</footer>
-
-  <!-- Floating Support Button -->
-  <a href="mailto:contact@gourmetrevient.fr" class="floating-support" title="Besoin d'aide ?">
-    <span class="support-icon">💬</span>
-    <span class="support-text">Aide & Support</span>
-  </a>
-
-  <style>
-    .floating-support {
-      position: fixed;
-      bottom: 2rem;
-      right: 2rem;
-      background: white;
-      border: 1px solid rgba(99, 102, 241, 0.2);
-      padding: 0.8rem 1.2rem;
-      border-radius: 50px;
-      display: flex;
-      align-items: center;
-      gap: 0.8rem;
-      text-decoration: none;
-      color: #1e293b;
-      font-weight: 600;
-      box-shadow: 0 10px 25px rgba(30, 41, 59, 0.1);
-      transition: all 0.3s ease;
-      z-index: 1000;
-      backdrop-filter: blur(10px);
-    }
-    .floating-support:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 15px 35px rgba(99, 102, 241, 0.2);
-      border-color: #6366f1;
-    }
-    .support-icon { font-size: 1.2rem; }
-    @media (max-width: 768px) {
-      .support-text { display: none; }
-      .floating-support { padding: 1rem; border-radius: 50%; bottom: 1rem; right: 1rem; }
-    }
-  </style>
-
+  <script>
+    (function() {
+      const isAuth = localStorage.getItem('gourmet_auth') === 'true' || localStorage.getItem('sb-hogfrddigcojdmjjpbno-auth-token');
+      if (isAuth) {
+        // Met à jour les boutons pour les utilisateurs déjà connectés
+        const ctaBtns = document.querySelectorAll('.btn-primary');
+        ctaBtns.forEach(btn => {
+          if (btn.innerText.includes('Démarrer') || btn.innerText.includes('Créer')) {
+            btn.innerText = 'Accéder à mon Laboratoire 👨‍🍳';
+            btn.href = 'index.html';
+          }
+        });
+        
+        const loginBtn = document.querySelector('.btn-ghost');
+        if (loginBtn && loginBtn.innerText.includes('Se connecter')) {
+          loginBtn.style.display = 'none';
+        }
+      }
+    })();
+  </script>
 </body>
 </html>

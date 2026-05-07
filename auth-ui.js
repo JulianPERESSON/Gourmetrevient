@@ -56,14 +56,10 @@ const AuthUI = (() => {
     supabase.auth.onAuthStateChange(async (event, session) => {
       _currentUser = session?.user || null;
 
-      // Whitelist stricte — seuls les utilisateurs autorisés peuvent accéder
-      if (_currentUser && !isAuthorized(_currentUser)) {
-        console.warn('🚫 Accès refusé :', _currentUser.email);
-        await supabase.auth.signOut();
-        _currentUser = null;
-        if (typeof showToast === 'function') showToast('🚫 Accès non autorisé. Veuillez souscrire à un abonnement.', 'error');
-        _updateUI(null);
-        return;
+      // Autorisation : Admin ou tout utilisateur avec un abonnement valide
+      // (La vérification du plan se fait juste après)
+      if (_currentUser) {
+        console.info('🔐 Utilisateur détecté :', _currentUser.email);
       }
 
       if (_currentUser) {
@@ -88,14 +84,34 @@ const AuthUI = (() => {
     // Vérification de la session existante au chargement
     const { data: { session } } = await supabase.auth.getSession();
     _currentUser = session?.user || null;
+
+    // Support du mode démo (si pas de session réelle)
+    if (!_currentUser && localStorage.getItem('gourmet_demo_mode') === 'true') {
+      console.info('🚀 Mode Démo actif');
+      _currentPlan = 'pro';
+      window.GOURMET_PLAN = 'pro';
+      _currentUser = { 
+        id: 'demo-user', 
+        email: 'demo@gourmetrevient.fr', 
+        user_metadata: { full_name: 'Visiteur Chef' } 
+      };
+    }
     
     if (_currentUser) {
-      _currentPlan = await _checkSubscription(_currentUser);
+      if (_currentUser.id !== 'demo-user') {
+        _currentPlan = await _checkSubscription(_currentUser);
+      }
       window.GOURMET_PLAN = _currentPlan;
     }
 
     _renderButton();
     _updateUI(_currentUser);
+
+    // Ouverture automatique du modal si demandé par l'URL (Inscription)
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('tab') === 'signup' && !_currentUser) {
+      setTimeout(() => showModal('signup'), 500);
+    }
   }
 
 
@@ -142,6 +158,7 @@ const AuthUI = (() => {
     if (!btn) return;
 
     if (user) {
+      const isDemo = user.id === 'demo-user';
       let name = user.user_metadata?.full_name || user.email.split('@')[0];
       
       // Nettoyage spécial pour l'admin : forcer "Ju"
@@ -149,11 +166,13 @@ const AuthUI = (() => {
          name = 'Ju';
          if(typeof showToast === 'function') showToast('Supabase: Admin reconnu', 'success');
       } else {
-         if(typeof showToast === 'function') showToast('Supabase: Utilisateur standard', 'info');
+         if (!isDemo && typeof showToast === 'function') showToast('Supabase: Connecté', 'info');
          // Prendre uniquement le prénom
          name = name.split(' ')[0];
          name = name.replace(/[\s-]*2503$/, '');
       }
+
+      if (isDemo) name += ' (Démo)';
 
       btn.className = 'auth-nav-btn auth-nav-btn--logged';
       btn.innerHTML = `<span class="auth-btn-icon">👨‍🍳</span><span class="auth-btn-label">${GourmetSecurity?.sanitize(name) || name}</span>`;
@@ -239,7 +258,7 @@ const AuthUI = (() => {
     modal.setAttribute('aria-label', 'Connexion à GourmetRevient');
 
     modal.innerHTML = `
-      <div class="glass-modal-content auth-modal-box">
+      <div class="auth-modal-box">
 
         <!-- Header -->
         <div class="auth-modal-header">
@@ -266,9 +285,15 @@ const AuthUI = (() => {
             <button type="button" class="auth-pwd-toggle" onclick="AuthUI.togglePwd()" title="Afficher/masquer">👁</button>
           </div>
           <div id="authSignupFields" style="display:none;">
-            <div class="auth-field">
-              <label for="authFullName">👨‍🍳 Votre nom</label>
-              <input type="text" id="authFullName" placeholder="Ex: Marie Dupont" class="auth-input" maxlength="100">
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+              <div class="auth-field">
+                <label for="authFirstName">👤 Prénom</label>
+                <input type="text" id="authFirstName" placeholder="Marie" class="auth-input">
+              </div>
+              <div class="auth-field">
+                <label for="authLastName">👤 Nom</label>
+                <input type="text" id="authLastName" placeholder="Dupont" class="auth-input">
+              </div>
             </div>
             <div class="auth-field">
               <label for="authPasswordConfirm">🔑 Confirmer le mot de passe</label>
@@ -312,9 +337,9 @@ const AuthUI = (() => {
     document.getElementById('tabSignup').classList.toggle('active',  isSignup);
     document.getElementById('authSignupFields').style.display = isSignup ? 'block' : 'none';
     document.getElementById('authForgotZone').style.display   = isSignup ? 'none'  : 'block';
-    document.getElementById('authSubmitBtn').textContent      = isSignup ? 'Création désactivée 🔒' : 'Se connecter';
-    document.getElementById('authModalTitle').textContent     = isSignup ? 'Accès Restreint' : 'Bienvenue Chef !';
-    document.getElementById('authModalSubtitle').textContent  = isSignup ? 'Les inscriptions sont actuellement fermées. Souscrivez à un abonnement pour obtenir l\'accès.' : 'Connectez-vous pour synchroniser vos recettes.';
+    document.getElementById('authSubmitBtn').textContent      = isSignup ? 'S\'inscrire & S\'abonner 🚀' : 'Se connecter';
+    document.getElementById('authModalTitle').textContent     = isSignup ? 'Rejoindre l\'Atelier' : 'Bienvenue Chef !';
+    document.getElementById('authModalSubtitle').textContent  = isSignup ? 'Commencez vos 14 jours d\'essai gratuit dès maintenant.' : 'Connectez-vous pour synchroniser vos recettes.';
     document.getElementById('authError').style.display = 'none';
     document.getElementById('authSubmitBtn').dataset.tab = tab;
   }
@@ -342,8 +367,7 @@ const AuthUI = (() => {
 
     try {
       if (tab === 'signup') {
-        _showError('🔒 Les inscriptions sont actuellement fermées. Contactez l\'administrateur ou souscrivez à un abonnement.');
-        return;
+        await _handleSignUp(email, pwd);
       } else {
         await _handleLogin(email, pwd);
       }
@@ -369,23 +393,42 @@ const AuthUI = (() => {
   }
 
   async function _handleSignUp(email, password) {
-    const fullName = document.getElementById('authFullName')?.value.trim();
+    const firstName = document.getElementById('authFirstName')?.value.trim();
+    const lastName = document.getElementById('authLastName')?.value.trim();
     const confirm  = document.getElementById('authPasswordConfirm')?.value;
 
+    if (!firstName || !lastName) { _showError('Veuillez renseigner votre prénom et votre nom.'); return; }
     if (password !== confirm) { _showError('Les mots de passe ne correspondent pas.'); return; }
     if (password.length < 8)  { _showError('Le mot de passe doit faire au moins 8 caractères.'); return; }
 
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
-      options: { data: { full_name: fullName || email.split('@')[0] } }
+      options: { 
+        data: { 
+          first_name: firstName,
+          last_name: lastName,
+          full_name: `${firstName} ${lastName}`
+        } 
+      }
     });
 
     if (error) {
       _showError(error.message);
     } else {
-      document.getElementById('authModal')?.remove();
-      _showConfirmationMessage(email);
+      if (typeof showToast === 'function') showToast('Compte créé ! Redirection vers le paiement... 💳', 'success');
+      
+      // On attend un court instant pour laisser Supabase traiter l'inscription
+      setTimeout(async () => {
+        if (window.GourmetBilling) {
+          // On redirige vers Stripe pour le plan Pro (avec essai 14j configuré sur Stripe)
+          // On passe l'email pour pré-remplir le formulaire Stripe
+          await window.GourmetBilling.checkout('pro_monthly', email);
+        } else {
+          document.getElementById('authModal')?.remove();
+          _showConfirmationMessage(email);
+        }
+      }, 1500);
     }
   }
 
@@ -443,11 +486,13 @@ const AuthUI = (() => {
     let displayName = _currentUser?.user_metadata?.full_name || _currentUser?.email?.split('@')[0] || 'Chef';
     displayName = displayName.replace(/[\s-]*2503$/, '');
 
+    const isDemo = _currentUser?.id === 'demo-user';
+
     menu.innerHTML = `
       <div class="auth-menu-header">
         <div class="auth-menu-avatar">👨‍🍳</div>
         <div>
-          <div class="auth-menu-name">${GourmetSecurity?.sanitize(displayName) || 'Chef'}</div>
+          <div class="auth-menu-name">${GourmetSecurity?.sanitize(displayName) || 'Chef'} ${isDemo ? '<span style="font-size:0.7rem; color:var(--accent); font-weight:800;">DÉMO</span>' : ''}</div>
           <div class="auth-menu-email">${GourmetSecurity?.sanitize(_currentUser?.email || '') || ''}</div>
         </div>
       </div>
@@ -456,7 +501,10 @@ const AuthUI = (() => {
       <button onclick="AuthUI.exportData()" class="auth-menu-item">📤 Exporter mes données</button>
       <button onclick="AuthUI.openLegal()" class="auth-menu-item">⚖️ Mentions légales</button>
       <hr class="auth-menu-divider">
-      <button onclick="AuthUI.logout()" class="auth-menu-item auth-menu-danger">🚪 Se déconnecter</button>
+      ${isDemo ? 
+        `<button onclick="AuthUI.quitDemo()" class="auth-menu-item" style="color:var(--accent); font-weight:700;">🚪 Quitter le mode Démo</button>` : 
+        `<button onclick="AuthUI.logout()" class="auth-menu-item auth-menu-danger">🚪 Se déconnecter</button>`
+      }
     `;
     document.body.appendChild(menu);
     setTimeout(() => document.addEventListener('click', function close(e) {
@@ -470,8 +518,16 @@ const AuthUI = (() => {
   // ── ACTIONS UTILISATEUR ─────────────────────────────────────────────────────
   async function logout() {
     document.getElementById('authUserMenu')?.remove();
+    localStorage.removeItem('gourmet_demo_mode');
     await supabase.auth.signOut();
     if (typeof showToast === 'function') showToast('👋 Déconnecté avec succès.', 'info');
+  }
+
+  function quitDemo() {
+    document.getElementById('authUserMenu')?.remove();
+    localStorage.removeItem('gourmet_demo_mode');
+    localStorage.removeItem('gourmet_current_user');
+    window.location.href = 'landing.html';
   }
 
   function exportData() {
@@ -548,7 +604,7 @@ const AuthUI = (() => {
     }
   }
 
-  return { init, showModal, switchTab, handleSubmit, handleSubmitManual, handleForgotPassword, logout, exportData, openLegal, togglePwd, replayOnboarding, getCurrentUser, getCurrentPlan, isPro, isAdminUser };
+  return { init, showModal, switchTab, handleSubmit, handleSubmitManual, handleForgotPassword, logout, quitDemo, exportData, openLegal, togglePwd, replayOnboarding, getCurrentUser, getCurrentPlan, isPro, isAdminUser };
 
 })();
 

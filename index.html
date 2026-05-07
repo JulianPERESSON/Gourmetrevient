@@ -70,6 +70,21 @@
     }
   }
   </script>
+  
+  <!-- Redirection immédiate vers la landing page si non connecté -->
+  <script>
+    (function() {
+      // On ne redirige pas si on est en train de se connecter (action=login)
+      if (window.location.search.includes('action=login') || window.location.search.includes('tab=signup')) return;
+      
+      const isAuth = localStorage.getItem('gourmet_auth') === 'true' || localStorage.getItem('sb-hogfrddigcojdmjjpbno-auth-token');
+      const isDemo = localStorage.getItem('gourmet_demo_mode') === 'true';
+      
+      if (!isAuth && !isDemo) {
+        window.location.href = 'landing.html';
+      }
+    })();
+  </script>
 
   <link rel="stylesheet" href="./styles.css?v=4.1.0" />
   <link rel="stylesheet" href="./css/premium-branding.css?v=2.7.0" />
@@ -84,6 +99,8 @@
   <!-- Supabase SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="./supabase-config.js"></script>
+  <script src="./billing.js"></script>
+  <script src="./auth-ui.js"></script>
   <!-- Chart.js Zoom Plugin (nécessite hammer.js) -->
   <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1/dist/chartjs-plugin-zoom.min.js"></script>
@@ -967,13 +984,33 @@
   <div id="chocolateRainContainer"></div>
   <!-- Formulaire de connexion forcé (Securité SaaS) -->
   <div id="authManualOverlay" class="glass-modal-overlay">
-    <div class="glass-modal-content auth-modal-box">
+    <div class="auth-modal-box">
       <div class="auth-modal-header">
-        <div class="auth-modal-logo">🧁</div>
-        <h2>Bienvenue Chef !</h2>
-        <p>Connectez-vous pour accéder à vos recettes.</p>
+        <div class="auth-modal-logo">👨‍🍳</div>
+        <h2>Bienvenue dans votre Laboratoire</h2>
+        <p>Connectez-vous pour retrouver vos recettes et votre planning.</p>
       </div>
+      <!-- Onglets -->
+      <div class="auth-tabs" style="margin-bottom: 1.5rem;">
+        <button id="tabManualLogin" class="auth-tab active" onclick="switchManualTab('login')">Se connecter</button>
+        <button id="tabManualSignup" class="auth-tab" onclick="switchManualTab('signup')">Créer un compte</button>
+      </div>
+
       <div class="auth-form">
+        <!-- Champs Inscription (cachés par défaut) -->
+        <div id="signupFieldsManual" style="display:none;">
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+            <div class="auth-field">
+              <label>👤 Prénom</label>
+              <input type="text" id="authFirstNameManual" placeholder="Marie" class="auth-input">
+            </div>
+            <div class="auth-field">
+              <label>👤 Nom</label>
+              <input type="text" id="authLastNameManual" placeholder="Dupont" class="auth-input">
+            </div>
+          </div>
+        </div>
+
         <div class="auth-field">
           <label>📧 Email</label>
           <input type="email" id="authEmailManual" placeholder="chef@patisserie.fr" class="auth-input">
@@ -982,19 +1019,120 @@
           <label>🔑 Mot de passe</label>
           <input type="password" id="authPasswordManual" placeholder="••••••••" class="auth-input">
         </div>
+
+        <div id="confirmPassFieldManual" style="display:none;" class="auth-field">
+          <label>🔑 Confirmer le mot de passe</label>
+          <input type="password" id="authPasswordConfirmManual" placeholder="••••••••" class="auth-input">
+        </div>
+
         <div id="authErrorManual" class="auth-error" style="display:none;"></div>
-        <button onclick="loginDirect()" class="auth-btn-primary" style="margin-bottom: 1rem;">Se connecter</button>
         
-        <div style="margin-top: 10px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
-           <p style="font-size: 0.85rem; color: rgba(255,255,255,0.7); margin-bottom: 10px;">Nouveau sur GourmetRevient ?</p>
-           <button onclick="openRegister()" class="auth-btn-secondary" style="width: 100%; border: 1px solid var(--accent); color: var(--accent);">Créer un compte / S'abonner</button>
+        <button id="authBtnManual" onclick="handleManualSubmit()" class="auth-btn-primary">Se connecter</button>
+        
+        <div id="discoveryZoneManual" style="margin-top: 1.5rem; border-top: 1px solid var(--auth-border); padding-top: 1.5rem; text-align: center;">
+           <p style="font-size: 0.9rem; color: var(--auth-text-muted); margin-bottom: 0.75rem;">Nouveau sur GourmetRevient ?</p>
+           <a href="landing.html" class="auth-btn-secondary" style="display: inline-block; text-decoration: none; border-color: var(--auth-primary); color: var(--auth-primary); padding: 0.6rem 1.5rem; font-weight: 700; transition: all 0.2s;">
+             ✨ Découvrir toutes les fonctionnalités
+           </a>
         </div>
       </div>
-      <p class="auth-legal-note">Seul l'administrateur et les abonnés Pro peuvent accéder au service.</p>
+      <p class="auth-legal-note">Plateforme sécurisée pour les artisans pâtissiers.</p>
     </div>
   </div>
 
   <script>
+    let currentManualTab = 'login';
+
+    function switchManualTab(tab) {
+      currentManualTab = tab;
+      const signupFields = document.getElementById('signupFieldsManual');
+      const confirmField = document.getElementById('confirmPassFieldManual');
+      const btn = document.getElementById('authBtnManual');
+      const discovery = document.getElementById('discoveryZoneManual');
+      
+      document.getElementById('tabManualLogin').classList.toggle('active', tab === 'login');
+      document.getElementById('tabManualSignup').classList.toggle('active', tab === 'signup');
+
+      if (tab === 'signup') {
+        signupFields.style.display = 'block';
+        confirmField.style.display = 'block';
+        btn.innerText = 'Créer mon compte';
+        discovery.style.display = 'none';
+      } else {
+        signupFields.style.display = 'none';
+        confirmField.style.display = 'none';
+        btn.innerText = 'Se connecter';
+        discovery.style.display = 'block';
+      }
+    }
+
+    // Détection automatique du tab via l'URL
+    window.addEventListener('DOMContentLoaded', () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('tab') === 'signup') {
+        switchManualTab('signup');
+      }
+    });
+
+    async function handleManualSubmit() {
+      if (currentManualTab === 'login') {
+        await loginDirect();
+      } else {
+        await signupDirect();
+      }
+    }
+
+    async function signupDirect() {
+      const btn = document.getElementById('authBtnManual');
+      const errorDiv = document.getElementById('authErrorManual');
+      const email = document.getElementById('authEmailManual').value;
+      const pass = document.getElementById('authPasswordManual').value;
+      const passConf = document.getElementById('authPasswordConfirmManual').value;
+      const firstName = document.getElementById('authFirstNameManual').value;
+      const lastName = document.getElementById('authLastNameManual').value;
+
+      if (!email || !pass || !firstName || !lastName) {
+        errorDiv.innerText = "Veuillez remplir tous les champs.";
+        errorDiv.style.display = 'block';
+        return;
+      }
+
+      if (pass !== passConf) {
+        errorDiv.innerText = "Les mots de passe ne correspondent pas.";
+        errorDiv.style.display = 'block';
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerText = "Création en cours...";
+
+      try {
+        // On utilise la même logique que AuthUI pour la redirection Stripe
+        const { data, error } = await supabase.auth.signUp({
+          email,
+          password: pass,
+          options: {
+            data: { first_name: firstName, last_name: lastName }
+          }
+        });
+
+        if (error) throw error;
+
+        // Redirection vers Stripe via billing.js
+        if (typeof GourmetBilling !== 'undefined') {
+          await GourmetBilling.checkout('price_1QxO32B669iT33H7L63K8666', email);
+        } else {
+          alert("Inscription réussie ! Veuillez vous connecter.");
+          switchManualTab('login');
+        }
+      } catch (err) {
+        errorDiv.innerText = err.message;
+        errorDiv.style.display = 'block';
+        btn.disabled = false;
+        btn.innerText = "Créer mon compte";
+      }
+    }
+
     // Fonction de secours ultra-robuste insérée directement dans le HTML
     async function loginDirect() {
       const btn = document.querySelector('#authManualOverlay .auth-btn-primary');

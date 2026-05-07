@@ -50,7 +50,7 @@ const GourmetBilling = {
     /**
      * Redirige l'utilisateur vers Stripe Checkout pour s'abonner
      */
-    async checkout(planKey) {
+    async checkout(planKey, optionalEmail = null) {
         const priceId = this.CONFIG.pricing.pro[planKey === 'pro_monthly' ? 'monthly' : 'yearly'];
         console.log('🔄 Initialisation du paiement Stripe pour:', priceId);
 
@@ -58,13 +58,16 @@ const GourmetBilling = {
         toastFn('Préparation du paiement sécurisé... ⏳', 'info');
 
         // Récupère l'utilisateur s'il est connecté (optionnel)
-        let userEmail = null;
+        let userEmail = optionalEmail;
         let userId = null;
         try {
-            const client = window.supabaseClient || window.supabase;
+            const client = window.supabase; 
             if (client) {
                 const { data: { user } } = await client.auth.getUser();
-                if (user) { userEmail = user.email; userId = user.id; }
+                if (user) { 
+                    if (!userEmail) userEmail = user.email; 
+                    userId = user.id; 
+                }
             }
         } catch(e) { /* non connecté, on continue quand même */ }
 
@@ -133,16 +136,17 @@ const GourmetBilling = {
 
                 <!-- Plan Pro -->
                 <div class="pricing-card" style="background:var(--surface); border:2px solid var(--primary); border-radius:16px; padding:2rem; text-align:center; position:relative;">
-                    <div style="position:absolute; top:-12px; left:50%; transform:translateX(-50%); background:var(--primary); color:white; padding:2px 12px; border-radius:20px; font-size:0.75rem; font-weight:800;">RECOMMANDÉ</div>
+                    <div style="position:absolute; top:-12px; left:50%; transform:translateX(-50%); background:var(--primary); color:white; padding:2px 12px; border-radius:20px; font-size:0.75rem; font-weight:800;">14 JOURS D'ESSAI OFFERTS</div>
                     <h3 style="margin-bottom:1rem;">👨‍🍳 Pro Chef</h3>
                     <div style="font-size:2rem; font-weight:800; margin-bottom:1.5rem;">14,99€ <small style="font-size:1rem; font-weight:400;">/mois</small></div>
                     <ul style="text-align:left; margin-bottom:2rem; list-style:none; padding:0; color:var(--muted);">
+                        <li style="margin-bottom:0.5rem;">✅ Essai gratuit de 14 jours</li>
                         <li style="margin-bottom:0.5rem;">✅ Recettes Illimitées</li>
                         <li style="margin-bottom:0.5rem;">✅ Synchronisation Cloud</li>
                         <li style="margin-bottom:0.5rem;">✅ Gestion Clients & Commandes</li>
                         <li style="margin-bottom:0.5rem;">✅ Export PDF Premium</li>
                     </ul>
-                    <button class="btn btn-primary" style="width:100%;" onclick="GourmetBilling.checkout('pro_monthly')">S'abonner maintenant</button>
+                    <button class="btn btn-primary" style="width:100%;" onclick="GourmetBilling.checkout('pro_monthly')">Commencer l'essai gratuit</button>
                 </div>
             </div>
         `;
