@@ -51,7 +51,11 @@ const GourmetBilling = {
      * Redirige l'utilisateur vers Stripe Checkout pour s'abonner
      */
     async checkout(planKey, optionalEmail = null) {
-        const priceId = this.CONFIG.pricing.pro[planKey === 'pro_monthly' ? 'monthly' : 'yearly'];
+        // Détermine le Price ID : soit une clé (pro_monthly/yearly), soit l'ID direct
+        let priceId = planKey;
+        if (planKey === 'pro_monthly') priceId = this.CONFIG.pricing.pro.monthly;
+        if (planKey === 'pro_yearly')  priceId = this.CONFIG.pricing.pro.yearly;
+        
         console.log('🔄 Initialisation du paiement Stripe pour:', priceId);
 
         const toastFn = typeof showToast === 'function' ? showToast : (m) => console.log(m);

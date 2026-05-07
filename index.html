@@ -1120,7 +1120,7 @@
 
         // Redirection vers Stripe via billing.js
         if (typeof GourmetBilling !== 'undefined') {
-          await GourmetBilling.checkout('price_1QxO32B669iT33H7L63K8666', email);
+          await GourmetBilling.checkout('pro_monthly', email);
         } else {
           alert("Inscription réussie ! Veuillez vous connecter.");
           switchManualTab('login');
