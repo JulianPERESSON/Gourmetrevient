@@ -193,37 +193,51 @@ const GourmetSync = {
     },
 
     async resetUserData() {
-        const user = (await gourmetSupabase.auth.getSession()).data.session?.user;
+        const { data: { session } } = await gourmetSupabase.auth.getSession();
+        const user = session?.user;
         if (!user) return;
 
-        if (!confirm('⚠️ Êtes-vous sûr de vouloir vider TOUTES vos données (Recettes, Inventaire, Planning, Commandes) ? Cette action est irréversible.')) return;
+        if (!confirm('⚠️ Êtes-vous sûr de vouloir vider TOUTES vos données ?\n\nCela supprimera vos recettes, votre inventaire, votre équipe et votre planning définitivement.\n\nCette action est irréversible.')) return;
 
-        showToast('Nettoyage des données... ⏳', 'info');
+        showToast('Nettoyage intégral en cours... ⏳', 'info');
 
-        const tables = ['recettes', 'recette_ingredients', 'ingredients', 'commandes', 'clients', 'fournisseurs', 'planning_production', 'haccp_temperatures', 'haccp_nettoyage', 'pertes'];
+        const tables = [
+            'recettes', 
+            'recette_ingredients', 
+            'ingredients', 
+            'commandes', 
+            'clients', 
+            'fournisseurs', 
+            'planning_production', 
+            'haccp_temperatures', 
+            'haccp_nettoyage', 
+            'pertes',
+            'team_members',
+            'staff_leaves'
+        ];
         
         for (const table of tables) {
             try {
+                // Suppression Cloud
                 await gourmetSupabase.from(table).delete().eq('user_id', user.id);
-            } catch(e) { console.error(`Erreur reset ${table}`, e); }
+            } catch(e) { 
+                console.warn(`Note: Reset table ${table} ignoré ou erreur.`); 
+            }
         }
 
-        // Vider localStorage spécifique
+        // Nettoyage LocalStorage Intégral (Sweep)
         const userPrefix = (user.email.split('@')[0]).toLowerCase();
-        const keysToRemove = [
-            `gourmet_recettes_${userPrefix}`,
-            `gourmet_inventory_${userPrefix}`,
-            `gourmet_planning_${userPrefix}`,
-            `gourmet_commandes_${userPrefix}`,
-            'gourmet_recettes',
-            'gourmet_ingredients',
-            'gourmet_commandes'
-        ];
+        const allKeys = Object.keys(localStorage);
         
-        keysToRemove.forEach(k => localStorage.removeItem(k));
+        allKeys.forEach(key => {
+            const k = key.toLowerCase();
+            if (k.includes('gourmet') || k.includes('labpatiss') || k.includes(userPrefix)) {
+                localStorage.removeItem(key);
+            }
+        });
         
-        showToast('✅ Données réinitialisées. Recharge...', 'success');
-        setTimeout(() => window.location.reload(), 1500);
+        showToast('✅ Espace de travail réinitialisé.', 'success');
+        setTimeout(() => window.location.reload(), 1200);
     }
 };
 
