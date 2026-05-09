@@ -596,29 +596,45 @@ const AuthUI = (() => {
     setTimeout(() => window.location.reload(), 1000);
   }
 
-  function handleResetClick(btn) {
-    if (!btn.dataset.confirmed) {
-      // Premier clic : Demander confirmation
-      btn.dataset.confirmed = "true";
-      btn.style.background = "#ef4444";
-      btn.style.color = "#ffffff";
-      btn.innerHTML = "⚠️ CONFIRMER LA SUPPRESSION";
-      
-      // Reset le bouton après 5 secondes si pas de 2ème clic
-      setTimeout(() => {
-        if (btn.dataset.confirmed === "true") {
-          delete btn.dataset.confirmed;
-          btn.style.background = "transparent";
-          btn.style.color = "#ef4444";
-          btn.innerHTML = "🗑️ Vider mes données";
+  // Attachement direct pour éviter tout problème d'attribut HTML
+  setTimeout(() => {
+    const btn = document.getElementById('btnResetData');
+    if (btn) {
+      // Retirer l'attribut onclick inline pour éviter les conflits
+      btn.removeAttribute('onclick');
+      btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        if (!this.dataset.confirmed) {
+          // Premier clic
+          this.dataset.confirmed = "true";
+          this.style.background = "#ef4444";
+          this.style.color = "#ffffff";
+          this.innerHTML = "⚠️ CONFIRMER LA SUPPRESSION";
+          
+          setTimeout(() => {
+            if (this.dataset.confirmed === "true") {
+              delete this.dataset.confirmed;
+              this.style.background = "transparent";
+              this.style.color = "#ef4444";
+              this.innerHTML = "🗑️ Vider mes données";
+            }
+          }, 5000);
+        } else {
+          // Deuxième clic
+          this.disabled = true;
+          this.innerHTML = "⏳ Nettoyage en cours...";
+          resetUserData();
         }
-      }, 5000);
-    } else {
-      // Deuxième clic : Exécuter le reset
-      btn.disabled = true;
-      btn.innerHTML = "⏳ Nettoyage en cours...";
-      resetUserData();
+      });
     }
+  }, 1000);
+
+  function handleResetClick(btn) {
+    // Legacy fallback
+    const triggerBtn = btn || document.getElementById('btnResetData');
+    if (triggerBtn) triggerBtn.click();
   }
 
   async function resetUserData() {
