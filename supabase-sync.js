@@ -41,13 +41,13 @@ const GourmetSync = {
     async sauvegarder(table, item, localStorageKey) {
         // 1. Mise à jour locale immédiate (Optimistic UI)
         // Note: l'item doit avoir un user_id
-        const user = (await supabase.auth.getSession()).data.session?.user;
+        const user = (await gourmetSupabase.auth.getSession()).data.session?.user;
         if (user) item.user_id = user.id;
 
         // 2. Tentative de push vers Supabase
         if (navigator.onLine && window.supabase) {
             try {
-                const { error } = await supabase.from(table).upsert(item);
+                const { error } = await gourmetSupabase.from(table).upsert(item);
                 if (error) throw error;
             } catch (err) {
                 console.error(`Erreur sauvegarde ${table}, mise en file d'attente...`);
@@ -61,7 +61,7 @@ const GourmetSync = {
     async supprimer(table, id, localStorageKey) {
         if (navigator.onLine && window.supabase) {
             try {
-                const { error } = await supabase.from(table).delete().eq('id', id);
+                const { error } = await gourmetSupabase.from(table).delete().eq('id', id);
                 if (error) throw error;
             } catch (err) {
                 this.addToQueue(table, 'delete', { id });
@@ -87,10 +87,10 @@ const GourmetSync = {
             try {
                 let error;
                 if (op.action === 'upsert') {
-                    const { error: err } = await supabase.from(op.table).upsert(op.data);
+                    const { error: err } = await gourmetSupabase.from(op.table).upsert(op.data);
                     error = err;
                 } else if (op.action === 'delete') {
-                    const { error: err } = await supabase.from(op.table).delete().eq('id', op.data.id);
+                    const { error: err } = await gourmetSupabase.from(op.table).delete().eq('id', op.data.id);
                     error = err;
                 }
                 if (error) throw error;
@@ -118,7 +118,7 @@ const GourmetSync = {
         if (recettes) {
             // Pour chaque recette, charger ses ingrédients
             for (let r of recettes) {
-                const { data: ing } = await supabase.from('recette_ingredients').select('*').eq('recette_id', r.id);
+                const { data: ing } = await gourmetSupabase.from('recette_ingredients').select('*').eq('recette_id', r.id);
                 r.ingredients = ing || [];
             }
         }
@@ -143,7 +143,7 @@ const GourmetSync = {
         if (!window.supabase) return;
 
         // Alerte stock
-        supabase.channel('stock-alerts')
+        gourmetSupabase.channel('stock-alerts')
             .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'ingredients' }, payload => {
                 if (payload.new.stock_actuel <= payload.new.seuil_alerte) {
                     if (typeof showToast === 'function') showToast(`⚠️ Stock critique : ${payload.new.name}`, 'warning');
@@ -152,7 +152,7 @@ const GourmetSync = {
             .subscribe();
 
         // Nouvelles commandes
-        supabase.channel('new-orders')
+        gourmetSupabase.channel('new-orders')
             .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'commandes' }, payload => {
                 if (typeof showToast === 'function') showToast(`🔔 Nouvelle commande reçue !`, 'success');
                 if (typeof renderCommandes === 'function') renderCommandes();
@@ -164,7 +164,7 @@ const GourmetSync = {
     async migrerLocalStorageVersSupabase() {
         if (localStorage.getItem('gourmet_migration_done') === 'true') return;
         
-        const user = (await supabase.auth.getSession()).data.session?.user;
+        const user = (await gourmetSupabase.auth.getSession()).data.session?.user;
         if (!user) return;
 
         console.info('🚀 Migration localStorage -> Supabase...');
@@ -183,7 +183,7 @@ const GourmetSync = {
             if (Array.isArray(data) && data.length > 0) {
                 for (const item of data) {
                     item.user_id = user.id;
-                    await supabase.from(m.table).upsert(item);
+                    await gourmetSupabase.from(m.table).upsert(item);
                 }
             }
         }

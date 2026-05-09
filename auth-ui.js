@@ -78,7 +78,7 @@ const AuthUI = (() => {
   async function init() {
     console.log('🔐 AuthUI : Initialisation...');
 
-    supabase.auth.onAuthStateChange(async (event, session) => {
+    gourmetSupabase.auth.onAuthStateChange(async (event, session) => {
       _currentUser = session?.user || null;
 
       // Autorisation : Admin ou tout utilisateur avec un abonnement valide
@@ -107,7 +107,7 @@ const AuthUI = (() => {
     });
 
     // Vérification de la session existante au chargement
-    const { data: { session } } = await supabase.auth.getSession();
+    const { data: { session } } = await gourmetSupabase.auth.getSession();
     _currentUser = session?.user || null;
 
     // Support du mode démo (si pas de session réelle)
@@ -403,7 +403,7 @@ const AuthUI = (() => {
   }
 
   async function _handleLogin(email, password) {
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    const { data, error } = await gourmetSupabase.auth.signInWithPassword({ email, password });
     if (error) {
       const msg = error.message.includes('Invalid login') ? 'Email ou mot de passe incorrect.' : error.message;
       _showError(msg);
@@ -430,7 +430,7 @@ const AuthUI = (() => {
     if (password !== confirm) { _showError('Les mots de passe ne correspondent pas.'); return; }
     if (password.length < 8)  { _showError('Le mot de passe doit faire au moins 8 caractères.'); return; }
 
-    const { data, error } = await supabase.auth.signUp({
+    const { data, error } = await gourmetSupabase.auth.signUp({
       email,
       password,
       options: { 
@@ -465,7 +465,7 @@ const AuthUI = (() => {
     const email = document.getElementById('authEmail')?.value.trim();
     if (!email) { _showError('Entrez votre email pour recevoir le lien de réinitialisation.'); return; }
 
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    const { error } = await gourmetSupabase.auth.resetPasswordForEmail(email, {
       redirectTo: window.location.origin + window.location.pathname,
     });
 
@@ -548,7 +548,7 @@ const AuthUI = (() => {
   async function logout() {
     document.getElementById('authUserMenu')?.remove();
     localStorage.removeItem('gourmet_demo_mode');
-    await supabase.auth.signOut();
+    await gourmetSupabase.auth.signOut();
     if (typeof showToast === 'function') showToast('👋 Déconnecté avec succès.', 'info');
   }
 
@@ -619,7 +619,7 @@ const AuthUI = (() => {
       btn.style.opacity = '0.7';
     }
 
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    const { data, error } = await gourmetSupabase.auth.signInWithPassword({ email, password });
 
     if (error) {
       if (errorZone) { errorZone.textContent = 'Erreur : ' + error.message; errorZone.style.display = 'block'; }

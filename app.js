@@ -651,7 +651,7 @@ async function saveInventory() {
       for (const item of APP.inventory) {
           await GourmetSync.sauvegarder('ingredients', {
               id: item.id,
-              user_id: (await supabase.auth.getSession()).data.session?.user.id,
+              user_id: (await gourmetSupabase.auth.getSession()).data.session?.user.id,
               name: item.name,
               stock_actuel: item.stock,
               unite: item.unit

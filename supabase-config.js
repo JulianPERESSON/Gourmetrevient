@@ -11,8 +11,9 @@
 const SUPABASE_URL = 'https://hogfrddigcojdmjjpbno.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_9iePEQdGSdnjXaw4I1s0Nw_wyitVBla';
 
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-window.supabase = supabase; // Objet global standard
+const gourmetSupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+window.supabase = gourmetSupabase;
+window.gourmetSupabase = gourmetSupabase; // Alias explicite pour éviter les conflits avec la lib CDN
 
 /**
  * GESTION DE L'ÉTAT ET NAVIGATION
@@ -44,9 +45,9 @@ function afficherLandingPage() {
 
 async function initApp() {
     try {
-        const { data: { session } } = await supabase.auth.getSession();
+        const { data: { session } } = await gourmetSupabase.auth.getSession();
         if (session) {
-            const { data: profile, error } = await supabase
+            const { data: profile, error } = await gourmetSupabase
                 .from('profiles')
                 .select('*')
                 .eq('id', session.user.id)
@@ -79,7 +80,7 @@ async function initApp() {
 }
 
 // Écouteur global de session
-supabase.auth.onAuthStateChange((event, session) => {
+gourmetSupabase.auth.onAuthStateChange((event, session) => {
     console.log('Auth event:', event);
     if (event === 'SIGNED_IN') initApp();
     if (event === 'SIGNED_OUT') {
@@ -96,10 +97,10 @@ supabase.auth.onAuthStateChange((event, session) => {
 const db = {
     // Récupérer le profil de l'utilisateur connecté
     async getProfile() {
-        const { data: { user } } = await supabase.auth.getUser();
+        const { data: { user } } = await gourmetSupabase.auth.getUser();
         if (!user) return null;
         
-        const { data, error } = await supabase
+        const { data, error } = await gourmetSupabase
             .from('profiles')
             .select('*')
             .eq('id', user.id)
@@ -110,10 +111,10 @@ const db = {
 
     // Sauvegarder une recette
     async saveRecipe(recipe) {
-        const { data: { user } } = await supabase.auth.getUser();
+        const { data: { user } } = await gourmetSupabase.auth.getUser();
         if (!user) return { error: 'Utilisateur non connecté' };
 
-        const { data, error } = await supabase
+        const { data, error } = await gourmetSupabase
             .from('recipes')
             .upsert({
                 user_id: user.id,
