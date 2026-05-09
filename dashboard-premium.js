@@ -261,6 +261,20 @@ window.hydratePremiumDashboard = function () {
     if (priorityList) {
         let priorities = [];
         
+        // Custom user priorities
+        const currUser = (localStorage.getItem('gourmet_current_user') || 'chef').toLowerCase();
+        const customKey = `gourmet_custom_priorities_${currUser}`;
+        const customPriorities = JSON.parse(localStorage.getItem(customKey) || '[]');
+        
+        customPriorities.forEach(cp => {
+            priorities.push({ urgency: 'urgent', icon: '📌',
+                title: cp.title,
+                desc: cp.desc || 'Tâche personnalisée',
+                action: `window.removeCustomPriority('${cp.id}')`,
+                btn: 'Terminé'
+            });
+        });
+        
         // Priority: HACCP Missing Log Alert (if after 10am and no log today)
         const currentHour = now.getHours();
         const haccpToday = (haccpLogs.temp || []).filter(l => (l.date || l.timestamp || '').split('T')[0] === todayStr);
@@ -333,7 +347,7 @@ window.hydratePremiumDashboard = function () {
             });
         }
 
-        priorityList.innerHTML = priorities.slice(0, 3).map(p => `
+        priorityList.innerHTML = priorities.slice(0, 4).map(p => `
             <div class="priority-item ${p.urgency}">
                 <div class="p-icon">${p.icon}</div>
                 <div class="p-content">
@@ -777,4 +791,37 @@ window.showHub = function () {
     setTimeout(() => {
         if (typeof hydratePremiumDashboard === 'function') hydratePremiumDashboard();
     }, 50);
+};
+
+// =============================================================================
+// CUSTOM PRIORITIES MANAGEMENT
+// =============================================================================
+window.addCustomPriority = function() {
+    // Demander le nom de la priorité
+    const title = prompt("Entrez la priorité du jour :");
+    if (!title || title.trim() === '') return;
+    
+    const currUser = (localStorage.getItem('gourmet_current_user') || 'chef').toLowerCase();
+    const customKey = `gourmet_custom_priorities_${currUser}`;
+    const customPriorities = JSON.parse(localStorage.getItem(customKey) || '[]');
+    
+    customPriorities.push({
+        id: 'prio_' + Date.now(),
+        title: title.trim(),
+        desc: 'Tâche manuelle'
+    });
+    
+    localStorage.setItem(customKey, JSON.stringify(customPriorities));
+    hydratePremiumDashboard();
+};
+
+window.removeCustomPriority = function(id) {
+    const currUser = (localStorage.getItem('gourmet_current_user') || 'chef').toLowerCase();
+    const customKey = `gourmet_custom_priorities_${currUser}`;
+    let customPriorities = JSON.parse(localStorage.getItem(customKey) || '[]');
+    
+    customPriorities = customPriorities.filter(p => p.id !== id);
+    
+    localStorage.setItem(customKey, JSON.stringify(customPriorities));
+    hydratePremiumDashboard();
 };
