@@ -192,12 +192,12 @@ const GourmetSync = {
         showToast('✅ Migration terminée ! Vos données sont sécurisées sur le Cloud.', 'success');
     },
 
-    async resetUserData() {
+    async resetUserData(skipConfirm = false) {
         const { data: { session } } = await gourmetSupabase.auth.getSession();
         const user = session?.user;
         if (!user) return;
 
-        if (!confirm('⚠️ Êtes-vous sûr de vouloir vider TOUTES vos données ?\n\nCela supprimera vos recettes, votre inventaire, votre équipe et votre planning définitivement.\n\nCette action est irréversible.')) return;
+        if (!skipConfirm && !confirm('⚠️ Êtes-vous sûr de vouloir vider TOUTES vos données ?\n\nCela supprimera vos recettes, votre inventaire, votre équipe et votre planning définitivement.\n\nCette action est irréversible.')) return;
 
         showToast('Nettoyage intégral en cours... ⏳', 'info');
 

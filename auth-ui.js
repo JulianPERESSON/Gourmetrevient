@@ -596,9 +596,46 @@ const AuthUI = (() => {
     setTimeout(() => window.location.reload(), 1000);
   }
 
+  function handleResetClick(btn) {
+    if (!btn.dataset.confirmed) {
+      // Premier clic : Demander confirmation
+      btn.dataset.confirmed = "true";
+      btn.style.background = "#ef4444";
+      btn.style.color = "#ffffff";
+      btn.innerHTML = "⚠️ CONFIRMER LA SUPPRESSION";
+      
+      // Reset le bouton après 5 secondes si pas de 2ème clic
+      setTimeout(() => {
+        if (btn.dataset.confirmed === "true") {
+          delete btn.dataset.confirmed;
+          btn.style.background = "transparent";
+          btn.style.color = "#ef4444";
+          btn.innerHTML = "🗑️ Vider mes données";
+        }
+      }, 5000);
+    } else {
+      // Deuxième clic : Exécuter le reset
+      btn.disabled = true;
+      btn.innerHTML = "⏳ Nettoyage en cours...";
+      resetUserData();
+    }
+  }
+
   async function resetUserData() {
-    if (typeof GourmetSync !== 'undefined' && GourmetSync.resetUserData) {
-        await GourmetSync.resetUserData();
+    console.warn("🚀 Lancement du reset complet des données...");
+    try {
+      if (typeof GourmetSync !== 'undefined' && GourmetSync.resetUserData) {
+          // Note: On ne passe pas par confirm() ici car déjà géré par le bouton
+          await GourmetSync.resetUserData(true); 
+      } else {
+          // Fallback si GourmetSync est absent
+          localStorage.clear();
+          window.location.reload();
+      }
+    } catch (err) {
+      console.error("Erreur Reset:", err);
+      localStorage.clear();
+      window.location.reload();
     }
   }
 
@@ -655,7 +692,7 @@ const AuthUI = (() => {
     }
   }
 
-  return { init, showModal, switchTab, handleSubmit, handleSubmitManual, handleForgotPassword, logout, quitDemo, exportData, openLegal, togglePwd, replayOnboarding, getCurrentUser, getCurrentPlan, isPro, isAdminUser, checkPlan, toggleDemoMode, resetUserData };
+  return { init, showModal, switchTab, handleSubmit, handleSubmitManual, handleForgotPassword, logout, quitDemo, exportData, openLegal, togglePwd, replayOnboarding, getCurrentUser, getCurrentPlan, isPro, isAdminUser, checkPlan, toggleDemoMode, resetUserData, handleResetClick };
 
 })();
 

@@ -4220,7 +4220,7 @@
               <span class="slider round"></span>
             </label>
           </div>
-          <button class="btn btn-outline btn-full" onclick="if(window.AuthUI) AuthUI.resetUserData()" style="border-color: #ef4444; color: #ef4444; font-weight: 900; margin-bottom: 0.5rem; display: flex; align-items: center; justify-content: center; gap: 10px; border-width: 2px;">
+          <button id="btnResetData" class="btn btn-outline btn-full" onclick="if(window.AuthUI) AuthUI.handleResetClick(this)" style="border-color: #ef4444; color: #ef4444; font-weight: 900; margin-bottom: 0.5rem; display: flex; align-items: center; justify-content: center; gap: 10px; border-width: 2px; transition: all 0.3s;">
             🗑️ Vider mes données
           </button>
         </div>
