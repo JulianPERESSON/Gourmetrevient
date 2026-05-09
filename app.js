@@ -5230,141 +5230,162 @@ function renderAnnualCalendar() {
     container.innerHTML = html;
 }
 
-function renderAdminUsers() {
+async function renderAdminUsers() {
   const container = $('#adminUserList');
   if (!container) return;
 
-  const usersDb = JSON.parse(localStorage.getItem(STORAGE_KEYS.users) || '{}');
-  const userKeys = Object.keys(usersDb);
+  container.innerHTML = `<tr><td colspan="5" style="padding:2rem; text-align:center;"><div class="spinner-pro"></div><br>Chargement des utilisateurs Supabase...</td></tr>`;
 
-  if (userKeys.length === 0) {
-    container.innerHTML = `<tr><td colspan="5" style="padding:1rem; text-align:center;">${t('admin.col.user') === 'User' ? 'No registered users.' : (t('admin.col.user') === 'Usuario' ? 'No hay usuarios registrados.' : 'Aucun utilisateur enregistré.')}</td></tr>`;
-    return;
+  try {
+    // Fetch all profiles from Supabase
+    const { data: profiles, error } = await gourmetSupabase
+      .from('profiles')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+
+    if (!profiles || profiles.length === 0) {
+      container.innerHTML = `<tr><td colspan="5" style="padding:1rem; text-align:center;">${t('admin.col.user') === 'User' ? 'No registered users.' : 'Aucun utilisateur enregistré.'}</td></tr>`;
+      return;
+    }
+
+    container.innerHTML = profiles.map(u => {
+      const isAdmin = u.plan === 'admin' || u.is_admin === true;
+      const isBanned = u.is_banned || false;
+      const planLabel = u.plan ? u.plan.toUpperCase() : 'FREE';
+      const planColor = u.plan === 'admin' ? 'var(--primary)' : (u.plan === 'pro' ? 'var(--secondary)' : 'var(--text-muted)');
+
+      return `
+        <tr style="border-bottom:1px solid var(--surface-border); ${isBanned ? 'opacity:0.6; background:rgba(254,226,226,0.3);' : ''}">
+          <td style="padding:1rem; font-weight:600;">
+            <div style="display:flex; align-items:center; gap:10px;">
+               <span style="font-size:1.2rem;">${u.gender === 'female' ? '👩‍🍳' : '👨‍🍳'}</span>
+               <div>
+                  ${escapeHtml(u.full_name || u.email.split('@')[0])}
+                  ${isAdmin ? '<span style="margin-left:5px; font-size:0.65rem; background:var(--primary); color:white; padding:1px 4px; border-radius:3px; font-weight:800;">ADMIN</span>' : ''}
+               </div>
+            </div>
+          </td>
+          <td style="padding:1rem; color:var(--text-muted); font-size:0.85rem;">${escapeHtml(u.email || '—')}</td>
+          <td style="padding:1rem;">
+             <span style="font-size:0.7rem; font-weight:800; padding:3px 8px; border-radius:20px; background:${planColor}22; color:${planColor}; border:1px solid ${planColor}44;">
+                ${planLabel}
+             </span>
+          </td>
+          <td style="padding:1rem; font-size:0.85rem;">${escapeHtml(u.role || 'Chef de Labo')}</td>
+          <td style="padding:1rem; text-align:right; display:flex; gap:0.5rem; justify-content:flex-end;">
+            <button class="btn btn-sm btn-outline" onclick="openAdminModeration('${u.id}')">🛡️ ${t('nav.admin') === 'Admin' ? 'Moderate' : 'Modérer'}</button>
+            ${!isAdmin ?
+          `<button class="btn btn-sm btn-outline" style="color:var(--danger); border-color:var(--danger);" onclick="deleteUserSupabase('${u.id}')">🗑️</button>` :
+          '<small style="color:var(--text-muted); padding:0 0.5rem;">Admin</small>'}
+          </td>
+        </tr>
+      `;
+    }).join('');
+  } catch (err) {
+    console.error('Admin Fetch Error:', err);
+    container.innerHTML = `<tr><td colspan="5" style="padding:1rem; text-align:center; color:var(--danger);">Erreur de connexion Supabase. Vérifiez vos politiques RLS.</td></tr>`;
   }
-
-  container.innerHTML = userKeys.map(key => {
-    const u = usersDb[key];
-    const isPinSet = (u.password && u.password !== '0000') || (u.pin && u.pin !== '0000');
-    const isAdmin = u.isAdmin || key.toLowerCase() === 'ju';
-    const isBanned = u.isBanned || false;
-
-    return `
-      <tr style="border-bottom:1px solid var(--surface-border); ${isBanned ? 'opacity:0.6; background:rgba(254,226,226,0.3);' : ''}">
-        <td style="padding:1rem; font-weight:600;">
-          ${escapeHtml(key)}
-          ${isAdmin ? '<span style="margin-left:5px; font-size:0.65rem; background:var(--primary); color:white; padding:1px 4px; border-radius:3px;">ADMIN</span>' : ''}
-          ${isBanned ? '<span style="margin-left:5px; font-size:0.65rem; background:var(--danger); color:white; padding:1px 4px; border-radius:3px;">BAN</span>' : ''}
-        </td>
-        <td style="padding:1rem;">${escapeHtml(u.email || '—')}</td>
-        <td style="padding:1rem;">${u.gender === 'female' ? t('auth.gender.female') : t('auth.gender.male')}</td>
-        <td style="padding:1rem;">
-          <span style="padding:0.25rem 0.5rem; border-radius:4px; font-size:0.75rem; background:${isPinSet ? '#dcfce7' : '#fee2e2'}; color:${isPinSet ? '#166534' : '#b91c1c'};">
-            ${isPinSet ? (t('admin.col.user') === 'User' ? 'Password Set' : (t('admin.col.user') === 'Usuario' ? 'Pass Definido' : 'Mdp Défini')) : (t('admin.col.user') === 'User' ? 'Weak Pass' : (t('admin.col.user') === 'Usuario' ? 'Pass Débil' : 'Mdp Faible'))}
-          </span>
-        </td>
-        <td style="padding:1rem; text-align:right; display:flex; gap:0.5rem; justify-content:flex-end;">
-          <button class="btn btn-sm btn-outline" onclick="openAdminModeration('${key}')">🛡️ ${t('nav.admin') === 'Admin' ? 'Moderate' : (t('nav.admin') === 'Admin' ? 'Moderar' : 'Modérer')}</button>
-          ${key.toLowerCase() !== 'ju' ?
-        `<button class="btn btn-sm btn-outline" style="color:var(--danger); border-color:var(--danger);" onclick="deleteUser('${key}')">🗑️</button>` :
-        '<small style="color:var(--text-muted); padding:0 0.5rem;">Admin</small>'}
-        </td>
-      </tr>
-    `;
-  }).join('');
 }
 
 let selectedModerationUser = null;
 
-function openAdminModeration(user) {
-  const usersDb = JSON.parse(localStorage.getItem(STORAGE_KEYS.users) || '{}');
-  const u = usersDb[user.toLowerCase()];
-  if (!u) return;
+async function openAdminModeration(userId) {
+  const container = $('#adminUserDetail');
+  if (!container) return;
 
-  selectedModerationUser = user;
-  const isAdmin = u.isAdmin || user.toLowerCase() === 'ju';
-  const isBanned = u.isBanned || false;
-
-  $('#adminUserDetail').innerHTML = `
-    <div style="background:var(--bg-alt); padding:1rem; border-radius:var(--radius-md); border:1px solid var(--surface-border);">
-      <div style="font-weight:700; font-size:1.1rem; margin-bottom:0.5rem;">${escapeHtml(user)}</div>
-      <div style="display:grid; grid-template-columns:auto 1fr; gap:0.5rem 1rem; font-size:0.9rem;">
-        <span style="color:var(--text-muted);">Email:</span> <b>${escapeHtml(u.email || 'Non renseigné')}</b>
-        <span style="color:var(--text-muted);">Mot de passe:</span> <b style="letter-spacing:2px; color:var(--accent);">••••••••</b>
-        <span style="color:var(--text-muted);">Genre:</span> <b>${u.gender === 'female' ? 'Femme' : 'Homme'}</b>
-      </div>
-    </div>
-  `;
-
-  const btnAdmin = $('#btnAdminToggle');
-  const btnBan = $('#btnBanToggle');
-
-  btnAdmin.textContent = isAdmin ? '🛡️ Retirer Admin' : '🛡️ Rendre Admin';
-  btnAdmin.style.background = isAdmin ? 'var(--primary-glow)' : 'transparent';
-  btnAdmin.disabled = user.toLowerCase() === 'ju'; // Cannot demote 'Ju'
-
-  btnBan.textContent = isBanned ? '✅ Débannir' : '🚫 Bannir';
-  btnBan.style.background = isBanned ? 'rgba(34,197,94,0.1)' : 'transparent';
-  btnBan.style.color = isBanned ? 'var(--success)' : 'var(--danger)';
-  btnBan.style.borderColor = isBanned ? 'var(--success)' : 'var(--danger)';
-  btnBan.disabled = user.toLowerCase() === 'ju'; // Cannot ban 'Ju'
-
-  $('#btnDeleteUserModal').style.display = user.toLowerCase() === 'ju' ? 'none' : 'block';
-
+  selectedModerationUser = userId;
   $('#adminUserModal').style.display = 'flex';
+  container.innerHTML = '<div style="padding:1rem; text-align:center;"><div class="spinner-pro"></div></div>';
+
+  try {
+    const { data: u, error } = await gourmetSupabase
+      .from('profiles')
+      .select('*')
+      .eq('id', userId)
+      .single();
+
+    if (error) throw error;
+
+    const isAdmin = u.plan === 'admin';
+    const isBanned = u.is_banned || false;
+
+    container.innerHTML = `
+      <div style="background:var(--bg-alt); padding:1.5rem; border-radius:var(--radius-md); border:1px solid var(--surface-border);">
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:1rem;">
+           <span style="font-size:2rem;">${u.gender === 'female' ? '👩‍🍳' : '👨‍🍳'}</span>
+           <div>
+              <div style="font-weight:900; font-size:1.2rem;">${escapeHtml(u.full_name || 'Chef')}</div>
+              <div style="font-size:0.85rem; color:var(--text-muted);">${escapeHtml(u.email)}</div>
+           </div>
+        </div>
+        <div style="display:grid; grid-template-columns:auto 1fr; gap:0.5rem 1rem; font-size:0.9rem; padding-top:1rem; border-top:1px dashed var(--surface-border);">
+          <span style="color:var(--text-muted);">ID Supabase:</span> <code style="font-size:0.7rem;">${u.id}</code>
+          <span style="color:var(--text-muted);">Plan Actuel:</span> <b style="color:var(--primary);">${u.plan?.toUpperCase() || 'FREE'}</b>
+          <span style="color:var(--text-muted);">Inscrit le:</span> <b>${new Date(u.created_at).toLocaleDateString()}</b>
+        </div>
+      </div>
+    `;
+
+    const btnAdmin = $('#btnAdminToggle');
+    const btnBan = $('#btnBanToggle');
+
+    if (btnAdmin) {
+      btnAdmin.textContent = isAdmin ? '🛡️ Retirer Admin' : '🛡️ Rendre Admin';
+      btnAdmin.className = isAdmin ? 'btn btn-primary btn-full' : 'btn btn-outline btn-full';
+      btnAdmin.onclick = () => toggleAdminStatusSupabase(u.id, isAdmin);
+    }
+
+    if (btnBan) {
+      btnBan.textContent = isBanned ? '✅ Débannir' : '🚫 Bannir l\'utilisateur';
+      btnBan.style.color = isBanned ? 'var(--success)' : 'var(--danger)';
+      btnBan.style.borderColor = isBanned ? 'var(--success)' : 'var(--danger)';
+      btnBan.onclick = () => toggleBanStatusSupabase(u.id, isBanned);
+    }
+    
+    $('#btnDeleteUserModal').onclick = () => deleteUserSupabase(u.id, u.full_name || u.email);
+
+  } catch (err) {
+    container.innerHTML = `<div style="color:var(--danger); padding:1rem;">Erreur de chargement du profil.</div>`;
+  }
 }
 
-function toggleAdminStatus() {
-  if (!selectedModerationUser) return;
-  const userKey = selectedModerationUser.toLowerCase();
-  let usersDb = JSON.parse(localStorage.getItem(STORAGE_KEYS.users) || '{}');
-
-  usersDb[userKey].isAdmin = !usersDb[userKey].isAdmin;
-  localStorage.setItem(STORAGE_KEYS.users, JSON.stringify(usersDb)); if (window.GourmetCloud && window.GourmetCloud.syncUsersToCloud) GourmetCloud.syncUsersToCloud();
-
-  openAdminModeration(selectedModerationUser);
-  renderAdminUsers();
-  showToast(t('admin.status.admin_updated', { name: selectedModerationUser }), 'info');
+async function toggleAdminStatusSupabase(userId, currentStatus) {
+  const newPlan = currentStatus ? 'pro' : 'admin';
+  try {
+    const { error } = await gourmetSupabase.from('profiles').update({ plan: newPlan }).eq('id', userId);
+    if (error) throw error;
+    showToast('Statut Admin mis à jour', 'success');
+    openAdminModeration(userId);
+    renderAdminUsers();
+  } catch (err) {
+    showToast('Erreur lors de la mise à jour', 'error');
+  }
 }
 
-function toggleBanStatus() {
-  if (!selectedModerationUser) return;
-  const userKey = selectedModerationUser.toLowerCase();
-  let usersDb = JSON.parse(localStorage.getItem(STORAGE_KEYS.users) || '{}');
-
-  usersDb[userKey].isBanned = !usersDb[userKey].isBanned;
-  localStorage.setItem(STORAGE_KEYS.users, JSON.stringify(usersDb)); if (window.GourmetCloud && window.GourmetCloud.syncUsersToCloud) GourmetCloud.syncUsersToCloud();
-
-  openAdminModeration(selectedModerationUser);
-  renderAdminUsers();
-  const statusMsg = usersDb[userKey].isBanned ? t('admin.status.banned', { name: selectedModerationUser }) : t('admin.status.unbanned', { name: selectedModerationUser });
-  showToast(statusMsg, 'info');
+async function toggleBanStatusSupabase(userId, currentStatus) {
+  try {
+    const { error } = await gourmetSupabase.from('profiles').update({ is_banned: !currentStatus }).eq('id', userId);
+    if (error) throw error;
+    showToast(currentStatus ? 'Utilisateur débanni' : 'Utilisateur banni', 'info');
+    openAdminModeration(userId);
+    renderAdminUsers();
+  } catch (err) {
+    showToast('Erreur lors du bannissement', 'error');
+  }
 }
 
-function deleteUser(user) {
-  const userKey = user.toLowerCase();
-
-  if (confirm(t('admin.confirm.delete_user', { name: user }))) {
-    // 1. Remove from database
-    let usersDb = JSON.parse(localStorage.getItem(STORAGE_KEYS.users) || '{}');
-    delete usersDb[userKey];
-    localStorage.setItem(STORAGE_KEYS.users, JSON.stringify(usersDb)); if (window.GourmetCloud && window.GourmetCloud.syncUsersToCloud) GourmetCloud.syncUsersToCloud();
-
-    // 2. Remove user specific data
-    localStorage.removeItem(`gourmetrevient_recipes_${userKey}`);
-    localStorage.removeItem(`gourmet_team_members_${userKey}`);
-    localStorage.removeItem(`gourmet_staff_leaves_${userKey}`);
-    localStorage.removeItem(`gourmet_lab_plan_${userKey}`);
-    localStorage.removeItem(`labpatiss_config_${userKey}`);
-    localStorage.removeItem(`labpatiss_placements_${userKey}`);
-
-    // If deleting the current user (theoretically possible if admin deletes itself, but we blocked it)
-    if (localStorage.getItem(STORAGE_KEYS.currentUser)?.toLowerCase() === userKey) {
-      localStorage.removeItem('gourmet_auth');
-      localStorage.removeItem(STORAGE_KEYS.currentUser);
-      location.reload();
-    } else {
+async function deleteUserSupabase(userId, name) {
+  if (confirm(`⚠️ ATTENTION : Voulez-vous vraiment supprimer définitivement le profil de ${name} ?\n\nNote : Cela supprimera son profil dans la base mais pas son accès Auth (à faire manuellement dans le dashboard Supabase).`)) {
+    try {
+      const { error } = await gourmetSupabase.from('profiles').delete().eq('id', userId);
+      if (error) throw error;
+      showToast('Profil supprimé avec succès', 'success');
+      closeAdminModeration();
       renderAdminUsers();
-      showToast(t('admin.user.deleted', { name: user }), 'info');
+    } catch (err) {
+      showToast('Erreur lors de la suppression', 'error');
     }
   }
 }
@@ -5372,13 +5393,6 @@ function deleteUser(user) {
 function closeAdminModeration() {
   const m = $('#adminUserModal');
   if (m) m.style.display = 'none';
-}
-
-function promptDeleteAdminUser() {
-  if (selectedModerationUser && confirm(`Voulez-vous vraiment supprimer le compte de ${selectedModerationUser} ?`)) {
-    deleteUser(selectedModerationUser);
-    closeAdminModeration();
-  }
 }
 
 // ============================================================================
