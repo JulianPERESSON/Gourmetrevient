@@ -692,7 +692,28 @@ const AuthUI = (() => {
     }
   }
 
-  return { init, showModal, switchTab, handleSubmit, handleSubmitManual, handleForgotPassword, logout, quitDemo, exportData, openLegal, togglePwd, replayOnboarding, getCurrentUser, getCurrentPlan, isPro, isAdminUser, checkPlan, toggleDemoMode, resetUserData, handleResetClick };
+  return { 
+    init, 
+    showModal, 
+    switchTab, 
+    handleSubmit, 
+    handleSubmitManual, 
+    handleForgotPassword, 
+    logout, 
+    quitDemo, 
+    exportData, 
+    openLegal, 
+    togglePwd, 
+    replayOnboarding, 
+    getCurrentUser, 
+    getCurrentPlan, 
+    isPro, 
+    isAdminUser, 
+    checkPlan, 
+    toggleDemoMode, 
+    resetUserData, 
+    handleResetClick 
+  };
 
 })();
 
