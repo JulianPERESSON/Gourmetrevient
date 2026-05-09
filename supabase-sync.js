@@ -190,6 +190,40 @@ const GourmetSync = {
 
         localStorage.setItem('gourmet_migration_done', 'true');
         showToast('✅ Migration terminée ! Vos données sont sécurisées sur le Cloud.', 'success');
+    },
+
+    async resetUserData() {
+        const user = (await gourmetSupabase.auth.getSession()).data.session?.user;
+        if (!user) return;
+
+        if (!confirm('⚠️ Êtes-vous sûr de vouloir vider TOUTES vos données (Recettes, Inventaire, Planning, Commandes) ? Cette action est irréversible.')) return;
+
+        showToast('Nettoyage des données... ⏳', 'info');
+
+        const tables = ['recettes', 'recette_ingredients', 'ingredients', 'commandes', 'clients', 'fournisseurs', 'planning_production', 'haccp_temperatures', 'haccp_nettoyage', 'pertes'];
+        
+        for (const table of tables) {
+            try {
+                await gourmetSupabase.from(table).delete().eq('user_id', user.id);
+            } catch(e) { console.error(`Erreur reset ${table}`, e); }
+        }
+
+        // Vider localStorage spécifique
+        const userPrefix = (user.email.split('@')[0]).toLowerCase();
+        const keysToRemove = [
+            `gourmet_recettes_${userPrefix}`,
+            `gourmet_inventory_${userPrefix}`,
+            `gourmet_planning_${userPrefix}`,
+            `gourmet_commandes_${userPrefix}`,
+            'gourmet_recettes',
+            'gourmet_ingredients',
+            'gourmet_commandes'
+        ];
+        
+        keysToRemove.forEach(k => localStorage.removeItem(k));
+        
+        showToast('✅ Données réinitialisées. Recharge...', 'success');
+        setTimeout(() => window.location.reload(), 1500);
     }
 };
 

@@ -526,6 +526,15 @@ const AuthUI = (() => {
         </div>
       </div>
       <hr class="auth-menu-divider">
+      <div class="auth-menu-item" style="display:flex; justify-content:space-between; align-items:center;">
+        <span>Mode Démo</span>
+        <label class="switch">
+          <input type="checkbox" id="demoToggle" ${localStorage.getItem('gourmet_demo_mode') === 'true' ? 'checked' : ''} onchange="AuthUI.toggleDemoMode(this.checked)">
+          <span class="slider round"></span>
+        </label>
+      </div>
+      <button onclick="AuthUI.resetUserData()" class="auth-menu-item" style="color:var(--accent);">🗑️ Vider mes données</button>
+      <hr class="auth-menu-divider">
       <button onclick="AuthUI.replayOnboarding()" class="auth-menu-item" style="color:var(--primary, #10b981); font-weight:700;">✨ Relancer le guide</button>
       <button onclick="AuthUI.exportData()" class="auth-menu-item">📤 Exporter mes données</button>
       <button onclick="AuthUI.openLegal()" class="auth-menu-item">⚖️ Mentions légales</button>
@@ -580,7 +589,18 @@ const AuthUI = (() => {
     window.open('./legal.html', '_blank');
   }
 
-  function replayOnboarding() {
+  function toggleDemoMode(enabled) {
+    localStorage.setItem('gourmet_demo_mode', enabled ? 'true' : 'false');
+    if (typeof showToast === 'function') showToast(enabled ? 'Mode Démo activé 🎭' : 'Mode Réel activé (Données Cloud) ☁️', 'info');
+    setTimeout(() => window.location.reload(), 1000);
+  }
+
+  async function resetUserData() {
+    if (typeof GourmetSync !== 'undefined' && GourmetSync.resetUserData) {
+        await GourmetSync.resetUserData();
+    }
+  }
+
     document.getElementById('authUserMenu')?.remove();
     if (window.GourmetOnboarding) {
       window.GourmetOnboarding.start();
@@ -633,7 +653,7 @@ const AuthUI = (() => {
     }
   }
 
-  return { init, showModal, switchTab, handleSubmit, handleSubmitManual, handleForgotPassword, logout, quitDemo, exportData, openLegal, togglePwd, replayOnboarding, getCurrentUser, getCurrentPlan, isPro, isAdminUser, checkPlan };
+  return { init, showModal, switchTab, handleSubmit, handleSubmitManual, handleForgotPassword, logout, quitDemo, exportData, openLegal, togglePwd, replayOnboarding, getCurrentUser, getCurrentPlan, isPro, isAdminUser, checkPlan, toggleDemoMode, resetUserData };
 
 })();
 
