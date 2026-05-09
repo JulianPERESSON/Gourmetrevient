@@ -225,12 +225,16 @@ const GourmetSync = {
             }
         }
 
-        // Nettoyage LocalStorage Intégral (Sweep)
+        // Nettoyage LocalStorage Intégral SAUF l'authentification
         const userPrefix = (user.email.split('@')[0]).toLowerCase();
         const allKeys = Object.keys(localStorage);
         
+        const protectedKeys = ['gourmet_auth', 'gourmet_current_user', 'gourmet_demo_mode'];
+
         allKeys.forEach(key => {
             const k = key.toLowerCase();
+            if (protectedKeys.includes(k)) return; // Ne pas déconnecter l'utilisateur
+
             if (k.includes('gourmet') || k.includes('labpatiss') || k.includes(userPrefix)) {
                 localStorage.removeItem(key);
             }

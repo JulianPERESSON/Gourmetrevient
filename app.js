@@ -550,7 +550,10 @@ async function loadSavedRecipes() {
     });
     if (needsSave) saveSavedRecipes();
 
-    if (APP.savedRecipes.length < 6) seedDemoData();
+    const isDemo = localStorage.getItem('gourmet_demo_mode') === 'true';
+    if (APP.savedRecipes.length === 0 && isDemo) {
+      seedDemoData();
+    }
   } catch (err) { 
     console.error('Erreur chargement recettes:', err);
     APP.savedRecipes = []; 
@@ -638,7 +641,8 @@ async function loadInventory() {
       }
   }
   
-  if (APP.inventory.length === 0) {
+  const isDemo = localStorage.getItem('gourmet_demo_mode') === 'true';
+  if (APP.inventory.length === 0 && isDemo) {
     initInventoryFromDb();
   }
 }
@@ -5863,8 +5867,9 @@ function loadHaccpLogs() {
 
     let dataChanged = false;
     const now = new Date();
+    const isDemo = localStorage.getItem('gourmet_demo_mode') === 'true';
 
-    if (APP.haccpLogs.temp.length === 0 || APP.haccpLogs._demoVersion !== 3) {
+    if (isDemo && (APP.haccpLogs.temp.length === 0 || APP.haccpLogs._demoVersion !== 3)) {
       APP.haccpLogs.temp = [
         { id: 't_demo1', date: new Date(now - 1000 * 60 * 60 * 2).toISOString(), equipKey: 'haccp.equip.frigo1', val: 3.2, user: 'Julian', action: null, shift: 'matin' },
         { id: 't_demo2', date: new Date(now - 1000 * 60 * 60 * 14).toISOString(), equipKey: 'haccp.equip.frigo2', val: 4.5, user: 'Julian', action: null, shift: 'soir' },
@@ -5873,7 +5878,7 @@ function loadHaccpLogs() {
       dataChanged = true;
     }
 
-    if (APP.haccpLogs.reception.length === 0 || APP.haccpLogs._demoVersion !== 3) {
+    if (isDemo && (APP.haccpLogs.reception.length === 0 || APP.haccpLogs._demoVersion !== 3)) {
       APP.haccpLogs.reception = [
         { id: 'r_demo1', date: new Date(now - 1000 * 60 * 60 * 3).toISOString(), supplier: 'Métro', temp: 2.5, hygiene: 'ok' },
         { id: 'r_demo2', date: new Date(now - 1000 * 60 * 60 * 24 * 2).toISOString(), supplier: 'Pomona Passion Froid', temp: 3.1, hygiene: 'ok' },
@@ -5882,7 +5887,7 @@ function loadHaccpLogs() {
       dataChanged = true;
     }
 
-    if (APP.haccpLogs.trace.length === 0 || APP.haccpLogs._demoVersion !== 3) {
+    if (isDemo && (APP.haccpLogs.trace.length === 0 || APP.haccpLogs._demoVersion !== 3)) {
       APP.haccpLogs.trace = [
         { id: 'tr_demo1', lot: 'L260301', product: 'Éclair Chocolat', date: new Date(now - 1000 * 60 * 60 * 24).toISOString(), exp: '2026-03-06', qty: '50' },
         { id: 'tr_demo2', lot: 'L260302', product: 'Tarte Citron Meringuée', date: new Date(now - 1000 * 60 * 60 * 12).toISOString(), exp: '2026-03-07', qty: '12' },

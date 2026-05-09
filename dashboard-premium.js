@@ -17,6 +17,8 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function seedDemoData() {
+    if (localStorage.getItem('gourmet_demo_mode') !== 'true') return;
+    
     const today = new Date().toISOString().split('T')[0];
     // Use the same user-scoped keys as hydratePremiumDashboard
     const currUser = (localStorage.getItem('gourmet_current_user') || 'chef').toLowerCase();
@@ -105,8 +107,10 @@ function seedDemoData() {
     // ── Team (user-scoped key) ────────────────────────────────────────
     const teamKey = `gourmet_team_members_${currUser}`;
     const leavesKey = `gourmet_staff_leaves_${currUser}`;
+    const isDemo = localStorage.getItem('gourmet_demo_mode') === 'true';
+    
     const team = JSON.parse(localStorage.getItem(teamKey) || '[]');
-    if (team.length === 0) {
+    if (team.length === 0 && isDemo) {
         const demoTeam = [
             { id: 1, name: 'Chef Julian', role: 'Chef Pâtissier', avatar: '👨‍🍳' },
             { id: 2, name: 'M. Dupont', role: 'Pâtissier', avatar: '🧑‍🍳' },
@@ -124,8 +128,8 @@ function seedDemoData() {
     const haccpRaw = JSON.parse(localStorage.getItem('gourmet_haccp_logs') || '{"temp":[]}');
     const logsToday = (haccpRaw.temp || []).filter(l => l.date && l.date.split('T')[0] === today);
     
-    // Only seed if empty to allow users to play with it
-    if (logsToday.length === 0) {
+    // Only seed if empty to allow users to play with it, and ONLY if demo mode is on
+    if (logsToday.length === 0 && isDemo) {
         const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
         const demoTemp = [
             { date: yesterday, timestamp: yesterday, zone: 'Chambre froide 1', temp: 3.2, status: 'ok', by: 'Chef Julian' },
