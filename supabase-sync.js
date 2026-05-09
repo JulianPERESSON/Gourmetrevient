@@ -204,7 +204,6 @@ const GourmetSync = {
         const tables = [
             'recettes', 
             'recette_ingredients', 
-            'ingredients', 
             'commandes', 
             'clients', 
             'fournisseurs', 
@@ -224,16 +223,38 @@ const GourmetSync = {
                 console.warn(`Note: Reset table ${table} ignoré ou erreur.`); 
             }
         }
+        
+        // Vider l'inventaire au lieu de le supprimer (Cloud)
+        try {
+            await gourmetSupabase.from('ingredients').update({ stock_actuel: 0 }).eq('user_id', user.id);
+        } catch(e) {
+            console.warn(`Erreur reset inventaire:`, e);
+        }
 
-        // Nettoyage LocalStorage Intégral SAUF l'authentification
+        // Nettoyage LocalStorage Intégral SAUF l'authentification et l'inventaire
         const userPrefix = (user.email.split('@')[0]).toLowerCase();
         const allKeys = Object.keys(localStorage);
         
-        const protectedKeys = ['gourmet_auth', 'gourmet_current_user', 'gourmet_demo_mode'];
+        const protectedKeys = [
+            'gourmet_auth', 
+            'gourmet_current_user', 
+            'gourmet_demo_mode',
+            'gourmet_ingredient_db'
+        ];
 
         allKeys.forEach(key => {
             const k = key.toLowerCase();
-            if (protectedKeys.includes(k)) return; // Ne pas déconnecter l'utilisateur
+            if (protectedKeys.includes(k)) return; // Ne pas déconnecter ni effacer la base d'ingrédients
+
+            if (k.includes('gourmet_inventory')) {
+                // Mettre les stocks à 0 au lieu de supprimer
+                try {
+                    let inv = JSON.parse(localStorage.getItem(key) || '[]');
+                    inv.forEach(i => i.stock = 0);
+                    localStorage.setItem(key, JSON.stringify(inv));
+                } catch(e) {}
+                return;
+            }
 
             if (k.includes('gourmet') || k.includes('labpatiss') || k.includes(userPrefix)) {
                 localStorage.removeItem(key);

@@ -4873,7 +4873,7 @@
         // Find which function to call based on ID
         const navId = navLink.id;
         const navActions = {
-          'navHub': showHub, 'mNavHub': showHub,
+          'navHub': () => window.showHub(), 'mNavHub': () => window.showHub(),
           'navRecettes': showRecettes, 'mLinkRecettes': showRecettes,
           'navLabo': showLabo, 'mLinkLabo': showLabo,
           'navPlanning': showPlanning, 'mLinkPlanning': showPlanning,
