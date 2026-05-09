@@ -4211,6 +4211,19 @@
               data-i18n="auth.gender.female">Femme</button>
           </div>
         </div>
+        <div class="form-group"
+          style="padding-top: 1rem; border-top: 1px solid var(--surface-border); margin-top: 1rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <label style="margin:0; font-weight:700;">Mode Démonstration</label>
+            <label class="switch">
+              <input type="checkbox" id="demoToggleModal" onchange="if(window.AuthUI) AuthUI.toggleDemoMode(this.checked)">
+              <span class="slider round"></span>
+            </label>
+          </div>
+          <button class="btn btn-outline btn-full" onclick="if(window.AuthUI) AuthUI.resetUserData()" style="border-color: var(--accent); color: var(--accent); font-weight: 800; margin-bottom: 0.5rem; display: flex; align-items: center; justify-content: center; gap: 8px;">
+            🗑️ Vider mes données (Reset)
+          </button>
+        </div>
         <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px dashed var(--surface-border);">
           <button class="btn btn-outline btn-full" onclick="if(window.GourmetOnboarding) GourmetOnboarding.start(); document.getElementById('pinModal').style.display='none';" style="border-color: var(--primary); color: var(--primary); font-weight: 700;">
             ✨ Lancer le guide interactif

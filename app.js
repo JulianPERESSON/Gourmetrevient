@@ -3468,6 +3468,12 @@ function showPinModal() {
       btn.classList.add('btn-outline');
     }
   });
+
+  // Sync demo mode toggle
+  const demoToggleModal = $('#demoToggleModal');
+  if (demoToggleModal) {
+      demoToggleModal.checked = (localStorage.getItem('gourmet_demo_mode') === 'true');
+  }
 }
 
 function hidePinModal() {
