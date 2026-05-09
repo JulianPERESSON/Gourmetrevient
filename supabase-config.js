@@ -75,7 +75,14 @@ async function initApp() {
         }
     } catch (err) {
         console.error('Erreur initApp:', err);
-        afficherLandingPage();
+        // Si erreur de session/profil, on permet la déconnexion forcée
+        if (confirm('Problème de session détecté. Voulez-vous vous déconnecter pour réessayer ?')) {
+            await gourmetSupabase.auth.signOut();
+            localStorage.clear();
+            window.location.href = 'landing.html';
+        } else {
+            afficherLandingPage();
+        }
     }
 }
 

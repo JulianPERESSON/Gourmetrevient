@@ -602,6 +602,7 @@ const AuthUI = (() => {
     }
   }
 
+  function replayOnboarding() {
     document.getElementById('authUserMenu')?.remove();
     if (window.GourmetOnboarding) {
       window.GourmetOnboarding.start();
