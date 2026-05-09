@@ -39,14 +39,39 @@ const AuthUI = (() => {
     if (isAdmin(user)) return 'admin';
     try {
       const { data, error } = await supabase
-        .from('subscriptions')
-        .select('plan_type, status')
-        .eq('user_id', user.id)
+        .from('profiles')
+        .select('plan, subscription_status')
+        .eq('id', user.id)
         .single();
       if (error || !data) return 'free';
-      if (data.status === 'active' || data.status === 'trialing') return data.plan_type || 'pro';
-      return 'free';
+      return data.plan || 'free';
     } catch(e) { return 'free'; }
+  }
+
+  function checkPlan(feature) {
+    const plan = _currentPlan;
+    if (plan === 'admin' || plan === 'pro' || plan === 'labo') return true;
+    
+    const freeFeatures = ['base_calc'];
+    if (freeFeatures.includes(feature)) return true;
+
+    // Feature gating
+    const limits = {
+        'pdf_export': 3, // exemple
+        'max_recipes': 5
+    };
+
+    if (feature === 'pro_tools' || feature === 'haccp_full' || feature === 'crm' || feature === 'planning_full') {
+        _showUpgradeModal();
+        return false;
+    }
+    return true;
+  }
+
+  function _showUpgradeModal() {
+    if (typeof showToast === 'function') {
+        showToast('✨ Cette fonctionnalité est réservée aux membres Pro. <a href="#" onclick="GourmetBilling.checkout(\'pro_monthly\')">Passer Pro</a>', 'info');
+    }
   }
 
   // ── INIT ─────────────────────────────────────────────────────────────────────
@@ -608,7 +633,7 @@ const AuthUI = (() => {
     }
   }
 
-  return { init, showModal, switchTab, handleSubmit, handleSubmitManual, handleForgotPassword, logout, quitDemo, exportData, openLegal, togglePwd, replayOnboarding, getCurrentUser, getCurrentPlan, isPro, isAdminUser };
+  return { init, showModal, switchTab, handleSubmit, handleSubmitManual, handleForgotPassword, logout, quitDemo, exportData, openLegal, togglePwd, replayOnboarding, getCurrentUser, getCurrentPlan, isPro, isAdminUser, checkPlan };
 
 })();
 

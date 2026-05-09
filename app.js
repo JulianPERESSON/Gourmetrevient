@@ -522,18 +522,24 @@ function getUserPlacementsKey() {
   return `labpatiss_placements_${owner.toLowerCase()}`;
 }
 
-function getUserInventoryKey() {
-  const owner = getViewOwner();
-  return `gourmet_inventory_${owner.toLowerCase()}`;
-}
-
-function loadSavedRecipes() {
+async function loadSavedRecipes() {
   try {
     const key = getUserRecipesKey();
-    const data = localStorage.getItem(key);
-    APP.savedRecipes = data ? JSON.parse(data) : [];
+    
+    // 1. Charger du cache local (Immédiat)
+    const localData = localStorage.getItem(key);
+    if (localData) APP.savedRecipes = JSON.parse(localData);
 
-    // ENHANCEMENT: Ensure all recipes have cost data for the dashboard
+    // 2. Synchroniser avec Supabase si possible
+    if (window.GourmetSync && navigator.onLine) {
+        const cloudData = await GourmetSync.chargerRecettes();
+        if (cloudData) {
+            APP.savedRecipes = cloudData;
+            localStorage.setItem(key, JSON.stringify(cloudData));
+        }
+    }
+
+    // Calcul des coûts si manquants
     let needsSave = false;
     APP.savedRecipes.forEach(r => {
       if (!r.costs && typeof calcFullCost === 'function') {
@@ -544,11 +550,11 @@ function loadSavedRecipes() {
     });
     if (needsSave) saveSavedRecipes();
 
-    // Seed examples if totally empty or very low to show off the stats/portfolio
-    if (APP.savedRecipes.length < 6) {
-      seedDemoData();
-    }
-  } catch { APP.savedRecipes = []; }
+    if (APP.savedRecipes.length < 6) seedDemoData();
+  } catch (err) { 
+    console.error('Erreur chargement recettes:', err);
+    APP.savedRecipes = []; 
+  }
 }
 
 function seedDemoData() {
@@ -583,9 +589,15 @@ function seedDemoData() {
   saveInventory();
 }
 
-function saveSavedRecipes() {
+async function saveSavedRecipes() {
   const key = getUserRecipesKey();
   localStorage.setItem(key, JSON.stringify(APP.savedRecipes));
+
+  if (window.GourmetSync && navigator.onLine) {
+      for (const recipe of APP.savedRecipes) {
+          await GourmetSync.sauvegarderRecette(recipe);
+      }
+  }
 }
 
 function loadIngredientDb() {
@@ -610,43 +622,42 @@ function loadIngredientDb() {
 
 function saveIngredientDb() { localStorage.setItem(STORAGE_KEYS.ingredientDb, JSON.stringify(APP.ingredientDb)); }
 
-function loadInventory() {
+async function loadInventory() {
   const userKey = getUserInventoryKey();
-  const globalKey = 'gourmet_inventory';
   
+  // 1. Charger local
   const userData = localStorage.getItem(userKey);
-  const globalData = localStorage.getItem(globalKey);
-  
-  let inv = userData ? JSON.parse(userData) : [];
-  let gInv = globalData ? JSON.parse(globalData) : [];
-  
-  // Recovery logic: if user-scoped is very small (likely demo) and global has more data, prioritize global
-  if (gInv.length > inv.length || (inv.length < 5 && gInv.length > 5)) {
-    // Check if we should merge or just use global
-    const userNames = new Set(inv.map(i => i.name.toLowerCase().trim()));
-    gInv.forEach(gi => {
-      const name = gi.name.toLowerCase().trim();
-      if (!userNames.has(name)) {
-        inv.push(gi);
+  if (userData) APP.inventory = JSON.parse(userData);
+
+  // 2. Charger Cloud
+  if (window.GourmetSync && navigator.onLine) {
+      const cloudData = await GourmetSync.charger('ingredients', userKey);
+      if (cloudData) {
+          APP.inventory = cloudData;
+          localStorage.setItem(userKey, JSON.stringify(cloudData));
       }
-    });
-    // Save the merged version to user-scoped
-    localStorage.setItem(userKey, JSON.stringify(inv));
   }
   
-  if (inv.length > 0) {
-    APP.inventory = inv;
-    // Auto-sync if it looks like we only have the demo set (4 items)
-    if (inv.length < 5 && inv.some(i => i.name === 'Beurre AOP' && i.unit === 'kg')) {
-       initInventoryFromDb();
-    }
-  } else {
+  if (APP.inventory.length === 0) {
     initInventoryFromDb();
   }
 }
 
-function saveInventory() {
-  localStorage.setItem(getUserInventoryKey(), JSON.stringify(APP.inventory));
+async function saveInventory() {
+  const userKey = getUserInventoryKey();
+  localStorage.setItem(userKey, JSON.stringify(APP.inventory));
+
+  if (window.GourmetSync && navigator.onLine) {
+      for (const item of APP.inventory) {
+          await GourmetSync.sauvegarder('ingredients', {
+              id: item.id,
+              user_id: (await supabase.auth.getSession()).data.session?.user.id,
+              name: item.name,
+              stock_actuel: item.stock,
+              unite: item.unit
+          }, userKey);
+      }
+  }
 }
 
 // Price History Tracking — records each price change for trend analysis

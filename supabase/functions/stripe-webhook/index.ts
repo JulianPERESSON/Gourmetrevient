@@ -43,7 +43,8 @@ serve(async (req) => {
         throw new Error("ID Utilisateur manquant dans les métadonnées de la session");
       }
 
-      const { error } = await supabase.from('subscriptions').upsert({
+      // Mise à jour de la table legacy (optionnelle)
+      await supabase.from('subscriptions').upsert({
         user_id: userId,
         stripe_customer_id: session.customer,
         stripe_subscription_id: session.subscription,
@@ -52,34 +53,53 @@ serve(async (req) => {
         current_period_end: new Date(Date.now() + 31 * 24 * 60 * 60 * 1000).toISOString()
       });
 
-      if (error) throw error;
+      // Mise à jour de la table profiles (REQUIS ÉTAPE 7)
+      await supabase.from('profiles').update({ 
+        plan: 'pro', 
+        subscription_status: 'active' 
+      }).eq('id', userId);
+
       console.log(`✅ Abonnement activé avec succès pour : ${userId}`);
     }
 
     // Cas 2 : L'abonnement est mis à jour (ex: renouvellement)
-    if (event.type === 'customer.subscription.updated') {
+    if (event.type === 'customer.subscription.updated' || event.type === 'invoice.paid') {
       const subscription = event.data.object;
-      const { error } = await supabase
+      const { data: subData } = await supabase
         .from('subscriptions')
-        .update({
-          status: subscription.status,
-          current_period_end: new Date(subscription.current_period_end * 1000).toISOString()
-        })
-        .eq('stripe_subscription_id', subscription.id);
-      
-      if (error) throw error;
-      console.log(`🔄 Abonnement mis à jour : ${subscription.id}`);
+        .select('user_id')
+        .eq('stripe_subscription_id', subscription.id || subscription.subscription)
+        .single();
+
+      if (subData) {
+          await supabase.from('profiles').update({ 
+            subscription_status: 'active' 
+          }).eq('id', subData.user_id);
+      }
     }
 
     // Cas 3 : L'abonnement est annulé
     if (event.type === 'customer.subscription.deleted') {
       const subscription = event.data.object;
-      const { error } = await supabase
+      
+      const { data: subData } = await supabase
+        .from('subscriptions')
+        .select('user_id')
+        .eq('stripe_subscription_id', subscription.id)
+        .single();
+
+      if (subData) {
+          await supabase.from('profiles').update({ 
+            plan: 'free', 
+            subscription_status: 'inactive' 
+          }).eq('id', subData.user_id);
+      }
+      
+      await supabase
         .from('subscriptions')
         .update({ status: 'canceled' })
         .eq('stripe_subscription_id', subscription.id);
       
-      if (error) throw error;
       console.log(`🚫 Abonnement résilié : ${subscription.id}`);
     }
 
