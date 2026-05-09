@@ -537,6 +537,7 @@ const AuthUI = (() => {
       <hr class="auth-menu-divider">
       <button onclick="AuthUI.replayOnboarding()" class="auth-menu-item" style="color:var(--primary, #10b981); font-weight:700;">✨ Relancer le guide</button>
       <button onclick="AuthUI.exportData()" class="auth-menu-item">📤 Exporter mes données</button>
+      ${!isDemo ? `<button onclick="GourmetBilling.openCustomerPortal()" class="auth-menu-item">💳 Mon abonnement</button>` : ''}
       <button onclick="AuthUI.openLegal()" class="auth-menu-item">⚖️ Mentions légales</button>
       <hr class="auth-menu-divider">
       ${isDemo ? 
