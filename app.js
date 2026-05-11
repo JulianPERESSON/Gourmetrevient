@@ -628,39 +628,204 @@ function saveIngredientDb() { localStorage.setItem(STORAGE_KEYS.ingredientDb, JS
 async function loadInventory() {
   const userKey = getUserInventoryKey();
   
-  // 1. Charger local
+  // 1. Load local cache as a starting point (offline fallback only)
   const userData = localStorage.getItem(userKey);
-  if (userData) APP.inventory = JSON.parse(userData);
-
-  // 2. Charger Cloud
-  if (window.GourmetSync && navigator.onLine) {
-      const cloudData = await GourmetSync.charger('ingredients', userKey);
-      if (cloudData) {
-          APP.inventory = cloudData;
-          localStorage.setItem(userKey, JSON.stringify(cloudData));
-      }
+  if (userData) {
+    try { APP.inventory = JSON.parse(userData); } catch(e) { APP.inventory = []; }
   }
-  
-  const isDemo = localStorage.getItem('gourmet_demo_mode') === 'true';
-  if (APP.inventory.length === 0 && isDemo) {
-    initInventoryFromDb();
+
+  // 2. If online + Supabase, cloud is the source of truth
+  if (navigator.onLine && window.gourmetSupabase) {
+    try {
+      const { data: { session } } = await gourmetSupabase.auth.getSession();
+      const userId = session?.user?.id;
+      if (userId) {
+        const { data: cloudItems, error } = await gourmetSupabase
+          .from('ingredients')
+          .select('*')
+          .eq('user_id', userId)
+          .order('name', { ascending: true });
+
+        if (!error && cloudItems !== null) {
+          if (cloudItems.length > 0) {
+            // Cloud has data → use it directly
+            APP.inventory = cloudItems.map(row => ({
+              id: row.id || ('inv_' + row.name.replace(/\s/g, '_')),
+              name: row.name,
+              stock: row.stock_actuel || 0,
+              unit: row.unite || row.unit || 'g',
+              price: row.prix_unitaire || row.price || 0,
+              alertThreshold: row.seuil_alerte || (row.unite === 'g' || row.unite === 'ml' ? 1000 : 5),
+              lastUpdate: row.updated_at || new Date().toISOString(),
+              priceHistory: row.price_history || []
+            }));
+            localStorage.setItem(userKey, JSON.stringify(APP.inventory));
+          } else {
+            // Cloud returned 0 rows → user never saved any inventory
+            // Load structure from DB with stock=0 (don't trust local cache)
+            APP.inventory = [];
+            DEFAULT_INGREDIENT_DB.forEach(ing => {
+              APP.inventory.push({
+                id: 'inv_' + Math.random().toString(36).substr(2, 9),
+                name: ing.name,
+                stock: 0,
+                unit: ing.unit,
+                price: ing.pricePerUnit,
+                alertThreshold: ing.unit === 'g' || ing.unit === 'ml' ? 1000 : 5,
+                lastUpdate: new Date().toISOString()
+              });
+            });
+            localStorage.setItem(userKey, JSON.stringify(APP.inventory));
+          }
+        }
+      }
+    } catch (e) {
+      console.warn('[Inventory] Cloud load failed, using local cache:', e.message);
+    }
+  }
+
+  // 3. If still empty offline + not demo, load structure at stock=0
+  if (APP.inventory.length === 0) {
+    const isDemo = localStorage.getItem('gourmet_demo_mode') === 'true';
+    if (isDemo) {
+      initInventoryFromDb(); // demo mode: add fake stocks
+    } else {
+      // Real mode offline: add structure with stock=0
+      DEFAULT_INGREDIENT_DB.forEach(ing => {
+        APP.inventory.push({
+          id: 'inv_' + Math.random().toString(36).substr(2, 9),
+          name: ing.name,
+          stock: 0,
+          unit: ing.unit,
+          price: ing.pricePerUnit,
+          alertThreshold: ing.unit === 'g' || ing.unit === 'ml' ? 1000 : 5,
+          lastUpdate: new Date().toISOString()
+        });
+      });
+      localStorage.setItem(userKey, JSON.stringify(APP.inventory));
+    }
   }
 }
+
+/**
+ * Synchronise l'inventaire avec le cloud (bouton "Synchronisation Ingrédients").
+ * Le cloud est la source de vérité : si aucune donnée cloud, stocks = 0.
+ */
+async function syncInventoryWithCloud() {
+  if (typeof showToast === 'function') showToast('🔄 Synchronisation en cours…', 'info');
+
+  if (!navigator.onLine) {
+    if (typeof showToast === 'function') showToast('⚠️ Vous êtes hors ligne. Synchronisation impossible.', 'warning');
+    return;
+  }
+
+  try {
+    const { data: { session } } = await gourmetSupabase.auth.getSession();
+    const userId = session?.user?.id;
+
+    if (!userId) {
+      // Not authenticated → just add ingredient structure at stock=0
+      initInventoryFromDb();
+      if (typeof showToast === 'function') showToast('✅ Structure chargée (non connecté, stocks = 0).', 'info');
+      return;
+    }
+
+    const { data: cloudItems, error } = await gourmetSupabase
+      .from('ingredients')
+      .select('*')
+      .eq('user_id', userId)
+      .order('name', { ascending: true });
+
+    if (error) throw error;
+
+    const userKey = getUserInventoryKey();
+
+    if (cloudItems && cloudItems.length > 0) {
+      // Cloud has data → this is the truth
+      APP.inventory = cloudItems.map(row => ({
+        id: row.id || ('inv_' + row.name.replace(/\s/g, '_')),
+        name: row.name,
+        stock: row.stock_actuel || 0,
+        unit: row.unite || row.unit || 'g',
+        price: row.prix_unitaire || row.price || 0,
+        alertThreshold: row.seuil_alerte || (row.unite === 'g' || row.unite === 'ml' ? 1000 : 5),
+        lastUpdate: row.updated_at || new Date().toISOString(),
+        priceHistory: row.price_history || []
+      }));
+
+      // Ensure any DB ingredients not yet in cloud are added at stock=0 locally
+      DEFAULT_INGREDIENT_DB.forEach(ing => {
+        const exists = APP.inventory.find(i => i.name.toLowerCase() === ing.name.toLowerCase());
+        if (!exists) {
+          APP.inventory.push({
+            id: 'inv_' + Math.random().toString(36).substr(2, 9),
+            name: ing.name,
+            stock: 0,
+            unit: ing.unit,
+            price: ing.pricePerUnit,
+            alertThreshold: ing.unit === 'g' || ing.unit === 'ml' ? 1000 : 5,
+            lastUpdate: new Date().toISOString()
+          });
+        }
+      });
+
+      localStorage.setItem(userKey, JSON.stringify(APP.inventory));
+      if (typeof showToast === 'function') showToast(`✅ ${cloudItems.length} produit(s) synchronisés depuis le cloud.`, 'success');
+    } else {
+      // Cloud has NO data for this user → fresh start, all stocks = 0
+      APP.inventory = [];
+      DEFAULT_INGREDIENT_DB.forEach(ing => {
+        APP.inventory.push({
+          id: 'inv_' + Math.random().toString(36).substr(2, 9),
+          name: ing.name,
+          stock: 0,
+          unit: ing.unit,
+          price: ing.pricePerUnit,
+          alertThreshold: ing.unit === 'g' || ing.unit === 'ml' ? 1000 : 5,
+          lastUpdate: new Date().toISOString()
+        });
+      });
+      localStorage.setItem(userKey, JSON.stringify(APP.inventory));
+      if (typeof showToast === 'function') showToast(`✅ ${APP.inventory.length} produits chargés (aucune donnée cloud → stocks = 0).`, 'info');
+    }
+
+    renderInventory();
+    if (typeof updateDashboard === 'function') updateDashboard();
+
+  } catch (err) {
+    console.error('[syncInventoryWithCloud]', err);
+    // Fallback: just refresh the structure
+    initInventoryFromDb();
+    if (typeof showToast === 'function') showToast('⚠️ Erreur cloud, structure locale chargée.', 'warning');
+  }
+}
+window.syncInventoryWithCloud = syncInventoryWithCloud;
 
 async function saveInventory() {
   const userKey = getUserInventoryKey();
   localStorage.setItem(userKey, JSON.stringify(APP.inventory));
 
-  if (window.GourmetSync && navigator.onLine) {
-      for (const item of APP.inventory) {
-          await GourmetSync.sauvegarder('ingredients', {
-              id: item.id,
-              user_id: (await gourmetSupabase.auth.getSession()).data.session?.user.id,
-              name: item.name,
-              stock_actuel: item.stock,
-              unite: item.unit
-          }, userKey);
+  if (navigator.onLine && window.gourmetSupabase) {
+    try {
+      const { data: { session } } = await gourmetSupabase.auth.getSession();
+      const userId = session?.user?.id;
+      if (userId) {
+        for (const item of APP.inventory) {
+          await gourmetSupabase.from('ingredients').upsert({
+            id: item.id,
+            user_id: userId,
+            name: item.name,
+            stock_actuel: item.stock,
+            unite: item.unit,
+            prix_unitaire: item.price,
+            seuil_alerte: item.alertThreshold,
+            updated_at: new Date().toISOString()
+          });
+        }
       }
+    } catch (e) {
+      console.warn('[saveInventory] Cloud save failed:', e.message);
+    }
   }
 }
 
@@ -691,16 +856,16 @@ function initInventoryFromDb() {
   if (!Array.isArray(APP.inventory)) APP.inventory = [];
   
   let addedCount = 0;
-  let updatedCount = 0;
   
+  // Merge: add missing ingredients with stock=0, NEVER overwrite existing stock
   DEFAULT_INGREDIENT_DB.forEach(ing => {
     const searchName = ing.name.toLowerCase().trim();
-    let item = APP.inventory.find(inv => 
+    const exists = APP.inventory.find(inv =>
       inv.name.toLowerCase().trim() === searchName
     );
     
-    if (!item) {
-      item = {
+    if (!exists) {
+      APP.inventory.push({
         id: 'inv_' + Math.random().toString(36).substr(2, 9),
         name: ing.name,
         stock: 0,
@@ -708,30 +873,18 @@ function initInventoryFromDb() {
         price: ing.pricePerUnit,
         alertThreshold: ing.unit === 'g' || ing.unit === 'ml' ? 1000 : 5,
         lastUpdate: new Date().toISOString()
-      };
-      APP.inventory.push(item);
+      });
       addedCount++;
-    }
-
-    // Aggressively fill stock if it's 0
-    if (item.stock === 0) {
-      let initialStock = 5; // Default fallback
-      if (searchName.includes('farine')) initialStock = Math.floor(Math.random() * 50) + 15;
-      else if (searchName.includes('sucre')) initialStock = Math.floor(Math.random() * 20) + 10;
-      else if (searchName.includes('chocolat')) initialStock = Math.floor(Math.random() * 10) + 5;
-      else if (searchName.includes('lait')) initialStock = Math.floor(Math.random() * 12) + 8;
-      else if (searchName.includes('beurre')) initialStock = Math.floor(Math.random() * 15) + 10;
-      else if (searchName.includes('œuf')) initialStock = Math.floor(Math.random() * 30) + 24;
-      else initialStock = Math.floor(Math.random() * 5) + 2;
-
-      item.stock = initialStock;
-      updatedCount++;
     }
   });
   
   saveInventory();
   if (typeof showToast === 'function') {
-    showToast(`Inventaire prêt : ${addedCount} nouveaux, ${updatedCount} stocks mis à jour.`, 'success');
+    if (addedCount > 0) {
+      showToast(`✅ ${addedCount} ingrédient(s) ajouté(s) à l'inventaire (stock = 0).`, 'success');
+    } else {
+      showToast('✅ Inventaire déjà à jour avec la base d\'ingrédients.', 'info');
+    }
   }
   renderInventory();
   updateDashboard();
@@ -3241,7 +3394,7 @@ function renderInventory() {
     container.innerHTML = `
       <tr>
         <td colspan="6" style="text-align:center; padding:3rem; color:var(--text-muted);">
-          ${t('inv.table.empty') || 'Module d\'inventaire vide.'} <button class="btn btn-sm btn-outline" onclick="initInventoryFromDb(); renderInventory();">✨ ${t('inv.btn.sync') || 'Initialiser la Réserve'}</button>
+          ${t('inv.table.empty') || 'Le module d\'inventaire est en cours d\'initialisation.'} <button class="btn btn-sm btn-outline" onclick="syncInventoryWithCloud()">✨ ${t('inv.btn.sync') || 'Synchronisation Ingrédients'}</button>
         </td>
       </tr>
     `;
@@ -3326,17 +3479,37 @@ function showRestockModal() {
   const selector = $('#restockItemSelector');
   if (!modal || !selector) return;
 
-  // Fill selector with all ingredients from DB
-  selector.innerHTML = APP.inventory.map(item => `<option value="${item.id}">${getIngredientEmoji(item.name)} ${item.name}</option>`).join('');
+  // Build a combined list: inventory items (with real IDs) + DB ingredients not yet in inventory
+  const allItems = [];
+
+  // 1. All existing inventory items
+  APP.inventory.forEach(item => {
+    allItems.push({ id: item.id, name: item.name, unit: item.unit, fromInventory: true });
+  });
+
+  // 2. Ingredients from DB not yet in inventory (will be added on restock)
+  (APP.ingredientDb || []).forEach(dbIng => {
+    const already = APP.inventory.find(i => i.name.toLowerCase().trim() === dbIng.name.toLowerCase().trim());
+    if (!already) {
+      allItems.push({ id: 'db_' + dbIng.name, name: dbIng.name, unit: dbIng.unit, fromInventory: false, dbEntry: dbIng });
+    }
+  });
+
+  // Sort alphabetically
+  allItems.sort((a, b) => a.name.localeCompare(b.name, 'fr'));
+
+  selector.innerHTML = '<option value="">— Sélectionner un ingrédient —</option>' +
+    allItems.map(item => `<option value="${item.id}" data-unit="${item.unit}">${getIngredientEmoji(item.name)} ${item.name}</option>`).join('');
 
   selector.onchange = () => {
-    const item = APP.inventory.find(i => i.id === selector.value);
-    if (item) $('#restockUnit').value = item.unit;
+    const selected = allItems.find(i => i.id === selector.value);
+    if (selected && $('#restockUnit')) $('#restockUnit').value = selected.unit;
   };
 
   // Trigger initial value
-  if (APP.inventory.length > 0) {
-    $('#restockUnit').value = APP.inventory[0].unit;
+  if (allItems.length > 0 && selector.value) {
+    const first = allItems.find(i => i.id === selector.value);
+    if (first && $('#restockUnit')) $('#restockUnit').value = first.unit;
   }
 
   modal.style.display = 'flex';
@@ -3351,14 +3524,42 @@ function confirmRestock() {
   const qty = parseFloat($('#restockQty').value) || 0;
   const totalLotPrice = parseFloat($('#restockTotalPrice').value);
 
-  const item = APP.inventory.find(i => i.id === itemId);
-  if (item && qty > 0) {
+  if (!itemId) {
+    if (typeof showToast === 'function') showToast('Veuillez sélectionner un ingrédient.', 'warning');
+    return;
+  }
+  if (qty <= 0) {
+    if (typeof showToast === 'function') showToast('Veuillez entrer une quantité valide.', 'warning');
+    return;
+  }
+
+  // Check if item is already in inventory
+  let item = APP.inventory.find(i => i.id === itemId);
+
+  // If not in inventory but from DB (id starts with 'db_'), auto-create it
+  if (!item && itemId.startsWith('db_')) {
+    const ingName = itemId.replace('db_', '');
+    const dbEntry = (APP.ingredientDb || []).find(i => i.name === ingName);
+    if (dbEntry) {
+      item = {
+        id: 'inv_' + Math.random().toString(36).substr(2, 9),
+        name: dbEntry.name,
+        stock: 0,
+        unit: dbEntry.unit,
+        price: dbEntry.pricePerUnit,
+        alertThreshold: dbEntry.unit === 'g' || dbEntry.unit === 'ml' ? 1000 : 5,
+        lastUpdate: new Date().toISOString()
+      };
+      APP.inventory.push(item);
+    }
+  }
+
+  if (item) {
     item.stock += qty;
     item.lastUpdate = new Date().toISOString();
 
     // Logic: if totalLotPrice is provided, update the reference price in the DB
     if (!isNaN(totalLotPrice) && totalLotPrice > 0) {
-      // Calculate new unit price (pricePerKg or pricePerL)
       let unitPrice;
       if (item.unit === 'g' || item.unit === 'ml') {
         unitPrice = (totalLotPrice / qty) * 1000;
@@ -3366,12 +3567,10 @@ function confirmRestock() {
         unitPrice = totalLotPrice / qty;
       }
       
-      // Track price history before updating
       recordPriceChange(item, unitPrice);
       item.price = unitPrice;
 
-      // Also update the global ingredient DB for future recipes
-      const dbIng = APP.ingredientDb.find(i => i.name === item.name);
+      const dbIng = (APP.ingredientDb || []).find(i => i.name === item.name);
       if (dbIng) dbIng.pricePerUnit = unitPrice;
       saveIngredientDb();
     }
@@ -3380,8 +3579,8 @@ function confirmRestock() {
     hideRestockModal();
     renderInventory();
     updateDashboard();
-    renderSuppliers();
-    if (typeof showToast === 'function') showToast(`Arrivage de ${item.name} enregistré`, 'success');
+    if (typeof renderSuppliers === 'function') renderSuppliers();
+    if (typeof showToast === 'function') showToast(`✅ Arrivage de ${item.name} enregistré (${qty} ${item.unit})`, 'success');
   }
 }
 
@@ -5812,36 +6011,113 @@ function confirmProduction() {
 
 // 2. SCAN FACTURE (Simulated IA)
 function simulateInvoiceScan() {
+  // Open the real OCR scanner modal if available
+  const ocrModal = document.getElementById('ocrScannerModal');
+  if (ocrModal) {
+    // Clear previous state
+    const preview = document.getElementById('ocrPreview');
+    const status = document.getElementById('ocrStatus');
+    const results = document.getElementById('ocrResults');
+    if (preview) preview.innerHTML = '';
+    if (status) { status.style.display = 'none'; status.textContent = ''; }
+    if (results) results.innerHTML = '';
+
+    ocrModal.style.display = 'flex';
+
+    // Inject a file picker directly if none exists yet
+    if (preview && !preview.querySelector('input[type=file]')) {
+      const label = document.createElement('label');
+      label.style.cssText = 'display:flex; flex-direction:column; align-items:center; gap:1rem; padding:2rem; border:2px dashed var(--surface-border); border-radius:12px; cursor:pointer; transition:all 0.3s;';
+      label.innerHTML = `
+        <span style="font-size:3rem;">📸</span>
+        <span style="font-weight:700; font-size:1rem;">Cliquez pour choisir une photo de facture</span>
+        <span style="font-size:0.8rem; color:var(--text-muted);">Formats acceptés : JPG, PNG, WEBP, PDF</span>
+        <input type="file" accept="image/*,application/pdf" style="display:none;">
+      `;
+      preview.appendChild(label);
+
+      label.querySelector('input').onchange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        // Show image preview
+        if (file.type.startsWith('image/')) {
+          const reader = new FileReader();
+          reader.onload = (ev) => {
+            preview.innerHTML = `<img src="${ev.target.result}" style="max-width:100%; max-height:300px; border-radius:8px; object-fit:contain;">` ;
+          };
+          reader.readAsDataURL(file);
+        } else {
+          preview.innerHTML = `<div style="padding:1rem; background:var(--bg-alt); border-radius:8px;">📄 ${file.name}</div>`;
+        }
+
+        // Status
+        if (status) {
+          status.style.display = 'block';
+          status.innerHTML = '⏳ Analyse de la facture en cours… (simulation OCR)';
+        }
+
+        // Simulate OCR extraction after delay
+        setTimeout(() => {
+          if (status) status.innerHTML = '✅ Analyse terminée ! Voici les ingrédients détectés :';
+
+          // Pick 3–5 random items from inventory/DB to simulate detected prices
+          const pool = APP.inventory.length > 0 ? APP.inventory : (APP.ingredientDb || []).map(d => ({ name: d.name, unit: d.unit, price: d.pricePerUnit }));
+          const detected = pool.slice(0, Math.min(5, pool.length)).map(item => ({
+            name: item.name,
+            unit: item.unit,
+            detectedPrice: Math.round(((item.price || 1) * (1 + (Math.random() * 0.3 - 0.05))) * 100) / 100
+          }));
+
+          if (results) {
+            results.innerHTML = detected.map((d, i) => `
+              <div style="display:flex; justify-content:space-between; align-items:center; padding:0.7rem 1rem; background:var(--bg-alt); border-radius:8px; margin-bottom:6px;">
+                <span>${getIngredientEmoji(d.name)} <strong>${d.name}</strong></span>
+                <span style="color:var(--accent); font-weight:700;">${d.detectedPrice.toFixed(2)} € / ${d.unit === 'g' ? 'kg' : d.unit === 'ml' ? 'L' : d.unit}</span>
+                <button class="btn btn-sm btn-primary" onclick="applyOCRPrice(${i}, '${d.name}', ${d.detectedPrice})" style="padding:4px 10px;">✅ Appliquer</button>
+              </div>
+            `).join('');
+            // Store detected data globally for apply function
+            window._ocrDetected = detected;
+          }
+        }, 2500);
+      };
+    }
+    return;
+  }
+
+  // Fallback: simple file picker if modal is missing
   const input = document.createElement('input');
   input.type = 'file';
   input.accept = 'image/*';
   input.onchange = (e) => {
     const file = e.target.files[0];
-    if (file) {
-      if (typeof showToast === 'function') showToast('Scan de la facture en cours (IA)...', 'info');
-      // Simulated AI Processing Delay
-      setTimeout(() => {
-        // We find a few ingredients to update "randomly" to simulate reading prices
-        const toUpdate = APP.inventory.slice(0, 3);
-        if (toUpdate.length === 0) return showToast('Inventaire vide, rien à mettre à jour.', 'warning');
-
-        toUpdate.forEach(item => {
-          const oldPrice = item.price || 1;
-          const fluctuation = (Math.random() * 0.2) - 0.05; // -5% to +15%
-          const newPrice = Math.round((oldPrice * (1 + fluctuation)) * 100) / 100;
-          // Track price history
-          recordPriceChange(item, newPrice);
-          item.price = newPrice;
-        });
-
-        saveInventory();
-        renderInventory();
-        showToast(`Scan terminé ! ${toUpdate.length} prix mis à jour automatiquement via IA.`, 'success');
-      }, 3000);
-    }
+    if (!file) return;
+    if (typeof showToast === 'function') showToast('⏳ Scan de la facture en cours…', 'info');
+    setTimeout(() => {
+      if (typeof showToast === 'function') showToast('✅ Scan terminé ! Ouvrez la fenêtre OCR pour voir les résultats.', 'success');
+    }, 2500);
   };
   input.click();
 }
+
+function applyOCRPrice(index, name, price) {
+  const item = APP.inventory.find(i => i.name === name);
+  if (item) {
+    recordPriceChange(item, price);
+    item.price = price;
+    const dbIng = (APP.ingredientDb || []).find(i => i.name === name);
+    if (dbIng) dbIng.pricePerUnit = price;
+    saveIngredientDb();
+    saveInventory();
+    renderInventory();
+  }
+  // Update button to mark as applied
+  const btn = document.querySelectorAll('#ocrResults button')[index];
+  if (btn) { btn.textContent = '✓ Appliqué'; btn.disabled = true; btn.style.background = 'var(--success)'; }
+  if (typeof showToast === 'function') showToast(`✅ Prix de ${name} mis à jour : ${price} €`, 'success');
+}
+window.applyOCRPrice = applyOCRPrice;
 
 // 3. HYGIÈNE & HACCP LOGIC
 function saveHaccpLogs() {

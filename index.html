@@ -1243,7 +1243,7 @@
 
   <!-- Header -->
   <header class="app-header">
-    <div class="header-brand" id="headerBrand" style="cursor:pointer;" role="banner">
+    <div class="header-brand" id="headerBrand" style="cursor:pointer;" role="banner" onclick="showHub()">
       <div class="logo-icon" aria-label="Logo GourmetRevient">🧁</div>
       <h1 title="GourmetRevient — Retour à l'accueil">Gourmet<span>Revient</span></h1>
     </div>
@@ -1267,10 +1267,8 @@
     </div>
 
     <div class="header-nav" id="mainNav" style="display:none; align-items:center; flex: 1; gap: 0.2rem;">
-      <button class="nav-link" id="navOmniSearch" title="Recherche Spotlight (Ctrl+K)"
-        style="color: var(--accent); font-size: 1.1rem; padding: 0.3rem 0.6rem;">🔍</button>
       <!-- Cockpit -->
-      <button class="nav-link" id="navHub">🏠 <span data-i18n="nav.home">Cockpit</span></button>
+      <button class="nav-link" id="navHub" onclick="showHub()">🏠 <span data-i18n="nav.home">Cockpit</span></button>
 
       <!-- 1. L'Atelier Créatif -->
       <div class="nav-dropdown">
@@ -2728,9 +2726,9 @@
                   data-i18n="inv.btn.scan_invoice">📸 Scanner Facture</button>
                 <button class="btn btn-sm btn-primary" onclick="showRestockModal()" data-i18n="inv.btn.restock">➕ Nouvel
                   Arrivage</button>
-                <button class="btn btn-sm btn-outline" onclick="initInventoryFromDb(); if(typeof renderInventory==='function')renderInventory();"
-                  title="Synchroniser avec la base de données globale" data-i18n-title="inv.btn.sync"
-                  data-i18n="inv.btn.sync">🔄 Synchroniser</button>
+                <button class="btn btn-sm btn-outline" onclick="syncInventoryWithCloud()"
+                  title="Synchroniser avec le cloud (source de vérité)" data-i18n-title="inv.btn.sync"
+                  data-i18n="inv.btn.sync">🔄 Synchronisation Ingrédients</button>
               </div>
             </div>
             <div class="table-responsive-premium inventory-full-table">
@@ -4801,9 +4799,24 @@
       else if (sub === 'waste-log') { if (typeof populateWasteDropdown === 'function') populateWasteDropdown(); }
       else if (sub === 'allergens') { if (typeof renderAllergenMatrix === 'function') renderAllergenMatrix(); }
     }
+    window.showHub = showHub;
+    window.showRecettes = showRecettes;
+    window.showLabo = showLabo;
+    window.showAPropos = showAPropos;
+    window.showHygiene = showHygiene;
+    window.showCRM = showCRM;
+    window.showPortfolio = showPortfolio;
+    window.showPlanning = showPlanning;
+    window.showAdmin = showAdmin;
+    window.showScheduler = showScheduler;
+    window.showInventaire = showInventaire;
+    window.showLabeling = showLabeling;
+    window.showSuppliers = showSuppliers;
+    window.showStats = showStats;
+    window.showMgmt = showMgmt;
+    window.showProTools = showProTools;
+    window.hideAllApps = hideAllApps;
     window.switchQualitySubTab = switchQualitySubTab;
-
-
 
   </script>
 
@@ -4873,7 +4886,8 @@
         // Find which function to call based on ID
         const navId = navLink.id;
         const navActions = {
-          'navHub': () => window.showHub(), 'mNavHub': () => window.showHub(),
+          'navHub': showHub, 
+          'mNavHub': showHub,
           'navRecettes': showRecettes, 'mLinkRecettes': showRecettes,
           'navLabo': showLabo, 'mLinkLabo': showLabo,
           'navPlanning': showPlanning, 'mLinkPlanning': showPlanning,
@@ -4901,7 +4915,7 @@
           'navChefsBrain': () => { if (typeof window.openChefsBrain === 'function') window.openChefsBrain(); },
           'navAssembly': () => { if (typeof window.openAssemblySimulator === 'function') window.openAssemblySimulator(); },
           'navConverter': () => { if (typeof window.openMasterConverter === 'function') window.openMasterConverter(); },
-          'navOmniSearch': () => { if (typeof showOmniSearch === 'function') showOmniSearch(); }
+          'navOmniSearch': () => { if (typeof toggleOmniSearch === 'function') toggleOmniSearch(); }
         };
 
         if (navActions[navId]) {
@@ -4985,7 +4999,7 @@
 
   <!-- Mobile Bottom Nav Bar -->
   <nav class="mobile-nav-bar" id="mobileNavBar" style="display:none;">
-    <button class="mobile-nav-item active" id="mNavHub">
+    <button class="mobile-nav-item active" id="mNavHub" onclick="showHub()">
       <span class="icon">🏠</span>
       <span class="label" data-i18n="nav.home">Accueil</span>
     </button>
@@ -5156,10 +5170,28 @@
       </div>
       <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1.5rem;" data-i18n="ocr.modal.desc">Importez une photo de facture fournisseur. L'OCR extraira les prix pour mettre à jour votre base d'ingrédients.</p>
       <div id="ocrPreview" class="ocr-preview-container"></div>
-      <div id="ocrStatus" class="ocr-status" style="display:none;"></div>
+      <div id="ocrStatus" class="ocr-status" style="display:none; padding:0.8rem; background:var(--bg-alt); border-radius:8px; margin-bottom:1rem; font-weight:600;"></div>
       <div id="ocrResults" class="ocr-results-container"></div>
+      <div style="margin-top:1.5rem; text-align:right;">
+        <button class="btn btn-outline" onclick="closeOCRScanner()">✕ Fermer</button>
+      </div>
     </div>
   </div>
+
+  <script>
+    function closeOCRScanner() {
+      const modal = document.getElementById('ocrScannerModal');
+      if (modal) modal.style.display = 'none';
+      // Clear the preview so next open starts fresh
+      const preview = document.getElementById('ocrPreview');
+      if (preview) preview.innerHTML = '';
+      const status = document.getElementById('ocrStatus');
+      if (status) { status.style.display = 'none'; status.innerHTML = ''; }
+      const results = document.getElementById('ocrResults');
+      if (results) results.innerHTML = '';
+    }
+    window.closeOCRScanner = closeOCRScanner;
+  </script>
 
   <!-- ================================================ -->
   <!-- INCO LABEL MODAL -->

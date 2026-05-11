@@ -638,20 +638,80 @@ const AuthUI = (() => {
   }
 
   async function resetUserData() {
-    console.warn("🚀 Lancement du reset complet des données...");
+    console.warn("🚀 Lancement du reset des quantités d'inventaire...");
     try {
-      if (typeof GourmetSync !== 'undefined' && GourmetSync.resetUserData) {
-          // Note: On ne passe pas par confirm() ici car déjà géré par le bouton
-          await GourmetSync.resetUserData(true); 
-      } else {
-          // Fallback si GourmetSync est absent
-          localStorage.clear();
-          window.location.reload();
+      // Get the current user key to target only their data
+      const userName = (localStorage.getItem('gourmet_current_user') || 'chef').toLowerCase();
+      const inventoryKey = `gourmetrevient_inventory_${userName}`;
+      
+      // Load current inventory
+      let inventory = [];
+      try { inventory = JSON.parse(localStorage.getItem(inventoryKey) || '[]'); } catch(e) { inventory = []; }
+      
+      // Zero out all stock quantities, but keep the product list intact
+      inventory.forEach(item => {
+        item.stock = 0;
+        item.lastUpdate = new Date().toISOString();
+        item.priceHistory = []; // Reset price history too
+      });
+      
+      // Save back
+      localStorage.setItem(inventoryKey, JSON.stringify(inventory));
+
+      // Also reset the in-memory APP state if available
+      if (typeof window.APP !== 'undefined' && Array.isArray(window.APP.inventory)) {
+        window.APP.inventory.forEach(item => {
+          item.stock = 0;
+          item.lastUpdate = new Date().toISOString();
+          item.priceHistory = [];
+        });
       }
+
+      // Also reset saved recipes if APP is available
+      const recipesKey = `gourmetrevient_recipes_${userName}`;
+      localStorage.setItem(recipesKey, JSON.stringify([]));
+      if (typeof window.APP !== 'undefined') {
+        window.APP.savedRecipes = [];
+      }
+
+      // Refresh UI
+      if (typeof renderInventory === 'function') renderInventory();
+      if (typeof updateDashboard === 'function') updateDashboard();
+
+      // Synchronize with Cloud if possible
+      if (typeof window.GourmetSync !== 'undefined' && window.GourmetSync.resetUserData) {
+        // We handle the cloud reset here
+        const { data: { session } } = await window.gourmetSupabase.auth.getSession();
+        if (session?.user) {
+          await window.gourmetSupabase.from('ingredients').update({ stock_actuel: 0 }).eq('user_id', session.user.id);
+        }
+      } else if (typeof saveInventory === 'function') {
+        // Fallback: push local zeros to cloud
+        await saveInventory();
+      }
+
+      if (typeof showToast === 'function') {
+        showToast('✅ Données vidées : stocks remis à 0, liste conservée.', 'success');
+      }
+
+      // Close the menu if open
+      document.getElementById('authUserMenu')?.remove();
+
+      // Reset the button state in profile modal
+      const btn = document.getElementById('btnResetData');
+      if (btn) {
+        delete btn.dataset.confirmed;
+        btn.disabled = false;
+        btn.style.background = 'transparent';
+        btn.style.color = '#ef4444';
+        btn.innerHTML = '🗑️ Vider mes données';
+      }
+
     } catch (err) {
       console.error("Erreur Reset:", err);
-      localStorage.clear();
-      window.location.reload();
+      if (typeof showToast === 'function') {
+        showToast('❌ Erreur lors du reset. Réessayez.', 'error');
+      }
     }
   }
 
