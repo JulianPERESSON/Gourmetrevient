@@ -536,7 +536,7 @@ const AuthUI = (() => {
       <button onclick="AuthUI.resetUserData()" class="auth-menu-item" style="color:var(--accent);">🗑️ Vider mes données</button>
       <hr class="auth-menu-divider">
       <button onclick="AuthUI.replayOnboarding()" class="auth-menu-item" style="color:var(--primary, #10b981); font-weight:700;">✨ Relancer le guide</button>
-      <button onclick="AuthUI.exportData()" class="auth-menu-item">📤 Exporter mes données</button>
+      <button onclick="AuthUI.exportData()" class="auth-menu-item">📤 Exporter mes données (RGPD)</button>
       ${!isDemo ? `<button onclick="GourmetBilling.openCustomerPortal()" class="auth-menu-item">💳 Mon abonnement</button>` : ''}
       <button onclick="AuthUI.openLegal()" class="auth-menu-item">⚖️ Mentions légales</button>
       <hr class="auth-menu-divider">
@@ -544,6 +544,9 @@ const AuthUI = (() => {
         `<button onclick="AuthUI.quitDemo()" class="auth-menu-item" style="color:var(--accent); font-weight:700;">🚪 Quitter le mode Démo</button>` : 
         `<button onclick="AuthUI.logout()" class="auth-menu-item auth-menu-danger">🚪 Se déconnecter</button>`
       }
+      ${!isDemo ? `
+      <hr class="auth-menu-divider">
+      <button onclick="AuthUI.confirmDeleteAccount()" class="auth-menu-item" style="color:#ef4444;font-size:0.8rem;opacity:0.75;" title="Suppression définitive de votre compte (RGPD Art. 17)">🗑️ Supprimer mon compte</button>` : ''}
     `;
     document.body.appendChild(menu);
     setTimeout(() => document.addEventListener('click', function close(e) {
@@ -560,6 +563,24 @@ const AuthUI = (() => {
     localStorage.removeItem('gourmet_demo_mode');
     await gourmetSupabase.auth.signOut();
     if (typeof showToast === 'function') showToast('👋 Déconnecté avec succès.', 'info');
+    // Rediriger vers la landing après déconnexion
+    setTimeout(() => { window.location.href = './landing.html'; }, 1200);
+  }
+
+  /**
+   * Suppression RGPD du compte — appelée depuis le menu utilisateur.
+   * Délègue à GourmetSync.deleteFullAccount() avec double confirmation.
+   */
+  async function confirmDeleteAccount() {
+    document.getElementById('authUserMenu')?.remove();
+    if (window.GourmetSync?.deleteFullAccount) {
+      await window.GourmetSync.deleteFullAccount();
+    } else if (window.GourmetBilling?.deleteAccount) {
+      await window.GourmetBilling.deleteAccount();
+    } else {
+      if (typeof showToast === 'function')
+        showToast('❌ Module RGPD non disponible. Contactez le support.', 'error');
+    }
   }
 
   function quitDemo() {
@@ -775,7 +796,8 @@ const AuthUI = (() => {
     handleSubmit, 
     handleSubmitManual, 
     handleForgotPassword, 
-    logout, 
+    logout,
+    confirmDeleteAccount,
     quitDemo, 
     exportData, 
     openLegal, 

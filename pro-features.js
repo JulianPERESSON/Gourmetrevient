@@ -29,7 +29,12 @@ async function initOCR() {
   }
 }
 
-function openOCRScanner() {
+async function openOCRScanner() {
+  // Gate Pro — accès conditionné à un abonnement actif
+  if (window.GourmetBilling && !await GourmetBilling.isPro()) {
+    await GourmetBilling.requirePro('Le Scanner OCR de Factures');
+    return;
+  }
   const modal = document.getElementById('ocrScannerModal');
   if (modal) modal.style.display = 'flex';
   const preview = document.getElementById('ocrPreview');
@@ -141,18 +146,31 @@ function renderOCRResults(items, rawText) {
 
 function applyOCRPrice(idx) {
   const item = window._ocrItems?.[idx];
-  if (item && item.matched) {
-    const dbItem = APP.ingredientDb.find(db => db.name === item.dbName);
-    if (dbItem) {
-      dbItem.pricePerUnit = item.unitPrice;
-      saveIngredientDb();
-      showToast(`${item.dbName} mis à jour`, 'success');
-    }
+  if (!item || !item.matched) return;
+
+  // Validation : prix positif et non nul
+  if (isNaN(item.unitPrice) || item.unitPrice <= 0) {
+    if (typeof showToast === 'function')
+      showToast(`⚠️ Prix invalide pour ${item.name || 'cet article'} : doit être supérieur à 0€.`, 'warning');
+    return;
+  }
+
+  const dbItem = APP.ingredientDb.find(db => db.name === item.dbName);
+  if (dbItem) {
+    dbItem.pricePerUnit = item.unitPrice;
+    saveIngredientDb();
+    if (typeof showToast === 'function')
+      showToast(`✅ ${item.dbName} mis à jour — ${item.unitPrice.toFixed(2)}€`, 'success');
   }
 }
 
 function applyAllOCRPrices() {
-  window._ocrItems?.forEach((item, i) => applyOCRPrice(i));
+  if (!window._ocrItems?.length) return;
+  let applied = 0;
+  window._ocrItems.forEach((item, i) => {
+    if (item.matched && item.unitPrice > 0) { applyOCRPrice(i); applied++; }
+  });
+  if (typeof showToast === 'function') showToast(`✅ ${applied} prix appliqués.`, 'success');
   closeOCRScanner();
 }
 
@@ -160,7 +178,12 @@ function applyAllOCRPrices() {
 // 2. ÉTIQUETTES INCO
 // ============================================================================
 
-function openINCoGenerator() {
+async function openINCoGenerator() {
+  // Gate Pro — accès conditionné à un abonnement actif
+  if (window.GourmetBilling && !await GourmetBilling.isPro()) {
+    await GourmetBilling.requirePro('Le Générateur d\'Étiquettes INCO');
+    return;
+  }
   const modal = document.getElementById('incoModal');
   if (modal) modal.style.display = 'flex';
   const select = document.getElementById('incoRecipeSelect');
@@ -176,10 +199,25 @@ function closeINCoModal() {
 }
 
 function generateINCOLabel() {
-  const idx = document.getElementById('incoRecipeSelect')?.value;
+  const selectEl = document.getElementById('incoRecipeSelect');
+  const idx = selectEl?.value;
+
+  // Validation : recette sélectionnée et non vide
+  if (idx === '' || idx === null || idx === undefined) {
+    _showModalError('incoModal', 'Veuillez sélectionner une recette.');
+    return;
+  }
+
   const recipe = APP.savedRecipes[idx];
-  if (!recipe) return;
-  
+  if (!recipe || !recipe.name?.trim()) {
+    _showModalError('incoModal', 'Recette invalide ou sans nom.');
+    return;
+  }
+  if (!recipe.ingredients || recipe.ingredients.length === 0) {
+    _showModalError('incoModal', 'Cette recette ne contient aucun ingrédient.');
+    return;
+  }
+
   const allergenSet = new Set();
   recipe.ingredients.forEach(ing => {
     const dbItem = APP.ingredientDb.find(db => db.name.toLowerCase() === ing.name.toLowerCase());
@@ -209,10 +247,70 @@ function convertToGrams(ing) {
 }
 
 // ============================================================================
+// UTILITAIRES VALIDATION MODAUX
+// ============================================================================
+
+/**
+ * Affiche une erreur inline dans un modal (non bloquante).
+ * Cherche ou crée un élément #<modalId>-error dans le modal.
+ */
+function _showModalError(modalId, message) {
+  const modal = document.getElementById(modalId);
+  if (!modal) return;
+  let errEl = modal.querySelector('.modal-validation-error');
+  if (!errEl) {
+    errEl = document.createElement('div');
+    errEl.className = 'modal-validation-error';
+    errEl.style.cssText = [
+      'background:rgba(239,68,68,0.12)',
+      'border:1px solid rgba(239,68,68,0.35)',
+      'border-radius:10px',
+      'color:#fca5a5',
+      'font-size:0.85rem',
+      'font-weight:600',
+      'padding:0.6rem 1rem',
+      'margin-top:0.75rem',
+      'display:flex',
+      'align-items:center',
+      'gap:6px',
+      'animation:shakeModal 0.35s ease'
+    ].join(';');
+    // Insérer juste avant le premier bouton d'action du modal
+    const firstBtn = modal.querySelector('button.btn, button[class*="btn"]');
+    if (firstBtn) modal.insertBefore(errEl, firstBtn);
+    else modal.appendChild(errEl);
+  }
+  errEl.innerHTML = `⚠️ ${message}`;
+  errEl.style.display = 'flex';
+  // Auto-hide après 5s
+  clearTimeout(errEl._hideTimer);
+  errEl._hideTimer = setTimeout(() => { errEl.style.display = 'none'; }, 5000);
+}
+
+function _clearModalError(modalId) {
+  const modal = document.getElementById(modalId);
+  const errEl = modal?.querySelector('.modal-validation-error');
+  if (errEl) errEl.style.display = 'none';
+}
+
+// Injection du keyframe shake si absent
+if (!document.getElementById('modalShakeStyle')) {
+  const s = document.createElement('style');
+  s.id = 'modalShakeStyle';
+  s.textContent = `@keyframes shakeModal{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}} .input-error{border-color:#ef4444!important;box-shadow:0 0 0 3px rgba(239,68,68,0.2)!important;}`;
+  document.head.appendChild(s);
+}
+
+// ============================================================================
 // 3. FOISONNEMENT
 // ============================================================================
 
-function openFoisonnement() {
+async function openFoisonnement() {
+  // Gate Pro — accès conditionné à un abonnement actif
+  if (window.GourmetBilling && !await GourmetBilling.isPro()) {
+    await GourmetBilling.requirePro('Le Calculateur de Foisonnement');
+    return;
+  }
   document.getElementById('foisonnementModal').style.display = 'flex';
 }
 
@@ -222,12 +320,29 @@ function closeFoisonnement() {
 }
 
 function calcFoisonnement() {
-  const before = parseFloat(document.getElementById('foisVolumeBefore').value) || 0;
-  const after = parseFloat(document.getElementById('foisVolumeAfter').value) || 0;
-  if (before > 0) {
-    const result = ((after - before) / before * 100).toFixed(1);
-    document.getElementById('foisResult').innerHTML = `<h3>${result}%</h3>`;
+  const beforeEl = document.getElementById('foisVolumeBefore');
+  const afterEl  = document.getElementById('foisVolumeAfter');
+  const before = parseFloat(beforeEl?.value) || 0;
+  const after  = parseFloat(afterEl?.value)  || 0;
+
+  // Validation stricte
+  if (before <= 0) {
+    _showModalError('foisonnementModal', 'Le volume initial doit être supérieur à zéro.');
+    if (beforeEl) { beforeEl.classList.add('input-error'); beforeEl.focus(); }
+    return;
   }
+  if (after < 0) {
+    _showModalError('foisonnementModal', 'Le volume final ne peut pas être négatif.');
+    if (afterEl) { afterEl.classList.add('input-error'); afterEl.focus(); }
+    return;
+  }
+  // Effacer les erreurs précédentes
+  if (beforeEl) beforeEl.classList.remove('input-error');
+  if (afterEl)  afterEl.classList.remove('input-error');
+  _clearModalError('foisonnementModal');
+
+  const result = ((after - before) / before * 100).toFixed(1);
+  document.getElementById('foisResult').innerHTML = `<h3>${result}%</h3><p style="font-size:0.82rem;opacity:0.6;margin-top:4px;">${after > before ? '⬆️ Foisonnement positif' : after < before ? '⬇️ Contraction' : '↔️ Neutre'}</p>`;
 }
 
 // ============================================================================
@@ -426,7 +541,12 @@ function invalidateInflationCache() {
 
 const SUPABASE_CONFIG = { url: '', key: '' };
 
-function openCloudSync() {
+async function openCloudSync() {
+  // Gate Pro — accès conditionné à un abonnement actif
+  if (window.GourmetBilling && !await GourmetBilling.isPro()) {
+    await GourmetBilling.requirePro('La Synchronisation Cloud Avancée');
+    return;
+  }
   document.getElementById('cloudSyncModal').style.display = 'flex';
   const saved = JSON.parse(localStorage.getItem('gourmet_cloud_config') || '{}');
   document.getElementById('supabaseUrl').value = saved.url || '';

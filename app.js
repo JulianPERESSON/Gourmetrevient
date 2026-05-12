@@ -1802,7 +1802,7 @@ function renderSummary() {
 // ============================================================================
 
 
-function saveCurrentRecipe() {
+async function saveCurrentRecipe() {
   collectCurrentStepData();
   const r = APP.recipe;
 
@@ -1811,7 +1811,14 @@ function saveCurrentRecipe() {
     return;
   }
 
-  if (!r.id) r.id = generateId();
+  // Si c'est une nouvelle recette (pas d'ID), on vérifie la limite du plan
+  const isNew = !r.id;
+  if (isNew) {
+      if (window.GourmetBilling && !await GourmetBilling.canSaveRecipe()) {
+          return; // Limite atteinte, canSaveRecipe affiche déjà le toast/upgrade
+      }
+      r.id = generateId();
+  }
 
   const toSave = {
     ...JSON.parse(JSON.stringify(r)),

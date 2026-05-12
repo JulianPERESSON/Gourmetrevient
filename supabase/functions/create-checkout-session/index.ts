@@ -26,7 +26,7 @@ serve(async (req) => {
     if (origin === 'null' || !origin.startsWith('http')) {
       origin = 'https://julianperesson.github.io/Gourmetrevient'
     }
-    
+
     console.log('--- Origin détectée :', origin)
 
     // Configuration de la session Checkout
@@ -38,8 +38,17 @@ serve(async (req) => {
         },
       ],
       mode: 'subscription',
-      success_url: `${origin}/#success=true`,
-      cancel_url: `${origin}/#cancel=true`,
+      // ✅ Query params (?) lisibles par le Stripe Return Handler dans index.html
+      // {CHECKOUT_SESSION_ID} est remplacé automatiquement par Stripe
+      success_url: `${origin}/index.html?success=true&session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url:  `${origin}/index.html?canceled=true`,
+      // Essai gratuit 14 jours (mentionné dans les CGV)
+      subscription_data: {
+        trial_period_days: 14,
+        metadata: { userId: userId || '' },
+      },
+      // Autoriser les codes promo
+      allow_promotion_codes: true,
     }
 
     // Ajouter l'email si disponible, sinon Stripe le demandera
@@ -54,6 +63,8 @@ serve(async (req) => {
 
     const session = await stripe.checkout.sessions.create(sessionOptions)
 
+    console.log(`✅ Session Checkout créée : ${session.id} pour userId=${userId}`)
+
     return new Response(
       JSON.stringify({ url: session.url }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 },
@@ -62,7 +73,7 @@ serve(async (req) => {
     console.error('Stripe Error:', error)
     return new Response(
       JSON.stringify({ error: error.message, stack: error.stack }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }, // On renvoie 200 pour que le client puisse lire le JSON d'erreur
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 },
     )
   }
 })

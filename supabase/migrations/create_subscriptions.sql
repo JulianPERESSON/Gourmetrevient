@@ -50,17 +50,41 @@ CREATE TRIGGER subscriptions_updated_at
   BEFORE UPDATE ON public.subscriptions
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at();
 
--- 5. Insérer l'abonnement admin (Ju) directement en base
---    Remplacer <USER_ID_JU> par l'UUID réel de votre compte dans auth.users
---    (Supabase > Authentication > Users > copier l'ID)
-INSERT INTO public.subscriptions (user_id, plan_type, status, current_period_end)
-VALUES (
-  '<USER_ID_JU>',   -- ← Remplacer par votre UUID Supabase
-  'pro',
-  'active',
-  '2099-12-31 23:59:59+00'
-)
-ON CONFLICT (id) DO NOTHING;
+-- 5. Insérer l'abonnement admin (Ju) — lookup dynamique par email
+--    Pas besoin de connaître l'UUID à l'avance.
+DO $$
+DECLARE
+  v_admin_id UUID;
+BEGIN
+  SELECT id INTO v_admin_id
+  FROM auth.users
+  WHERE email = 'julian31.peresson@gmail.com'
+  LIMIT 1;
+
+  IF v_admin_id IS NOT NULL THEN
+    INSERT INTO public.subscriptions (
+      user_id, plan_type, status,
+      current_period_end, trial_end
+    )
+    VALUES (
+      v_admin_id,
+      'pro',
+      'active',
+      '2099-12-31 23:59:59+00',
+      NULL  -- Pas de trial pour l'admin
+    )
+    ON CONFLICT (user_id)
+    DO UPDATE SET
+      plan_type          = 'pro',
+      status             = 'active',
+      current_period_end = '2099-12-31 23:59:59+00',
+      updated_at         = NOW();
+
+    RAISE NOTICE '✅ Abonnement admin créé/mis à jour pour : %', v_admin_id;
+  ELSE
+    RAISE WARNING '⚠️ Compte admin non trouvé (julian31.peresson@gmail.com). Créez-le d''abord dans Supabase Auth.';
+  END IF;
+END $$;
 
 -- ============================================================
 -- VÉRIFICATION — Après exécution, tester avec :

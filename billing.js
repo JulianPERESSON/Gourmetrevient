@@ -20,31 +20,101 @@ const GourmetBilling = {
     /**
      * Vérifie le statut de l'abonnement de l'utilisateur actuel
      */
+    /**
+     * Vérifie le statut d'abonnement depuis la table `subscriptions` Supabase.
+     * Retour sécurisé : si erreur réseau → plan 'free' (pas d'accès Pro par défaut).
+     * Politique : subscription_active = (status === 'active' ET plan_type !== 'free')
+     */
     async checkSubscriptionStatus() {
-        const client = window.supabaseClient;
-        if (!client) return { plan: 'free', status: 'active' };
-
-        const { data: { user } } = await client.auth.getUser();
-        if (!user) return { plan: 'free', status: 'inactive' };
+        const client = window.gourmetSupabase || window.supabase;
+        if (!client) return { plan: 'free', status: 'inactive', subscription_active: false };
 
         try {
+            const { data: { user }, error: authErr } = await client.auth.getUser();
+            if (authErr || !user) return { plan: 'free', status: 'inactive', subscription_active: false };
+
             const { data, error } = await client
                 .from('subscriptions')
-                .select('*')
+                .select('plan_type, status, current_period_end, trial_end')
                 .eq('user_id', user.id)
-                .single();
+                .maybeSingle();
 
-            if (error || !data) return { plan: 'free', status: 'active' };
-            
+            if (error) throw error;
+            if (!data) return { plan: 'free', status: 'inactive', subscription_active: false };
+
+            // Vérification stricte : actif ET pas plan gratuit ET période non expirée
+            const now = Date.now();
+            const periodEnd = data.current_period_end ? new Date(data.current_period_end).getTime() : 0;
+            const trialEnd  = data.trial_end ? new Date(data.trial_end).getTime() : 0;
+            const inTrial   = trialEnd > now;
+            const inPeriod  = periodEnd > now;
+
+            const subscription_active =
+                data.status === 'active' &&
+                data.plan_type !== 'free' &&
+                (inPeriod || inTrial);
+
             return {
-                plan: data.plan_type, // 'pro', 'premium', 'free'
-                status: data.status,  // 'active', 'canceled', 'past_due'
-                current_period_end: data.current_period_end
+                plan: data.plan_type,
+                status: data.status,
+                current_period_end: data.current_period_end,
+                subscription_active
             };
         } catch (e) {
-            console.error('Erreur lors de la vérification de l\'abonnement:', e);
-            return { plan: 'free', status: 'active' };
+            console.error('GourmetBilling — Erreur vérification abonnement:', e);
+            // Fail-closed : en cas d'erreur, pas d'accès Pro
+            return { plan: 'free', status: 'error', subscription_active: false };
         }
+    },
+
+    /**
+     * Vérifie si l'utilisateur est Pro (gate d'accès aux Outils Pro).
+     * Priorité : AuthUI.isPro() (mémorisé) > checkSubscriptionStatus() (fresh)
+     */
+    async isPro() {
+        // 1. Vérification rapide via AuthUI (déjà chargé en mémoire)
+        if (window.AuthUI && typeof window.AuthUI.isPro === 'function') {
+            return window.AuthUI.isPro();
+        }
+        // 2. Fallback : requête fraîche
+        const status = await this.checkSubscriptionStatus();
+        return status.subscription_active;
+    },
+
+    /**
+     * Bloque l'accès aux Outils Pro si l'abonnement n'est pas actif.
+     * À appeler en début de chaque fonction Pro.
+     */
+    async requirePro(featureName = 'cette fonctionnalité') {
+        const pro = await this.isPro();
+        if (!pro) {
+            const toastFn = typeof showToast === 'function' ? showToast : console.log;
+            toastFn(`🔒 ${featureName} est réservé aux membres Pro. Passez à l'offre Pro pour y accéder.`, 'info');
+            if (window.GourmetBilling) {
+                setTimeout(() => this.renderUpgradePrompt(), 300);
+            }
+            return false;
+        }
+        return true;
+    },
+
+    /**
+     * Vérifie si l'utilisateur peut sauvegarder une nouvelle recette (Limite 5 pour Free)
+     */
+    async canSaveRecipe() {
+        const pro = await this.isPro();
+        if (pro) return true; // Les pros n'ont pas de limite
+
+        // Compte les recettes sauvegardées localement ou dans l'APP
+        const count = (window.APP && window.APP.savedRecipes) ? window.APP.savedRecipes.length : 0;
+        
+        if (count >= 5) {
+            const toastFn = typeof showToast === 'function' ? showToast : console.log;
+            toastFn("🛑 Limite de 5 recettes atteinte (Plan Gratuit). Passez Pro pour en ajouter d'autres !", "warning");
+            this.renderUpgradePrompt();
+            return false;
+        }
+        return true;
     },
 
     /**
@@ -198,6 +268,32 @@ const GourmetBilling = {
                 </div>
             </div>
         `;
+    }
+    /**
+     * Affiche un prompt d'upgrade rapide (bannière non-bloquante).
+     */
+    renderUpgradePrompt() {
+        if (document.getElementById('grUpgradePrompt')) return;
+        const el = document.createElement('div');
+        el.id = 'grUpgradePrompt';
+        el.style.cssText = 'position:fixed;bottom:80px;right:24px;z-index:9998;background:linear-gradient(135deg,#6366f1,#4f46e5);color:#fff;padding:1rem 1.4rem;border-radius:16px;box-shadow:0 8px 32px rgba(99,102,241,0.4);font-family:Inter,sans-serif;max-width:280px;cursor:pointer;';
+        el.innerHTML = `<div style="font-weight:800;margin-bottom:4px;">💎 Passez Pro</div><div style="font-size:0.82rem;opacity:0.85;">14 jours gratuits, sans engagement.</div>`;
+        el.onclick = () => { el.remove(); this.checkout('pro_monthly'); };
+        document.body.appendChild(el);
+        setTimeout(() => el?.remove(), 8000);
+    },
+
+    /**
+     * Déclenche la suppression RGPD complète du compte via GourmetSync.
+     */
+    async deleteAccount() {
+        if (window.GourmetSync?.deleteFullAccount) {
+            return window.GourmetSync.deleteFullAccount();
+        }
+        // Fallback si GourmetSync non chargé
+        const toastFn = typeof showToast === 'function' ? showToast : console.log;
+        toastFn('❌ Module de suppression non disponible. Contactez le support.', 'error');
+        return false;
     }
 };
 
