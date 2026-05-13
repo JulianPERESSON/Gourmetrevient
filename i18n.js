@@ -116,6 +116,7 @@ const TRANSLATIONS = {
         'nav.comparator': 'Comparateur Multi-Périodes',
         'nav.catalogue': 'E-Catalogue Client',
         'nav.crm': 'Clients & Ventes (CRM)',
+        'nav.billing': 'Factures & Abonnement',
         'nav.category.analysis': "Pilotage & Business",
         'nav.category.assistance': "Assistance",
         'nav.onboarding': "Centre d'Aide & Guide",
@@ -1664,6 +1665,8 @@ const TRANSLATIONS = {
         'modal.converter.subtitle': "Culinary Geometry",
         'modal.converter.desc': "Instantly adapt the quantities of a recipe to a new mold format.",
 
+        'nav.crm': 'Clients & Sales (CRM)',
+        'nav.billing': 'Invoices & Subscription',
         'nav.home': 'Home',
         'nav.recipes': 'Recipe Calculator',
         'nav.lab': 'Laboratory',
@@ -1703,7 +1706,7 @@ const TRANSLATIONS = {
         'nav.catalogue': 'Client E-Catalogue',
         'nav.crm': 'Clients & Sales (CRM)',
         'nav.category.mgmt': "Steering & Lab",
-        'nav.category.analysis': "Steering & Tools",
+        'nav.category.analysis': "Management & Business",
 
         // Library & Search
         'search.placeholder': 'Search for a recipe...',
@@ -3214,6 +3217,8 @@ const TRANSLATIONS = {
         'auth.desc.register': 'Únase a GourmetRevient para gestionar sus recetas y su laboratorio.',
         'auth.desc.gender': 'Elija su avatar para personalizar su espacio.',
         'auth.label.username': 'Nombre de usuario',
+        'nav.crm': 'Clientes y Ventas (CRM)',
+        'nav.billing': 'Facturas y Suscripción',
         'auth.placeholder.username': 'Su nombre',
         'auth.label.pin': 'Código PIN',
         'auth.btn.login': 'Iniciar sesión',
