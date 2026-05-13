@@ -284,6 +284,89 @@ const GourmetBilling = {
     },
 
     /**
+     * Renders the billing history table in mgmtViewBilling
+     */
+    async renderBillingHistory() {
+        const container = document.getElementById('billingHistoryBody');
+        if (!container) return;
+
+        container.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:2rem;">⏳ Chargement de l\'historique...</td></tr>';
+
+        try {
+            const status = await this.checkSubscriptionStatus();
+            const { data: { user } } = await (window.gourmetSupabase || window.supabase).auth.getUser();
+
+            if (!status.subscription_active && !user) {
+                container.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:2rem; color:var(--text-muted);">Connectez-vous pour voir vos factures.</td></tr>';
+                return;
+            }
+
+            // In a real app, we would fetch from a 'support_tickets' or 'invoices' table.
+            // Here we simulate the current active subscription as the first invoice.
+            const history = [];
+            if (status.subscription_active) {
+                history.push({
+                    id: 'INV-' + Math.random().toString(36).substr(2, 9).toUpperCase(),
+                    date: new Date().toISOString(),
+                    desc: `Abonnement GourmetRevient ${status.plan.toUpperCase()}`,
+                    amount: status.plan === 'pro' ? 14.99 : 49.99,
+                    status: 'payé'
+                });
+            }
+
+            if (history.length === 0) {
+                container.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:2rem; color:var(--text-muted);">Aucune facture trouvée.</td></tr>';
+                return;
+            }
+
+            container.innerHTML = history.map(inv => `
+                <tr>
+                    <td style="font-weight:600;">${new Date(inv.date).toLocaleDateString('fr-FR')}</td>
+                    <td style="font-family:monospace; font-weight:700; color:var(--primary);">${inv.id}</td>
+                    <td>${inv.desc}</td>
+                    <td style="font-weight:800;">${inv.amount.toFixed(2)} €</td>
+                    <td><span class="badge status-ok">PAYÉE</span></td>
+                    <td>
+                        <button class="btn btn-sm btn-outline btn-round" onclick="GourmetBilling.downloadInvoice('${inv.id}', '${inv.desc}', ${inv.amount})">
+                           📥 PDF
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+
+        } catch (err) {
+            console.error('Error rendering billing history:', err);
+            container.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:2rem; color:var(--danger);">Erreur lors du chargement.</td></tr>';
+        }
+    },
+
+    /**
+     * Triggers the PDF generation
+     */
+    async downloadInvoice(id, desc, amount) {
+        if (!window.GourmetInvoice) {
+            console.error('Invoice engine not loaded');
+            return;
+        }
+
+        const client = window.gourmetSupabase || window.supabase;
+        const { data: { user } } = await client.auth.getUser();
+
+        const data = {
+            user: {
+                name: user?.user_metadata?.full_name || 'Chef Gourmet',
+                email: user?.email || 'contact@gourmetrevient.fr'
+            },
+            invoiceId: id,
+            date: new Date().toISOString(),
+            amount: amount,
+            planName: desc.replace('Abonnement GourmetRevient ', '')
+        };
+
+        window.GourmetInvoice.generate(data);
+    },
+
+    /**
      * Déclenche la suppression RGPD complète du compte via GourmetSync.
      */
     async deleteAccount() {
