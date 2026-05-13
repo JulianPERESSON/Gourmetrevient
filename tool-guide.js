@@ -15,14 +15,7 @@ const ToolGuide = (() => {
                 { target: '.hub-card-team', icon: '👥', title: 'Équipe & HACCP', text: 'Gérez la présence de votre staff et assurez la conformité totale de vos relevés sanitaires.' }
             ]
         },
-        'appRecettes': {
-            title: "Calculateur de Recettes",
-            steps: [
-                { target: '#btnCreateRecipe', icon: '⚖️', title: 'Nouvelle Recette', text: 'Commencez à créer votre fiche technique pas à pas avec notre calculateur intelligent.' },
-                { target: '#recipeLibraryGrid', icon: '📖', title: 'Bibliothèque', text: 'Retrouvez toutes vos recettes sauvegardées et les classiques pré-calculés du catalogue.' },
-                { target: '.library-filters', icon: '🔍', title: 'Filtres & Recherche', text: 'Trouvez instantanément une recette par catégorie, ingrédient ou mot-clé.' }
-            ]
-        },
+
         'appInventaire': {
             title: "Gestion des Stocks",
             steps: [
