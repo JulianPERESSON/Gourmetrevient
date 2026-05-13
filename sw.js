@@ -3,7 +3,7 @@
 // Stratégie : Cache-First assets statiques + SWR Google Fonts/CDN + IDB Queue
 // =============================================================================
 
-const CACHE_VERSION = '12.0.0'; // Zero-Bug & Conformité — Fonts + Icons cached
+const CACHE_VERSION = '12.1.0'; // Zero-Bug & Conformité — Help Guide & Planning Fixes
 const CACHE_STATIC  = `gourmet-static-v${CACHE_VERSION}`;
 const CACHE_RUNTIME = `gourmet-runtime-v${CACHE_VERSION}`;
 const CACHE_FONTS   = `gourmet-fonts-v${CACHE_VERSION}`;

@@ -688,11 +688,34 @@ const AuthUI = (() => {
         });
       }
 
-      // Also reset saved recipes if APP is available
+      // Reset des Recettes
       const recipesKey = `gourmetrevient_recipes_${userName}`;
       localStorage.setItem(recipesKey, JSON.stringify([]));
+      
+      // Reset CRM & Planning (LocalStorage)
+      const keysToReset = [
+          `gourmetrevient_clients_${userName}`,
+          `gourmetrevient_commandes_${userName}`,
+          `gourmetrevient_fournisseurs_${userName}`,
+          `gourmetrevient_planning_${userName}`,
+          `gourmetrevient_haccp_temp_${userName}`,
+          `gourmetrevient_haccp_clean_${userName}`,
+          `gourmetrevient_pertes_${userName}`,
+          `gourmetrevient_team_${userName}`
+      ];
+      keysToReset.forEach(k => localStorage.setItem(k, JSON.stringify([])));
+
+      // Reset APP State (In-memory)
       if (typeof window.APP !== 'undefined') {
         window.APP.savedRecipes = [];
+        window.APP.clients = [];
+        window.APP.commandes = [];
+        window.APP.fournisseurs = [];
+        window.APP.planning = [];
+        window.APP.haccp = { temp: [], cleaning: [] };
+        window.APP.pertes = [];
+        window.APP.teamMembers = [];
+        window.APP.staffLeaves = [];
       }
 
       // Refresh UI
@@ -700,15 +723,11 @@ const AuthUI = (() => {
       if (typeof updateDashboard === 'function') updateDashboard();
 
       // Synchronize with Cloud if possible
-      if (typeof window.GourmetSync !== 'undefined' && window.GourmetSync.resetUserData) {
-        // We handle the cloud reset here
-        const { data: { session } } = await window.gourmetSupabase.auth.getSession();
-        if (session?.user) {
-          await window.gourmetSupabase.from('ingredients').update({ stock_actuel: 0 }).eq('user_id', session.user.id);
-        }
-      } else if (typeof saveInventory === 'function') {
-        // Fallback: push local zeros to cloud
-        await saveInventory();
+      if (typeof window.GourmetSync !== 'undefined' && window.GourmetSync.resetCloudData) {
+        await window.GourmetSync.resetCloudData();
+      } else if (session?.user) {
+        // Fallback minimaliste
+        await window.gourmetSupabase.from('ingredients').update({ stock_actuel: 0 }).eq('user_id', session.user.id);
       }
 
       if (typeof showToast === 'function') {

@@ -287,6 +287,35 @@ const GourmetSync = {
 
     // ── SUPPRESSION RGPD COMPLÈTE ────────────────────────────────────────────
     /**
+     * resetCloudData — Vide les données métier du Cloud (sauf Profil/Subscription)
+     * Utile pour "Vider mes données" sans supprimer le compte.
+     */
+    async resetCloudData() {
+        const { data: { session } } = await gourmetSupabase.auth.getSession();
+        const user = session?.user;
+        if (!user) return;
+
+        const tablesToDelete = [
+            'recette_ingredients', 'recettes', 'commandes', 'clients',
+            'fournisseurs', 'planning_production', 'haccp_temperatures',
+            'haccp_nettoyage', 'pertes', 'staff_leaves', 'team_members'
+        ];
+
+        for (const table of tablesToDelete) {
+            try {
+                await gourmetSupabase.from(table).delete().eq('user_id', user.id);
+            } catch (e) { console.warn(`resetCloudData — ${table}:`, e); }
+        }
+
+        try {
+            await gourmetSupabase.from('ingredients').update({ 
+                stock_actuel: 0,
+                updated_at: new Date().toISOString()
+            }).eq('user_id', user.id);
+        } catch (e) { console.warn(`resetCloudData — ingredients:`, e); }
+    },
+
+    /**
      * deleteFullAccount — Art. 17 RGPD (Droit à l'effacement)
      * Nettoie en cascade toutes les tables + localStorage + ferme la session.
      */

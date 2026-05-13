@@ -7698,8 +7698,11 @@ function renderProductionPlan() {
 }
 
 function addProductionItem() {
-  const recipes = APP.savedRecipes || [];
-  if (recipes.length === 0) {
+  const userRecipes = APP.savedRecipes || [];
+  const catalogRecipes = typeof RECIPES !== 'undefined' ? RECIPES : [];
+  const allAvailable = [...userRecipes, ...catalogRecipes];
+
+  if (allAvailable.length === 0) {
     showToast(t('mgmt.production.no_recipes') || "Ajoutez d'abord des recettes.", "error");
     return;
   }
@@ -7707,7 +7710,7 @@ function addProductionItem() {
   const plan = JSON.parse(localStorage.getItem('gourmet_production_plan') || '[]');
   
   // Pick first recipe as default
-  const defaultRecipe = recipes[0];
+  const defaultRecipe = allAvailable[0];
   plan.push({
     name: defaultRecipe.name,
     recipeId: defaultRecipe.id,

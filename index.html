@@ -5,10 +5,10 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧁</text></svg>">
-  <title>GourmetRevient — Calculateur professionnel de coût de recette v4.2</title>
-  <link rel="stylesheet" href="css/tool-guide.css">
+  <title>GourmetRevient — Le Copilote des Artisans Pâtissiers</title>
+  <link rel="stylesheet" href="css/tool-guide.css?v=11.5.1">
   <meta name="description"
-    content="Calculez le coût de revient de vos recettes, déterminez votre prix de vente et optimisez vos marges. Outil professionnel pour pâtissiers et restaurateurs." />
+    content="Logiciel de gestion tout-en-un pour artisans pâtissiers : calcul de coût de revient, conformité HACCP, planning d'équipe et agencement de laboratoire." />
 
   <!-- Open Graph / social media -->
   <meta property="og:type" content="website" />
@@ -27,7 +27,7 @@
   <link rel="alternate" hreflang="es" href="https://julianperesson.github.io/Gourmetrevient/?lang=es" />
   <link rel="alternate" hreflang="x-default" href="https://julianperesson.github.io/Gourmetrevient/" />
   <link rel="manifest" href="./manifest.json?v=1.0.1" />
-  <meta name="theme-color" content="#10b981" />
+  <meta name="theme-color" content="#4f46e5" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="GourmetRev" />
@@ -246,6 +246,14 @@
       -webkit-mask-composite: xor;
       mask-composite: exclude;
       pointer-events: none;
+    }
+
+    .tool-tour-highlight {
+      position: relative;
+      z-index: 9999 !important;
+      pointer-events: none;
+      transition: box-shadow 0.4s ease;
+      box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.4), 0 0 20px rgba(79, 70, 229, 0.2);
     }
 
     .glass-card-premium:hover {
@@ -1352,7 +1360,7 @@
   <header class="app-header">
     <div class="header-brand" id="headerBrand" style="cursor:pointer;" role="banner" onclick="showHub()">
       <div class="logo-icon" aria-label="Logo GourmetRevient">🧁</div>
-      <h1 title="GourmetRevient — Retour à l'accueil">Gourmet<span>Revient</span></h1>
+      <h1 title="GourmetRevient — Retour à l'accueil">GourmetRevient</h1>
     </div>
 
     <div id="headerLangSwitcher" class="nav-dropdown lang-selector-dropdown" style="margin-right: 10px;">
@@ -1377,41 +1385,47 @@
       <!-- Cockpit -->
       <button class="nav-link" id="navHub" onclick="showHub()">🏠 <span data-i18n="nav.home">Cockpit</span></button>
 
-      <!-- 1. L'Atelier Créatif -->
+      <!-- 1. Pilotage & Business -->
       <div class="nav-dropdown">
-        <button class="nav-dropdown-trigger">💡 <span data-i18n="nav.category.atelier">L'Atelier</span> <span class="nav-arrow">▼</span></button>
+        <button class="nav-dropdown-trigger">📊 <span data-i18n="nav.category.analysis">Pilotage & Business</span> <span class="nav-arrow">▼</span></button>
         <div class="nav-dropdown-content">
-          <button class="nav-link nav-dropdown-link" id="navRecettes">📖 <span data-i18n="nav.recipes">Calculateur de Recettes</span></button>
-          <button class="nav-link nav-dropdown-link" id="navChefsBrain">🧠 <span data-i18n="nav.creative.brain">Cerveau du Chef</span></button>
-          <button class="nav-link nav-dropdown-link" id="navAssembly">🏗️ <span data-i18n="nav.creative.assembly">Simulateur Montage</span></button>
-          <button class="nav-link nav-dropdown-link" id="navConverter">📏 <span data-i18n="nav.creative.converter">Convertisseur de Moules</span></button>
-          <button class="nav-link nav-dropdown-link" id="navPortfolio">🖼️ <span data-i18n="nav.portfolio">Portfolio</span></button>
-          <button class="nav-link nav-dropdown-link" id="navScheduler">🎓 <span data-i18n="nav.scheduler">Ordonnancement</span></button>
+          <button class="nav-link nav-dropdown-link" id="navStats"><span data-i18n="nav.stats">Tableau de Bord & Stats</span></button>
+          <button class="nav-link nav-dropdown-link" id="navCRM"><span data-i18n="nav.crm">Commandes & CRM</span></button>
+          <button class="nav-link nav-dropdown-link" id="navCatalogue"><span data-i18n="nav.catalogue">E-Catalogue Client</span></button>
+          <button class="nav-link nav-dropdown-link" id="navProTools"><span data-i18n="mgmt.tab.protools">Outils de Gestion</span></button>
         </div>
       </div>
 
-      <!-- 2. Pilotage & Outils -->
+      <!-- 2. Atelier & Production -->
       <div class="nav-dropdown">
-        <button class="nav-dropdown-trigger">📈 <span data-i18n="nav.category.analysis">Pilotage & Outils</span> <span class="nav-arrow">▼</span></button>
+        <button class="nav-dropdown-trigger">👨‍🍳 <span data-i18n="nav.category.atelier">Atelier & Prod</span> <span class="nav-arrow">▼</span></button>
         <div class="nav-dropdown-content">
-          <button class="nav-link nav-dropdown-link" id="navStats">📊 <span data-i18n="nav.stats">Dashboard & Statistiques</span></button>
-          <button class="nav-link nav-dropdown-link" id="navCatalogue">🌐 <span data-i18n="nav.catalogue">E-Catalogue Client</span></button>
-          <button class="nav-link nav-dropdown-link" id="navCRM">🤝 <span data-i18n="nav.crm">Commandes & CRM</span></button>
-
-          <button class="nav-link nav-dropdown-link" id="navProTools">🛠️ <span data-i18n="mgmt.tab.protools">Outils Métier</span></button>
+          <button class="nav-link nav-dropdown-link" id="navRecettes"><span data-i18n="nav.recipes">Calculateur de Recettes</span></button>
+          <button class="nav-link nav-dropdown-link" id="navInventaire"><span data-i18n="nav.inventory">Stocks & Inventaire</span></button>
+          <button class="nav-link nav-dropdown-link" id="navChefsBrain"><span data-i18n="nav.creative.brain">Cerveau du Chef</span></button>
+          <button class="nav-link nav-dropdown-link" id="navAssembly"><span data-i18n="nav.creative.assembly">Simulateur Montage</span></button>
+          <button class="nav-link nav-dropdown-link" id="navConverter"><span data-i18n="nav.creative.converter">Convertisseur Moules</span></button>
         </div>
       </div>
 
-      <!-- 3. Labo & Sécurité -->
+      <!-- 3. Labo & Qualité -->
       <div class="nav-dropdown">
-        <button class="nav-dropdown-trigger">🛡️ <span data-i18n="nav.category.mgmt">Labo & Sécurité</span> <span class="nav-arrow">▼</span></button>
+        <button class="nav-dropdown-trigger">🛡️ <span data-i18n="nav.category.mgmt">Labo & Qualité</span> <span class="nav-arrow">▼</span></button>
         <div class="nav-dropdown-content">
-          <button class="nav-link nav-dropdown-link" id="navPlanning">🌴 <span data-i18n="nav.team">Équipe & Congés</span></button>
-          <button class="nav-link nav-dropdown-link" id="navInventaire">📦 <span data-i18n="nav.inventory">Inventaire des Stocks</span></button>
-          <button class="nav-link nav-dropdown-link" id="navSuppliers">🏢 <span data-i18n="nav.suppliers">Fournisseurs</span></button>
-          <button class="nav-link nav-dropdown-link" id="navHygiene">🧼 <span data-i18n="nav.hygiene">Hygiène & HACCP Pro</span></button>
-          <button class="nav-link nav-dropdown-link" id="navLabo">📐 <span data-i18n="nav.creative.lab">Matériel & Outillage (2D)</span></button>
-          <button class="nav-link nav-dropdown-link" id="navAbout">📖 <span data-i18n="nav.about">À propos</span></button>
+          <button class="nav-link nav-dropdown-link" id="navHygiene"><span data-i18n="nav.hygiene">Hygiène & HACCP</span></button>
+          <button class="nav-link nav-dropdown-link" id="navPlanning"><span data-i18n="nav.team">Équipe & Planning</span></button>
+          <button class="nav-link nav-dropdown-link" id="navLabo"><span data-i18n="nav.creative.lab">Agencement Labo (2D)</span></button>
+          <button class="nav-link nav-dropdown-link" id="navSuppliers"><span data-i18n="nav.suppliers">Fournisseurs</span></button>
+          <button class="nav-link nav-dropdown-link" id="navScheduler"><span data-i18n="nav.scheduler">Ordonnancement CAP</span></button>
+        </div>
+      </div>
+
+      <!-- 4. Assistance -->
+      <div class="nav-dropdown">
+        <button class="nav-dropdown-trigger">✨ Assistance <span class="nav-arrow">▼</span></button>
+        <div class="nav-dropdown-content">
+          <button class="nav-link nav-dropdown-link" id="navPortfolio"><span data-i18n="nav.portfolio">Mon Portfolio</span></button>
+          <button class="nav-link nav-dropdown-link" id="navAbout"><span data-i18n="nav.about">À propos du projet</span></button>
         </div>
       </div>
 
@@ -1475,6 +1489,7 @@
   </header>
 
   <main class="app-main" id="appMain">
+
 
     <!-- ================================================ -->
     <!-- HUB / DASHBOARD SECTION -->
@@ -1732,7 +1747,7 @@
             </div>
           </div>
 
-          <div class="mgmt-shopping-grid">
+          <div id="shoppingListZone" class="mgmt-shopping-grid">
             <!-- Left: Planning Card -->
             <div class="mgmt-glass-card">
               <div class="mgmt-card-header header-centered">
@@ -1989,7 +2004,7 @@
 
         <!-- TAB: PRO TOOLS (Merged from appProTools) -->
         <div id="mgmtViewProTools" class="mgmt-view" style="display:none;">
-          <div class="protools-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
+          <div id="proToolsGrid" class="protools-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
             <!-- OCR Scanner Card -->
             <div class="protools-card" onclick="openOCRScanner()">
               <div class="protools-card-icon" style="background:rgba(99,102,241,0.1); color:#6366f1;">📷</div>
@@ -2089,7 +2104,7 @@
 
         <!-- TAB: DASHBOARD V2 -->
         <div id="mgmtViewDashboard" class="mgmt-view">
-          <div class="stats-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2rem; flex-wrap:wrap; gap:1rem;">
+          <div id="mgmtDashboardGrid" class="stats-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2rem; flex-wrap:wrap; gap:1rem;">
             <div>
               <h2 style="margin:0; font-family:var(--font-display); font-size:1.8rem; color:var(--primary);" data-i18n="stats.dashboard.title">📊 Cockpit de Pilotage Pro</h2>
               <p style="color:var(--text-muted); margin:0; font-size:0.9rem;" data-i18n="stats.dashboard.subtitle">Intelligence commerciale & optimisation des marges en temps réel.</p>
@@ -2233,7 +2248,7 @@
       </section>
 
       <div class="mgmt-container hero-mgmt-overlap">
-          <div class="mgmt-glass-card scheduler-setup">
+          <div class="mgmt-glass-card scheduler-setup scheduler-config">
             <div class="mgmt-card-header header-centered">
               <div class="mgmt-card-title">
                 <div class="title-icon icon-purple">📋</div>
@@ -2270,7 +2285,7 @@
             </div>
           </div>
 
-          <div id="schedulerResult" style="margin-top:2rem;">
+          <div id="schedulerResult" class="scheduler-timeline" style="margin-top:2rem;">
             <!-- Gantt Chart Rendered here -->
           </div>
       </div>
@@ -4343,11 +4358,7 @@
             🗑️ Vider mes données
           </button>
         </div>
-        <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px dashed var(--surface-border);">
-          <button class="btn btn-outline btn-full" onclick="if(window.GourmetOnboarding) GourmetOnboarding.start(); document.getElementById('pinModal').style.display='none';" style="border-color: var(--primary); color: var(--primary); font-weight: 700;">
-            ✨ Lancer le guide interactif
-          </button>
-        </div>
+
         <button id="btnSaveProfile" class="btn btn-primary btn-full" style="margin-top:1.5rem;"
           data-i18n="modal.pin.save">Mettre à jour mon
           profil</button>
@@ -4634,29 +4645,39 @@
       if (navProTools) navProTools.classList.remove('active');
     }
 
+    function updateBreadcrumb(title, section) {
+      const bc = document.getElementById('breadcrumb-container');
+      if (bc) bc.style.display = 'none';
+    }
+
     function showHub() {
       hideAllApps();
       hubSec.style.display = 'block';
       mainNav.style.display = 'flex';
       if (navHub) navHub.classList.add('active');
+      updateBreadcrumb('Cockpit', 'hub');
       if (typeof updateRandomTip === 'function') updateRandomTip();
       if (typeof updateDashStats === 'function') updateDashStats();
       if (typeof renderRecentRecipes === 'function') renderRecentRecipes();
       if (typeof renderPendingLeavesDashboard === 'function') renderPendingLeavesDashboard();
+      if (window.ToolGuide) ToolGuide.init();
     }
     function showRecettes() {
       hideAllApps();
       recApp.style.display = 'block';
       mainNav.style.display = 'flex';
       if (navRec) navRec.classList.add('active');
+      updateBreadcrumb('Calculateur de Recettes');
       if (typeof renderLibraryRecipes === 'function') renderLibraryRecipes();
       if (typeof updateRandomTip === 'function') updateRandomTip();
+      if (window.ToolGuide) ToolGuide.init();
     }
     function showLabo() {
       hideAllApps();
       labApp.style.display = 'block';
       mainNav.style.display = 'flex';
       if (navLab) navLab.classList.add('active');
+      updateBreadcrumb('Agencement Labo (2D)');
       setTimeout(() => { if (typeof resizePlan2D === 'function') resizePlan2D(); }, 100);
       if (typeof updateRandomTip === 'function') updateRandomTip();
     }
@@ -4735,6 +4756,7 @@
       if (navScheduler) navScheduler.classList.add('active');
       if (typeof switchExamType === 'function') switchExamType('EP1');
       if (typeof updateRandomTip === 'function') updateRandomTip();
+      if (window.ToolGuide) ToolGuide.init();
     }
 
     function showInventaire() {
@@ -4742,9 +4764,11 @@
       if (appInventaire) appInventaire.style.display = 'block';
       mainNav.style.display = 'flex';
       if (navInventory) navInventory.classList.add('active');
+      updateBreadcrumb('Stocks & Inventaire');
       if (typeof renderInventory === 'function') renderInventory();
       if (typeof updateDashboard === 'function') updateDashboard();
       if (typeof updateRandomTip === 'function') updateRandomTip();
+      if (window.ToolGuide) ToolGuide.init();
     }
 
     function showLabeling() {
@@ -4784,9 +4808,13 @@
       hideAllApps();
       if (appMgmt) appMgmt.style.display = 'block';
       if (navMgmt) navMgmt.classList.add('active');
+      
+      const titles = { 'dashboard': 'Tableau de Bord', 'production': 'Planning Production', 'quality': 'Qualité & HACCP', 'protools': 'Outils Pro' };
+      updateBreadcrumb(titles[tab || 'dashboard'] || 'Gestion');
       if (typeof switchMgmtTab === 'function') switchMgmtTab(tab || 'dashboard');
       if (typeof updateMgmtKpis === 'function') updateMgmtKpis();
       if (typeof updateRandomTip === 'function') updateRandomTip();
+      if (window.ToolGuide) ToolGuide.init();
     }
 
     function showProTools() {
@@ -4954,7 +4982,7 @@
   <script src="./billing.js?v=11.5.0"></script>
   <script src="./cloud-sync.js?v=11.5.0"></script>
   <script src="./rgpd-banner.js?v=11.5.0"></script>
-  <script src="./app.js?v=11.5.0"></script>
+  <script src="./app.js?v=11.5.1"></script>
   <script src="./pro-features.js?v=1.0.8"></script>
   <script src="./equipment.js?v=2.1.1"></script>
   <script src="./lab-logic.js?v=2.1.1"></script>
@@ -5640,6 +5668,7 @@
   <!-- ANALYTICS INTERACTIF + PWA OFFLINE MANAGER               -->
   <!-- ======================================================== -->
   <script src="./analytics-interactive.js?v=11.3.6"></script>
+  <script src="./rgpd-banner.js?v=11.3.6"></script>
   <script src="./onboarding.js?v=11.3.6"></script>
   <script>
     // ── Onboarding : démarre automatiquement pour les nouveaux utilisateurs ──
@@ -5654,6 +5683,71 @@
   </script>
 
   <script>
+    // ── Gourmet Academy : Nouveau Système de Guide ──────────────────────────
+    const GourmetAcademy = {
+      open() {
+        const modal = document.getElementById('academyModal');
+        if (modal) {
+          modal.style.display = 'flex';
+          requestAnimationFrame(() => modal.classList.add('visible'));
+        }
+      },
+      close() {
+        const modal = document.getElementById('academyModal');
+        if (modal) {
+          modal.classList.remove('visible');
+          setTimeout(() => modal.style.display = 'none', 300);
+        }
+      },
+      showArticle(id) {
+        const modal = document.getElementById('academyArticleModal');
+        const content = document.getElementById('academyArticleContent');
+        if (!modal || !content) return;
+
+        const library = {
+          'margins': `
+            <div style="font-size:3rem; margin-bottom:1rem;">📊</div>
+            <h2>Maîtriser ses Marges & Coûts</h2>
+            <p>Le succès d'une pâtisserie repose sur une règle d'or : <strong>connaître son coût de revient exact.</strong></p>
+            <h3>1. Le Coût Matière (CM)</h3>
+            <p>C'est la somme de tous les ingrédients utilisés. GourmetRevient le calcule automatiquement pour vous.</p>
+            <h3>2. La Marge Brute</h3>
+            <p>Elle doit couvrir vos frais fixes (loyer, électricité) et vos salaires. En pâtisserie artisanale, on vise généralement un coefficient de <strong>4.0 à 5.0</strong>.</p>
+            <div class="article-tip">
+              <strong>Conseil du Chef :</strong> N'oubliez pas les "pertes sèches" (farine sur le tour, chutes de biscuits). GourmetRevient inclut une marge de sécurité de 10% par défaut.
+            </div>
+          `,
+          'haccp': `
+            <div style="font-size:3rem; margin-bottom:1rem;">🧼</div>
+            <h2>Hygiène & Conformité HACCP</h2>
+            <p>La sécurité alimentaire n'est pas une option, c'est une obligation légale et morale.</p>
+            <h3>Les points critiques (CCP) :</h3>
+            <ul>
+              <li><strong>Températures :</strong> Vos frigos doivent être entre 0°C et +4°C.</li>
+              <li><strong>Traçabilité :</strong> Gardez les étiquettes de vos matières premières pendant 6 mois.</li>
+              <li><strong>Plan de Nettoyage :</strong> Chaque zone doit avoir son planning dédié.</li>
+            </ul>
+            <div class="article-tip">
+              <strong>Le saviez-vous ?</strong> GourmetRevient permet de scanner vos factures pour extraire automatiquement les numéros de lots (Module Pro).
+            </div>
+          `,
+          'team': `
+            <div style="font-size:3rem; margin-bottom:1rem;">👨‍👩‍👧‍👦</div>
+            <h2>Organisation & Équipe</h2>
+            <p>Une production fluide commence par un planning sans failles.</p>
+            <h3>Anticiper les pics :</h3>
+            <p>Utilisez le calendrier des zones scolaires (A, B, C) intégré pour prévoir vos besoins en personnel pendant les vacances.</p>
+            <h3>Communication :</h3>
+            <p>Partagez les fiches techniques PDF générées par le logiciel pour que chaque membre de l'équipe respecte exactement le même process de montage.</p>
+          `
+        };
+
+        content.innerHTML = library[id] || "<h2>Contenu en cours de rédaction</h2><p>Ce guide sera disponible prochainement.</p>";
+        modal.style.display = 'flex';
+      }
+    };
+    window.GourmetAcademy = GourmetAcademy;
+
     // ── Gestion des raccourcis PWA (URL params) ──────────────────────────────
     (function handlePWAShortcuts() {
       const params = new URLSearchParams(window.location.search);
@@ -5701,45 +5795,157 @@
     })();
   </script>
 
-  <!-- Floating Support Button -->
-  <a href="mailto:contact@gourmetrevient.fr" class="floating-support" title="Besoin d'aide ?">
-    <span class="support-icon">💬</span>
-    <span class="support-text">Support</span>
-  </a>
+  <!-- Floating Action Buttons -->
+  <div class="floating-actions" style="position: fixed; bottom: 1.5rem; right: 1.5rem; display: flex; flex-direction: column; gap: 0.8rem; z-index: 1000;">
+    <button onclick="GourmetAcademy.open()" class="floating-btn help-btn" title="Académie GourmetRevient">
+      <span class="btn-icon">🎓</span>
+      <span class="btn-text">Académie</span>
+    </button>
+    <a href="mailto:contact@gourmetrevient.fr" class="floating-btn support-btn" title="Besoin d'aide ?">
+      <span class="btn-icon">💬</span>
+      <span class="btn-text">Support</span>
+    </a>
+  </div>
+
+  <!-- Gourmet Academy Modal -->
+  <div id="academyModal" class="glass-modal-overlay" style="display:none; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(6px);">
+    <div class="glass-modal-content academy-content" style="max-width: 900px; width: 95%; background: white; border-radius: 32px; box-shadow: 0 40px 100px rgba(0,0,0,0.3);">
+      <button onclick="GourmetAcademy.close()" class="auth-close">✕</button>
+      
+      <div class="academy-header">
+        <span class="academy-badge">🎓 GOURMET ACADEMY</span>
+        <h2>Maîtrisez votre laboratoire numérique</h2>
+        <p>Apprenez à optimiser votre rentabilité et votre organisation avec nos guides experts.</p>
+      </div>
+
+      <div class="academy-grid">
+        <div class="academy-card" onclick="GourmetOnboarding.start(); GourmetAcademy.close();">
+          <div class="ac-icon">🚀</div>
+          <div class="ac-info">
+            <h3>Tour Interactif</h3>
+            <p>Une visite guidée complète de tous vos outils en 2 minutes.</p>
+            <span class="ac-action">Démarrer le tour →</span>
+          </div>
+        </div>
+        
+        <div class="academy-card" onclick="GourmetAcademy.showArticle('margins')">
+          <div class="ac-icon">💰</div>
+          <div class="ac-info">
+            <h3>Optimiser ses marges</h3>
+            <p>Comprendre le calcul du coût de revient et fixer ses prix de vente.</p>
+            <span class="ac-action">Lire le guide →</span>
+          </div>
+        </div>
+
+        <div class="academy-card" onclick="GourmetAcademy.showArticle('haccp')">
+          <div class="ac-icon">🧼</div>
+          <div class="ac-info">
+            <h3>Conformité HACCP</h3>
+            <p>Comment gérer ses relevés de température et sa traçabilité.</p>
+            <span class="ac-action">Découvrir →</span>
+          </div>
+        </div>
+
+        <div class="academy-card" onclick="GourmetAcademy.showArticle('team')">
+          <div class="ac-icon">👨‍👩‍👧‍👦</div>
+          <div class="ac-info">
+            <h3>Gestion d'Équipe</h3>
+            <p>Plannings, congés et organisation du laboratoire.</p>
+            <span class="ac-action">Voir plus →</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="academy-footer">
+        <p>Besoin d'une formation personnalisée ? <a href="mailto:contact@gourmetrevient.fr">Contactez le Chef Expert</a></p>
+      </div>
+    </div>
+  </div>
 
   <style>
-    .floating-support {
-      position: fixed;
-      bottom: 1.5rem;
-      right: 1.5rem;
+    .floating-btn {
       background: white;
       border: 1px solid rgba(99, 102, 241, 0.2);
-      padding: 0.6rem 1rem;
+      padding: 0.7rem 1.2rem;
       border-radius: 50px;
       display: flex;
       align-items: center;
       gap: 0.6rem;
       text-decoration: none;
       color: #1e293b;
-      font-weight: 600;
+      font-weight: 700;
       box-shadow: 0 10px 25px rgba(30, 41, 59, 0.1);
-      transition: all 0.3s ease;
-      z-index: 1000;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       backdrop-filter: blur(10px);
       font-size: 0.9rem;
+      cursor: pointer;
     }
-    .floating-support:hover {
-      transform: translateY(-5px);
+    .floating-btn:hover {
+      transform: translateY(-5px) scale(1.05);
       box-shadow: 0 15px 35px rgba(99, 102, 241, 0.2);
       border-color: #6366f1;
     }
+    .help-btn { border-color: rgba(16, 185, 129, 0.2); }
+    .help-btn:hover { border-color: #10b981; }
+
+    .academy-header { text-align: center; margin-bottom: 2.5rem; }
+    .academy-badge { background: rgba(99, 102, 241, 0.1); color: #6366f1; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; letter-spacing: 1px; }
+    .academy-header h2 { margin: 1rem 0 0.5rem; font-size: 1.8rem; }
+    .academy-header p { color: #64748b; font-size: 1rem; }
+
+    .academy-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 1.5rem; }
+    .academy-card { 
+      background: rgba(255, 255, 255, 0.5); border: 1px solid rgba(255, 255, 255, 0.8); 
+      padding: 1.5rem; border-radius: 24px; display: flex; gap: 1.2rem; cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .academy-card:hover { 
+      transform: translateY(-8px); background: white; border-color: #6366f1; 
+      box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+    }
+    .ac-icon { font-size: 2rem; background: #f8fafc; width: 64px; height: 64px; display: flex; align-items: center; justify-content: center; border-radius: 18px; }
+    .ac-info h3 { margin: 0 0 0.4rem; font-size: 1.1rem; }
+    .ac-info p { margin: 0 0 1rem; color: #64748b; font-size: 0.9rem; line-height: 1.4; }
+    .ac-action { font-size: 0.85rem; font-weight: 800; color: #6366f1; }
+
+    .academy-footer { margin-top: 3rem; text-align: center; padding-top: 1.5rem; border-top: 1px solid rgba(0,0,0,0.05); }
+    .academy-footer p { color: #64748b; font-size: 0.9rem; }
+    .academy-footer a { color: #6366f1; font-weight: 700; text-decoration: none; }
+
     @media (max-width: 768px) {
-      .support-text { display: none; }
-      .floating-support { padding: 0.8rem; border-radius: 50%; bottom: 1rem; right: 1rem; }
+      .btn-text { display: none; }
+      .floating-btn { padding: 0.8rem; border-radius: 50%; }
+      .academy-grid { grid-template-columns: 1fr; }
     }
   </style>
 
-  <script src="tool-guide.js"></script>
+
+
+  <!-- Academy Article Viewer -->
+  <div id="academyArticleModal" class="glass-modal-overlay" style="display:none; z-index: 10002; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(8px);">
+    <div class="glass-modal-content" style="max-width: 750px; padding: 3rem; border-radius: 32px; background: white; box-shadow: 0 30px 60px rgba(0,0,0,0.4); border: 1px solid rgba(0,0,0,0.1);">
+      <button onclick="document.getElementById('academyArticleModal').style.display='none'" class="auth-close" style="color: #1e293b;">✕</button>
+      <div id="academyArticleContent" class="article-body">
+        <!-- Populated by JS -->
+      </div>
+      <div style="margin-top:2.5rem; text-align:center;">
+        <button onclick="document.getElementById('academyArticleModal').style.display='none'" class="auth-btn-primary" style="width: auto; padding: 0.8rem 3rem; font-size: 1rem;">J'ai compris</button>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    .article-body { color: #1e293b; text-align: left; }
+    .article-body h2 { color: #1e293b; margin-bottom: 1.5rem; font-size: 2.2rem; font-weight: 850; line-height: 1.2; }
+    .article-body h3 { margin-top: 2rem; color: #4f46e5; font-size: 1.3rem; font-weight: 800; }
+    .article-body p { line-height: 1.7; color: #334155; margin-bottom: 1.2rem; font-size: 1.05rem; }
+    .article-body ul { padding-left: 1.5rem; color: #334155; margin-bottom: 1.5rem; }
+    .article-body li { margin-bottom: 0.8rem; line-height: 1.6; }
+    .article-body strong { color: #0f172a; font-weight: 750; }
+    .article-tip { background: #f0fdf4; border-left: 5px solid #22c55e; padding: 1.5rem; border-radius: 16px; margin: 2rem 0; font-size: 1rem; color: #14532d; box-shadow: 0 4px 12px rgba(34, 197, 94, 0.1); }
+  </style>
+
+  <script src="tool-guide.js?v=11.5.1"></script>
 </body>
 
 </html>

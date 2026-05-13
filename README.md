@@ -1,8 +1,8 @@
-# 🧁 Gourmet Revient — Simulateur de Coût de Revient Pâtissier
+# 🧁 GourmetRevient — Simulateur de Coût de Revient Pâtissier
 
 [![GitHub Pages](https://img.shields.io/badge/Deploy-GitHub%20Pages-blue?style=for-the-badge&logo=github)](https://julianperesson.github.io/Gourmetrevient/)
 
-**Gourmet Revient** est un outil interactif professionnel conçu pour les pâtissiers (notamment dans le cadre du Chef d'Œuvre du CAP Pâtissier). Il permet de calculer précisément le coût de revient des créations, de simuler des marges et d'analyser l'impact du marché sur la rentabilité.
+**GourmetRevient** est un outil interactif professionnel conçu pour les pâtissiers (notamment dans le cadre du Chef d'Œuvre du CAP Pâtissier). Il permet de calculer précisément le coût de revient des créations, de simuler des marges et d'analyser l'impact du marché sur la rentabilité.
 
 ## 🚀 Fonctionnalités Clés
 

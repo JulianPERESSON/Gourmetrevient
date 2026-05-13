@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧁</text></svg>">
-  <title>GourmetRevient — Le Copilote des Artisans Pâtissiers</title>
-  <meta name="description" content="Optimisez la rentabilité de votre pâtisserie avec GourmetRevient. Coûts de revient, HACCP, Planning et CRM. Conçu pour les artisans.">
+  <title>GourmetRevient — Logiciel de Gestion Pro pour Pâtissiers Artisans</title>
+  <meta name="description" content="Boostez la rentabilité de votre pâtisserie. Coût de revient, HACCP, Planning et CRM. 14 jours d'essai gratuits.">
 
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -549,8 +549,10 @@
 
   <nav>
     <div class="container nav-inner">
-      <a href="#" class="logo">🧁 Gourmet<span>Revient</span></a>
+      <a href="#" class="logo">🧁 GourmetRevient</a>
       <div class="nav-actions">
+        <a href="#features" class="btn btn-ghost">Fonctionnalités</a>
+        <a href="#pricing" class="btn btn-ghost">Tarifs</a>
         <a href="index.html?action=login" class="btn btn-ghost">Connexion</a>
         <a href="index.html?tab=signup" class="btn btn-primary">Inscription</a>
       </div>
@@ -716,17 +718,33 @@
   </section>
 
 
-  <section class="demo-video animate-fade-in" style="padding: 6rem 0; background: #f8fafc;">
-    <div class="container" style="text-align: center;">
-      <div class="section-header">
-        <span class="hero-badge">Démo Live</span>
-        <h2>Découvrez GourmetRevient en action</h2>
-        <p>Gérez vos coûts, votre hygiène et votre équipe en quelques clics.</p>
+  <section class="testimonials" id="testimonials" style="padding: 8rem 0; background: #f8fafc;">
+    <div class="container">
+      <div class="section-header" style="text-align: center; margin-bottom: 5rem;">
+        <span class="hero-badge">Témoignages</span>
+        <h2>Ils pâtissent avec GourmetRevient</h2>
+        <p>Découvrez pourquoi les artisans choisissent notre solution.</p>
       </div>
-      <div style="max-width: 900px; margin: 3rem auto; background: white; padding: 15px; border-radius: 24px; box-shadow: 0 30px 60px -12px rgba(0,0,0,0.15); border: 1px solid #e2e8f0;">
-        <div style="aspect-ratio: 16/9; background: #f1f5f9; border-radius: 12px; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden;">
-           <div style="font-size: 4rem; cursor: pointer; transition: transform 0.2s;" onclick="alert('Espace pour votre vidéo de démonstration')">▶️</div>
-           <p style="position: absolute; bottom: 20px; font-weight: 600; color: #64748b;">Vidéo de démonstration (30s)</p>
+      <div class="testimonials-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
+        <div class="testimonial-card" style="background: white; padding: 2.5rem; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid #e2e8f0;">
+          <p style="font-style: italic; color: #475569; margin-bottom: 1.5rem;">"GourmetRevient a changé ma façon de calculer mes marges. Je sais enfin exactement ce que me coûte chaque entremets au centime près."</p>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="width: 48px; height: 48px; background: #eef2ff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--primary);">MP</div>
+            <div>
+              <h4 style="font-size: 1rem; margin: 0;">Marc P.</h4>
+              <p style="font-size: 0.85rem; color: #64748b; margin: 0;">Artisan Pâtissier, Lyon</p>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-card" style="background: white; padding: 2.5rem; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid #e2e8f0;">
+          <p style="font-style: italic; color: #475569; margin-bottom: 1.5rem;">"Le module HACCP digital est un gain de temps énorme. Plus de feuilles volantes dans le labo, tout est sur ma tablette."</p>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="width: 48px; height: 48px; background: #ecfdf5; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #10b981;">SL</div>
+            <div>
+              <h4 style="font-size: 1rem; margin: 0;">Sophie L.</h4>
+              <p style="font-size: 0.85rem; color: #64748b; margin: 0;">Cheffe de Labo, Paris</p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -807,8 +825,10 @@
   <footer>
     <div class="container">
       <div class="footer-links">
-        <a href="legal.html">Mentions légales</a>
-        <a href="legal.html#confidentialite">Confidentialité</a>
+        <a href="legal.html">Mentions Légales</a>
+        <a href="legal.html#cgv">CGV</a>
+        <a href="legal.html#rgpd">Politique de Confidentialité</a>
+        <a href="index.html?action=login">Espace Client</a>
         <a href="mailto:julian31.peresson@gmail.com">Support</a>
       </div>
       <p style="opacity: 0.6; font-size: 0.8rem;">© 2026 GourmetRevient. Conçu avec passion pour l'artisanat.</p>

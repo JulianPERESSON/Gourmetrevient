@@ -47,8 +47,8 @@ const TRANSLATIONS = {
         'auth.error.taken': "Ce nom d'utilisateur est déjà pris.",
 
         // Navigation
-        'nav.category.atelier': "L'Atelier",
-        'nav.category.mgmt': "Labo & Sécurité",
+        'nav.category.atelier': "Atelier & Prod",
+        'nav.category.mgmt': "Labo & Qualité",
         'mgmt.tab.scheduler': '🎓 Ordonnanceur CAP',
         'scheduler.title': 'Ordonnanceur Tactique CAP',
         'scheduler.desc': 'Générez un plan de travail optimisé sans temps mort pour vos examens EP1 et EP2.',
@@ -95,9 +95,9 @@ const TRANSLATIONS = {
         'nav.shopping': "Calculateur d'Achats",
         'nav.team': "Équipe & Congés",
         'nav.suppliers': 'Fournisseurs',
-        'nav.stats': 'Statistiques',
+        'nav.stats': 'Tableau de Bord & Stats',
         'nav.mgmt': 'Gestion Pro',
-        'nav.orders': 'Devis & Factures',
+        'nav.orders': 'Commandes & CRM',
         'devis.title': 'Mon Devis Personnalisé',
         'devis.config': 'Configuration',
         'devis.empty': 'Aucun équipement sélectionné. Veuillez ajuster votre budget.',
@@ -116,7 +116,9 @@ const TRANSLATIONS = {
         'nav.comparator': 'Comparateur Multi-Périodes',
         'nav.catalogue': 'E-Catalogue Client',
         'nav.crm': 'Clients & Ventes (CRM)',
-        'nav.category.analysis': "Pilotage & Outils",
+        'nav.category.analysis': "Pilotage & Business",
+        'nav.category.assistance': "Assistance",
+        'nav.onboarding': "Centre d'Aide & Guide",
 
         // Library & Search
         'search.placeholder': 'Rechercher une recette...',

@@ -18,115 +18,117 @@ const GourmetOnboarding = {
       text: 'Bienvenue ! Je vais vous présenter l\'intégralité de vos outils. Accrochez-vous, votre laboratoire est prêt !',
       position: 'center'
     },
-    // --- MENU 1 : L'ATELIER ---
+    // --- PILLIER 1 : PILOTAGE & BUSINESS ---
+    {
+      target: '#mainNav .nav-dropdown:nth-child(2) .nav-dropdown-trigger',
+      icon: '📊',
+      title: 'Pilotage & Business',
+      text: 'Gérez votre rentabilité et votre relation client depuis ce pôle stratégique.',
+      action: function() { this._closeAllDropdowns(); },
+      requireClick: '#mainNav .nav-dropdown:nth-child(2) .nav-dropdown-trigger'
+    },
+    {
+      target: '#navStats',
+      icon: '📈',
+      title: 'Dashboard & Stats',
+      text: 'Visualisez vos marges, analysez l\'impact de l\'inflation et suivez vos performances.',
+      action: function() { this._toggleDropdown(0, true); }
+    },
+    {
+      target: '#navCRM',
+      icon: '🤝',
+      title: 'Commandes & CRM',
+      text: 'Gérez vos fiches clients et suivez l\'historique de chaque commande.',
+      action: function() { this._toggleDropdown(0, true); }
+    },
+    {
+      target: '#navCatalogue',
+      icon: '🌐',
+      title: 'E-Catalogue Client',
+      text: 'Générez une vitrine numérique pour présenter vos tarifs et créations.',
+      action: function() { this._toggleDropdown(0, true); }
+    },
+    {
+      target: '#navProTools',
+      icon: '🛠️',
+      title: 'Outils & Scanner OCR',
+      text: 'Scanner de factures et calculateurs métier pour gagner du temps au quotidien.',
+      action: function() { this._toggleDropdown(0, true); }
+    },
+
+    // --- PILLIER 2 : ATELIER & PROD ---
     {
       target: '#mainNav .nav-dropdown:nth-child(3) .nav-dropdown-trigger',
-      icon: '💡',
-      title: 'L\'Atelier Créatif',
-      text: 'Cliquez sur "L\'Atelier" pour débloquer les outils de création.',
-      action: function() { this._toggleDropdown(0, false); },
+      icon: '👨‍🍳',
+      title: 'Atelier & Production',
+      text: 'Tout ce dont vous avez besoin pour créer et fabriquer vos pâtisseries.',
+      action: function() { this._closeAllDropdowns(); },
       requireClick: '#mainNav .nav-dropdown:nth-child(3) .nav-dropdown-trigger'
     },
     {
       target: '#navRecettes',
       icon: '📖',
       title: 'Calculateur de Recettes',
-      text: 'Créez vos fiches techniques et maîtrisez votre rentabilité au gramme près.',
-      action: function() { this._toggleDropdown(0, true); }
-    },
-    {
-      target: '#navChefsBrain',
-      icon: '🧠',
-      title: 'Cerveau du Chef',
-      text: 'Trouvez l\'accord parfait ! Ce dictionnaire expert vous suggère les meilleures associations de saveurs.',
-      action: function() { this._toggleDropdown(0, true); }
-    },
-    {
-      target: '#navAssembly',
-      icon: '🏗️',
-      title: 'Simulateur de Montage',
-      text: 'Visualisez vos entremets en coupe et ajustez vos épaisseurs de couches graphiquement.',
-      action: function() { this._toggleDropdown(0, true); }
-    },
-    {
-      target: '#navConverter',
-      icon: '📏',
-      title: 'Convertisseur de Moules',
-      text: 'Adaptez vos quantités à n\'importe quel format de moule en un clic.',
-      action: function() { this._toggleDropdown(0, true); }
-    },
-    {
-      target: '#navPortfolio',
-      icon: '🖼️',
-      title: 'Portfolio Client',
-      text: 'Une galerie visuelle pour présenter vos réalisations à vos clients.',
-      action: function() { this._toggleDropdown(0, true); }
-    },
-    {
-      target: '#navScheduler',
-      icon: '🎓',
-      title: 'Ordonnancement',
-      text: 'Planifiez vos étapes de production pas à pas pour ne jamais être pris de court.',
-      action: function() { this._toggleDropdown(0, true); }
-    },
-    // --- MENU 2 : PILOTAGE ---
-    {
-      target: '#mainNav .nav-dropdown:nth-child(4) .nav-dropdown-trigger',
-      icon: '📈',
-      title: 'Pilotage & Outils',
-      text: 'Cliquez sur ce menu pour voir vos outils analytiques.',
-      action: function() { this._closeAllDropdowns(); },
-      requireClick: '#mainNav .nav-dropdown:nth-child(4) .nav-dropdown-trigger'
-    },
-    {
-      target: '#navStats',
-      icon: '📊',
-      title: 'Dashboard Analytique',
-      text: 'Suivez vos prix, vos marges et l\'impact de l\'inflation sur votre catalogue.',
+      text: 'Créez vos fiches techniques et calculez vos coûts de revient au gramme près.',
       action: function() { this._toggleDropdown(1, true); }
-    },
-    {
-      target: '#navCatalogue',
-      icon: '🌐',
-      title: 'E-Catalogue Pro',
-      text: 'Générez une vitrine numérique propre pour présenter vos tarifs aux clients.',
-      action: function() { this._toggleDropdown(1, true); }
-    },
-    {
-      target: '#navCRM',
-      icon: '🤝',
-      title: 'Commandes & CRM',
-      text: 'Gérez votre base client et suivez l\'historique de chaque commande.',
-      action: function() { this._toggleDropdown(1, true); }
-    },
-    {
-      target: '#navProTools',
-      icon: '🛠️',
-      title: 'Outils Métier',
-      text: 'Des calculateurs spécifiques pour les professionnels de la pâtisserie.',
-      action: function() { this._toggleDropdown(1, true); }
-    },
-    // --- MENU 3 : LABO ---
-    {
-      target: '#mainNav .nav-dropdown:nth-child(5) .nav-dropdown-trigger',
-      icon: '🛡️',
-      title: 'Labo & Sécurité',
-      text: 'Cliquez ici pour accéder à la gestion du laboratoire.',
-      action: function() { this._closeAllDropdowns(); },
-      requireClick: '#mainNav .nav-dropdown:nth-child(5) .nav-dropdown-trigger'
-    },
-    {
-      target: '#navPlanning',
-      icon: '🌴',
-      title: 'Équipe & Congés',
-      text: 'Organisez les plannings et suivez les absences de vos collaborateurs.',
-      action: function() { this._toggleDropdown(2, true); }
     },
     {
       target: '#navInventaire',
       icon: '📦',
       title: 'Stocks & Ingrédients',
-      text: 'Mettez à jour vos prix d\'achat une seule fois ici pour impacter toutes vos recettes.',
+      text: 'Suivez vos stocks en temps réel et mettez à jour vos prix d\'achat.',
+      action: function() { this._toggleDropdown(1, true); }
+    },
+    {
+      target: '#navChefsBrain',
+      icon: '🧠',
+      title: 'Cerveau du Chef',
+      text: 'Dictionnaire expert d\'associations de saveurs pour booster votre créativité.',
+      action: function() { this._toggleDropdown(1, true); }
+    },
+    {
+      target: '#navAssembly',
+      icon: '🏗️',
+      title: 'Simulateur de Montage',
+      text: 'Visualisez vos entremets en coupe et ajustez vos épaisseurs graphiquement.',
+      action: function() { this._toggleDropdown(1, true); }
+    },
+    {
+      target: '#navConverter',
+      icon: '📏',
+      title: 'Convertisseur de Moules',
+      text: 'Adaptez vos recettes à n\'importe quel format de moule instantanément.',
+      action: function() { this._toggleDropdown(1, true); }
+    },
+    {
+      target: '#navScheduler',
+      icon: '🎓',
+      title: 'Ordonnanceur CAP',
+      text: 'Planifiez vos étapes de production sans temps mort pour vos examens.',
+      action: function() { this._toggleDropdown(1, true); }
+    },
+
+    // --- PILLIER 3 : LABO & QUALITÉ ---
+    {
+      target: '#mainNav .nav-dropdown:nth-child(4) .nav-dropdown-trigger',
+      icon: '🛡️',
+      title: 'Labo & Qualité',
+      text: 'Maîtrisez votre hygiène, votre équipe et votre espace de travail.',
+      action: function() { this._closeAllDropdowns(); },
+      requireClick: '#mainNav .nav-dropdown:nth-child(4) .nav-dropdown-trigger'
+    },
+    {
+      target: '#navHygiene',
+      icon: '🧼',
+      title: 'Hygiène & HACCP',
+      text: 'Relevés de température, traçabilité et protocoles de nettoyage digitaux.',
+      action: function() { this._toggleDropdown(2, true); }
+    },
+    {
+      target: '#navPlanning',
+      icon: '🌴',
+      title: 'Équipe & Planning',
+      text: 'Organisez les plannings et suivez les absences de vos collaborateurs.',
       action: function() { this._toggleDropdown(2, true); }
     },
     {
@@ -137,18 +139,35 @@ const GourmetOnboarding = {
       action: function() { this._toggleDropdown(2, true); }
     },
     {
-      target: '#navHygiene',
-      icon: '🧼',
-      title: 'Hygiène & HACCP Pro',
-      text: 'Suivez vos protocoles de nettoyage et de sécurité alimentaire.',
+      target: '#navLabo',
+      icon: '📐',
+      title: 'Agencement Labo (2D)',
+      text: 'Optimisez l\'espace de votre laboratoire et gérez votre petit matériel.',
       action: function() { this._toggleDropdown(2, true); }
     },
     {
-      target: '#navLabo',
-      icon: '📐',
-      title: 'Matériel & Outillage (2D)',
-      text: 'Aménagement de votre laboratoire en 2D et gestion du petit matériel.',
+      target: '#navLabeling',
+      icon: '🏷️',
+      title: 'Étiquetage & DLC',
+      text: 'Générez des étiquettes professionnelles avec calcul automatique des DLC.',
       action: function() { this._toggleDropdown(2, true); }
+    },
+
+    // --- PILLIER 4 : ASSISTANCE ---
+    {
+      target: '#mainNav .nav-dropdown:nth-child(5) .nav-dropdown-trigger',
+      icon: '✨',
+      title: 'Assistance & Plus',
+      text: 'Retrouvez votre portfolio et les informations sur le projet.',
+      action: function() { this._closeAllDropdowns(); },
+      requireClick: '#mainNav .nav-dropdown:nth-child(5) .nav-dropdown-trigger'
+    },
+    {
+      target: '#navPortfolio',
+      icon: '🖼️',
+      title: 'Portfolio Pâtissier',
+      text: 'Mettez en valeur vos plus belles réalisations.',
+      action: function() { this._toggleDropdown(3, true); }
     },
     // --- FIN ---
     {
