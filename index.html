@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="fr">
 
 <head>
@@ -5807,10 +5807,10 @@
       <span class="btn-icon">🎓</span>
       <span class="btn-text">Académie</span>
     </button>
-    <a href="mailto:contact@gourmetrevient.fr" class="floating-btn support-btn" title="Besoin d'aide ?">
+    <button onclick="openSupport()" class="floating-btn support-btn" title="Besoin d'aide ?">
       <span class="btn-icon">💬</span>
       <span class="btn-text">Support</span>
-    </a>
+    </button>
   </div>
 
   <!-- Gourmet Academy Modal -->
@@ -5951,6 +5951,49 @@
     .article-tip { background: #f0fdf4; border-left: 5px solid #22c55e; padding: 1.5rem; border-radius: 16px; margin: 2rem 0; font-size: 1rem; color: #14532d; box-shadow: 0 4px 12px rgba(34, 197, 94, 0.1); }
   </style>
 
+  <!-- Support Center Modal -->
+  <div id="supportModal" class="glass-modal-overlay" style="display:none; z-index: 10003; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(8px);">
+    <div class="glass-modal-content" style="max-width: 600px; padding: 0; border-radius: 32px; background: white; overflow: hidden; box-shadow: 0 30px 60px rgba(0,0,0,0.4); border: 1px solid rgba(0,0,0,0.1);">
+      <div style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); padding: 3rem 2.5rem; color: white; position: relative;">
+        <button onclick="closeSupport()" class="auth-close" style="color: white; top: 1.5rem; right: 1.5rem;">✕</button>
+        <h2 style="margin: 0; font-size: 2rem; font-weight: 850;">Centre d'Aide</h2>
+        <p style="margin: 0.5rem 0 0; opacity: 0.9; font-size: 1rem;">Une question ? Notre équipe vous répond sous 24h.</p>
+        <div style="margin-top: 1.5rem; display: flex; gap: 1rem;">
+          <div style="background: rgba(255,255,255,0.2); padding: 0.5rem 1rem; border-radius: 50px; font-size: 0.8rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem;">
+            <span style="width: 8px; height: 8px; background: #4ade80; border-radius: 50%;"></span>
+            Support en ligne
+          </div>
+        </div>
+      </div>
+      
+      <div style="padding: 2.5rem;">
+        <div class="support-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; margin-bottom: 2rem;">
+          <div onclick="GourmetAcademy.open(); closeSupport()" style="padding: 1.5rem; border: 2px solid #f1f5f9; border-radius: 20px; cursor: pointer; transition: all 0.3s ease; text-align: center;" onmouseover="this.style.borderColor='#6366f1'; this.style.background='#f8fafc'" onmouseout="this.style.borderColor='#f1f5f9'; this.style.background='transparent'">
+            <div style="font-size: 2rem; margin-bottom: 0.5rem;">📖</div>
+            <div style="font-weight: 800; font-size: 0.9rem; color: #1e293b;">Académie</div>
+            <div style="font-size: 0.75rem; color: #64748b;">Guides & Tutos</div>
+          </div>
+          <div onclick="window.location.href='mailto:contact@gourmetrevient.fr'" style="padding: 1.5rem; border: 2px solid #f1f5f9; border-radius: 20px; cursor: pointer; transition: all 0.3s ease; text-align: center;" onmouseover="this.style.borderColor='#6366f1'; this.style.background='#f8fafc'" onmouseout="this.style.borderColor='#f1f5f9'; this.style.background='transparent'">
+            <div style="font-size: 2rem; margin-bottom: 0.5rem;">✉️</div>
+            <div style="font-weight: 800; font-size: 0.9rem; color: #1e293b;">E-mail</div>
+            <div style="font-size: 0.75rem; color: #64748b;">contact@gourmetrevient.fr</div>
+          </div>
+        </div>
+
+        <form id="supportForm" onsubmit="sendSupportMessage(event)">
+          <div class="form-group" style="margin-bottom: 1.2rem;">
+            <label style="display: block; font-size: 0.8rem; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 0.5rem;">Votre message</label>
+            <textarea id="supportMessage" required placeholder="Comment pouvons-nous vous aider aujourd'hui ?" style="width: 100%; height: 120px; padding: 1rem; border: 2px solid #f1f5f9; border-radius: 16px; font-family: inherit; resize: none; font-size: 0.95rem;" onfocus="this.style.borderColor='#6366f1'; this.style.outline='none'"></textarea>
+          </div>
+          <button type="submit" class="auth-btn-primary" style="width: 100%; padding: 1rem; font-size: 1rem; border-radius: 16px;">
+            Envoyer ma demande
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="support-service.js?v=1.0.0"></script>
   <script src="tool-guide.js?v=11.5.1"></script>
 </body>
 
