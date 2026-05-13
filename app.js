@@ -1714,9 +1714,14 @@ function renderSummary() {
 
     container.innerHTML = `
       ${r.description ? `<p style="color:var(--text-secondary); margin-bottom:1.2rem; font-style:italic;">${escapeHtml(r.description)}</p>` : ''}
-      <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:1.5rem;">
-        ⏱ ${t('ui.label.prep')}: ${prepStr} · ${t('ui.label.cook')}: ${cookStr} · ${r.portions} ${r.portions > 1 ? t('unit.portions') : t('unit.portion')}
+      <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:1.5rem; display:flex; align-items:center; gap:1.5rem; flex-wrap:wrap;">
+        <span>⏱ ${t('ui.label.prep')}: ${prepStr} · ${t('ui.label.cook')}: ${cookStr} · ${r.portions} ${r.portions > 1 ? t('unit.portions') : t('unit.portion')}</span>
+        <span id="summaryNutriBadge"></span>
+        <button onclick="window.GourmetRecipeHistory.showHistory('${r.name}')" class="btn btn-sm btn-outline" style="padding:4px 10px; font-size:0.7rem;">📜 Historique Versions</button>
+        <button onclick="window.GourmetBaseline.lock()" class="btn btn-sm btn-outline" style="padding:4px 10px; font-size:0.7rem;">🔒 Verrouiller Prix Réf.</button>
       </p>
+
+      <div id="baselineComparisonPanel" style="margin-bottom:1.5rem; display:none;"></div>
 
       <div class="summary-sections-grid">
         <div class="summary-section">
@@ -1793,6 +1798,16 @@ function renderSummary() {
         stagger: 0.03,
         delay: 0.3
       });
+    }
+
+    // Render Nutri-Score badge
+    if (window.renderNutriBadge) {
+      window.renderNutriBadge('summaryNutriBadge', r);
+    }
+    
+    // Render Baseline comparison if active
+    if (window.GourmetBaseline && APP.baselineCosts && APP.baselineCosts.recipeName === r.name) {
+      window.GourmetBaseline.renderComparison();
     }
   }, 400);
 }

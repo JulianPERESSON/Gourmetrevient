@@ -259,6 +259,60 @@ window.renderAllergenBadges = function(containerId, recipe) {
 
 
 // ============================================================
+// 3b. CALCULATEUR NUTRI-SCORE (SIMULÉ)
+// ============================================================
+window.calcNutriScore = function(recipe) {
+  if (!recipe || !recipe.ingredients) return 'C'; // Default
+
+  let negativePoints = 0; // Energy, Sugar, Sat Fat, Sodium
+  let positivePoints = 0; // Fruits, Veggies, Protein, Fiber
+
+  recipe.ingredients.forEach(ing => {
+    const name = ing.name.toLowerCase();
+    const qty = parseFloat(ing.qty) || 0;
+
+    // Simplified heuristics
+    if (name.includes('sucre') || name.includes('miel') || name.includes('sirop')) negativePoints += (qty / 100) * 10;
+    if (name.includes('beurre') || name.includes('crème') || name.includes('huile')) negativePoints += (qty / 100) * 8;
+    if (name.includes('sel')) negativePoints += (qty / 10) * 15;
+    
+    if (name.includes('pomme') || name.includes('fruit') || name.includes('fraise') || name.includes('framboise')) positivePoints += (qty / 100) * 15;
+    if (name.includes('noix') || name.includes('amande') || name.includes('noisette')) positivePoints += (qty / 100) * 10;
+    if (name.includes('farine complète')) positivePoints += (qty / 100) * 5;
+  });
+
+  const finalScore = negativePoints - positivePoints;
+
+  if (finalScore < 0) return 'A';
+  if (finalScore < 5) return 'B';
+  if (finalScore < 15) return 'C';
+  if (finalScore < 25) return 'D';
+  return 'E';
+};
+
+/** Render le badge Nutri-Score */
+window.renderNutriBadge = function(containerId, recipe) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+
+  const score = calcNutriScore(recipe);
+  const colors = {
+    'A': '#038141', 'B': '#85BB2F', 'C': '#FECB02', 'D': '#EE8100', 'E': '#E63E11'
+  };
+
+  container.innerHTML = `
+    <div style="display:inline-flex; align-items:center; border-radius:6px; overflow:hidden; font-family:sans-serif; font-weight:900; color:white; font-size:0.8rem; box-shadow:0 2px 5px rgba(0,0,0,0.1);">
+      ${['A','B','C','D','E'].map(l => `
+        <div style="padding:4px 8px; background:${l === score ? colors[l] : '#eee'}; color:${l === score ? 'white' : '#aaa'}; ${l === score ? 'transform:scale(1.15); z-index:1; box-shadow:0 0 10px rgba(0,0,0,0.2);' : ''} transition:0.3s;">
+          ${l}
+        </div>
+      `).join('')}
+    </div>
+  `;
+};
+
+
+// ============================================================
 // 4. HISTORIQUE DES VERSIONS DE RECETTES
 // ============================================================
 window.GourmetRecipeHistory = {
