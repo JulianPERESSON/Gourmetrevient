@@ -32,14 +32,36 @@ window.sendSupportMessage = async function(event) {
     btn.disabled = true;
     btn.innerHTML = '<span class="spinner" style="display:inline-block; width:20px; height:20px; border:3px solid rgba(255,255,255,0.3); border-radius:50%; border-top-color:white; animation:spin 1s linear infinite;"></span>';
 
-    // Simulated API call delay
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    try {
+        // Prepare ticket data
+        const { data: { session } } = await window.gourmetSupabase.auth.getSession();
+        const ticketData = {
+            message: message,
+            user_id: session?.user?.id || null,
+            email: session?.user?.email || 'Visiteur Anonyme',
+            user_agent: navigator.userAgent,
+            created_at: new Date().toISOString(),
+            status: 'new'
+        };
 
-    // Simulation success
-    if (typeof showToast === 'function') {
-        showToast("Message envoyé avec succès ! Notre équipe vous répondra bientôt.", "success");
-    } else {
-        alert("Message envoyé ! Notre équipe vous répondra bientôt.");
+        // Save to Supabase (Julian will see this in his dashboard)
+        const { error } = await window.gourmetSupabase
+            .from('support_tickets')
+            .insert([ticketData]);
+
+        if (error) {
+            // Fallback to mailto if table doesn't exist yet
+            console.warn('[Support] Table support_tickets missing, falling back to mailto');
+            window.location.href = `mailto:contact@gourmetrevient.fr?subject=Support GourmetRevient&body=${encodeURIComponent(message)}`;
+        } else {
+            if (typeof showToast === 'function') {
+                showToast("Demande envoyée ! Nous vous répondrons par email.", "success");
+            }
+        }
+    } catch (err) {
+        console.error('[Support] Error:', err);
+        // Fallback to mailto
+        window.location.href = `mailto:contact@gourmetrevient.fr?subject=Support GourmetRevient&body=${encodeURIComponent(message)}`;
     }
 
     // Reset form and close
