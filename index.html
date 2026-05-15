@@ -12,13 +12,15 @@
 
   <!-- Open Graph / social media -->
   <meta property="og:type" content="website" />
-  <meta property="og:title" content="GourmetRevient — Optimisez la rentabilité de votre pâtisserie" />
+  <meta property="og:title" content="GourmetRevient — Le Copilote des Artisans Pâtissiers" />
   <meta property="og:description"
-    content="Calculateur de coût de revient, outil d'agencement 2D de laboratoire et gestion d'équipe pour artisans pâtissiers." />
+    content="Boostez votre rentabilité : coût de revient au gramme, HACCP digitalisé et planning intelligent. 14 jours d'essai gratuits." />
   <meta property="og:url" content="https://julianperesson.github.io/Gourmetrevient/" />
   <meta property="og:image" content="https://julianperesson.github.io/Gourmetrevient/img/og-preview.png" />
   <meta property="og:site_name" content="GourmetRevient" />
   <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="GourmetRevient — Le Copilote des Artisans Pâtissiers" />
+  <meta name="twitter:description" content="Boostez votre rentabilité : coût de revient au gramme, HACCP digitalisé et planning intelligent. 14 jours d'essai gratuits." />
   <meta name="twitter:image" content="https://julianperesson.github.io/Gourmetrevient/img/og-preview.png" />
 
   <!-- SEO Multilingual -->
@@ -111,95 +113,22 @@
     const isCanceled = params.get('canceled') === 'true';
     if (!isSuccess && !isCanceled) return;
 
-    // Nettoyer l'URL immédiatement (ne pas laisser les params dans l'historique)
+    if (isSuccess) {
+      window.location.href = 'confirmation.html';
+      return;
+    }
+
+    // Nettoyer l'URL immédiatement
     window.history.replaceState({}, document.title, window.location.pathname);
 
     window.addEventListener('DOMContentLoaded', () => {
       setTimeout(() => {
-        if (isSuccess) _showStripeSuccessModal();
         if (isCanceled) _showStripeCanceledToast();
-      }, 1200); // Délai pour laisser l'app s'initialiser
+      }, 1200);
     });
   })();
 
-  function _showStripeSuccessModal() {
-    const overlay = document.createElement('div');
-    overlay.id = 'stripeSuccessOverlay';
-    overlay.style.cssText = [
-      'position:fixed','inset:0','z-index:99999',
-      'background:rgba(0,0,0,0.75)','backdrop-filter:blur(12px)',
-      'display:flex','align-items:center','justify-content:center',
-      'padding:1.5rem','animation:fadeInOverlay 0.4s ease'
-    ].join(';');
-
-    overlay.innerHTML = `
-      <style>
-        @keyframes fadeInOverlay{from{opacity:0}to{opacity:1}}
-        @keyframes popIn{from{opacity:0;transform:scale(0.88) translateY(20px)}to{opacity:1;transform:scale(1) translateY(0)}}
-        @keyframes confettiFloat{0%{transform:translateY(0) rotate(0deg);opacity:1}100%{transform:translateY(-120px) rotate(360deg);opacity:0}}
-        #stripeSuccessCard{animation:popIn 0.5s cubic-bezier(.34,1.56,.64,1) 0.1s both}
-        .stripe-confetti{position:absolute;width:8px;height:8px;border-radius:2px;animation:confettiFloat 1.5s ease forwards}
-      </style>
-      <div id="stripeSuccessCard" style="background:linear-gradient(135deg,#0f172a,#1e293b);border:1px solid rgba(99,102,241,0.4);border-radius:28px;padding:2.5rem 2rem;max-width:440px;width:100%;text-align:center;position:relative;overflow:hidden;box-shadow:0 40px 80px rgba(0,0,0,0.6);">
-        <!-- Glow background -->
-        <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% -20%,rgba(99,102,241,0.18),transparent 70%);pointer-events:none;"></div>
-        <!-- Icon -->
-        <div style="font-size:3.5rem;margin-bottom:1rem;filter:drop-shadow(0 0 20px rgba(99,102,241,0.6));">🎉</div>
-        <!-- Badge -->
-        <div style="display:inline-block;background:linear-gradient(135deg,#6366f1,#4f46e5);color:#fff;padding:0.3rem 1rem;border-radius:50px;font-size:0.72rem;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:1.2rem;">Abonnement Pro Actif</div>
-        <!-- Title -->
-        <h2 style="color:#fff;font-size:1.6rem;font-weight:800;margin-bottom:0.6rem;line-height:1.2;">Bienvenue dans GourmetRevient Pro !</h2>
-        <p style="color:rgba(255,255,255,0.6);font-size:0.9rem;margin-bottom:1.5rem;line-height:1.6;">Votre accès complet est activé. Toutes les fonctionnalités Pro sont débloquées : OCR, INCO, CRM, Cloud Sync et bien plus.</p>
-        <!-- Features list -->
-        <div style="display:flex;flex-direction:column;gap:0.5rem;margin-bottom:1.8rem;text-align:left;">
-          ${['✅ Recettes illimitées','✅ Scanner OCR de Factures','✅ Étiquettes INCO Réglementaires','✅ CRM Clients & Commandes','✅ Synchronisation Cloud multi-appareils'].map(f=>`<div style="background:rgba(255,255,255,0.05);border-radius:10px;padding:0.5rem 0.9rem;color:rgba(255,255,255,0.8);font-size:0.85rem;font-weight:600;">${f}</div>`).join('')}
-        </div>
-        <!-- CTA -->
-        <button id="stripeSuccessClose" style="background:linear-gradient(135deg,#6366f1,#4f46e5);color:#fff;border:none;padding:0.9rem 2.5rem;border-radius:14px;font-size:1rem;font-weight:800;cursor:pointer;width:100%;box-shadow:0 8px 30px rgba(99,102,241,0.45);transition:transform 0.2s,box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'">
-          🚀 Commencer maintenant
-        </button>
-        <p id="stripeSuccessTimer" style="color:rgba(255,255,255,0.3);font-size:0.75rem;margin-top:0.8rem;">Fermeture automatique dans <span id="stripeCountdown">8</span>s</p>
-      </div>
-    `;
-
-    document.body.appendChild(overlay);
-
-    // Confettis dynamiques
-    const colors = ['#6366f1','#10b981','#f59e0b','#ec4899','#8b5cf6'];
-    const card = overlay.querySelector('#stripeSuccessCard');
-    for (let i = 0; i < 12; i++) {
-      const c = document.createElement('div');
-      c.className = 'stripe-confetti';
-      c.style.cssText = `left:${10+Math.random()*80}%;bottom:${Math.random()*30}%;background:${colors[i%colors.length]};animation-delay:${Math.random()*0.8}s;animation-duration:${1.2+Math.random()*0.8}s;`;
-      card.appendChild(c);
-    }
-
-    // Fermeture
-    const close = () => {
-      overlay.style.opacity = '0';
-      overlay.style.transition = 'opacity 0.3s';
-      setTimeout(() => overlay.remove(), 300);
-      // Rafraîchir le plan depuis Supabase
-      if (window.AuthUI && typeof window.AuthUI.init === 'function') {
-        window.AuthUI.init();
-      }
-    };
-
-    document.getElementById('stripeSuccessClose').addEventListener('click', close);
-    overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
-
-    // Compte à rebours
-    let t = 8;
-    const countdown = document.getElementById('stripeCountdown');
-    const timer = setInterval(() => {
-      t--;
-      if (countdown) countdown.textContent = t;
-      if (t <= 0) { clearInterval(timer); close(); }
-    }, 1000);
-  }
-
   function _showStripeCanceledToast() {
-    // Toast non bloquant pour annulation de paiement
     const t = document.createElement('div');
     t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1e293b;border:1px solid rgba(245,158,11,0.4);color:#fff;padding:0.9rem 1.5rem;border-radius:14px;font-size:0.88rem;font-weight:600;z-index:99999;box-shadow:0 8px 32px rgba(0,0,0,0.4);display:flex;align-items:center;gap:10px;max-width:90vw;';
     t.innerHTML = '<span style="font-size:1.2rem;">💳</span><span>Paiement annulé. Vous pouvez réessayer à tout moment depuis votre profil.</span>';
@@ -207,6 +136,8 @@
     setTimeout(() => { t.style.opacity='0'; t.style.transition='opacity 0.4s'; setTimeout(()=>t.remove(),400); }, 6000);
   }
   </script>
+
+  <script src="rgpd-banner.js"></script>
 
   <!-- Chart.js Zoom Plugin (nécessite hammer.js) -->
   <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>

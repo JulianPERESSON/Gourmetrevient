@@ -7,8 +7,25 @@
   <title>GourmetRevient — Logiciel de Gestion Pro pour Pâtissiers Artisans</title>
   <meta name="description" content="Boostez la rentabilité de votre pâtisserie. Coût de revient, HACCP, Planning et CRM. 14 jours d'essai gratuits.">
 
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://julianperesson.github.io/Gourmetrevient/landing.html">
+  <meta property="og:title" content="GourmetRevient — Le Copilote des Artisans Pâtissiers">
+  <meta property="og:description" content="Gérez votre pâtisserie comme un chef : coût de revient, HACCP, Planning et CRM.">
+  <meta property="og:image" content="https://julianperesson.github.io/Gourmetrevient/img/og-preview.png">
+
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:url" content="https://julianperesson.github.io/Gourmetrevient/landing.html">
+  <meta property="twitter:title" content="GourmetRevient — Le Copilote des Artisans Pâtissiers">
+  <meta property="twitter:description" content="Gérez votre pâtisserie comme un chef : coût de revient, HACCP, Planning et CRM.">
+  <meta property="twitter:image" content="https://julianperesson.github.io/Gourmetrevient/img/og-preview.png">
+
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/rgpd-banner.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="./supabase-config.js"></script>
   
   <style>
     :root {
@@ -553,6 +570,7 @@
       <div class="nav-actions">
         <a href="#features" class="btn btn-ghost">Fonctionnalités</a>
         <a href="#pricing" class="btn btn-ghost">Tarifs</a>
+        <a href="blog.html" class="btn btn-ghost">Blog</a>
         <a href="index.html?action=login" class="btn btn-ghost">Connexion</a>
         <a href="index.html?tab=signup" class="btn btn-primary">Inscription</a>
       </div>
@@ -564,6 +582,16 @@
       <div class="hero-badge animate-fade-in">Indispensable pour Pâtissiers Artisans</div>
       <h1 class="animate-fade-in delay-1">Ne laissez plus vos marges s'évaporer au four.</h1>
       <p class="animate-fade-in delay-2">La plateforme tout-en-un pour piloter votre laboratoire : coût de revient précis, conformité HACCP simplifiée et gestion de production intelligente.</p>
+      
+      <div class="social-proof animate-fade-in delay-2" style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-bottom: 2rem;">
+        <div style="display: flex; -webkit-mask-image: linear-gradient(to right, black 80%, transparent); mask-image: linear-gradient(to right, black 80%, transparent);">
+          <span style="font-size: 1.2rem; margin-right: -8px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));">👨‍🍳</span>
+          <span style="font-size: 1.2rem; margin-right: -8px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));">👩‍🍳</span>
+          <span style="font-size: 1.2rem; margin-right: -8px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));">🥐</span>
+          <span style="font-size: 1.2rem; margin-right: -8px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));">🍰</span>
+        </div>
+        <span id="userCounter" style="font-size: 0.95rem; font-weight: 600; color: #475569;">+120 pâtissiers nous font déjà confiance</span>
+      </div>
       
       <div class="hero-ctas animate-fade-in delay-3">
         <a href="index.html?tab=signup" class="btn btn-primary" style="padding: 1.1rem 3rem; font-size: 1.2rem; border-radius: 14px; font-weight: 700; background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%); box-shadow: 0 10px 25px -5px rgba(79, 70, 229, 0.4);">
@@ -663,6 +691,24 @@
     </div>
   </section>
 
+  <section class="demo-video" style="padding: 100px 0; background: white; text-align: center;">
+    <div class="container">
+      <div class="section-header">
+        <span class="hero-badge">Démo Vidéo</span>
+        <h2>Découvrez GourmetRevient en action</h2>
+        <p>Une minute pour comprendre comment nous allons transformer la rentabilité de votre laboratoire.</p>
+      </div>
+      <div class="video-container" style="max-width: 900px; margin: 0 auto; border-radius: 24px; overflow: hidden; box-shadow: 0 40px 100px -20px rgba(0,0,0,0.2); border: 1px solid var(--border); aspect-ratio: 16/9; background: #0f172a; display: flex; align-items: center; justify-content: center; position: relative; cursor: pointer; transition: transform 0.3s ease;">
+        <div style="color: white; text-align: center; z-index: 2;">
+          <div style="width: 80px; height: 80px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; font-size: 2rem; padding-left: 5px; box-shadow: 0 0 30px rgba(79, 70, 229, 0.6);">▶</div>
+          <h3 style="font-size: 1.5rem; font-family: var(--font-display);">Regarder la démo (60s)</h3>
+        </div>
+        <div style="position: absolute; inset: 0; opacity: 0.5; background-image: url('https://images.unsplash.com/photo-1556910103-1c02745aae4d?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'); background-size: cover; background-position: center;"></div>
+        <div style="position: absolute; inset: 0; background: linear-gradient(0deg, rgba(15,23,42,0.8) 0%, transparent 100%);"></div>
+      </div>
+    </div>
+  </section>
+
 
   <section class="features" id="features">
     <div class="container">
@@ -729,7 +775,9 @@
         <div class="testimonial-card" style="background: white; padding: 2.5rem; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid #e2e8f0;">
           <p style="font-style: italic; color: #475569; margin-bottom: 1.5rem;">"GourmetRevient a changé ma façon de calculer mes marges. Je sais enfin exactement ce que me coûte chaque entremets au centime près."</p>
           <div style="display: flex; align-items: center; gap: 12px;">
-            <div style="width: 48px; height: 48px; background: #eef2ff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--primary);">MP</div>
+            <div style="width: 48px; height: 48px; border-radius: 50%; overflow: hidden; background: #eef2ff; border: 2px solid #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+              <img src="https://ui-avatars.com/api/?name=Marc+P&background=4f46e5&color=fff" alt="Marc P." style="width:100%; height:100%; object-fit:cover;">
+            </div>
             <div>
               <h4 style="font-size: 1rem; margin: 0;">Marc P.</h4>
               <p style="font-size: 0.85rem; color: #64748b; margin: 0;">Artisan Pâtissier, Lyon</p>
@@ -739,10 +787,24 @@
         <div class="testimonial-card" style="background: white; padding: 2.5rem; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid #e2e8f0;">
           <p style="font-style: italic; color: #475569; margin-bottom: 1.5rem;">"Le module HACCP digital est un gain de temps énorme. Plus de feuilles volantes dans le labo, tout est sur ma tablette."</p>
           <div style="display: flex; align-items: center; gap: 12px;">
-            <div style="width: 48px; height: 48px; background: #ecfdf5; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #10b981;">SL</div>
+            <div style="width: 48px; height: 48px; border-radius: 50%; overflow: hidden; background: #ecfdf5; border: 2px solid #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+              <img src="https://ui-avatars.com/api/?name=Sophie+L&background=10b981&color=fff" alt="Sophie L." style="width:100%; height:100%; object-fit:cover;">
+            </div>
             <div>
               <h4 style="font-size: 1rem; margin: 0;">Sophie L.</h4>
               <p style="font-size: 0.85rem; color: #64748b; margin: 0;">Cheffe de Labo, Paris</p>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-card" style="background: white; padding: 2.5rem; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid #e2e8f0;">
+          <p style="font-style: italic; color: #475569; margin-bottom: 1.5rem;">"L'outil d'agencement 2D m'a permis de repenser mon laboratoire pour Noël. On a gagné 15% de productivité."</p>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="width: 48px; height: 48px; border-radius: 50%; overflow: hidden; background: #fff7ed; border: 2px solid #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+              <img src="https://ui-avatars.com/api/?name=Jean+D&background=f59e0b&color=fff" alt="Jean D." style="width:100%; height:100%; object-fit:cover;">
+            </div>
+            <div>
+              <h4 style="font-size: 1rem; margin: 0;">Jean D.</h4>
+              <p style="font-size: 0.85rem; color: #64748b; margin: 0;">Boulanger-Pâtissier, Bordeaux</p>
             </div>
           </div>
         </div>
@@ -818,6 +880,10 @@
           <h4 style="margin-bottom: 1rem; color: #1e293b; font-size: 1.1rem;">🍰 Puis-je essayer gratuitement ?</h4>
           <p style="color: #64748b; line-height: 1.6;">Oui, nous offrons 14 jours d'essai complet. Vous ne serez prélevé qu'à la fin de cette période si vous décidez de continuer l'aventure avec nous.</p>
         </div>
+        <div class="faq-item" style="background: white; border-radius: 16px; padding: 2rem; border: 1px solid #e2e8f0;">
+          <h4 style="margin-bottom: 1rem; color: #1e293b; font-size: 1.1rem;">📉 Est-ce que ça fonctionne hors-ligne ?</h4>
+          <p style="color: #64748b; line-height: 1.6;">Oui ! Une fois installée, l'application peut être utilisée dans votre laboratoire même si la connexion est instable. Les données se synchroniseront automatiquement dès que vous retrouverez du réseau.</p>
+        </div>
       </div>
     </div>
   </section>
@@ -828,6 +894,7 @@
         <a href="legal.html">Mentions Légales</a>
         <a href="legal.html#cgv">CGV</a>
         <a href="legal.html#rgpd">Politique de Confidentialité</a>
+        <a href="blog.html">Blog</a>
         <a href="index.html?action=login">Espace Client</a>
         <a href="mailto:julian31.peresson@gmail.com">Support</a>
       </div>
@@ -835,14 +902,65 @@
     </div>
   </footer>
 
+  <script src="rgpd-banner.js"></script>
   <script>
+    // --- GESTION DU COMPTEUR SOCIAL TEMPS RÉEL ---
+    async function updateSocialCounter() {
+      const counterEl = document.getElementById('userCounter');
+      if (!counterEl || !window.gourmetSupabase) return;
+
+      const fetchCount = async () => {
+        try {
+          // Tentative via RPC (recommandé pour contourner RLS proprement)
+          const { data, error } = await gourmetSupabase.rpc('get_user_count');
+          if (error) throw error;
+          return parseInt(data);
+        } catch (e) {
+          console.warn("RPC get_user_count échoué, tentative directe...", e);
+          // Fallback direct (pourrait retourner 0 si RLS est actif)
+          const { count, error } = await gourmetSupabase
+            .from('profiles')
+            .select('*', { count: 'exact', head: true });
+          return count || 120; // Baseline 120 si tout échoue
+        }
+      };
+
+      let currentCount = await fetchCount();
+      
+      const renderCount = (n) => {
+        counterEl.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
+        counterEl.style.opacity = '0';
+        counterEl.style.transform = 'translateY(-10px)';
+        
+        setTimeout(() => {
+          counterEl.innerText = `+${n} pâtissiers nous font déjà confiance`;
+          counterEl.style.opacity = '1';
+          counterEl.style.transform = 'translateY(0)';
+        }, 300);
+      };
+
+      renderCount(currentCount);
+
+      // Temps réel : Écoute les nouvelles inscriptions
+      gourmetSupabase
+        .channel('public-user-count')
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'profiles' }, async () => {
+          console.log("🚀 Nouvel utilisateur détecté !");
+          currentCount = await fetchCount();
+          renderCount(currentCount);
+        })
+        .subscribe();
+    }
+
+    window.addEventListener('DOMContentLoaded', updateSocialCounter);
+
     (function() {
       const isAuth = localStorage.getItem('gourmet_auth') === 'true' || localStorage.getItem('sb-hogfrddigcojdmjjpbno-auth-token');
       if (isAuth) {
         // Met à jour les boutons pour les utilisateurs déjà connectés
         const ctaBtns = document.querySelectorAll('.btn-primary');
         ctaBtns.forEach(btn => {
-          if (btn.innerText.includes('Démarrer') || btn.innerText.includes('Créer')) {
+          if (btn.innerText.includes('Démarrer') || btn.innerText.includes('Créer') || btn.innerText.includes('S\'inscrire')) {
             btn.innerText = 'Accéder à mon Laboratoire 👨‍🍳';
             btn.href = 'index.html';
           }

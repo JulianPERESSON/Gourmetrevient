@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧁</text></svg>">
+  <title>Félicitations ! Votre abonnement est actif — GourmetRevient</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #4f46e5;
+      --primary-dark: #3730a3;
+      --secondary: #10b981;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --font-display: 'Plus Jakarta Sans', sans-serif;
+      --font-body: 'Outfit', sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font-body);
+      background: linear-gradient(135deg, #f8fafc 0%, #eef2ff 100%);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+    .card {
+      background: white;
+      max-width: 600px;
+      width: 100%;
+      padding: 4rem 3rem;
+      border-radius: 32px;
+      box-shadow: 0 40px 100px -20px rgba(79, 70, 229, 0.15);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(79, 70, 229, 0.1);
+    }
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 8px;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+    }
+    .icon-wrapper {
+      width: 100px;
+      height: 100px;
+      background: #f0fdf4;
+      color: #10b981;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      margin: 0 auto 2rem;
+      animation: scaleUp 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    @keyframes scaleUp {
+      from { transform: scale(0.5); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    h1 {
+      font-family: var(--font-display);
+      font-size: 2.2rem;
+      font-weight: 800;
+      margin-bottom: 1rem;
+      color: #0f172a;
+    }
+    p {
+      font-size: 1.15rem;
+      color: var(--text-muted);
+      margin-bottom: 2.5rem;
+      line-height: 1.6;
+    }
+    .features-list {
+      text-align: left;
+      background: #f8fafc;
+      padding: 1.5rem;
+      border-radius: 20px;
+      margin-bottom: 2.5rem;
+    }
+    .feature-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 0.8rem;
+      font-weight: 600;
+      color: #475569;
+    }
+    .feature-item:last-child { margin-bottom: 0; }
+    .feature-item span { color: var(--secondary); font-weight: 900; }
+    
+    .btn-group {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.1rem 2.5rem;
+      border-radius: 16px;
+      font-weight: 700;
+      font-size: 1.1rem;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+      box-shadow: 0 10px 25px -5px rgba(79, 70, 229, 0.4);
+    }
+    .btn-primary:hover {
+      background: var(--primary-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 15px 30px -5px rgba(79, 70, 229, 0.5);
+    }
+    .btn-outline {
+      background: transparent;
+      color: var(--primary);
+      border: 2px solid var(--primary);
+    }
+    .btn-outline:hover {
+      background: #eef2ff;
+    }
+    .confetti {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background: var(--primary);
+      border-radius: 2px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="icon-wrapper">✓</div>
+    <h1>Bienvenue, Chef !</h1>
+    <p>Votre abonnement <strong>GourmetRevient Pro</strong> est maintenant actif. Préparez-vous à transformer la gestion de votre laboratoire.</p>
+    
+    <div class="features-list">
+      <div class="feature-item"><span>✓</span> Accès illimité à toutes les fonctionnalités</div>
+      <div class="feature-item"><span>✓</span> Synchronisation Cloud multi-appareils</div>
+      <div class="feature-item"><span>✓</span> Support prioritaire dédié</div>
+      <div class="feature-item"><span>✓</span> Zéro publicité, 100% efficacité</div>
+    </div>
+
+    <div class="btn-group">
+      <a href="index.html" class="btn btn-primary">Accéder à mon Laboratoire 🚀</a>
+      <a href="index.html?action=login" class="btn btn-outline">Se connecter</a>
+    </div>
+
+    <p style="margin-top: 2.5rem; font-size: 0.9rem; opacity: 0.7;">
+      Un email de confirmation vous a été envoyé. Besoin d'aide ? <a href="mailto:support@gourmetrevient.com" style="color: var(--primary);">Contactez-nous</a>.
+    </p>
+  </div>
+
+  <script>
+    // Simple confetti effect
+    function createConfetti() {
+      const colors = ['#4f46e5', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6'];
+      for (let i = 0; i < 50; i++) {
+        const confetti = document.createElement('div');
+        confetti.className = 'confetti';
+        confetti.style.left = Math.random() * 100 + '%';
+        confetti.style.top = Math.random() * 100 + '%';
+        confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+        confetti.style.opacity = Math.random();
+        document.body.appendChild(confetti);
+        
+        // Simple float animation
+        const duration = 2 + Math.random() * 3;
+        confetti.animate([
+          { transform: `translate(0, 0) rotate(0deg)`, opacity: 1 },
+          { transform: `translate(${Math.random() * 200 - 100}px, ${Math.random() * 200 + 500}px) rotate(${Math.random() * 720}deg)`, opacity: 0 }
+        ], {
+          duration: duration * 1000,
+          easing: 'cubic-bezier(0, .9, .57, 1)',
+          fill: 'forwards'
+        });
+      }
+    }
+    window.onload = createConfetti;
+  </script>
+</body>
+</html>

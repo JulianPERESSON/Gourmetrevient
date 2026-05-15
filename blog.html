@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧁</text></svg>">
+  <title>Le Blog des Pâtissiers — GourmetRevient</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #4f46e5;
+      --primary-dark: #3730a3;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --font-display: 'Plus Jakarta Sans', sans-serif;
+      --font-body: 'Outfit', sans-serif;
+      --border: #e2e8f0;
+      --radius: 20px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font-body);
+      background-color: #f8fafc;
+      color: var(--text-main);
+      line-height: 1.6;
+    }
+    header {
+      background: white;
+      padding: 4rem 0;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+    }
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+    h1 {
+      font-family: var(--font-display);
+      font-size: 3rem;
+      font-weight: 800;
+      margin-bottom: 1rem;
+    }
+    .subtitle {
+      font-size: 1.25rem;
+      color: var(--text-muted);
+    }
+    .blog-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      padding: 4rem 0;
+    }
+    .blog-card {
+      background: white;
+      border-radius: var(--radius);
+      overflow: hidden;
+      border: 1px solid var(--border);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      text-decoration: none;
+      color: inherit;
+    }
+    .blog-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 40px -10px rgba(0,0,0,0.1);
+    }
+    .blog-image {
+      height: 200px;
+      background-size: cover;
+      background-position: center;
+    }
+    .blog-content {
+      padding: 1.5rem;
+    }
+    .blog-tag {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      background: #eef2ff;
+      color: var(--primary);
+      border-radius: 50px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+    .blog-card h3 {
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      margin-bottom: 0.75rem;
+    }
+    .blog-card p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    nav {
+      height: 72px;
+      background: white;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+    }
+    .nav-inner {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .logo {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--primary-dark);
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <div class="container nav-inner">
+      <a href="landing.html" class="logo">🧁 GourmetRevient</a>
+      <a href="landing.html" style="text-decoration: none; font-weight: 600; color: var(--primary);">← Retour à l'accueil</a>
+    </div>
+  </nav>
+
+  <header>
+    <div class="container">
+      <h1>Le Blog des Pâtissiers</h1>
+      <p class="subtitle">Conseils, astuces et actualités pour booster votre rentabilité.</p>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="blog-grid">
+      <a href="#" class="blog-card">
+        <div class="blog-image" style="background-image: url('https://images.unsplash.com/photo-1555507036-ab1f4038808a?auto=format&fit=crop&w=800&q=80')"></div>
+        <div class="blog-content">
+          <span class="blog-tag">Gestion</span>
+          <h3>Calculer son coût de revient : le guide ultime</h3>
+          <p>Apprenez à identifier tous vos coûts cachés et à fixer des prix de vente qui garantissent votre marge.</p>
+        </div>
+      </a>
+
+      <a href="#" class="blog-card">
+        <div class="blog-image" style="background-image: url('https://images.unsplash.com/photo-1558326567-98ae2405596b?auto=format&fit=crop&w=800&q=80')"></div>
+        <div class="blog-content">
+          <span class="blog-tag">Hygiène</span>
+          <h3>HACCP : Digitaliser ses relevés pour gagner du temps</h3>
+          <p>Pourquoi passer au numérique pour vos contrôles de température et votre traçabilité est un choix stratégique.</p>
+        </div>
+      </a>
+
+      <a href="#" class="blog-card">
+        <div class="blog-image" style="background-image: url('https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=800&q=80')"></div>
+        <div class="blog-content">
+          <span class="blog-tag">Production</span>
+          <h3>Optimiser son planning de production en période de fêtes</h3>
+          <p>Astuces pour organiser votre laboratoire et vos fournées sans stress pendant les pics d'activité.</p>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <footer style="padding: 4rem 0; text-align: center; border-top: 1px solid var(--border); margin-top: 4rem;">
+    <p style="color: var(--text-muted);">© 2026 GourmetRevient. Tous droits réservés.</p>
+  </footer>
+</body>
+</html>
