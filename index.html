@@ -8,7 +8,7 @@
   <title>GourmetRevient — Le Copilote des Artisans Pâtissiers</title>
   <link rel="stylesheet" href="css/tool-guide.css?v=11.5.1">
   <meta name="description"
-    content="Logiciel de gestion tout-en-un pour artisans pà¢tissiers : calcul de coût de revient, conformité HACCP, planning d'équipe et agencement de laboratoire." />
+    content="Logiciel de gestion tout-en-un pour artisans pâtissiers : calcul de coût de revient, conformité HACCP, planning d'équipe et agencement de laboratoire." />
 
   <!-- Open Graph / social media -->
   <meta property="og:type" content="website" />
@@ -54,7 +54,7 @@
     "@type": "WebApplication",
     "name": "GourmetRevient",
     "url": "https://julianperesson.github.io/Gourmetrevient/",
-    "description": "Logiciel SaaS professionnel pour pà¢tissiers : calcul du prix de revient, gestion des fiches techniques et agencement de laboratoire 2D.",
+    "description": "Logiciel SaaS professionnel pour pâtissiers : calcul du prix de revient, gestion des fiches techniques et agencement de laboratoire 2D.",
     "applicationCategory": "BusinessApplication, CulinaryApplication",
     "operatingSystem": "All",
     "author": {
@@ -1016,6 +1016,109 @@
     color: #ffffff !important;
 }
 
+
+/* --- RGPD Cookie Banner --- */
+#rgpdBanner {
+  position: fixed;
+  bottom: 24px;
+  left: 24px;
+  right: 24px;
+  background: rgba(15, 23, 42, 0.95);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 24px;
+  padding: 1.5rem 2rem;
+  z-index: 20000;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+  transform: translateY(150%);
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+#rgpdBanner.rgpd-visible { transform: translateY(0); }
+#rgpdBanner.rgpd-hiding { transform: translateY(150%); }
+
+.rgpd-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.rgpd-left {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+}
+
+.rgpd-icon { font-size: 2rem; }
+
+.rgpd-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.rgpd-text strong {
+  color: #ffffff;
+  font-size: 1.1rem;
+  font-family: var(--font-display);
+}
+
+.rgpd-text span {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.rgpd-link {
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.rgpd-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.rgpd-btn-primary {
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.rgpd-btn-secondary {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.rgpd-pref-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 0;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+@media (max-width: 768px) {
+  .rgpd-inner { flex-direction: column; align-items: flex-start; gap: 1.5rem; }
+  .rgpd-actions { width: 100%; flex-direction: column; }
+  .rgpd-btn-primary, .rgpd-btn-secondary { width: 100%; }
+}
+
 </style>
 </head>
 
@@ -1129,7 +1232,7 @@
            </a>
         </div>
       </div>
-      <p class="auth-legal-note">Plateforme sécurisée pour les artisans pà¢tissiers.</p>
+      <p class="auth-legal-note">Plateforme sécurisée pour les artisans pâtissiers.</p>
     </div>
   </div>
 
@@ -2581,7 +2684,7 @@
       <div class="step-content" id="step4">
         <!-- Nutrition & Allergens (calculated) -->
         <div class="card" style="margin-bottom: 1.2rem; background: var(--bg-alt);">
-          <div class="card-title" data-i18n="s4.nutrition">Ã…Â½ Profil Nutritionnel & Allergènes</div>
+          <div class="card-title" data-i18n="s4.nutrition">Ã…Âé Profil Nutritionnel & Allergènes</div>
           <div class="card-subtitle" data-i18n="s4.nutrition.desc" style="margin-bottom:1rem;">Calculé automatiquement
             pour 100g selon vos ingrédients et données Open Food Facts.</div>
           <div id="nutritionGrid"
@@ -2800,7 +2903,7 @@
               style="flex:1; min-width:120px; cursor:pointer; text-align:center; padding:1rem;">¥<br><span
                 data-i18n="lab.mode.viennoiserie">Viennoiserie</span></div>
             <div class="card" data-mode="traiteur"
-              style="flex:1; min-width:120px; cursor:pointer; text-align:center; padding:1rem;">½<br><span
+              style="flex:1; min-width:120px; cursor:pointer; text-align:center; padding:1rem;">é<br><span
                 data-i18n="lab.mode.traiteur">Traiteur</span></div>
             <div class="card" data-mode="boulangerie"
               style="flex:1; min-width:120px; cursor:pointer; text-align:center; padding:1rem;">¥Ã¢â‚¬â€œ<br><span
@@ -3304,7 +3407,7 @@
               équipe de choc chez <strong>Christian Larroque et ses fils</strong> «¶»</p>
             <p data-i18n="portfolio.thanks.team_detail">Merci pour tous les bons moments, les fous rires partagés et
               la
-              confiance que vous m C un vrai plaisir de travailler à vos cà´tés et de partager votre
+              confiance que vous m C un vrai plaisir de travailler à vos côtés et de partager votre
               passion, votre rigueur et l que vous mettez chaque jour dans vos créations.</p>
             <div class="thanks-sig">Julian Peresson</div>
           </div>
@@ -3967,7 +4070,7 @@
       <section class="hero" id="aboutHeroSection" style="padding-bottom: 3rem;">
         <div class="hero-badge" data-i18n="about.badge">📖 ÀÀ propos du projet</div>
         <h2 data-i18n="about.title">Gourmet<span class="accent">Revient</span></h2>
-        <p data-i18n="about.desc">Projet Chef d'Ãƒâ€¦Ã¢â‚¬â„¢uvre réalisé par Julian Peresson, étudiant en CAP Pà¢tisserie au CMA de
+        <p data-i18n="about.desc">Projet Chef d'Œuvre réalisé par Julian Peresson, étudiant en CAP Pà¢tisserie au CMA de
           Muret.</p>
       </section>
 
@@ -3981,7 +4084,7 @@
         <p style="color:var(--text-secondary); line-height:1.7; font-size:1rem; margin-bottom:2rem;"
           data-i18n="about.desc2">
           Ce projet a été développé par <strong>Julian Peresson</strong>, étudiant en <strong>CAP Pà¢tisserie au CMA de
-            Muret</strong> (Haute-Garonne), dans le cadre de son <strong>Chef d'Ãƒâ€¦Ã¢â‚¬â„¢uvre</strong>. Il démontre à la fois
+            Muret</strong> (Haute-Garonne), dans le cadre de son <strong>Chef d'Œuvre</strong>. Il démontre à la fois
           une compréhension approfondie du métier d'artisan pà¢tissier, du matériel professionnel et des compétences
           numériques avancées pour accompagner l'entrepreneuriat.
         </p>
@@ -4099,7 +4202,7 @@
         <h2 class="apropos-title" data-i18n="about.context">Contexte de la CMA de Muret</h2>
         <p style="color:var(--text-secondary); line-height:1.7; font-size:1rem; margin-bottom:1rem;"
           data-i18n="about.chef_oeuvre.desc">
-          Réalisé en tant que "Chef d'Ãƒâ€¦Ã¢â‚¬â„¢uvre" dans le cursus de la Chambre de Métiers et de l'Artisanat. L'accent a été
+          Réalisé en tant que "Chef d'Œuvre" dans le cursus de la Chambre de Métiers et de l'Artisanat. L'accent a été
           mis sur la viabilité commerciale qui sous-tend les métiers de bouche.
         </p>
         <p style="color:var(--text-secondary); line-height:1.7; font-size:1rem; margin-top:1rem; border-top:1px solid var(--surface-border); padding-top:1rem;"
@@ -5577,8 +5680,8 @@
             <option value="foret_noire">Ã¢â‚¬â„¢ Forêt-Noire</option>
             <option value="tarte_citron">Ã¢â‚¬Â¹ Tarte Citron Meringuée</option>
             <option value="royal">« Royal Chocolat</option>
-            <option value="Étatin">Ã…Â½ Entremet Pomme Tatin</option>
-            <option value="bourdaloue">¥§ Tarte Bourdaloue</option>
+            <option value="Étatin">Ã…Âé Entremet Pomme Tatin</option>
+            <option value="bourdaloue">à Tarte Bourdaloue</option>
             <option value="negresco">Ã¢â‚¬Å“ Negresco Signature</option>
           </select>
           <button class="btn btn-sm btn-outline" onclick="clearAssembly()"> Effacer</button>
@@ -5605,7 +5708,7 @@
                 <option value="cercle"> Cercle</option>
                 <option value="carre"> Carré</option>
                 <option value="buche">🎚️ Bûche</option>
-                <option value="tarte">¥§ Tarte</option>
+                <option value="tarte">à Tarte</option>
                 <option value="verrine">¥Ã†â€™ Verrine</option>
               </select>
               <input type="number" id="assemblyMoldSize" class="form-input" style="width:55px; font-size:0.85rem; padding:4px 8px; margin:0; text-align:center;" value="22" step="1" onchange="changeAssemblyMold()">
@@ -5688,7 +5791,7 @@
               <option value="rectangle"> Rectangle / Cadre</option>
               <option value="buche">ªµ Bûche</option>
               <option value="verrine">¥Ã†â€™ Verrine</option>
-              <option value="tarte">¥§ Moule à tarte</option>
+              <option value="tarte">à Moule à tarte</option>
             </select>
             <div class="mc-fields" id="mcFromFields">
               <!-- Dynamically populated by JS -->
@@ -5710,7 +5813,7 @@
               <option value="rectangle"> Rectangle / Cadre</option>
               <option value="buche">ªµ Bûche</option>
               <option value="verrine">¥Ã†â€™ Verrine</option>
-              <option value="tarte">¥§ Moule à tarte</option>
+              <option value="tarte">à Moule à tarte</option>
             </select>
             <div class="mc-fields" id="mcToFields">
               <!-- Dynamically populated by JS -->
@@ -5736,7 +5839,7 @@
 
       <!-- STEP 4: Recipe selector + Ingredient Scaling -->
       <div class="mc-recipe-zone">
-        <label> ½ Adapter une Recette (optionnel)</label>
+        <label> é Adapter une Recette (optionnel)</label>
         <select class="form-input" id="mcRecipeSelect" onchange="mcSelectRecipe(this.value)">
           <option value="">— Aucune recette sélectionnée —</option>
         </select>
@@ -5972,7 +6075,7 @@
       </div>
 
       <div class="academy-footer">
-        <p>Besoin d'une formation personnalisée ? <a href="mailto:contact@gourmetrevient.fr">Contactez le Chef Expert</a></p>
+        <p>Besoin d'une formation personnalisée ? <a href="mailto:julian31.peresson@gmail.com">Contactez le Chef Expert</a></p>
       </div>
     </div>
   </div>

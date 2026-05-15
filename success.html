@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bienvenue Chef ! - GourmetRevient</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            background: radial-gradient(circle at top right, #6366f1, #1e293b 40%);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-align: center;
+            padding: 2rem;
+        }
+        .success-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 4rem 3rem;
+            border-radius: 40px;
+            max-width: 600px;
+            box-shadow: 0 40px 100px rgba(0,0,0,0.4);
+            animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+        .icon-check {
+            width: 80px;
+            height: 80px;
+            background: #4ade80;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            margin: 0 auto 2rem;
+            box-shadow: 0 0 30px rgba(74, 222, 128, 0.4);
+        }
+        h1 { font-family: 'Outfit', sans-serif; font-size: 2.5rem; font-weight: 850; margin-bottom: 1rem; }
+        p { font-size: 1.1rem; opacity: 0.8; line-height: 1.6; margin-bottom: 2.5rem; }
+        .btn-go {
+            background: white;
+            color: #1e293b;
+            padding: 1.2rem 2.5rem;
+            border-radius: 20px;
+            text-decoration: none;
+            font-weight: 800;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+            display: inline-block;
+        }
+        .btn-go:hover { transform: scale(1.05); box-shadow: 0 10px 30px rgba(255,255,255,0.2); }
+    </style>
+</head>
+<body>
+    <div class="success-card">
+        <div class="icon-check">✓</div>
+        <h1>Félicitations Chef !</h1>
+        <p>Votre abonnement <strong>GourmetRevient PRO</strong> est maintenant actif. <br> Préparez-vous à transformer la rentabilité de votre laboratoire.</p>
+        <a href="index.html" class="btn-go">Accéder à mon Cockpit →</a>
+    </div>
+</body>
+</html>
