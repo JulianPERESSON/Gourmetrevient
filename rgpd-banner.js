@@ -31,7 +31,10 @@ const RGPDManager = (() => {
 
   // Affiche la bannière si pas encore de consentement
   function showBannerIfNeeded() {
-    if (hasConsent()) return;
+    const consent = hasConsent();
+    console.log('🍪 RGPD : Consentement déjà donné ?', consent);
+    if (consent) return;
+    console.log('🍪 RGPD : Affichage de la bannière dans 800ms...');
     setTimeout(renderBanner, 800); // Léger délai pour laisser l'app charger
   }
 
@@ -163,8 +166,15 @@ const RGPDManager = (() => {
 // Exposition globale
 window.RGPDManager = RGPDManager;
 
-// Auto-démarrage après chargement de la page
-window.addEventListener('DOMContentLoaded', () => {
+// Initialisation robuste
+function initRGPD() {
+  console.log('🍪 RGPD : Initialisation...');
   RGPDManager.showBannerIfNeeded();
   RGPDManager.renderConsentLink();
-});
+}
+
+if (document.readyState === 'loading') {
+  window.addEventListener('DOMContentLoaded', initRGPD);
+} else {
+  initRGPD();
+}

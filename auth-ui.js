@@ -526,24 +526,14 @@ const AuthUI = (() => {
         </div>
       </div>
       <hr class="auth-menu-divider">
-      <div class="auth-menu-item" style="display:flex; justify-content:space-between; align-items:center;">
-        <span>Mode Démo</span>
-        <label class="switch">
-          <input type="checkbox" id="demoToggle" ${localStorage.getItem('gourmet_demo_mode') === 'true' ? 'checked' : ''} onchange="AuthUI.toggleDemoMode(this.checked)">
-          <span class="slider round"></span>
-        </label>
-      </div>
-      <button onclick="AuthUI.resetUserData()" class="auth-menu-item" style="color:var(--accent);">🗑️ Vider mes données</button>
+      <button onclick="AuthUI.resetUserData()" class="auth-menu-item" style="color:var(--accent); font-weight:700;">🗑️ Vider mes données</button>
       <hr class="auth-menu-divider">
       <button onclick="AuthUI.replayOnboarding()" class="auth-menu-item" style="color:var(--primary, #10b981); font-weight:700;">✨ Relancer le guide</button>
       <button onclick="AuthUI.exportData()" class="auth-menu-item">📤 Exporter mes données (RGPD)</button>
       ${!isDemo ? `<button onclick="GourmetBilling.openCustomerPortal()" class="auth-menu-item">💳 Mon abonnement</button>` : ''}
       <button onclick="AuthUI.openLegal()" class="auth-menu-item">⚖️ Mentions légales</button>
       <hr class="auth-menu-divider">
-      ${isDemo ? 
-        `<button onclick="AuthUI.quitDemo()" class="auth-menu-item" style="color:var(--accent); font-weight:700;">🚪 Quitter le mode Démo</button>` : 
-        `<button onclick="AuthUI.logout()" class="auth-menu-item auth-menu-danger">🚪 Se déconnecter</button>`
-      }
+      <button onclick="AuthUI.logout()" class="auth-menu-item auth-menu-danger">🚪 Se déconnecter</button>
       ${!isDemo ? `
       <hr class="auth-menu-divider">
       <button onclick="AuthUI.confirmDeleteAccount()" class="auth-menu-item" style="color:#ef4444;font-size:0.8rem;opacity:0.75;" title="Suppression définitive de votre compte (RGPD Art. 17)">🗑️ Supprimer mon compte</button>` : ''}
@@ -613,6 +603,9 @@ const AuthUI = (() => {
 
   function toggleDemoMode(enabled) {
     localStorage.setItem('gourmet_demo_mode', enabled ? 'true' : 'false');
+    if (!enabled) {
+      localStorage.removeItem('gourmet_demo_seeded');
+    }
     if (typeof showToast === 'function') showToast(enabled ? 'Mode Démo activé 🎭' : 'Mode Réel activé (Données Cloud) ☁️', 'info');
     setTimeout(() => window.location.reload(), 1000);
   }
@@ -687,66 +680,22 @@ const AuthUI = (() => {
           item.priceHistory = [];
         });
       }
-
-      // Reset des Recettes
-      const recipesKey = `gourmetrevient_recipes_${userName}`;
-      localStorage.setItem(recipesKey, JSON.stringify([]));
       
-      // Reset CRM & Planning (LocalStorage)
-      const keysToReset = [
-          `gourmetrevient_clients_${userName}`,
-          `gourmetrevient_commandes_${userName}`,
-          `gourmetrevient_fournisseurs_${userName}`,
-          `gourmetrevient_planning_${userName}`,
-          `gourmetrevient_haccp_temp_${userName}`,
-          `gourmetrevient_haccp_clean_${userName}`,
-          `gourmetrevient_pertes_${userName}`,
-          `gourmetrevient_team_${userName}`
-      ];
-      keysToReset.forEach(k => localStorage.setItem(k, JSON.stringify([])));
-
-      // Reset APP State (In-memory)
+      
+      // Reset HACCP in-memory
       if (typeof window.APP !== 'undefined') {
-        window.APP.savedRecipes = [];
-        window.APP.clients = [];
-        window.APP.commandes = [];
-        window.APP.fournisseurs = [];
-        window.APP.planning = [];
-        window.APP.haccp = { temp: [], cleaning: [] };
-        window.APP.pertes = [];
-        window.APP.teamMembers = [];
-        window.APP.staffLeaves = [];
+        window.APP.haccpLogs = { temp: [], trace: [], clean: [], reception: [], allergens: [] };
+        if (typeof window.saveHaccpLogs === 'function') window.saveHaccpLogs();
+        if (typeof window.updateHaccpDashboard === 'function') window.updateHaccpDashboard();
+        if (typeof window.loadHaccpLogs === 'function') window.loadHaccpLogs();
       }
-
-      // Refresh UI
-      if (typeof renderInventory === 'function') renderInventory();
-      if (typeof updateDashboard === 'function') updateDashboard();
-
-      // Synchronize with Cloud if possible
-      if (typeof window.GourmetSync !== 'undefined' && window.GourmetSync.resetCloudData) {
-        await window.GourmetSync.resetCloudData();
-      } else if (session?.user) {
-        // Fallback minimaliste
-        await window.gourmetSupabase.from('ingredients').update({ stock_actuel: 0 }).eq('user_id', session.user.id);
-      }
-
-      if (typeof showToast === 'function') {
-        showToast('✅ Données vidées : stocks remis à 0, liste conservée.', 'success');
-      }
-
-      // Close the menu if open
-      document.getElementById('authUserMenu')?.remove();
-
-      // Reset the button state in profile modal
-      const btn = document.getElementById('btnResetData');
-      if (btn) {
-        delete btn.dataset.confirmed;
-        btn.disabled = false;
-        btn.style.background = 'transparent';
-        btn.style.color = '#ef4444';
-        btn.innerHTML = '🗑️ Vider mes données';
-      }
-
+      
+      // Force clear specific localstorage keys just in case
+      const haccpKeys = ['gourmet_haccp_logs', 'gourmetrevient_haccp_temp', 'gourmetrevient_haccp_clean', 'gourmetrevient_haccp_trace', 'gourmetrevient_haccp_reception'];
+      haccpKeys.forEach(k => {
+          localStorage.removeItem(k);
+          localStorage.removeItem(k + '_' + userName);
+      });
     } catch (err) {
       console.error("Erreur Reset:", err);
       if (typeof showToast === 'function') {

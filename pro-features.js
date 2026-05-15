@@ -587,6 +587,7 @@ async function syncToCloud(silent = false) {
       user: getViewOwner(),
       recipes: JSON.stringify(APP.savedRecipes),
       ingredientDb: JSON.stringify(APP.ingredientDb),
+      haccp: JSON.stringify(APP.haccpLogs),
       profile: JSON.stringify(getUserProfile(getViewOwner())),
       timestamp: new Date().toISOString()
     };
@@ -618,9 +619,15 @@ async function syncFromCloud() {
       headers: { 'apikey': config.key, 'Authorization': `Bearer ${config.key}` }
     });
     const data = await response.json();
-    if (data?.[0]?.recipes) {
-      APP.savedRecipes = JSON.parse(data[0].recipes);
-      saveSavedRecipes();
+    if (data?.[0]) {
+      if (data[0].recipes) {
+        APP.savedRecipes = JSON.parse(data[0].recipes);
+        saveSavedRecipes();
+      }
+      if (data[0].haccp) {
+        APP.haccpLogs = JSON.parse(data[0].haccp);
+        if (typeof saveHaccpLogs === 'function') saveHaccpLogs();
+      }
       showToast('Données restaurées', 'success');
     }
   } catch (e) {

@@ -52,7 +52,7 @@ window.sendSupportMessage = async function(event) {
         if (error) {
             // Fallback to mailto if table doesn't exist yet
             console.warn('[Support] Table support_tickets missing, falling back to mailto');
-            window.location.href = `mailto:contact@gourmetrevient.fr?subject=Support GourmetRevient&body=${encodeURIComponent(message)}`;
+            window.location.href = `mailto:julian31.peresson@gmail.com?subject=Support GourmetRevient&body=${encodeURIComponent(message)}`;
         } else {
             if (typeof showToast === 'function') {
                 showToast("Demande envoyée ! Nous vous répondrons par email.", "success");
@@ -61,7 +61,7 @@ window.sendSupportMessage = async function(event) {
     } catch (err) {
         console.error('[Support] Error:', err);
         // Fallback to mailto
-        window.location.href = `mailto:contact@gourmetrevient.fr?subject=Support GourmetRevient&body=${encodeURIComponent(message)}`;
+        window.location.href = `mailto:julian31.peresson@gmail.com?subject=Support GourmetRevient&body=${encodeURIComponent(message)}`;
     }
 
     // Reset form and close

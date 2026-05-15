@@ -10925,7 +10925,7 @@ select.form-input {
   border-color: var(--accent);
 }
 
-/* --- STYLE POUR LE SWITCH MODE DÉMO --- */
+/* --- STYLE POUR LE SWITCH MODE Dï¿½MO --- */
 .switch {
   position: relative;
   display: inline-block;
@@ -10966,3 +10966,14 @@ input:checked + .slider:before {
   transform: translateX(14px);
 }
 
+
+/* --- Sync Status Indicator --- */
+.sync-status { display: flex; align-items: center; gap: 8px; padding: 6px 12px; background: var(--surface-glass); backdrop-filter: blur(8px); border-radius: 50px; border: 1px solid var(--surface-border); font-size: 0.8rem; font-weight: 600; margin-right: 15px; transition: all 0.3s ease; }
+.status-dot { width: 8px; height: 8px; border-radius: 50%; background: #94a3b8; }
+.status-dot.online { background: #10b981; box-shadow: 0 0 8px rgba(16, 185, 129, 0.5); }
+.status-dot.offline { background: #ef4444; box-shadow: 0 0 8px rgba(239, 68, 68, 0.5); }
+/* --- Floating WhatsApp Support --- */
+.floating-support { position: fixed; bottom: 25px; right: 25px; width: 55px; height: 55px; background: #25d366; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 25px rgba(37, 211, 102, 0.3); cursor: pointer; z-index: 10000; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+.floating-support:hover { transform: scale(1.1) rotate(5deg); box-shadow: 0 12px 30px rgba(37, 211, 102, 0.4); }
+.support-tooltip { position: absolute; right: 70px; background: white; color: #333; padding: 8px 15px; border-radius: 12px; font-size: 0.85rem; font-weight: 700; white-space: nowrap; box-shadow: 0 4px 15px rgba(0,0,0,0.1); opacity: 0; transform: translateX(10px); transition: all 0.3s ease; pointer-events: none; }
+.floating-support:hover .support-tooltip { opacity: 1; transform: translateX(0); }

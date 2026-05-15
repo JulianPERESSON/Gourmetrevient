@@ -238,7 +238,10 @@ const GourmetSync = {
             { key: 'gourmet_ingredients', table: 'ingredients' },
             { key: 'gourmet_haccp_temperatures', table: 'haccp_temperatures' },
             { key: 'gourmet_commandes', table: 'commandes' },
-            { key: 'gourmet_clients', table: 'clients' }
+            { key: 'gourmet_clients', table: 'clients' },
+            { key: 'gourmet_team_members', table: 'team_members' },
+            { key: 'gourmet_staff_leaves', table: 'staff_leaves' },
+            { key: 'gourmet_deliveries', table: 'deliveries' }
         ];
         for (const m of mappings) {
             const data = JSON.parse(localStorage.getItem(m.key) || '[]');
@@ -263,7 +266,7 @@ const GourmetSync = {
         if (typeof showToast === 'function') showToast('Nettoyage en cours... ⏳', 'info');
 
         const tables = ['recettes','recette_ingredients','commandes','clients','fournisseurs',
-            'planning_production','haccp_temperatures','haccp_nettoyage','pertes','team_members','staff_leaves'];
+            'planning_production','haccp_temperatures','haccp_nettoyage','pertes','team_members','staff_leaves','deliveries'];
         for (const table of tables) {
             try { await gourmetSupabase.from(table).delete().eq('user_id', user.id); } catch (e) {}
         }
@@ -280,6 +283,13 @@ const GourmetSync = {
             }
             if (k.includes('gourmet') || k.includes('labpatiss') || k.includes(userPrefix)) localStorage.removeItem(key);
         });
+
+        // Nettoyage forcé des clés spécifiques à l'utilisateur qui pourraient avoir été oubliées
+        localStorage.removeItem(`gourmet_team_members_${userPrefix}`);
+        localStorage.removeItem(`gourmet_staff_leaves_${userPrefix}`);
+        localStorage.removeItem(`gourmet_deliveries`);
+        localStorage.removeItem(`gourmet_production_plan`);
+        localStorage.removeItem(`gourmet_custom_priorities_${userPrefix}`);
 
         if (typeof showToast === 'function') showToast('✅ Espace de travail réinitialisé.', 'success');
         setTimeout(() => window.location.reload(), 1200);
@@ -298,7 +308,7 @@ const GourmetSync = {
         const tablesToDelete = [
             'recette_ingredients', 'recettes', 'commandes', 'clients',
             'fournisseurs', 'planning_production', 'haccp_temperatures',
-            'haccp_nettoyage', 'pertes', 'staff_leaves', 'team_members'
+            'haccp_nettoyage', 'pertes', 'staff_leaves', 'team_members', 'deliveries'
         ];
 
         for (const table of tablesToDelete) {

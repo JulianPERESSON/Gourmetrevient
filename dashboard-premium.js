@@ -18,8 +18,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function seedDemoData() {
     if (localStorage.getItem('gourmet_demo_mode') !== 'true') return;
+    if (localStorage.getItem('gourmet_demo_seeded') === 'true') return;
     
-    const today = new Date().toISOString().split('T')[0];
+    console.log('🌱 Seeding demo data...');
     // Use the same user-scoped keys as hydratePremiumDashboard
     const currUser = (localStorage.getItem('gourmet_current_user') || 'chef').toLowerCase();
 
@@ -137,6 +138,8 @@ function seedDemoData() {
         haccpRaw.temp = [...demoTemp, ...(haccpRaw.temp || [])];
         localStorage.setItem('gourmet_haccp_logs', JSON.stringify(haccpRaw));
     }
+
+    localStorage.setItem('gourmet_demo_seeded', 'true');
 }
 
 // =============================================================================
@@ -190,10 +193,11 @@ window.hydratePremiumDashboard = function () {
         : JSON.parse(localStorage.getItem(`gourmet_inventory${userSuffix}`) || localStorage.getItem('gourmet_inventory') || '[]');
     const team = (window.APP && window.APP.teamMembers && window.APP.teamMembers.length > 0)
         ? window.APP.teamMembers
-        : JSON.parse(localStorage.getItem(`gourmet_team_members${userSuffix}`) || '[]');
+        : JSON.parse(localStorage.getItem(`gourmet_team_members${userSuffix}`) || localStorage.getItem('gourmet_team_members') || '[]');
     const leaves = (window.APP && window.APP.staffLeaves && window.APP.staffLeaves.length > 0)
         ? window.APP.staffLeaves
-        : JSON.parse(localStorage.getItem(`gourmet_staff_leaves${userSuffix}`) || '[]');
+        : JSON.parse(localStorage.getItem(`gourmet_staff_leaves${userSuffix}`) || localStorage.getItem('gourmet_staff_leaves') || '[]');
+    const deliveries = JSON.parse(localStorage.getItem('gourmet_deliveries') || '[]');
     const haccpLogs = (window.APP && window.APP.haccpLogs)
         ? window.APP.haccpLogs
         : JSON.parse(localStorage.getItem('gourmet_haccp_logs') || '{"temp":[],"trace":[],"clean":[],"reception":[]}');
@@ -477,7 +481,9 @@ window.hydratePremiumDashboard = function () {
         // 1. Deliveries Today
         const deliveries = JSON.parse(localStorage.getItem('gourmet_deliveries') || '[]');
         if (deliveries.length > 0) {
-            deliveries.forEach(d => {
+            const todayStr = new Date().toISOString().split('T')[0];
+            const todayDeliveries = deliveries.filter(d => !d.delivery_date || d.delivery_date === todayStr);
+            todayDeliveries.forEach(d => {
                 radarItems.push({
                     icon: '🚚',
                     label: d.supplier,
@@ -824,4 +830,143 @@ window.removeCustomPriority = function(id) {
     
     localStorage.setItem(customKey, JSON.stringify(customPriorities));
     hydratePremiumDashboard();
+};
+
+// 10. ONLINE / OFFLINE LOGIC
+function updateOnlineStatus() {
+    const dot = document.querySelector('#syncStatus .status-dot');
+    const text = document.querySelector('#syncStatus .status-text');
+    const isOnline = navigator.onLine;
+
+    if (dot && text) {
+        dot.classList.toggle('online', isOnline);
+        dot.classList.toggle('offline', !isOnline);
+        text.textContent = isOnline ? 'Cloud Sync : Actif' : 'Mode Hors Ligne';
+    }
+    
+    const legacyDot = document.getElementById('offlineStatusDot');
+    if (legacyDot) {
+        legacyDot.className = isOnline ? 'sync-dot sync-dot--online' : 'sync-dot sync-dot--offline';
+        legacyDot.title = isOnline ? 'Synchronisé ✓' : 'Mode Hors Ligne (Attente réseau)';
+    }
+}
+
+window.addEventListener('online', updateOnlineStatus);
+window.addEventListener('offline', updateOnlineStatus);
+setTimeout(updateOnlineStatus, 1000);
+
+// 11. WEEKLY REPORT MODAL
+window.showWeeklyReport = function() {
+    const currUser = (localStorage.getItem('gourmet_current_user') || 'chef').toLowerCase();
+    const inventory = JSON.parse(localStorage.getItem(`gourmet_inventory_${currUser}`) || localStorage.getItem('gourmet_inventory') || '[]');
+    const recipes = JSON.parse(localStorage.getItem(`gourmetrevient_recipes_${currUser}`) || '[]');
+    const team = JSON.parse(localStorage.getItem(`gourmet_team_members_${currUser}`) || '[]');
+    
+    const topRecipes = [...recipes]
+        .sort((a, b) => (b.costs?.marginPct || 0) - (a.costs?.marginPct || 0))
+        .slice(0, 3);
+
+    const alerts = inventory.filter(i => (i.stock || 0) <= (i.alertThreshold || 5));
+    
+    const avgMargin = recipes.length > 0 
+        ? recipes.reduce((sum, r) => sum + (r.costs?.marginPct || 70), 0) / recipes.length 
+        : 72;
+
+    const modal = document.createElement('div');
+    modal.className = 'glass-modal-overlay';
+    modal.style.zIndex = '10001';
+    modal.innerHTML = `
+        <div class="mgmt-glass-card" style="max-width:600px; width:90%; padding:2.5rem; position:relative; animation: modalSlideUp 0.4s ease;">
+            <button onclick="this.closest('.glass-modal-overlay').remove()" style="position:absolute; top:20px; right:20px; background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:1.5rem;">&times;</button>
+            
+            <div style="text-align:center; margin-bottom:2rem;">
+                <div style="font-size:3rem; margin-bottom:0.5rem;">📅</div>
+                <h2 style="margin:0; font-family:var(--font-display); color:var(--primary);">Votre Rapport Hebdomadaire</h2>
+                <p style="color:var(--text-muted);">Résumé de performance du ${new Date().toLocaleDateString('fr-FR')}</p>
+            </div>
+
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1.5rem; margin-bottom:2rem;">
+                <div class="glass-card-inner" style="padding:1.2rem; text-align:center;">
+                    <div style="font-size:0.8rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px;">Marge Moyenne</div>
+                    <div style="font-size:1.8rem; font-weight:900; color:${avgMargin > 70 ? 'var(--success)' : 'var(--warning)'};">${avgMargin.toFixed(1)}%</div>
+                </div>
+                <div class="glass-card-inner" style="padding:1.2rem; text-align:center;">
+                    <div style="font-size:0.8rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px;">Alertes Stock</div>
+                    <div style="font-size:1.8rem; font-weight:900; color:${alerts.length > 0 ? 'var(--danger)' : 'var(--success)'};">${alerts.length}</div>
+                </div>
+            </div>
+
+            <h4 style="margin-bottom:1rem; border-bottom:1px solid var(--surface-border); padding-bottom:0.5rem;">🌟 Top 3 Rentabilité</h4>
+            <div style="display:flex; flex-direction:column; gap:0.8rem; margin-bottom:2rem;">
+                ${topRecipes.length > 0 ? topRecipes.map(r => `
+                    <div style="display:flex; justify-content:space-between; align-items:center; padding:0.8rem; background:rgba(99, 102, 241, 0.05); border-radius:10px;">
+                        <span style="font-weight:600;">${r.name}</span>
+                        <span style="font-weight:800; color:var(--accent);">${(r.costs?.marginPct || 0).toFixed(1)}%</span>
+                    </div>
+                `).join('') : '<p style="color:var(--text-muted); font-size:0.9rem;">Aucune recette enregistrée.</p>'}
+            </div>
+
+            <h4 style="margin-bottom:1rem; border-bottom:1px solid var(--surface-border); padding-bottom:0.5rem;">👷 Équipe & Planning</h4>
+            <p style="font-size:0.9rem; color:var(--text-secondary);">
+                ${team.length} collaborateurs actifs. 
+                ${team.length > 0 ? 'Planning à jour pour la semaine prochaine.' : 'Aucun collaborateur enregistré.'}
+            </p>
+
+            <button onclick="this.closest('.glass-modal-overlay').remove()" class="btn btn-primary btn-full" style="margin-top:2rem;">✅ Compris !</button>
+        </div>
+    `;
+    document.body.appendChild(modal);
+};
+
+// 12. ONBOARDING CHECKLIST LOGIC
+function updateOnboardingChecklist() {
+    const currUser = (localStorage.getItem('gourmet_current_user') || 'chef').toLowerCase();
+    const inventory = JSON.parse(localStorage.getItem(`gourmet_inventory_${currUser}`) || localStorage.getItem('gourmet_inventory') || '[]');
+    const recipes = JSON.parse(localStorage.getItem(`gourmetrevient_recipes_${currUser}`) || '[]');
+    const team = JSON.parse(localStorage.getItem(`gourmet_team_members_${currUser}`) || '[]');
+    const haccpLogs = JSON.parse(localStorage.getItem('gourmet_haccp_logs') || '{"temp":[]}');
+
+    const tasks = [
+        { id: 'recipe', done: recipes.length > 0, el: 'chkRecipe' },
+        { id: 'stock', done: inventory.length > 0, el: 'chkStock' },
+        { id: 'team', done: team.length > 0, el: 'chkTeam' },
+        { id: 'haccp', done: (haccpLogs.temp || []).length > 0, el: 'chkHaccp' }
+    ];
+
+    let completedCount = 0;
+    tasks.forEach(task => {
+        const checkbox = document.getElementById(task.el);
+        const parent = checkbox ? checkbox.closest('.check-item') : null;
+        if (checkbox) {
+            checkbox.checked = task.done;
+            if (task.done) {
+                completedCount++;
+                if (parent) parent.classList.add('completed');
+            } else {
+                if (parent) parent.classList.remove('completed');
+            }
+        }
+    });
+
+    const pct = Math.round((completedCount / tasks.length) * 100);
+    const progressBar = document.getElementById('onboardingProgressBar');
+    const pctText = document.getElementById('onboardingPctText');
+    const checklistCard = document.getElementById('onboardingChecklist');
+
+    if (progressBar) progressBar.style.width = pct + '%';
+    if (pctText) pctText.textContent = pct + '% complété';
+    
+    // Hide checklist if 100% completed after some time
+    if (pct === 100 && checklistCard) {
+        setTimeout(() => {
+            checklistCard.style.display = 'none';
+        }, 5000);
+    }
+}
+
+// Hook into the main hydration
+const originalHydrate = window.hydratePremiumDashboard;
+window.hydratePremiumDashboard = function() {
+    if (typeof originalHydrate === 'function') originalHydrate();
+    updateOnboardingChecklist();
 };

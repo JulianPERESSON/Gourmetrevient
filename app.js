@@ -1921,6 +1921,7 @@ function renderSavedRecipes() {
         <div class="sc-nutri" style="margin:0.4rem 0;">${typeof renderNutriScoreBadge === 'function' ? renderNutriScoreBadge(r) : ''}</div>
         <div class="sc-actions">
           <button class="btn btn-outline btn-sm" onclick="loadRecipe('${r.id}')">${t('nav.home') === 'Home' ? 'Load' : (t('nav.home') === 'Inicio' ? 'Cargar' : 'Charger')}</button>
+          <button class="btn btn-outline btn-sm" onclick="window.printDLCLabel('${r.id}', false)">🏷️</button>
           <button class="btn btn-danger btn-sm" onclick="deleteRecipe('${r.id}')">${t('nav.home') === 'Home' ? 'Delete' : (t('nav.home') === 'Inicio' ? 'Eliminar' : 'Supprimer')}</button>
         </div>
       </div>
@@ -2167,7 +2168,10 @@ window.filterLibrary = function() {
 
     return `
       <div class="library-card" onclick="loadExampleRecipe(${originalIdx})">
-        <button class="library-card-pdf" onclick="event.stopPropagation(); exportRecipePdfDirect(${originalIdx})" title="${t('recipe.lib.export_pdf')}">📄 PDF</button>
+        <div style="position:absolute; top:10px; right:10px; display:flex; gap:5px;">
+           <button class="library-card-pdf" onclick="event.stopPropagation(); exportRecipePdfDirect(${originalIdx})" title="${t('recipe.lib.export_pdf')}">📄 PDF</button>
+           <button class="library-card-pdf" style="background:#10b981;" onclick="event.stopPropagation(); window.printDLCLabel('${r.id}', true)" title="Étiquette DLC">🏷️</button>
+        </div>
         <div class="library-card-img-placeholder">${emoji}</div>
         <div class="library-card-category">${escapeHtml(tCat)}</div>
         <h4 class="library-card-title">${escapeHtml(displayName)}</h4>
@@ -2485,6 +2489,69 @@ function exportDevisPdf() {
     });
   }, 1000);
 }
+
+// ============================================================================
+// TRACEABILITY LABELS (DLC)
+// ============================================================================
+
+window.printDLCLabel = function(recipeId, isExample = false) {
+    let recipe;
+    if (isExample) {
+        recipe = (typeof RECIPES !== 'undefined' ? RECIPES : []).find(r => r.id === recipeId);
+    } else {
+        recipe = APP.savedRecipes.find(r => r.id === recipeId);
+    }
+    
+    if (!recipe) return;
+
+    const today = new Date();
+    const dlc = new Date();
+    dlc.setDate(today.getDate() + 3); // Default 3 days
+
+    const content = `
+        <div style="width: 300px; padding: 15px; border: 2px solid #000; font-family: sans-serif; text-align: center; background: #fff; color: #000;">
+            <div style="font-weight: 800; font-size: 1.2rem; border-bottom: 1px solid #000; padding-bottom: 5px; margin-bottom: 10px;">
+                🧁 GourmetRevient
+            </div>
+            <div style="font-size: 1rem; font-weight: 700; margin-bottom: 5px;">${recipe.name}</div>
+            <div style="font-size: 0.8rem; margin-bottom: 10px;">Catégorie: ${recipe.category || 'Pâtisserie'}</div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
+                <div style="text-align: left;">
+                    <div style="font-size: 0.6rem; text-transform: uppercase;">Fabriqué le</div>
+                    <div style="font-weight: 700;">${today.toLocaleDateString('fr-FR')}</div>
+                </div>
+                <div style="text-align: right;">
+                    <div style="font-size: 0.6rem; text-transform: uppercase; color: #ef4444;">À consommer jusqu'au</div>
+                    <div style="font-weight: 700; color: #ef4444;">${dlc.toLocaleDateString('fr-FR')}</div>
+                </div>
+            </div>
+
+            <div style="font-size: 0.6rem; text-align: left; margin-bottom: 10px; padding: 5px; background: #f1f5f9;">
+                <strong>ALLERGÈNES:</strong> Gluten, Œufs, Lait, Fruits à coque.
+            </div>
+
+            <div style="font-size: 0.7rem; border-top: 1px dashed #000; padding-top: 5px;">
+                Conserver entre 0°C et +4°C
+            </div>
+        </div>
+    `;
+
+    const opt = {
+        margin: 5,
+        filename: `label_${recipeId}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 3 },
+        jsPDF: { unit: 'mm', format: [100, 60], orientation: 'landscape' }
+    };
+
+    if (typeof html2pdf !== 'undefined') {
+        html2pdf().from(content).set(opt).save();
+        showToast('🏷️ Étiquette DLC générée', 'success');
+    } else {
+        showToast('Erreur: html2pdf non disponible', 'error');
+    }
+};
 
 // ============================================================================
 // INGREDIENT DATABASE MODAL
