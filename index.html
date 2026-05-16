@@ -8,7 +8,7 @@
   <title>GourmetRevient — Le Copilote des Artisans Pâtissiers</title>
   <link rel="stylesheet" href="css/tool-guide.css?v=11.5.1">
   <meta name="description"
-    content="Logiciel de gestion tout-en-un pour artisans p&acirc;tissiers : calcul de co&ucirc;t de revient, conformité HACCP, planning d'é&eacute;quipe et agencement de laboratoire." />
+    content="Logiciel de gestion tout-en-un pour artisans p&acirc;tissiers : calcul de co&ucirc;t de revient, conformité HACCP, planning d'ééquipe et agencement de laboratoire." />
 
   <!-- Open Graph / social media -->
   <meta property="og:type" content="website" />
@@ -31,12 +31,12 @@
   <link rel="manifest" href="./manifest.json?v=1.0.1" />
   <meta name="theme-color" content="#4f46e5" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-sÉtatus-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="GourmetRev" />
   <link rel="apple-touch-icon" href="./img/macaron.jpg" />
 
   <!--  CYBERSÉCURITÉ : Headers de protection -->
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://js.stripe.com 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gsÉtatic.com data:; img-src 'self' data: blob: https:; connect-src 'self' https://hogfrddigcojdmjjpbno.supabase.co https://api.stripe.com; frame-src https://js.stripe.com; object-src 'none'; upgrade-insecure-requests;">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://js.stripe.com 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; connect-src 'self' https://hogfrddigcojdmjjpbno.supabase.co https://api.stripe.com; frame-src https://js.stripe.com; object-src 'none'; upgrade-insecure-requests;">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta http-equiv="X-Content-Type-Options" content="nosniff">
   <meta http-equiv="X-Frame-Options" content="DENY">
@@ -111,7 +111,7 @@
     }
 
     // Nettoyer l'URL immédiatement
-    window.history.replaceSÉtate({}, document.title, window.location.pathname);
+    window.history.replaceState({}, document.title, window.location.pathname);
 
     window.addEventListener('DOMContentLoaded', () => {
       setTimeout(() => {
@@ -365,7 +365,7 @@
     }
 
     /* Section headers édito */
-    .sÉtats-header h2,
+    .stats-header h2,
     .mgmt-card-title h3 {
       font-family: var(--font-display);
       font-weight: var(--fw-black);
@@ -373,7 +373,7 @@
     }
 
     /* ·······························································
-       BANNIÃƒÆ’Ã‹â€ RE OFFLINE PWA
+       BANNIƒÆ’Ëâ€ RE OFFLINE PWA
        ······························································· */
 
     #offlineBanner {
@@ -721,7 +721,7 @@
       flex-shrink: 0;
     }
 
-    /* Loading sÉtate chart */
+    /* Loading state chart */
     .chart-loading {
       display: flex;
       align-items: center;
@@ -1197,27 +1197,27 @@
         <div id="signupFieldsManual" style="display:none;">
           <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
             <div class="auth-field">
-              <label>👤 Prénom</label>
+              <label>Prénom</label>
               <input type="text" id="authFirstNameManual" placeholder="Marie" class="auth-input">
             </div>
             <div class="auth-field">
-              <label>👤 Nom</label>
+              <label>Nom</label>
               <input type="text" id="authLastNameManual" placeholder="Dupont" class="auth-input">
             </div>
           </div>
         </div>
 
         <div class="auth-field">
-          <label>📧📧 Email</label>
+          <label>Email</label>
           <input type="email" id="authEmailManual" placeholder="chef@patisserie.fr" class="auth-input">
         </div>
         <div class="auth-field">
-          <label> Mot de passe</label>
+          <label>Mot de passe</label>
           <input type="password" id="authPasswordManual" placeholder="••••••••" class="auth-input">
         </div>
 
         <div id="confirmPassFieldManual" style="display:none;" class="auth-field">
-          <label> Confirmer le mot de passe</label>
+          <label>Confirmer le mot de passe</label>
           <input type="password" id="authPasswordConfirmManual" placeholder="••••••••" class="auth-input">
         </div>
 
@@ -1426,7 +1426,7 @@
     setInterval(() => {
       const isAuth = localStorage.getItem('gourmet_auth') === 'true';
       if (isAuth) {
-        // Force la suppression des éÉtats de blocage
+        // Force la suppression des états de blocage
         document.body.classList.remove('auth-pending');
         const overlay = document.getElementById('authManualOverlay');
         if (overlay) overlay.style.display = 'none';
@@ -1470,7 +1470,7 @@
       <div class="nav-dropdown">
         <button class="nav-dropdown-trigger">📊 <span data-i18n="nav.category.analysis">Pilotage & Business</span> <span class="nav-arrow">▼</span></button>
         <div class="nav-dropdown-content">
-          <button class="nav-link nav-dropdown-link" id="navSÉtats"><span data-i18n="nav.sÉtats">Tableau de Bord & SÉtats</span></button>
+          <button class="nav-link nav-dropdown-link" id="navStats"><span data-i18n="nav.stats">Tableau de Bord & Stats</span></button>
           <button class="nav-link nav-dropdown-link" id="navCRM"><span data-i18n="nav.crm">Commandes & CRM</span></button>
           <button class="nav-link nav-dropdown-link" id="navBilling"><span data-i18n="nav.billing">Factures & Abonnement</span></button>
           <button class="nav-link nav-dropdown-link" id="navCatalogue"><span data-i18n="nav.catalogue">E-Catalogue Client</span></button>
@@ -1495,7 +1495,7 @@
         <button class="nav-dropdown-trigger">🛡️ <span data-i18n="nav.category.mgmt">Labo & Qualité</span> <span class="nav-arrow">▼</span></button>
         <div class="nav-dropdown-content">
           <button class="nav-link nav-dropdown-link" id="navHygiene"><span data-i18n="nav.hygiene">Hygiène & HACCP</span></button>
-          <button class="nav-link nav-dropdown-link" id="navPlanning"><span data-i18n="nav.team">É&eacute;quipe & Planning</span></button>
+          <button class="nav-link nav-dropdown-link" id="navPlanning"><span data-i18n="nav.team">Ééquipe & Planning</span></button>
           <button class="nav-link nav-dropdown-link" id="navLabo"><span data-i18n="nav.creative.lab">Agencement Labo (2D)</span></button>
           <button class="nav-link nav-dropdown-link" id="navSuppliers"><span data-i18n="nav.suppliers">Fournisseurs</span></button>
           <button class="nav-link nav-dropdown-link" id="navScheduler"><span data-i18n="nav.scheduler">Ordonnancement CAP</span></button>
@@ -1507,7 +1507,7 @@
         <button class="nav-dropdown-trigger">📍 Projet & Portfolio <span class="nav-arrow">▼</span></button>
         <div class="nav-dropdown-content">
           <button class="nav-link nav-dropdown-link" id="navPortfolio"><span data-i18n="nav.portfolio">Mon Portfolio</span></button>
-          <button class="nav-link nav-dropdown-link" id="navAbout"><span data-i18n="nav.about">ÀÀ propos du projet</span></button>
+          <button class="nav-link nav-dropdown-link" id="navAbout"><span data-i18n="nav.about">À propos du projet</span></button>
         </div>
       </div>
 
@@ -1516,9 +1516,9 @@
 
     <div class="header-actions" id="userProfileArea" style="display:none; align-items:center; gap:12px; margin-left: auto;">
       <!-- °Cloud Sync Pill -->
-      <div id="syncSÉtatus" class="sync-sÉtatus" title="ÉÉtat de la synchronisation cloud" style="display: flex; align-items: center; gap: 6px; background: var(--bg-alt); padding: 4px 10px; border-radius: 20px; border: 1px solid var(--surface-border);">
-         <span id="offlineSÉtatusDot" class="sync-dot sync-dot--online" style="width:8px; height:8px; border-radius:50%; display:inline-block;"></span>
-         <span class="sÉtatus-text" style="font-size:0.7rem; font-weight:700; color:var(--text-secondary);">Cloud : Actif</span>
+      <div id="syncStatus" class="sync-status" title="État de la synchronisation cloud" style="display: flex; align-items: center; gap: 6px; background: var(--bg-alt); padding: 4px 10px; border-radius: 20px; border: 1px solid var(--surface-border);">
+         <span id="offlineStatusDot" class="sync-dot sync-dot--online" style="width:8px; height:8px; border-radius:50%; display:inline-block;"></span>
+         <span class="status-text" style="font-size:0.7rem; font-weight:700; color:var(--text-secondary);">Cloud : Actif</span>
       </div>
 
       <button class="btn btn-primary btn-sm" id="btnSubscribePro" onclick="window.GourmetBilling.checkout('pro_monthly')" style="background: linear-gradient(135deg, #6366f1, #8b5cf6); border: none; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3); padding: 0.5rem 1rem; border-radius: 12px;">
@@ -1570,9 +1570,9 @@
             <span class="hub-cta-icon">📖</span>
             <span data-i18n="nav.recipes">Nouvelle Recette</span>
           </button>
-          <button class="hub-cta-secondary" onclick="showSÉtats()">
+          <button class="hub-cta-secondary" onclick="showStats()">
             <span class="hub-cta-icon">📊</span>
-            <span>SÉtatistiques</span>
+            <span>Statistiques</span>
           </button>
         </div>
       </div>
@@ -1583,7 +1583,7 @@
           <div class="hub-kpi-icon" style="background: rgba(99,102,241,0.10); color: var(--accent);">°</div>
           <div class="hub-kpi-body">
             <span class="hub-kpi-value" id="briefingProdCount">—</span>
-            <span class="hub-kpi-label" data-i18n="dash.sÉtat.production">Production aujourd'hui</span>
+            <span class="hub-kpi-label" data-i18n="dash.stat.production">Production aujourd'hui</span>
           </div>
           <div class="hub-kpi-trend up">↑</div>
         </div>
@@ -1591,7 +1591,7 @@
           <div class="hub-kpi-icon" style="background: rgba(245,158,11,0.12); color: #f59e0b;">📦</div>
           <div class="hub-kpi-body">
             <span class="hub-kpi-value" id="briefingAlertCount">—</span>
-            <span class="hub-kpi-label" data-i18n="dash.sÉtat.alerts">Alertes Stock</span>
+            <span class="hub-kpi-label" data-i18n="dash.stat.alerts">Alertes Stock</span>
           </div>
           <div class="hub-kpi-trend neutral">→</div>
         </div>
@@ -1599,15 +1599,14 @@
           <div class="hub-kpi-icon" style="background: rgba(16,185,129,0.12); color: #10b981;">📈</div>
           <div class="hub-kpi-body">
             <span class="hub-kpi-value" id="briefingMarginValue">—</span>
-            <span class="hub-kpi-label" data-i18n="dash.sÉtat.rentability">Marge Moyenne</span>
+            <span class="hub-kpi-label" data-i18n="dash.stat.rentability">Marge Moyenne</span>
           </div>
           <div class="hub-kpi-trend up">↑</div>
         </div>
         <div class="hub-kpi-card hub-kpi-card-cta" onclick="showMgmt(); switchMgmtTab('production');">
           <div class="hub-kpi-icon" style="background: rgba(99,102,241,0.10); color: var(--accent);">📅</div>
           <div class="hub-kpi-body">
-            <span class="hub-kpi-value">Planifier</span>
-            <span class="hub-kpi-label">Gérer ma production</span>
+            <span class="hub-kpi-value" data-i18n="dash.priority.btn_plan">Planifier</span> <span class="hub-kpi-label" data-i18n="dash.cockpit.manage_planning">Gérer ma production</span>
           </div>
           <div class="hub-kpi-trend" style="color: var(--accent);">→</div>
         </div>
@@ -1640,7 +1639,7 @@
         <div class="hub-bento-card hub-card-priorities">
           <div class="hub-card-header" style="display: flex; justify-content: space-between; align-items: center;">
             <div class="hub-card-title-group">
-              <span class="hub-card-icon" style="color:#ef4444;"></span>
+              <span class="hub-card-icon" style="color:#ef4444;">🔥</span>
               <h3 data-i18n="dash.priority.title">Priorités du Jour</h3>
             </div>
             <button class="hub-header-action" onclick="window.addCustomPriority()" style="background:none; border:none; color:var(--text-muted); cursor:pointer; padding:4px;" title="Ajouter une priorité">
@@ -1662,7 +1661,7 @@
         <div class="hub-bento-card hub-card-ai">
           <div class="hub-card-header">
             <div class="hub-card-title-group">
-              <span class="hub-card-icon" style="color:#8b5cf6;">¤Ã¢â‚¬â€œ</span>
+              <span class="hub-card-icon" style="color:#8b5cf6;">🧠</span>
               <h3 data-i18n="dash.ai.expert.title">Assistant Expert</h3>
             </div>
             <span class="hub-badge-pro">PRO</span>
@@ -1704,7 +1703,7 @@
             <div class="pricewatch-item warning">
               <span class="pw-label">Beurre AOP</span>
               <span class="pw-value">+5%</span>
-              <span class="pw-trend"> Ã¢â‚¬â€</span>
+              <span class="pw-trend"> —</span>
             </div>
             <div class="pricewatch-item success">
               <span class="pw-label">Framboises</span>
@@ -1714,24 +1713,24 @@
           </div>
         </div>
 
-        <!-- °CARD 6: É&eacute;quipe & HACCP -->
+        <!-- °CARD 6: Ééquipe & HACCP -->
         <div class="hub-bento-card hub-card-team">
           <div class="hub-card-header">
             <div class="hub-card-title-group">
               <span class="hub-card-icon" style="color:#6366f1;"></span>
-              <h3 data-i18n="dash.kpi.team">É&eacute;quipe & Sécurité</h3>
+              <h3 data-i18n="dash.kpi.team">Ééquipe & Sécurité</h3>
             </div>
             <button class="hub-link-btn-sm" onclick="showPlanning()">Planning →</button>
           </div>
           <div class="hub-team-body" id="dashTeamSummary">
-            <div class="hub-team-sÉtat">
+            <div class="hub-team-stat">
               <span class="hub-team-label">Présence</span>
               <span class="hub-team-value" id="dashPresenceCount">—</span>
             </div>
             <div class="hub-team-divider"></div>
-            <div class="hub-team-sÉtat">
+            <div class="hub-team-stat">
               <span class="hub-team-label">HACCP</span>
-              <span class="hub-team-value" id="dashHACCPSÉtatus">—</span>
+              <span class="hub-team-value" id="dashHACCPStatus">—</span>
             </div>
           </div>
         </div>
@@ -1740,7 +1739,7 @@
 
       <!-- ··· PRO TIP ··· -->
       <div class="hub-pro-tip">
-        <span class="hub-tip-icon">💰¡</span>
+        <span class="hub-tip-icon">💡</span>
         <p id="dashTipBody" class="hub-tip-text"><strong data-i18n="dash.tip_prefix">Astuce du Chef</strong> — Utilisez le scanner OCR pour mettre à jour vos prix d'achat en 2 secondes.</p>
       </div>
     </section>
@@ -1752,7 +1751,7 @@
       <!-- Standard Site Hero -->
       <section class="hero" style="padding-bottom: 3.5rem;">
         <div class="hero-badge" data-i18n="mgmt.hero.badge"> Excellence Opérationnelle</div>
-        <h2 data-i18n="hero.title">Calculateur de <span class="accent">recettes</span><br>pour la p&acirc;tisserie</h2>
+        <h2 data-i18n="hero.title">Calculateur de <span class="accent">recettes</span><br>pour la pâtisserie</h2>
         <p data-i18n="mgmt.hero.desc">Planifiez vos fournées, gérez vos stocks et suivez vos allergènes réglementaires.</p>
       </section>
 
@@ -1763,7 +1762,7 @@
         <div class="mgmt-tabs-premium">
           <button class="mgmt-tab-pill active" id="mgmtTabDashboard" onclick="switchMgmtTab('dashboard')">
             <span class="tab-pill-emoji">📊</span>
-            <span data-i18n="nav.sÉtats">Tableau de Bord</span>
+            <span data-i18n="nav.stats">Tableau de Bord</span>
           </button>
           <button class="mgmt-tab-pill" id="mgmtTabProduction" onclick="switchMgmtTab('production')">
             <span class="tab-pill-emoji">📅</span>
@@ -1880,7 +1879,7 @@
                                    <th>N° Facture</th>
                                    <th>Description</th>
                                    <th>Montant</th>
-                                   <th>SÉtatut</th>
+                                   <th>Statut</th>
                                    <th>Action</th>
                                 </tr>
                              </thead>
@@ -1988,7 +1987,7 @@
                   <div id="qualityViewWasteLog" class="quality-subview" style="display:none;">
                      <div style="margin-bottom:2.5rem;">
                         <h2 style="margin:0; font-family:var(--font-display); font-size:1.8rem; color:var(--primary);"> Saisie de Signalement</h2>
-                        <p style="color:var(--text-muted); margin:5px 0 0 0;">Enregistrez une perte, une casse ou une dégusÉtation technique.</p>
+                        <p style="color:var(--text-muted); margin:5px 0 0 0;">Enregistrez une perte, une casse ou une dégustation technique.</p>
                      </div>
                      <div class="mgmt-glass-card" style="max-width: 600px; padding: 2.5rem; background: white; border-radius: 30px; margin: 0 auto; box-shadow: 0 20px 40px rgba(0,0,0,0.05);">
                         <div class="form-group" style="margin-bottom:1.5rem;">
@@ -2005,7 +2004,7 @@
                               <select id="wasteReason" class="form-input" style="width:100%; height:50px; border-radius:15px; border:2px solid rgba(99,102,241,0.1); font-weight:700;">
                                  <option value="invendu">¥ Invendu (Surproduction)</option>
                                  <option value="casse">💰¥ Casse / Erreur technique</option>
-                                 <option value="degusÉtation">¥Ã¢â‚¬Å¾ DégusÉtation / Client</option>
+                                 <option value="degustation">¥“ Dégustation / Client</option>
                                  <option value="peremption"> Périmé / Stock</option>
                               </select>
                            </div>
@@ -2127,7 +2126,7 @@
                 <p data-i18n="inco.card.desc">Générez des étiquettes réglementaires conformes UE n°1169/2011 avec allergènes en gras.</p>
               </div>
               <div class="protools-card-footer">
-                <span class="protools-tag">Format 60ÃƒÆ’Ã¢â‚¬â€40mm</span>
+                <span class="protools-tag">Format 60ƒÆ’—40mm</span>
                 <span class="protools-arrow">→</span>
               </div>
             </div>
@@ -2205,24 +2204,24 @@
 
         <!-- TAB: DASHBOARD V2 -->
         <div id="mgmtViewDashboard" class="mgmt-view">
-          <div id="mgmtDashboardGrid" class="sÉtats-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2rem; flex-wrap:wrap; gap:1rem;">
+          <div id="mgmtDashboardGrid" class="stats-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2rem; flex-wrap:wrap; gap:1rem;">
             <div>
-              <h2 style="margin:0; font-family:var(--font-display); font-size:1.8rem; color:var(--primary);" data-i18n="sÉtats.dashboard.title">📊 Cockpit de Pilotage Pro</h2>
-              <p style="color:var(--text-muted); margin:0; font-size:0.9rem;" data-i18n="sÉtats.dashboard.subtitle">Intelligence commerciale & optimisation des marges en temps réel.</p>
+              <h2 style="margin:0; font-family:var(--font-display); font-size:1.8rem; color:var(--primary);" data-i18n="stats.dashboard.title">📊 Cockpit de Pilotage Pro</h2>
+              <p style="color:var(--text-muted); margin:0; font-size:0.9rem;" data-i18n="stats.dashboard.subtitle">Intelligence commerciale & optimisation des marges en temps réel.</p>
             </div>
             <div style="display:flex; gap:0.8rem; align-items:center;">
-              <div id="sÉtatsCategoryFilters" class="sÉtats-toggle-group">
+              <div id="statsCategoryFilters" class="stats-toggle-group">
                  <!-- JS Populated -->
               </div>
               <button class="btn btn-sm btn-outline" onclick="window.showWeeklyReport()" title="Rapport Hebdo">📅 Rapport Hebdo</button>
               <button class="btn btn-sm btn-outline" onclick="switchMgmtTab('dashboard_config')" title="Paramètres"></button>
-              <button class="btn btn-sm btn-primary" onclick="exportSÉtatsPDF()"> Rapport PDF</button>
+              <button class="btn btn-sm btn-primary" onclick="exportStatsPDF()"> Rapport PDF</button>
             </div>
           </div>
 
 
-          <div class="sÉtats-main-grid" style="display:grid; grid-template-columns: 1fr 340px; gap:2rem;">
-            <div class="sÉtats-col-left" style="display:flex; flex-direction:column; gap:2rem;">
+          <div class="stats-main-grid" style="display:grid; grid-template-columns: 1fr 340px; gap:2rem;">
+            <div class="stats-col-left" style="display:flex; flex-direction:column; gap:2rem;">
                
                <!-- Top Charts Row -->
                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1.5rem;">
@@ -2232,7 +2231,7 @@
                      <p id="v2MarginAnalysis" style="font-size:0.75rem; color:var(--text-muted); margin-top:1rem; text-align:center;"></p>
                   </div>
                   <div class="mgmt-glass-card" style="padding:1.5rem;">
-                     <h3 style="font-size:1rem; margin:0 0 1rem 0; font-family:var(--font-display);">Ã¢â‚¬Â  Top 5 Performance</h3>
+                     <h3 style="font-size:1rem; margin:0 0 1rem 0; font-family:var(--font-display);">“   Top 5 Performance</h3>
                      <div style="height:220px;"><canvas id="v2PerformanceChart"></canvas></div>
                   </div>
                </div>
@@ -2250,7 +2249,7 @@
                </div>
             </div>
 
-            <div class="sÉtats-col-right" style="display:flex; flex-direction:column; gap:2rem;">
+            <div class="stats-col-right" style="display:flex; flex-direction:column; gap:2rem;">
                <!-- ONBOARDING CHECKLIST -->
                <div id="onboardingChecklist" class="mgmt-glass-card" style="padding:1.5rem; background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(16, 185, 129, 0.1)); border: 1px solid var(--accent-glow) !important;">
                   <h3 style="font-size:1rem; margin:0 0 1rem 0; display:flex; align-items:center; gap:0.5rem;">🚀 Checklist de Démarrage</h3>
@@ -2265,7 +2264,7 @@
                      </div>
                      <div class="check-item" data-id="team">
                         <input type="checkbox" id="chkTeam" disabled>
-                        <label for="chkTeam">Ajouter un membre d'é&eacute;quipe</label>
+                        <label for="chkTeam">Ajouter un membre d'ééquipe</label>
                      </div>
                      <div class="check-item" data-id="haccp">
                         <input type="checkbox" id="chkHaccp" disabled>
@@ -2282,15 +2281,15 @@
                   </div>
                </div>
                <div class="mgmt-glass-card" style="padding:1.5rem; background:rgba(99, 102, 241, 0.05); border:1px solid rgba(99, 102, 241, 0.3) !important;">
-                  <h3 style="font-size:1.1rem; margin:0 0 1rem 0; display:flex; align-items:center; gap:0.5rem;"><span>Ã°Å¸â€™Â¡ Assistant de Labo IA</span></h3>
-                  <p id="sÉtatsInsightText" style="font-size:0.85rem; line-height:1.6; color:var(--text-secondary);">
-                    Chargement des prévisions... </p></div><div class="pastry-timer" style="background:var(--surface); border:1px solid var(--surface-border); border-radius:12px; padding:1rem; text-align:center;"><div style="font-size:0.6rem; text-transform:uppercase; color:var(--text-muted); font-weight:700; margin-bottom:5px;">Ã¢ÂÂ²Ã¯Â¸Â Minuteur de Labo</div><div id="timerDisplay" style="font-family:monospace; font-size:1.8rem; font-weight:800; color:var(--primary); margin-bottom:10px;">00:00</div><div style="display:flex; justify-content:center; gap:0.5rem;"><button class="btn btn-sm btn-outline" style="padding:4px 10px;" onclick="window.adjustTimer(5)">+5m</button><button class="btn btn-sm btn-primary" style="padding:4px 15px;" id="btnTimerToggle" onclick="window.toggleTimer()">Start</button><button class="btn btn-sm btn-outline" style="padding:4px 10px;" onclick="window.resetTimer()">Reset</button></div></div>
+                  <h3 style="font-size:1.1rem; margin:0 0 1rem 0; display:flex; align-items:center; gap:0.5rem;"><span>😡 Assistant de Labo IA</span></h3>
+                  <p id="statsInsightText" style="font-size:0.85rem; line-height:1.6; color:var(--text-secondary);">
+                    Chargement des prévisions... </p></div><div class="pastry-timer" style="background:var(--surface); border:1px solid var(--surface-border); border-radius:12px; padding:1rem; text-align:center;"><div style="font-size:0.6rem; text-transform:uppercase; color:var(--text-muted); font-weight:700; margin-bottom:5px;">â²ïÂ¸ Minuteur de Labo</div><div id="timerDisplay" style="font-family:monospace; font-size:1.8rem; font-weight:800; color:var(--primary); margin-bottom:10px;">00:00</div><div style="display:flex; justify-content:center; gap:0.5rem;"><button class="btn btn-sm btn-outline" style="padding:4px 10px;" onclick="window.adjustTimer(5)">+5m</button><button class="btn btn-sm btn-primary" style="padding:4px 15px;" id="btnTimerToggle" onclick="window.toggleTimer()">Start</button><button class="btn btn-sm btn-outline" style="padding:4px 10px;" onclick="window.resetTimer()">Reset</button></div></div>
                   </p>
                </div>
                
                <div class="mgmt-glass-card" style="padding:1.5rem;">
-                  <h3 style="font-size:1.1rem; margin:0 0 1.2rem 0; display:flex; align-items:center; gap:0.5rem;"><span data-i18n="sÉtats.vigilance.title"> Points de Vigilance</span></h3>
-                  <div id="sÉtatsVigilanceList" style="display:flex; flex-direction:column; gap:1rem;">
+                  <h3 style="font-size:1.1rem; margin:0 0 1.2rem 0; display:flex; align-items:center; gap:0.5rem;"><span data-i18n="stats.vigilance.title"> Points de Vigilance</span></h3>
+                  <div id="statsVigilanceList" style="display:flex; flex-direction:column; gap:1rem;">
                      <!-- JS Populated -->
                   </div>
                </div>
@@ -2310,7 +2309,7 @@
         
         <!-- TAB: BOSTON MATRIX (BCG) -->
         <div id="mgmtViewBoston" class="mgmt-view" style="display:none;">
-            <div class="sÉtats-header" style="margin-bottom:2.5rem;">
+            <div class="stats-header" style="margin-bottom:2.5rem;">
                 <h2 style="margin:0; font-family:var(--font-display); font-size:1.8rem; color:var(--primary);">🎯 Matrice Stratégique de Boston (BCG)</h2>
                 <p style="color:var(--text-muted); margin:0; font-size:0.9rem;">Analysez la performance de votre catalogue : Rentabilité vs Volume de production.</p>
             </div>
@@ -2356,7 +2355,7 @@
 
         <!-- TAB: INFLATION SIMULATOR -->
         <div id="mgmtViewInflation" class="mgmt-view" style="display:none;">
-            <div class="sÉtats-header" style="margin-bottom:2rem;">
+            <div class="stats-header" style="margin-bottom:2rem;">
                <h2 style="margin:0; font-family:var(--font-display); font-size:1.8rem; color:var(--primary);" data-i18n="nav.inflation"> Simulateur de Crise & Inflation</h2>
                <p style="color:var(--text-muted); margin:0; font-size:0.9rem;">Simulez l'impact d'une hausse des prix sur l'ensemble de votre catalogue.</p>
             </div>
@@ -2429,7 +2428,7 @@
                     <th>Grossiste / Commercial</th>
                     <th>Heure de passage</th>
                     <th>Articles attendus</th>
-                    <th>SÉtatut</th>
+                    <th>Statut</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
@@ -2451,7 +2450,7 @@
       <!-- Expert Hero Header -->
       <section class="hero" style="padding-bottom: 2.5rem; padding-top: 3rem;">
         <div class="hero-badge" style="background: rgba(139, 92, 246, 0.1); color: #8b5cf6;" data-i18n="scheduler.hero.badge">🎓 Excellence Académique</div>
-        <h2 data-i18n="hero.title">Calculateur de <span class="accent">recettes</span><br>pour la p&acirc;tisserie</h2>
+        <h2 data-i18n="hero.title">Calculateur de <span class="accent">recettes</span><br>pour la pâtisserie</h2>
         <p style="color: var(--text-muted); max-width: 700px; margin: 0 auto;" data-i18n="scheduler.hero.desc">Maîtrisez votre temps et vos marges. Générez un plan de travail tactique optimisé pour vos épreuves EP1 et EP2.</p>
       </section>
 
@@ -2470,11 +2469,11 @@
             <div style="padding:1.5rem; background:var(--bg-alt); border-radius:12px; margin:1rem 0;">
               <h4 style="margin-top:0; font-size:1rem;" data-i18n="scheduler.choose_exam">1. Choisissez votre épreuve</h4>
               <div class="exam-type-selectors">
-                 <label class="sÉtats-toggle-btn">
+                 <label class="stats-toggle-btn">
                    <input type="radio" name="examType" value="EP1" checked onclick="switchExamType('EP1')">
                    <span data-i18n="scheduler.ep1">EP1 : Tour, petits fours secs et moelleux, gà¢teaux de voyage</span>
                  </label>
-                 <label class="sÉtats-toggle-btn">
+                 <label class="stats-toggle-btn">
                    <input type="radio" name="examType" value="EP2" onclick="switchExamType('EP2')">
                    <span data-i18n="scheduler.ep2">EP2 : Entremets et petits gà¢teaux</span>
                  </label>
@@ -2506,7 +2505,7 @@
       <!-- Hero / Onboarding (shown initially) -->
       <section class="hero" id="heroSection">
         <div class="hero-badge" data-i18n="hero.badge"> Coût de revient</div>
-        <h2 data-i18n="hero.title">Calculateur de <span class="accent">recettes</span><br>pour la p&acirc;tisserie</h2>
+        <h2 data-i18n="hero.title">Calculateur de <span class="accent">recettes</span><br>pour la pâtisserie</h2>
         <p data-i18n="hero.desc">Créez vos recettes, calculez vos co&ucirc;ts par portion, déterminez votre prix de vente et
           optimisez vos marges.
         </p>
@@ -2619,7 +2618,7 @@
       <!-- ================================================ -->
       <div class="step-content" id="step2">
         <div class="card">
-          <div class="card-title" data-i18n="s2.title">¥Ã¢â‚¬Å¾ Ingrédients</div>
+          <div class="card-title" data-i18n="s2.title">¥“ Ingrédients</div>
           <div class="card-subtitle" data-i18n="s2.subtitle">Ajoutez les ingrédients de votre recette. Les co&ucirc;ts se
             calculent automatiquement.
           </div>
@@ -2684,7 +2683,7 @@
       <div class="step-content" id="step4">
         <!-- Nutrition & Allergens (calculated) -->
         <div class="card" style="margin-bottom: 1.2rem; background: var(--bg-alt);">
-          <div class="card-title" data-i18n="s4.nutrition">Ã…Âé Profil Nutritionnel & Allergènes</div>
+          <div class="card-title" data-i18n="s4.nutrition">…Âé Profil Nutritionnel & Allergènes</div>
           <div class="card-subtitle" data-i18n="s4.nutrition.desc" style="margin-bottom:1rem;">Calculé automatiquement
             pour 100g selon vos ingrédients et données Open Food Facts.</div>
           <div id="nutritionGrid"
@@ -2759,7 +2758,7 @@
         <!-- Advanced Cost Parameters -->
         <div class="card" style="margin-bottom: 1.2rem; border: 1px dashed var(--accent); max-width: 100%;">
           <div class="card-title" data-i18n="s4.advanced">­ Paramètres avancés de production</div>
-          <div class="card-subtitle" data-i18n="s4.advanced.desc">Intégérez la main d'Ãƒâ€¦Ã¢â‚¬Å“uvre, les charges fixes et
+          <div class="card-subtitle" data-i18n="s4.advanced.desc">Intégérez la main d'Å“Å“uvre, les charges fixes et
             l'amortissement pour un co&ucirc;t complet.</div>
 
           <div
@@ -2848,7 +2847,7 @@
         <div class="steps-progress" style="width:100%; max-width:600px; justify-content:space-between; display:flex;">
           <div class="step-indicator active" id="labTabConfig" onclick="switchLabTab('config')" style="cursor:pointer"
             data-i18n="lab.tab1">
-            1. Budget & É&eacute;quipement</div>
+            1. Budget & Ééquipement</div>
           <div class="step-indicator" id="labTabPlan" onclick="switchLabTab('plan')" style="cursor:pointer"
             data-i18n="lab.tab2">2. Plan 2D
           </div>
@@ -2861,7 +2860,7 @@
       <!-- Tab 1: Configurator -->
       <div id="labViewConfig">
         <section class="hero" style="padding: 2rem 0 1rem 0;">
-          <h2 data-i18n="lab.config.title">Configuration <span class="accent">É&eacute;quipement</span></h2>
+          <h2 data-i18n="lab.config.title">Configuration <span class="accent">Ééquipement</span></h2>
           <div
             style="background:var(--bg-alt); padding:2rem; border-radius:var(--radius-lg); margin-top:1.5rem; display: flex; flex-direction: column; align-items: center; text-align:center;">
             <p class="budget-amount pulse" id="budgetAmount"
@@ -2906,7 +2905,7 @@
               style="flex:1; min-width:120px; cursor:pointer; text-align:center; padding:1rem;">é<br><span
                 data-i18n="lab.mode.traiteur">Traiteur</span></div>
             <div class="card" data-mode="boulangerie"
-              style="flex:1; min-width:120px; cursor:pointer; text-align:center; padding:1rem;">¥Ã¢â‚¬â€œ<br><span
+              style="flex:1; min-width:120px; cursor:pointer; text-align:center; padding:1rem;">¥“<br><span
                 data-i18n="lab.mode.boulangerie">Boulangerie</span></div>
           </div>
         </section>
@@ -2953,13 +2952,13 @@
             <div>
               <div style="font-size:0.7rem; color:var(--text-muted); text-transform:uppercase; font-weight:700;"
                 data-i18n="lab.summary.count">
-                É&eacute;quipements</div>
+                Ééquipements</div>
               <div id="summaryCount" style="font-size:1.2rem; font-weight:800; color:var(--text); margin-top:0.2rem;">
                 0
               </div>
             </div>
           </div>
-          <div id="summarySÉtatus" style="font-weight:700; font-size:0.9rem;" data-i18n="lab.summary.ok"> Budget
+          <div id="summaryStatus" style="font-weight:700; font-size:0.9rem;" data-i18n="lab.summary.ok"> Budget
             respecté</div>
           <button class="btn btn-primary" onclick="switchLabTab('plan')" data-i18n="lab.plan.btn2d">Plan 2D →</button>
         </div>
@@ -2998,7 +2997,7 @@
             <div
               style="margin-top:1.5rem; padding:1rem; background:rgba(184,134,11,0.05); border-radius:var(--radius-md); font-size:0.8rem; color:var(--primary);">
               <strong>💰¡ Astuce :</strong> <span data-i18n="lab.plan.tip">💰¡ Astuce : Vous pouvez glisser les
-                é&eacute;quipements pour ajuster le placement.</span>
+                ééquipements pour ajuster le placement.</span>
             </div>
             <button class="btn btn-primary btn-full" style="margin-top:1.5rem;" onclick="switchLabTab('devis')"
               data-i18n="lab.plan.btn_devis">Voir le Devis →</button>
@@ -3027,27 +3026,27 @@
 
       <div class="container-premium">
         <div class="inventory-dashboard-grid">
-          <div class="card glass-widget inv-sÉtats">
-            <div class="inv-sÉtat-row">
-              <div class="inv-sÉtat-box">
-                <div class="inv-sÉtat-icon-bg">📦</div>
-                <div class="inv-sÉtat-content">
-                  <span class="inv-sÉtat-val" id="invTotalItems">0</span>
-                  <span class="inv-sÉtat-lab" data-i18n="inv.sÉtat.products">Produits en stock</span>
+          <div class="card glass-widget inv-stats">
+            <div class="inv-stat-row">
+              <div class="inv-stat-box">
+                <div class="inv-stat-icon-bg">📦</div>
+                <div class="inv-stat-content">
+                  <span class="inv-stat-val" id="invTotalItems">0</span>
+                  <span class="inv-stat-lab" data-i18n="inv.stat.products">Produits en stock</span>
                 </div>
               </div>
-              <div class="inv-sÉtat-box warning">
-                <div class="inv-sÉtat-icon-bg"> </div>
-                <div class="inv-sÉtat-content">
-                  <span class="inv-sÉtat-val" id="invLowStock">0</span>
-                  <span class="inv-sÉtat-lab" data-i18n="inv.sÉtat.critical">Stocks critiques</span>
+              <div class="inv-stat-box warning">
+                <div class="inv-stat-icon-bg"> </div>
+                <div class="inv-stat-content">
+                  <span class="inv-stat-val" id="invLowStock">0</span>
+                  <span class="inv-stat-lab" data-i18n="inv.stat.critical">Stocks critiques</span>
                 </div>
               </div>
-              <div class="inv-sÉtat-box dangerous">
-                <div class="inv-sÉtat-icon-bg"></div>
-                <div class="inv-sÉtat-content">
-                  <span class="inv-sÉtat-val" id="invPriceAlerts">0</span>
-                  <span class="inv-sÉtat-lab" data-i18n="inv.sÉtat.price_diff">Écarts de prix</span>
+              <div class="inv-stat-box dangerous">
+                <div class="inv-stat-icon-bg"></div>
+                <div class="inv-stat-content">
+                  <span class="inv-stat-val" id="invPriceAlerts">0</span>
+                  <span class="inv-stat-lab" data-i18n="inv.stat.price_diff">Écarts de prix</span>
                 </div>
               </div>
             </div>
@@ -3056,7 +3055,7 @@
           <div class="card glass-widget inv-main-table">
             <div class="widget-header">
               <div class="header-main-info">
-                <h3 class="widget-title-modern" data-i18n="inv.table.title">📦 ÉÉtat de la Réserve</h3>
+                <h3 class="widget-title-modern" data-i18n="inv.table.title">📦 État de la Réserve</h3>
                 <div class="search-bar-premium">
                   <input type="text" id="invSearchInput" placeholder="Rechercher un ingrédient..."
                     data-i18n-placeholder="inv.search.ph" onkeyup="filterInventory()">
@@ -3080,7 +3079,7 @@
                     <th style="width: 15%; text-align: center;" data-i18n="inv.table.col_stock">Stock Actuel</th>
                     <th style="width: 8%; text-align: center;" data-i18n="inv.table.col_unit">Unité</th>
                     <th style="width: 15%; text-align: right;" data-i18n="inv.table.col_value">Valeur Immédiate</th>
-                    <th style="width: 15%; text-align: center;" data-i18n="inv.table.col_health">ÉÉtat Santé</th>
+                    <th style="width: 15%; text-align: center;" data-i18n="inv.table.col_health">État Santé</th>
                     <th style="width: 12%; text-align: center;" data-i18n="inv.table.col_config">Configuration</th>
                   </tr>
                 </thead>
@@ -3111,27 +3110,27 @@
       </section>
 
       <div class="container-premium">
-        <!-- SÉtats Row -->
-        <div class="inv-sÉtat-row" style="margin-bottom: 2rem;">
-          <div class="inv-sÉtat-box">
-            <div class="inv-sÉtat-icon-bg"></div>
-            <div class="inv-sÉtat-content">
-              <span class="inv-sÉtat-val" id="labTotalRecipes">0</span>
-              <span class="inv-sÉtat-lab" data-i18n="dash.saved_count">Recettes</span>
+        <!-- Stats Row -->
+        <div class="inv-stat-row" style="margin-bottom: 2rem;">
+          <div class="inv-stat-box">
+            <div class="inv-stat-icon-bg"></div>
+            <div class="inv-stat-content">
+              <span class="inv-stat-val" id="labTotalRecipes">0</span>
+              <span class="inv-stat-lab" data-i18n="dash.saved_count">Recettes</span>
             </div>
           </div>
-          <div class="inv-sÉtat-box" id="labAllergenSÉtatusBox">
-            <div class="inv-sÉtat-icon-bg">🛡️</div>
-            <div class="inv-sÉtat-content">
-              <span class="inv-sÉtat-val" id="labAllergenCount">0</span>
-              <span class="inv-sÉtat-lab" data-i18n="labeling.preview.allergens">Allergènes</span>
+          <div class="inv-stat-box" id="labAllergenStatusBox">
+            <div class="inv-stat-icon-bg">🛡️</div>
+            <div class="inv-stat-content">
+              <span class="inv-stat-val" id="labAllergenCount">0</span>
+              <span class="inv-stat-lab" data-i18n="labeling.preview.allergens">Allergènes</span>
             </div>
           </div>
-          <div class="inv-sÉtat-box">
-            <div class="inv-sÉtat-icon-bg"></div>
-            <div class="inv-sÉtat-content">
-              <span class="inv-sÉtat-val" style="font-size: 1.5rem;">INCO</span>
-              <span class="inv-sÉtat-lab">Conforme</span>
+          <div class="inv-stat-box">
+            <div class="inv-stat-icon-bg"></div>
+            <div class="inv-stat-content">
+              <span class="inv-stat-val" style="font-size: 1.5rem;">INCO</span>
+              <span class="inv-stat-lab">Conforme</span>
             </div>
           </div>
         </div>
@@ -3221,7 +3220,7 @@
                   <h2 id="prevRecipeName" style="margin: 0; font-size: 1.4rem; font-weight: 900;">NOM DU PRODUIT</h2>
                   <div id="prevProducer"
                     style="font-size: 0.75rem; color: #555; text-transform: uppercase; letter-spacing: 1px; margin-top: 4px;">
-                    ARTISAN PÃƒÆ’Ã¢â‚¬Å¡TISSIER</div>
+                    ARTISAN PƒÆ’“Å¡TISSIER</div>
                 </div>
 
                 <div style="flex: 1; font-size: 0.85rem; line-height: 1.4;">
@@ -3377,7 +3376,7 @@
                   <div class="timeline-content">
                     <strong data-i18n="portfolio.bio.passion_title">P&acirc;tisserie & Digital</strong>
                     <p data-i18n="portfolio.bio.passion_detail">Allier la rigueur technique de l'informatique à la
-                      créativité gourmande de la p&acirc;tisserie.</p>
+                      créativité gourmande de la pâtisserie.</p>
                   </div>
                 </div>
               </div>
@@ -3394,17 +3393,17 @@
         <!-- Populated by JS -->
       </div>
 
-      <!-- Section Remerciements É&eacute;quipe -->
+      <!-- Section Remerciements Ééquipe -->
       <div class="team-thanks-section">
         <div class="thanks-content">
           <div class="thanks-image-wrap">
-            <img src="team_larroque.jpg" alt="L'é&eacute;quipe Larroque" class="thanks-img" loading="lazy">
+            <img src="team_larroque.jpg" alt="L'ééquipe Larroque" class="thanks-img" loading="lazy">
           </div>
           <div class="thanks-text">
             <h3 data-i18n="portfolio.thanks">🙏 Un immense merci...</h3>
             <p data-i18n="portfolio.thanks.team" style="font-size: 1.1rem; font-weight: 700; margin-bottom: 0.8rem;">À
               la super
-              é&eacute;quipe de choc chez <strong>Christian Larroque et ses fils</strong> «¶»</p>
+              ééquipe de choc chez <strong>Christian Larroque et ses fils</strong> «¶»</p>
             <p data-i18n="portfolio.thanks.team_detail">Merci pour tous les bons moments, les fous rires partagés et
               la
               confiance que vous m C un vrai plaisir de travailler à vos côtés et de partager votre
@@ -3427,8 +3426,8 @@
 
       <section class="hero" id="planningHeroSection" style="padding-bottom: 3.5rem;">
         <div class="hero-badge" data-i18n="plan.badge"> Calendrier de Production</div>
-        <h2 data-i18n="plan.title">Planning & <span class="accent">Gestion d'É&eacute;quipe</span></h2>
-        <p data-i18n="plan.desc">Organisez votre production annuelle, gérez les congés et collaborez avec votre é&eacute;quipe
+        <h2 data-i18n="plan.title">Planning & <span class="accent">Gestion d'Ééquipe</span></h2>
+        <p data-i18n="plan.desc">Organisez votre production annuelle, gérez les congés et collaborez avec votre ééquipe
           pâtissière.</p>
 
         <div class="planning-selector-wrap"
@@ -3444,8 +3443,8 @@
         <aside class="planning-sidebar">
           <div class="card planning-widget">
             <div class="widget-header" style="margin-bottom:1rem;">
-              <h3 class="widget-title" data-i18n="plan.team">É&eacute;quipe</h3>
-              <input type="text" id="teamNameInput" class="form-input-inline" placeholder="Nom de l'é&eacute;quipe"
+              <h3 class="widget-title" data-i18n="plan.team">Ééquipe</h3>
+              <input type="text" id="teamNameInput" class="form-input-inline" placeholder="Nom de l'ééquipe"
                 data-i18n-placeholder="plan.team.placeholder" style="max-width:150px; font-size:0.8rem; height:28px;">
             </div>
             <div id="teamMemberList" class="team-list">
@@ -3540,7 +3539,7 @@
               <div class="legend-item"><span class="day-cell-mini sunday-day"></span> <span
                   data-i18n="plan.legend.sundays">Dimanches & Fériés</span></div>
               <div class="legend-item"><span class="day-cell-mini leave-active-day"></span> <span
-                  data-i18n="plan.legend.leaves">Congés É&eacute;quipe</span></div>
+                  data-i18n="plan.legend.leaves">Congés Ééquipe</span></div>
             </div>
             <div style="margin-top:1.5rem; font-size:0.8rem; color:var(--text-secondary); line-height:1.4;">
               <span data-i18n="plan.legend.info">Les dates intègrent les événements clés (Épiphanie, Pâques, Noël). Le
@@ -3593,7 +3592,7 @@
                 };
 
                 const events = {
-                  '01-01': ' Nouvel An', '01-06': ' Épiphanie', '02-02': '¥Ã…Â¾ Chandeleur', '02-14': ' Valentin',
+                  '01-01': ' Nouvel An', '01-06': ' Épiphanie', '02-02': '¥…¾ Chandeleur', '02-14': ' Valentin',
                   '03-01': ' Fête G-Mères', '04-05': '£ Pâques', '04-06': '« Lundi Pâques', '05-01': ' Fête Travail',
                   '05-08': ' Victoire 1945', '05-14': ' Ascension', '05-24': '  Pentecà´te', '05-31': ' Fête Mères',
                   '06-21': ' Fête Pères', '07-14': '  Fête Nationale', '08-15': ' Assomption', '11-01': ' Toussaint',
@@ -3640,7 +3639,7 @@
                 }
                 container.innerHTML = html;
             }
-            if (document.readySÉtate === 'loading') document.addEventListener('DOMContentLoaded', forceRenderCalendar);
+            if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', forceRenderCalendar);
             else forceRenderCalendar();
           </script>
         </main>
@@ -3648,13 +3647,13 @@
     </section>
 
     <!-- ================================================ -->
-    <!-- HYGIÃƒÆ’Ã‹â€ NE & HACCP APP -->
+    <!-- HYGIƒÆ’Ëâ€ NE & HACCP APP -->
     <!-- ================================================ -->
     <section class="haccp-container" id="appHygiene" style="display:none; margin: 0 auto; padding: 0;">
         <!-- Premium Section Header -->
         <section class="hero" style="padding-bottom: 3.5rem;">
           <div class="hero-badge" data-i18n="haccp.hero.badge">🛡️ Conformité & Sécurité</div>
-        <h2 data-i18n="hero.title">Calculateur de <span class="accent">recettes</span><br>pour la p&acirc;tisserie</h2>
+        <h2 data-i18n="hero.title">Calculateur de <span class="accent">recettes</span><br>pour la pâtisserie</h2>
           <p data-i18n="haccp.hero.desc">Assurez la sécurité alimentaire de votre laboratoire avec un suivi digital rigoureux et automatisé.</p>
         </section>
 
@@ -3734,10 +3733,10 @@
                              <thead>
                                 <tr>
                                    <th>Date</th>
-                                   <th>É&eacute;quipement</th>
+                                   <th>Ééquipement</th>
                                    <th>Température</th>
                                    <th>Par</th>
-                                   <th>SÉtatut</th>
+                                   <th>Statut</th>
                                    <th>Action</th>
                                 </tr>
                              </thead>
@@ -3806,8 +3805,8 @@
                                    <th>Date</th>
                                    <th>Fournisseur</th>
                                    <th>Temp. Camion</th>
-                                   <th>ÉÉtat Hygiène</th>
-                                   <th>SÉtatut</th>
+                                   <th>État Hygiène</th>
+                                   <th>Statut</th>
                                    <th style="text-align:right;">Action</th>
                                 </tr>
                              </thead>
@@ -3852,7 +3851,7 @@
       <div class="modal-card">
         <div class="modal-header">
           <h3 data-i18n="haccp.reception.title">Nouveau Contrà´le Réception</h3>
-          <button onclick="hideAddReceptionModal()">ÃƒÆ’Ã¢â‚¬â€</button>
+          <button onclick="hideAddReceptionModal()">ƒÆ’—</button>
         </div>
         <div class="modal-body" style="padding:2rem;">
           <div class="form-group" style="margin-bottom:1rem;">
@@ -3865,7 +3864,7 @@
               <input type="number" id="haccpReceptTemp" class="form-input" step="0.1">
             </div>
             <div class="form-group">
-              <label data-i18n="haccp.reception.hygiene">ÉÉtat Hygiénique</label>
+              <label data-i18n="haccp.reception.hygiene">État Hygiénique</label>
               <select id="haccpReceptHygiene" class="form-select">
                 <option value="ok" data-i18n="haccp.reception.ok">Conforme</option>
                 <option value="ko" data-i18n="haccp.reception.ko">Refusé</option>
@@ -3928,8 +3927,8 @@
           <input type="number" id="crmOrderPrice" class="form-input" step="0.5">
         </div>
         <div class="form-group">
-          <label>SÉtatut</label>
-          <select id="crmOrderSÉtatus" class="form-input">
+          <label>Statut</label>
+          <select id="crmOrderStatus" class="form-input">
             <option value="pending"> En attente de retrait</option>
             <option value="paid"> Payée</option>
             <option value="delivered">📦 Livrée</option>
@@ -4001,7 +4000,7 @@
           
           <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.2rem; margin-bottom:1.5rem;">
             <div class="form-group">
-              <label data-i18n="haccp.temp.equipment" style="font-weight:700; color:var(--text); margin-bottom:0.5rem; display:block;"> É&eacute;quipement</label>
+              <label data-i18n="haccp.temp.equipment" style="font-weight:700; color:var(--text); margin-bottom:0.5rem; display:block;"> Ééquipement</label>
               <select id="haccpTempEquip" class="form-select" style="width:100%; font-weight:600;">
                 <option value="Frigo 1">Frigo 1 (Vitrine)</option>
                 <option value="Frigo 2">Frigo 2 (Réserve)</option>
@@ -4021,7 +4020,7 @@
           <div class="form-group" style="margin-bottom:2rem;">
             <label data-i18n="haccp.temp.action" style="font-weight:700; color:var(--text); margin-bottom:0.5rem; display:block;">  Action Corrective</label>
             <textarea id="haccpTempAction" class="form-input" style="height:75px; resize:none; width:100%; border-left:3px solid var(--accent); background:var(--bg-alt);"
-              placeholder="FaculÉtatif. Saisissez une action si la courbe est anormale (ex: ThermosÉtat réajusté)"></textarea>
+              placeholder="FaculÉtatif. Saisissez une action si la courbe est anormale (ex: Thermostat réajusté)"></textarea>
           </div>
           
           <button class="btn btn-primary" onclick="addTempLog()" style="width:100%; padding:1.2rem; font-size:1.1rem; border-radius:12px; display:flex; justify-content:center; align-items:center; gap:0.5rem; box-shadow: 0 8px 16px var(--accent-glow);">
@@ -4054,7 +4053,7 @@
                 <th style="padding:1rem;" data-i18n="admin.col.user">Utilisateur</th>
                 <th style="padding:1rem;" data-i18n="admin.col.email">Email</th>
                 <th style="padding:1rem;" data-i18n="admin.col.gender">Genre</th>
-                <th style="padding:1rem;" data-i18n="admin.col.pin">SÉtatut PIN</th>
+                <th style="padding:1rem;" data-i18n="admin.col.pin">Statut PIN</th>
                 <th style="padding:1rem; text-align:right;" data-i18n="admin.col.actions">Actions</th>
               </tr>
             </thead>
@@ -4068,7 +4067,7 @@
 
     <div id="appAPropos" style="display:none; padding-bottom: 3rem;">
       <section class="hero" id="aboutHeroSection" style="padding-bottom: 3rem;">
-        <div class="hero-badge" data-i18n="about.badge">📖 ÀÀ propos du projet</div>
+        <div class="hero-badge" data-i18n="about.badge">📖 À propos du projet</div>
         <h2 data-i18n="about.title">Gourmet<span class="accent">Revient</span></h2>
         <p data-i18n="about.desc">Projet Chef d'Œuvre r&eacute;alis&eacute; par Julian Peresson, é&eacute;tudiant en CAP P&acirc;tisserie au CMA de
           Muret.</p>
@@ -4079,7 +4078,7 @@
         <p style="color:var(--text-secondary); line-height:1.7; font-size:1rem; margin-bottom:1rem;"
           data-i18n="about.desc1">
           <strong>GourmetRevient</strong> est à la fois un simulateur avancé de rentabilité de recettes et un
-          configurateur intelligent de laboratoire de p&acirc;tisserie professionnel.
+          configurateur intelligent de laboratoire de pâtisserie professionnel.
         </p>
         <p style="color:var(--text-secondary); line-height:1.7; font-size:1rem; margin-bottom:2rem;"
           data-i18n="about.desc2">
@@ -4094,7 +4093,7 @@
           <li data-i18n="about.obj1"><strong>Gestion financière</strong> — Outil complet pour ma&icirc;triser les co&ucirc;ts de
             revient et le prix de
             vente.</li>
-          <li data-i18n="about.obj2"><strong>Connaissance du matériel</strong> — Maîtrise des é&eacute;quipements
+          <li data-i18n="about.obj2"><strong>Connaissance du matériel</strong> — Maîtrise des ééquipements
             professionnels
             de laboratoire.</li>
           <li data-i18n="about.obj3"><strong>Cohérence économique</strong> — Configurations réalistes avec des prix du
@@ -4153,7 +4152,7 @@
               Terminée</div>
             <div style="font-size:0.9rem; color:var(--text-secondary); margin-top:0.3rem;"
               data-i18n="about.phase1.desc">Calculateur de co&ucirc;t de
-              revient pour gérer précisément les fiches techniques des p&acirc;tisseries.</div>
+              revient pour gérer précisément les fiches techniques des pâtisseries.</div>
           </div>
 
           <div style="position:relative; margin-bottom:1.5rem; padding-left:1rem;">
@@ -4245,28 +4244,28 @@
       <div class="suppliers-layout-premium"
         style="margin-top: -4.5rem; padding: 0 2rem 4rem; position: relative; z-index: 10;">
 
-        <!-- SÉtats Row (KPIs) -->
-        <div class="inv-sÉtat-row" style="margin-bottom: 2.5rem;">
-          <div class="inv-sÉtat-box" style="border-left: 5px solid var(--primary);">
-            <div class="inv-sÉtat-icon-bg">¢</div>
-            <div class="inv-sÉtat-content">
-              <span class="inv-sÉtat-val" id="sÉtatsTotalSuppliers">0</span>
-              <span class="inv-sÉtat-lab" data-i18n="suppliers.sÉtats.total">Total Fournisseurs</span>
+        <!-- Stats Row (KPIs) -->
+        <div class="inv-stat-row" style="margin-bottom: 2.5rem;">
+          <div class="inv-stat-box" style="border-left: 5px solid var(--primary);">
+            <div class="inv-stat-icon-bg">¢</div>
+            <div class="inv-stat-content">
+              <span class="inv-stat-val" id="statsTotalSuppliers">0</span>
+              <span class="inv-stat-lab" data-i18n="suppliers.stats.total">Total Fournisseurs</span>
             </div>
           </div>
-          <div class="inv-sÉtat-box warning" style="border-left: 5px solid var(--warning);">
-            <div class="inv-sÉtat-icon-bg"></div>
-            <div class="inv-sÉtat-content">
-              <span class="inv-sÉtat-val" id="sÉtatsPendingOrders">0</span>
-              <span class="inv-sÉtat-lab" data-i18n="suppliers.sÉtats.pending">Besoin Critique</span>
+          <div class="inv-stat-box warning" style="border-left: 5px solid var(--warning);">
+            <div class="inv-stat-icon-bg"></div>
+            <div class="inv-stat-content">
+              <span class="inv-stat-val" id="statsPendingOrders">0</span>
+              <span class="inv-stat-lab" data-i18n="suppliers.stats.pending">Besoin Critique</span>
             </div>
           </div>
-          <div class="inv-sÉtat-box success" style="border-left: 5px solid var(--success);">
-            <div class="inv-sÉtat-icon-bg"></div>
-            <div class="inv-sÉtat-content">
-              <span class="inv-sÉtat-val" style="font-size: 1.6rem; text-transform:uppercase;"
-                data-i18n="suppliers.sÉtats.active">Actif</span>
-              <span class="inv-sÉtat-lab" data-i18n="suppliers.sÉtats.network">Réseau Partenaires</span>
+          <div class="inv-stat-box success" style="border-left: 5px solid var(--success);">
+            <div class="inv-stat-icon-bg"></div>
+            <div class="inv-stat-content">
+              <span class="inv-stat-val" style="font-size: 1.6rem; text-transform:uppercase;"
+                data-i18n="suppliers.stats.active">Actif</span>
+              <span class="inv-stat-lab" data-i18n="suppliers.stats.network">Réseau Partenaires</span>
             </div>
           </div>
         </div>
@@ -4611,9 +4610,9 @@
           <h4 style="font-size:0.9rem; color:var(--text-muted); text-transform:uppercase;"
             data-i18n="modal.admin.actions">Actions Administrateur</h4>
           <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.8rem;">
-            <button class="btn btn-outline" id="btnAdminToggle" onclick="toggleAdminSÉtatus()" style="font-size:0.85rem;"
+            <button class="btn btn-outline" id="btnAdminToggle" onclick="toggleAdminStatus()" style="font-size:0.85rem;"
               data-i18n="modal.admin.toggle">Rendre Admin</button>
-            <button class="btn btn-outline" id="btnBanToggle" onclick="toggleBanSÉtatus()"
+            <button class="btn btn-outline" id="btnBanToggle" onclick="toggleBanStatus()"
               style="color:var(--danger); border-color:var(--danger); font-size:0.85rem;" data-i18n="modal.admin.ban">
               Bannir</button>
           </div>
@@ -4637,7 +4636,7 @@
               automatique des stocks et des prix</p>
           </div>
         </div>
-        <button class="close-btn-premium" onclick="hideRestockModal()">ÃƒÆ’Ã¢â‚¬â€</button>
+        <button class="close-btn-premium" onclick="hideRestockModal()">ƒÆ’—</button>
       </div>
       <div class="modal-body restock-form-premium">
         <div class="form-group">
@@ -4676,7 +4675,7 @@
     <div class="modal-card glass-card">
       <div class="premium-modal-header">
         <h3 id="supplierModalTitle">📦 Ajouter un Fournisseur</h3>
-        <button class="close-btn-premium" onclick="closeSupplierModal()">ÃƒÆ’Ã¢â‚¬â€</button>
+        <button class="close-btn-premium" onclick="closeSupplierModal()">ƒÆ’—</button>
       </div>
       <div class="modal-body restock-form-premium">
         <div style="display:flex; flex-direction:column; gap:1.2rem;">
@@ -4743,7 +4742,7 @@
               style="font-weight:800; font-family:monospace; font-size:1.2rem;">00:00:00</span>
             <button class="btn btn-sm btn-outline" onclick="toggleProdTimer()" id="btnProdTimer">Play</button>
           </div>
-          <button class="close-btn-premium" onclick="hideProductionMode()">ÃƒÆ’Ã¢â‚¬â€</button>
+          <button class="close-btn-premium" onclick="hideProductionMode()">ƒÆ’—</button>
         </div>
       </div>
       <div class="production-body">
@@ -4815,9 +4814,9 @@
       if (appMain) appMain.style.maxWidth = ''; // Reset global width constraint
 
       const appSuppliers = document.getElementById('appSuppliers');
-      const appSÉtats = document.getElementById('appSÉtats');
+      const appStats = document.getElementById('appStats');
       if (appSuppliers) appSuppliers.style.display = 'none';
-      if (appSÉtats) appSÉtats.style.display = 'none';
+      if (appStats) appStats.style.display = 'none';
 
       if (navHub) navHub.classList.remove('active');
       if (navRec) navRec.classList.remove('active');
@@ -4831,9 +4830,9 @@
       if (navScheduler) navScheduler.classList.remove('active');
 
       const navSuppliers = document.getElementById('navSuppliers');
-      const navSÉtats = document.getElementById('navSÉtats');
+      const navStats = document.getElementById('navStats');
       if (navSuppliers) navSuppliers.classList.remove('active');
-      if (navSÉtats) navSÉtats.classList.remove('active');
+      if (navStats) navStats.classList.remove('active');
 
       if (navInventory) navInventory.classList.remove('active');
       if (appInventaire) appInventaire.style.display = 'none';
@@ -4858,7 +4857,7 @@
       if (navHub) navHub.classList.add('active');
       updateBreadcrumb('Cockpit', 'hub');
       if (typeof updateRandomTip === 'function') updateRandomTip();
-      if (typeof updateDashSÉtats === 'function') updateDashSÉtats();
+      if (typeof updateDashStats === 'function') updateDashStats();
       if (typeof renderRecentRecipes === 'function') renderRecentRecipes();
       if (typeof renderPendingLeavesDashboard === 'function') renderPendingLeavesDashboard();
       if (window.ToolGuide) ToolGuide.init();
@@ -4977,7 +4976,7 @@
       if (appLabeling) appLabeling.style.display = 'block';
       mainNav.style.display = 'flex';
       if (navLabeling) navLabeling.classList.add('active');
-      if (typeof renderLabelingSÉtats === 'function') renderLabelingSÉtats();
+      if (typeof renderLabelingStats === 'function') renderLabelingStats();
       if (typeof updateRandomTip === 'function') updateRandomTip();
     }
 
@@ -4994,7 +4993,7 @@
       if (typeof updateRandomTip === 'function') updateRandomTip();
     }
 
-    function showSÉtats() {
+    function showStats() {
       showMgmt('dashboard');
     }
 
@@ -5075,7 +5074,7 @@
         } else {
           // Default Dashboard view (Charts, Breaking Point)
           document.getElementById('mgmtViewDashboard').style.display = 'block';
-          if (typeof renderSÉtats === 'function') renderSÉtats(); // SÉtats are now on dashboard
+          if (typeof renderStats === 'function') renderStats(); // Stats are now on dashboard
           if (typeof renderObjectives === 'function') renderObjectives();
         }
       }
@@ -5150,7 +5149,7 @@
       
       if (document.getElementById(target)) document.getElementById(target).style.display = 'block';
       
-      // Update sidebar sÉtate
+      // Update sidebar state
       const aside = document.querySelector('#mgmtViewQuality .premium-sidebar');
       if (aside) {
         aside.querySelectorAll('.sidebar-pill').forEach(b => b.classList.remove('active'));
@@ -5179,7 +5178,7 @@
     window.showInventaire = showInventaire;
     window.showLabeling = showLabeling;
     window.showSuppliers = showSuppliers;
-    window.showSÉtats = showSÉtats;
+    window.showStats = showStats;
     window.showMgmt = showMgmt;
     window.showProTools = showProTools;
     window.hideAllApps = hideAllApps;
@@ -5270,7 +5269,7 @@
           'navLabeling': showLabeling, 'mLinkLabeling': showLabeling,
           'navHygiene': showHygiene, 'mLinkHygiene': showHygiene,
           'navSuppliers': showSuppliers, 'mLinkSuppliers': showSuppliers,
-          'navSÉtats': showSÉtats, 'mLinkSÉtats': showSÉtats,
+          'navStats': showStats, 'mLinkStats': showStats,
           'navMgmt': showMgmt, 'mLinkMgmt': showMgmt,
           'navPlanningProd': () => showMgmt('production'),
           'navShopping': () => showMgmt('shopping'),
@@ -5295,7 +5294,7 @@
           navActions[navId]();
           // Close all dropdowns after navigation
           document.querySelectorAll('.nav-dropdown').forEach(d => d.classList.remove('active'));
-          // Update active sÉtate for mobile bottom bar if needed
+          // Update active state for mobile bottom bar if needed
           if (navLink.classList.contains('mobile-nav-item')) {
             updateMobileNavActive(navId);
           }
@@ -5423,7 +5422,7 @@
         items = [
           { id: 'mLinkRecettes', icon: '📖', label: 'nav.recipes', action: showRecettes },
           { id: 'mLinkChefsBrain', icon: '🧠', label: 'nav.creative.brain', action: () => { if (typeof window.openChefsBrain === 'function') window.openChefsBrain(); } },
-          { id: 'mLinkAssembly', icon: 'Ã¢â‚¬â€ label: 'nav.creative.assembly', action: () => { if (typeof window.openAssemblySimulator === 'function') window.openAssemblySimulator(); } },
+          { id: 'mLinkAssembly', icon: '— label: 'nav.creative.assembly', action: () => { if (typeof window.openAssemblySimulator === 'function') window.openAssemblySimulator(); } },
           { id: 'mLinkConverter', icon: '🎚️', label: 'nav.creative.converter', action: () => { if (typeof window.openMasterConverter === 'function') window.openMasterConverter(); } },
           { id: 'mLinkPortfolio', icon: ' label: 'nav.portfolio', action: showPortfolio },
           { id: 'mLinkScheduler', icon: '🎓', label: 'nav.scheduler', action: showScheduler }
@@ -5431,7 +5430,7 @@
       } else if (category === 'pilotage') {
         moreMenuTitle.textContent = "📈 Pilotage & Outils";
         items = [
-          { id: 'mLinkSÉtats', icon: '📊', label: 'nav.sÉtats', action: showSÉtats },
+          { id: 'mLinkStats', icon: '📊', label: 'nav.stats', action: showStats },
           { id: 'mLinkCatalogue', icon: ' label: 'nav.catalogue', action: () => { if (typeof window.generateECatalogue === 'function') window.generateECatalogue(); } },
           { id: 'mLinkCRM', icon: '🤮', label: 'nav.crm', action: showCRM }
         ];
@@ -5543,7 +5542,7 @@
       </div>
       <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1.5rem;" data-i18n="ocr.modal.desc">Importez une photo de facture fournisseur. L'OCR extraira les prix pour mettre à jour votre base d'ingrédients.</p>
       <div id="ocrPreview" class="ocr-preview-container"></div>
-      <div id="ocrSÉtatus" class="ocr-sÉtatus" style="display:none; padding:0.8rem; background:var(--bg-alt); border-radius:8px; margin-bottom:1rem; font-weight:600;"></div>
+      <div id="ocrStatus" class="ocr-status" style="display:none; padding:0.8rem; background:var(--bg-alt); border-radius:8px; margin-bottom:1rem; font-weight:600;"></div>
       <div id="ocrResults" class="ocr-results-container"></div>
       <div style="margin-top:1.5rem; text-align:right;">
         <button class="btn btn-outline" onclick="closeOCRScanner()">✖ Fermer</button>
@@ -5558,8 +5557,8 @@
       // Clear the preview so next open starts fresh
       const preview = document.getElementById('ocrPreview');
       if (preview) preview.innerHTML = '';
-      const sÉtatus = document.getElementById('ocrSÉtatus');
-      if (sÉtatus) { sÉtatus.style.display = 'none'; sÉtatus.innerHTML = ''; }
+      const status = document.getElementById('ocrStatus');
+      if (status) { status.style.display = 'none'; status.innerHTML = ''; }
       const results = document.getElementById('ocrResults');
       if (results) results.innerHTML = '';
     }
@@ -5582,7 +5581,7 @@
       </div>
       <div id="incoLabelPreview" class="inco-preview-container" style="margin-top:1.5rem;"></div>
       <div style="margin-top:1.5rem; display:flex; gap:10px;">
-        <button class="btn btn-primary btn-full" onclick="exportINCOPdf()" data-i18n="inco.btn.export">💰¾ Exporter PDF (60ÃƒÆ’Ã¢â‚¬â€40mm)</button>
+        <button class="btn btn-primary btn-full" onclick="exportINCOPdf()" data-i18n="inco.btn.export">💰¾ Exporter PDF (60ƒÆ’—40mm)</button>
         <button class="btn btn-outline btn-full" onclick="window.print()" data-i18n="ui.btn.print"> Imprimer</button>
       </div>
     </div>
@@ -5644,7 +5643,7 @@
       <!-- Selected ingredient display -->
       <div id="chefBrainSelected" style="display:none; margin-bottom:1.5rem;">
         <div class="cb-selected-card">
-          <span class="cb-selected-icon" id="cbSelectedIcon">Ã¢â‚¬Å“</span>
+          <span class="cb-selected-icon" id="cbSelectedIcon">“Å“</span>
           <div>
             <strong id="cbSelectedName">—</strong>
             <span class="cb-selected-price" id="cbSelectedPrice">— </span>
@@ -5672,17 +5671,17 @@
   <div id="assemblyModal" class="modal-overlay" style="display:none;">
     <div class="modal-content glass-panel" style="max-width:1250px; width:98%; max-height:92vh; overflow:hidden; display:flex; flex-direction:column; gap:0;">
       <div class="modal-header" style="display:flex; justify-content:space-between; align-items:center; margin: 1.2rem 1.5rem;">
-        <h3 style="margin:0;">Ã¢â‚¬â€ <span class="premium-shimmer-text">Simulateur de Montage &amp; Coupe Professionnel</span></h3>
+        <h3 style="margin:0;">— <span class="premium-shimmer-text">Simulateur de Montage &amp; Coupe Professionnel</span></h3>
         <div style="display:flex; gap:8px; align-items:center;">
           <select id="assemblyTemplateSelect" class="form-input" style="width:auto; font-size:0.85rem; padding:4px 8px; margin:0; border-color:var(--accent);" onchange="loadAssemblyTemplate()">
             <option value=""> Charger un modèle...</option>
             <option value="opera">° Opéra (7 couches)</option>
-            <option value="foret_noire">Ã¢â‚¬â„¢ Forêt-Noire</option>
-            <option value="tarte_citron">Ã¢â‚¬Â¹ Tarte Citron Meringuée</option>
+            <option value="foret_noire">’ Forêt-Noire</option>
+            <option value="tarte_citron">“Â¹ Tarte Citron Meringuée</option>
             <option value="royal">« Royal Chocolat</option>
-            <option value="Étatin">Ã…Âé Entremet Pomme Tatin</option>
+            <option value="Étatin">…Âé Entremet Pomme Tatin</option>
             <option value="bourdaloue">à Tarte Bourdaloue</option>
-            <option value="negresco">Ã¢â‚¬Å“ Negresco Signature</option>
+            <option value="negresco">“Å“ Negresco Signature</option>
           </select>
           <button class="btn btn-sm btn-outline" onclick="clearAssembly()"> Effacer</button>
           <button class="btn btn-sm btn-primary" onclick="exportAssemblyPNG()">💰¾ Exporter SVG</button>
@@ -5709,7 +5708,7 @@
                 <option value="carre"> Carré</option>
                 <option value="buche">🎚️ Bûche</option>
                 <option value="tarte">à Tarte</option>
-                <option value="verrine">¥Ã†â€™ Verrine</option>
+                <option value="verrine">¥†’ Verrine</option>
               </select>
               <input type="number" id="assemblyMoldSize" class="form-input" style="width:55px; font-size:0.85rem; padding:4px 8px; margin:0; text-align:center;" value="22" step="1" onchange="changeAssemblyMold()">
               <span style="font-size:0.75rem; opacity:0.6; font-weight:800;">cm</span>
@@ -5736,7 +5735,7 @@
       </div>
       
       <!-- AnnoÉtation Panel -->
-      <div id="asmAnnoÉtationPanel" style="display:none; background:var(--surface); border-top:1px solid var(--surface-border); padding: 1rem 1.5rem;">
+      <div id="asmAnnotationPanel" style="display:none; background:var(--surface); border-top:1px solid var(--surface-border); padding: 1rem 1.5rem;">
         <div style="font-size:0.7rem; font-weight:800; text-transform:uppercase; letter-spacing:.1em; color:var(--text-muted); margin-bottom:8px;">🎚️ AnnoÉtation couche : <span id="asmAnnotLayerName" style="color:var(--accent);"></span></div>
         <div style="display:grid; grid-template-columns:1fr 1fr 1fr 2fr auto; gap:12px; align-items:end;">
           <div class="form-group" style="margin:0;">
@@ -5790,7 +5789,7 @@
               <option value="carre"> Carré</option>
               <option value="rectangle"> Rectangle / Cadre</option>
               <option value="buche">ªµ Bûche</option>
-              <option value="verrine">¥Ã†â€™ Verrine</option>
+              <option value="verrine">¥†’ Verrine</option>
               <option value="tarte">à Moule à tarte</option>
             </select>
             <div class="mc-fields" id="mcFromFields">
@@ -5812,7 +5811,7 @@
               <option value="carre"> Carré</option>
               <option value="rectangle"> Rectangle / Cadre</option>
               <option value="buche">ªµ Bûche</option>
-              <option value="verrine">¥Ã†â€™ Verrine</option>
+              <option value="verrine">¥†’ Verrine</option>
               <option value="tarte">à Moule à tarte</option>
             </select>
             <div class="mc-fields" id="mcToFields">
@@ -5878,7 +5877,7 @@
       // Confirmation de chargement en console
       if (typeof window['openInvoiceGenerator'] === 'function' &&
           window['openInvoiceGenerator'].toString().length > 100) {
-        console.info('%c[GourmetRevient] crm-enhanced-v2.js  chargé avec succ&egrave;s', 'color:#10b981; font-weight:bold;');
+        console.info('%c[GourmetRevient] crm-enhanced-v2.js  chargé avec succès', 'color:#10b981; font-weight:bold;');
       }
     })();
   </script>
@@ -5926,11 +5925,11 @@
           'margins': `
             <div style="font-size:3rem; margin-bottom:1rem;">📊</div>
             <h2>Maîtriser ses Marges & Coûts</h2>
-            <p>Le succ&egrave;s d'une p&acirc;tisserie repose sur une règle d'or : <strong>connaître son co&ucirc;t de revient exact.</strong></p>
+            <p>Le succès d'une pâtisserie repose sur une règle d'or : <strong>connaître son co&ucirc;t de revient exact.</strong></p>
             <h3>1. Le Coût Matière (CM)</h3>
             <p>C'est la somme de tous les ingrédients utilisés. GourmetRevient le calcule automatiquement pour vous.</p>
             <h3>2. La Marge Brute</h3>
-            <p>Elle doit couvrir vos frais fixes (loyer, éélectricitééé) et vos salaires. En p&acirc;tisserie artisanale, on vise généralement un coefficient de <strong>4.0 à 5.0</strong>.</p>
+            <p>Elle doit couvrir vos frais fixes (loyer, éélectricitééé) et vos salaires. En pâtisserie artisanale, on vise généralement un coefficient de <strong>4.0 à 5.0</strong>.</p>
             <div class="article-tip">
               <strong>Conseil du Chef :</strong> N'oubliez pas les "pertes sèches" (farine sur le tour, chutes de biscuits). GourmetRevient inclut une marge de sécurité de 10% par défaut.
             </div>
@@ -5951,12 +5950,12 @@
           `,
           'team': `
             <div style="font-size:3rem; margin-bottom:1rem;">👨👩</div>
-            <h2>Organisation & É&eacute;quipe</h2>
+            <h2>Organisation & Ééquipe</h2>
             <p>Une production fluide commence par un planning sans failles.</p>
             <h3>Anticiper les pics :</h3>
             <p>Utilisez le calendrier des zones scolaires (A, B, C) intégré pour prévoir vos besoins en personnel pendant les vacances.</p>
             <h3>Communication :</h3>
-            <p>Partagez les fiches techniques PDF générées par le logiciel pour que chaque membre de l'é&eacute;quipe respecte exactement le même process de montage.</p>
+            <p>Partagez les fiches techniques PDF générées par le logiciel pour que chaque membre de l'ééquipe respecte exactement le même process de montage.</p>
           `
         };
 
@@ -5978,7 +5977,7 @@
         clearInterval(waitForApp);
         setTimeout(() => {
           if (action === 'new-recipe'  && typeof showRecettes   === 'function') showRecettes();
-          if (action === 'dashboard'   && typeof showSÉtats      === 'function') showSÉtats();
+          if (action === 'dashboard'   && typeof showStats      === 'function') showStats();
           if (action === 'inventory'   && typeof showInventaire === 'function') showInventaire();
         }, 300);
       }, 200);
@@ -6067,7 +6066,7 @@
         <div class="academy-card" onclick="GourmetAcademy.showArticle('team')">
           <div class="ac-icon">👨👩</div>
           <div class="ac-info">
-            <h3>Gestion d'É&eacute;quipe</h3>
+            <h3>Gestion d'Ééquipe</h3>
             <p>Plannings, congés et organisation du laboratoire.</p>
             <span class="ac-action">Voir plus →</span>
           </div>
@@ -6169,7 +6168,7 @@
       <div style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); padding: 3rem 2.5rem; color: white; position: relative;">
         <button onclick="closeSupport()" class="auth-close" style="color: white; top: 1.5rem; right: 1.5rem;">✖</button>
         <h2 style="margin: 0; font-size: 2rem; font-weight: 850;">Centre d'Aide</h2>
-        <p style="margin: 0.5rem 0 0; opacity: 0.9; font-size: 1rem;">Une question ? Notre é&eacute;quipe vous répond sous 24h.</p>
+        <p style="margin: 0.5rem 0 0; opacity: 0.9; font-size: 1rem;">Une question ? Notre ééquipe vous répond sous 24h.</p>
         <div style="margin-top: 1.5rem; display: flex; gap: 1rem;">
           <div style="background: rgba(255,255,255,0.2); padding: 0.5rem 1rem; border-radius: 50px; font-size: 0.8rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem;">
             <span style="width: 8px; height: 8px; background: #4ade80; border-radius: 50%;"></span>

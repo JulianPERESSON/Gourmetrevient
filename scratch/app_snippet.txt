@@ -17,4 +17,4 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-// === ASSISTANT DE SAISONNALITÃ‰ ===
+// === ASSISTANT DE SAISONNALITÉ ===

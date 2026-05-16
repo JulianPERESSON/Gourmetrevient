@@ -5,7 +5,7 @@ function fixBugs() {
         let content = fs.readFileSync('index.html', 'utf8');
         
         // 1. Fix Portfolio Mojibake
-        content = content.replace(/§Ã¢â‚¬Â <\/div>/, '👨‍🍳</div>');
+        content = content.replace(/§“Â <\/div>/, '👨‍🍳</div>');
         content = content.replace(/Pà¢tissier/g, 'Pâtissier');
         content = content.replace(/algorithmie/g, "algorithmique");
         

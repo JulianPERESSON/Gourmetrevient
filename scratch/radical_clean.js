@@ -16,8 +16,8 @@ function radicalClean() {
             'pà¢': 'pâ',
             'Pà¢': 'Pâ',
             'Â¢': 'Â',
-            'Ã‚Â ': ' ', // Clean up weird spaces
-            'Ã‚': ''    // Clean up floating fragments
+            'ÂÂ ': ' ', // Clean up weird spaces
+            'Â': ''    // Clean up floating fragments
         };
 
         for (const [key, val] of Object.entries(replacements)) {

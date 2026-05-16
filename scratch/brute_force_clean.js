@@ -6,12 +6,12 @@ const filesToClean = ['index.html', 'app.js', 'auth-ui.js', 'pro-features.js', '
 const replacements = [
     // Complex patterns reported by user
     { from: "pà¢tissiers", to: "pâtissiers" },
-    { from: "Ãƒâ€¦Ã¢â‚¬â„¢uvre", to: "Œuvre" },
+    { from: "œuvre", to: "Œuvre" },
     { from: "cà´tés", to: "côtés" },
-    { from: "Ãƒâ€¦Ã¢â‚¬Å\"", to: "Œ" },
+    { from: "Å“Å\"", to: "Œ" },
     { from: "½", to: "é" }, // Usually é in this context
     { from: "¥§", to: "à" },
-    { from: "ÃƒÆ'Ã¢â‚¬â€", to: "à" },
+    { from: "—", to: "à" },
     
     // Email correction
     { from: "contact@gourmetrevient.fr", to: "julian31.peresson@gmail.com" }

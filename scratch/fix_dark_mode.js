@@ -45,8 +45,8 @@ function fixDarkModeReadability() {
         content = content.replace('</style>', darkModeFix + '\n</style>');
 
         // 2. Fix the specific Mojibake in Assistant Expert
-        content = content.replace(/Ã¢â‚¬œAssistant Expert/g, '🤖 Assistant Expert');
-        content = content.replace(/Ã¢â‚¬œ/g, ''); // Global cleanup of this specific pattern
+        content = content.replace(/“œAssistant Expert/g, '🤖 Assistant Expert');
+        content = content.replace(/“œ/g, ''); // Global cleanup of this specific pattern
 
         fs.writeFileSync('index.html', content, 'utf8');
         console.log("Dark mode contrast fixed and Mojibake removed from Assistant Expert.");
