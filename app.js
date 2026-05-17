@@ -2168,7 +2168,7 @@ window.filterLibrary = function() {
 
     return `
       <div class="library-card" onclick="loadExampleRecipe(${originalIdx})">
-        <div style="position:absolute; top:10px; right:10px; display:flex; gap:5px;">
+        <div style="position:absolute; top:1.2rem; right:1.2rem; display:flex; gap:0.5rem; z-index:10; align-items:center;">
            <button class="library-card-pdf" onclick="event.stopPropagation(); exportRecipePdfDirect(${originalIdx})" title="${t('recipe.lib.export_pdf')}">📄 PDF</button>
            <button class="library-card-pdf" style="background:#10b981;" onclick="event.stopPropagation(); window.printDLCLabel('${r.id}', true)" title="Étiquette DLC">🏷️</button>
         </div>
