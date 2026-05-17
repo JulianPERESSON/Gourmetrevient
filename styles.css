@@ -1877,6 +1877,73 @@ select.form-input {
   }
 }
 
+/* ---------- Responsive Laptop (1025px - 1440px) ---------- */
+@media (max-width: 1440px) {
+  .header-nav {
+    justify-content: flex-start;
+    gap: 0.15rem;
+    padding: 0 0.5rem;
+  }
+  .nav-link {
+    padding: 0.4rem 0.5rem;
+    font-size: 0.75rem;
+  }
+  .header-brand h1 {
+    font-size: 1.15rem;
+  }
+  .header-brand .logo-icon {
+    width: 30px;
+    height: 30px;
+    font-size: 1.5rem;
+  }
+  .header-actions {
+    gap: 0.3rem;
+  }
+  .app-header {
+    padding: 0 0.8rem;
+  }
+  .hero h2 {
+    font-size: 2.2rem;
+  }
+  .hero p {
+    font-size: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  .hero {
+    padding: 2rem 1rem 1.5rem;
+  }
+}
+
+/* ---------- Responsive Laptop Height (< 850px) ---------- */
+@media (max-height: 850px) {
+  .auth-modal-box {
+    padding: 1.5rem 2rem;
+    max-width: 400px;
+  }
+  .auth-modal-header {
+    margin-bottom: 1rem;
+  }
+  .auth-modal-logo {
+    font-size: 2.2rem;
+    margin-bottom: 0.5rem;
+  }
+  .auth-modal-header h2 {
+    font-size: 1.25rem;
+  }
+  .auth-tabs {
+    margin-bottom: 1rem;
+  }
+  .auth-field {
+    margin-bottom: 0.85rem;
+  }
+  .auth-input {
+    padding: 0.55rem 0.8rem;
+  }
+  .auth-legal-note {
+    margin-top: 1rem;
+  }
+}
+
 /* ---------- Responsive Tablet ---------- */
 @media (max-width: 1024px) {
   .hero h2 {
