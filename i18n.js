@@ -86,7 +86,7 @@ const TRANSLATIONS = {
         'nav.hygiene': 'Hygiène & HACCP',
         'nav.portfolio': 'Portfolio',
         'nav.about': 'À propos',
-        'nav.blog': 'Le Blog des Pâtissiers',
+        'nav.blog': 'Blog',
         'nav.admin': 'Admin',
         'nav.my_recipes': 'Mes Recettes',
         'nav.my_profile': 'Mon Profil',
