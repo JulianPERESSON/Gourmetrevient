@@ -1,5 +1,5 @@
 const generateCover = (emoji, colorStart, colorEnd) => {
-  const svg = \`<svg xmlns="http://www.w3.org/2000/svg" width="800" height="400" viewBox="0 0 800 400"><defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="${colorStart}" /><stop offset="100%" stop-color="${colorEnd}" /></linearGradient></defs><rect width="800" height="400" fill="url(#g)" /><text x="50%" y="55%" font-size="140" text-anchor="middle" dominant-baseline="middle" font-family="system-ui, sans-serif">${emoji}</text></svg>\`;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="800" height="400" viewBox="0 0 800 400"><defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="${colorStart}" /><stop offset="100%" stop-color="${colorEnd}" /></linearGradient></defs><rect width="800" height="400" fill="url(#g)" /><text x="50%" y="55%" font-size="140" text-anchor="middle" dominant-baseline="middle" font-family="system-ui, sans-serif">${emoji}</text></svg>`;
   return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
 };
 
