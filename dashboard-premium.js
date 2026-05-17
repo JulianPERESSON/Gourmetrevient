@@ -98,12 +98,6 @@ function seedDemoData() {
 
     // ── Upcoming Deliveries ──────────────────────────────────────────
     const deliveries = JSON.parse(localStorage.getItem('gourmet_deliveries') || '[]');
-    if (deliveries.length === 0) {
-        localStorage.setItem('gourmet_deliveries', JSON.stringify([
-            { id: 101, supplier: 'Grossiste Pâtissier', status: 'planned', eta: '08h00 - 10h00', items: 'Farine, Sucre, Chocolat' },
-            { id: 102, supplier: 'Laiterie Locale', status: 'confirmed', eta: '14h30', items: 'Crème, Beurre' }
-        ]));
-    }
 
     // ── Team (user-scoped key) ────────────────────────────────────────
     const teamKey = `gourmet_team_members_${currUser}`;
@@ -111,19 +105,6 @@ function seedDemoData() {
     // isDemo defined above
     
     const team = JSON.parse(localStorage.getItem(teamKey) || '[]');
-    if (team.length === 0 && isDemo) {
-        const demoTeam = [
-            { id: 1, name: 'Chef Julian', role: 'Chef Pâtissier', avatar: '👨‍🍳' },
-            { id: 2, name: 'M. Dupont', role: 'Pâtissier', avatar: '🧑‍🍳' },
-            { id: 3, name: 'Mme. Martin', role: 'Pâtissière', avatar: '👩‍🍳' },
-            { id: 4, name: 'J. Petit', role: 'Apprenti', avatar: '🧑‍🍳' },
-        ];
-        const demoLeaves = [
-            { memberId: 2, memberName: 'M. Dupont', start: today, end: today, reason: 'Maladie' }
-        ];
-        localStorage.setItem(teamKey, JSON.stringify(demoTeam));
-        localStorage.setItem(leavesKey, JSON.stringify(demoLeaves));
-    }
 
     // ── HACCP Temperature Log (simulate missing morning log if after 11am) ────────
     const haccpRaw = JSON.parse(localStorage.getItem('gourmet_haccp_logs') || '{"temp":[]}');
