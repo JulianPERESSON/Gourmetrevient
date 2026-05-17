@@ -605,6 +605,13 @@ const AuthUI = (() => {
     localStorage.setItem('gourmet_demo_mode', enabled ? 'true' : 'false');
     if (!enabled) {
       localStorage.removeItem('gourmet_demo_seeded');
+      const userName = (localStorage.getItem('gourmet_current_user') || 'chef').toLowerCase();
+      const demoKeys = [
+          'gourmet_team_members', `gourmet_team_members_${userName}`, 'gourmet_team_members_chef', 'gourmet_team_members_ju', 'gourmet_team_members_julian',
+          'gourmet_staff_leaves', `gourmet_staff_leaves_${userName}`, 'gourmet_staff_leaves_chef', 'gourmet_staff_leaves_ju', 'gourmet_staff_leaves_julian',
+          'gourmet_deliveries', `gourmet_deliveries_${userName}`, 'gourmet_deliveries_chef'
+      ];
+      demoKeys.forEach(k => localStorage.removeItem(k));
     }
     if (typeof showToast === 'function') showToast(enabled ? 'Mode Démo activé 🎭' : 'Mode Réel activé (Données Cloud) ☁️', 'info');
     setTimeout(() => window.location.reload(), 1000);
@@ -696,6 +703,14 @@ const AuthUI = (() => {
           localStorage.removeItem(k);
           localStorage.removeItem(k + '_' + userName);
       });
+      
+      // Clear team and logistics keys
+      const teamKeys = [
+          'gourmet_team_members', `gourmet_team_members_${userName}`, 'gourmet_team_members_chef', 'gourmet_team_members_ju', 'gourmet_team_members_julian',
+          'gourmet_staff_leaves', `gourmet_staff_leaves_${userName}`, 'gourmet_staff_leaves_chef', 'gourmet_staff_leaves_ju', 'gourmet_staff_leaves_julian',
+          'gourmet_deliveries', `gourmet_deliveries_${userName}`, 'gourmet_deliveries_chef'
+      ];
+      teamKeys.forEach(k => localStorage.removeItem(k));
     } catch (err) {
       console.error("Erreur Reset:", err);
       if (typeof showToast === 'function') {

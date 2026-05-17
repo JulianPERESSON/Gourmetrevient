@@ -108,7 +108,7 @@ function seedDemoData() {
     // ── Team (user-scoped key) ────────────────────────────────────────
     const teamKey = `gourmet_team_members_${currUser}`;
     const leavesKey = `gourmet_staff_leaves_${currUser}`;
-    const isDemo = localStorage.getItem('gourmet_demo_mode') === 'true';
+    // isDemo defined above
     
     const team = JSON.parse(localStorage.getItem(teamKey) || '[]');
     if (team.length === 0 && isDemo) {
