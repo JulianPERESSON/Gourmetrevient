@@ -3,7 +3,7 @@
 // Stratégie : Cache-First assets statiques + SWR Google Fonts/CDN + IDB Queue
 // =============================================================================
 
-const CACHE_VERSION = '12.1.0'; // Zero-Bug & Conformité — Help Guide & Planning Fixes
+const CACHE_VERSION = '12.2.0'; // Zero-Bug & Conformité — Help Guide & Planning Fixes + Blog Updates
 const CACHE_STATIC  = `gourmet-static-v${CACHE_VERSION}`;
 const CACHE_RUNTIME = `gourmet-runtime-v${CACHE_VERSION}`;
 const CACHE_FONTS   = `gourmet-fonts-v${CACHE_VERSION}`;
@@ -17,9 +17,11 @@ const PRECACHE_ASSETS = [
   './index.html',
   './landing.html',
   './legal.html',
+  './blog.html',
   './styles.css',
   './app.js',
   './data.js',
+  './blog-data.js',
   './i18n.js',
   './dashboard-premium.js',
   './lab-logic.js',
