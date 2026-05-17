@@ -1495,7 +1495,7 @@
         <button class="nav-dropdown-trigger">🛡️ <span data-i18n="nav.category.mgmt">Labo & Qualité</span> <span class="nav-arrow">▼</span></button>
         <div class="nav-dropdown-content">
           <button class="nav-link nav-dropdown-link" id="navHygiene"><span data-i18n="nav.hygiene">Hygiène & HACCP</span></button>
-          <button class="nav-link nav-dropdown-link" id="navPlanning"><span data-i18n="nav.team">Ééquipe & Planning</span></button>
+          <button class="nav-link nav-dropdown-link" id="navPlanning"><span data-i18n="nav.team">Équipe & Planning</span></button>
           <button class="nav-link nav-dropdown-link" id="navLabo"><span data-i18n="nav.creative.lab">Agencement Labo (2D)</span></button>
           <button class="nav-link nav-dropdown-link" id="navSuppliers"><span data-i18n="nav.suppliers">Fournisseurs</span></button>
           <button class="nav-link nav-dropdown-link" id="navScheduler"><span data-i18n="nav.scheduler">Ordonnancement CAP</span></button>
@@ -1522,7 +1522,7 @@
       <!-- °Cloud Sync Pill -->
       <div id="syncStatus" class="sync-status" title="État de la synchronisation cloud" style="display: flex; align-items: center; gap: 6px; background: var(--bg-alt); padding: 4px 10px; border-radius: 20px; border: 1px solid var(--surface-border);">
          <span id="offlineStatusDot" class="sync-dot sync-dot--online" style="width:8px; height:8px; border-radius:50%; display:inline-block;"></span>
-         <span class="status-text" style="font-size:0.7rem; font-weight:700; color:var(--text-secondary);">Cloud : Actif</span>
+         <span class="status-text" style="font-size:0.7rem; font-weight:700; color:var(--text-secondary);">☁️ 🟢</span>
       </div>
 
       <button class="btn btn-primary btn-sm" id="btnSubscribePro" onclick="window.GourmetBilling.checkout('pro_monthly')" style="background: linear-gradient(135deg, #6366f1, #8b5cf6); border: none; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3); padding: 0.5rem 1rem; border-radius: 12px;">
@@ -1717,12 +1717,12 @@
           </div>
         </div>
 
-        <!-- °CARD 6: Ééquipe & HACCP -->
+        <!-- °CARD 6: Équipe & HACCP -->
         <div class="hub-bento-card hub-card-team">
           <div class="hub-card-header">
             <div class="hub-card-title-group">
               <span class="hub-card-icon" style="color:#6366f1;"></span>
-              <h3 data-i18n="dash.kpi.team">Ééquipe & Sécurité</h3>
+              <h3 data-i18n="dash.kpi.team">Équipe & Sécurité</h3>
             </div>
             <button class="hub-link-btn-sm" onclick="showPlanning()">Planning →</button>
           </div>
@@ -2851,7 +2851,7 @@
         <div class="steps-progress" style="width:100%; max-width:600px; justify-content:space-between; display:flex;">
           <div class="step-indicator active" id="labTabConfig" onclick="switchLabTab('config')" style="cursor:pointer"
             data-i18n="lab.tab1">
-            1. Budget & Ééquipement</div>
+            1. Budget & Équipement</div>
           <div class="step-indicator" id="labTabPlan" onclick="switchLabTab('plan')" style="cursor:pointer"
             data-i18n="lab.tab2">2. Plan 2D
           </div>
@@ -2864,7 +2864,7 @@
       <!-- Tab 1: Configurator -->
       <div id="labViewConfig">
         <section class="hero" style="padding: 2rem 0 1rem 0;">
-          <h2 data-i18n="lab.config.title">Configuration <span class="accent">Ééquipement</span></h2>
+          <h2 data-i18n="lab.config.title">Configuration <span class="accent">Équipement</span></h2>
           <div
             style="background:var(--bg-alt); padding:2rem; border-radius:var(--radius-lg); margin-top:1.5rem; display: flex; flex-direction: column; align-items: center; text-align:center;">
             <p class="budget-amount pulse" id="budgetAmount"
@@ -2956,7 +2956,7 @@
             <div>
               <div style="font-size:0.7rem; color:var(--text-muted); text-transform:uppercase; font-weight:700;"
                 data-i18n="lab.summary.count">
-                Ééquipements</div>
+                Équipements</div>
               <div id="summaryCount" style="font-size:1.2rem; font-weight:800; color:var(--text); margin-top:0.2rem;">
                 0
               </div>
@@ -3397,7 +3397,7 @@
         <!-- Populated by JS -->
       </div>
 
-      <!-- Section Remerciements Ééquipe -->
+      <!-- Section Remerciements Équipe -->
       <div class="team-thanks-section">
         <div class="thanks-content">
           <div class="thanks-image-wrap">
@@ -3430,7 +3430,7 @@
 
       <section class="hero" id="planningHeroSection" style="padding-bottom: 3.5rem;">
         <div class="hero-badge" data-i18n="plan.badge"> Calendrier de Production</div>
-        <h2 data-i18n="plan.title">Planning & <span class="accent">Gestion d'Ééquipe</span></h2>
+        <h2 data-i18n="plan.title">Planning & <span class="accent">Gestion d'Équipe</span></h2>
         <p data-i18n="plan.desc">Organisez votre production annuelle, gérez les congés et collaborez avec votre équipe
           pâtissière.</p>
 
@@ -3447,7 +3447,7 @@
         <aside class="planning-sidebar">
           <div class="card planning-widget">
             <div class="widget-header" style="margin-bottom:1rem;">
-              <h3 class="widget-title" data-i18n="plan.team">Ééquipe</h3>
+              <h3 class="widget-title" data-i18n="plan.team">Équipe</h3>
               <input type="text" id="teamNameInput" class="form-input-inline" placeholder="Nom de l'équipe"
                 data-i18n-placeholder="plan.team.placeholder" style="max-width:150px; font-size:0.8rem; height:28px;">
             </div>
@@ -3543,7 +3543,7 @@
               <div class="legend-item"><span class="day-cell-mini sunday-day"></span> <span
                   data-i18n="plan.legend.sundays">Dimanches & Fériés</span></div>
               <div class="legend-item"><span class="day-cell-mini leave-active-day"></span> <span
-                  data-i18n="plan.legend.leaves">Congés Ééquipe</span></div>
+                  data-i18n="plan.legend.leaves">Congés Équipe</span></div>
             </div>
             <div style="margin-top:1.5rem; font-size:0.8rem; color:var(--text-secondary); line-height:1.4;">
               <span data-i18n="plan.legend.info">Les dates intègrent les événements clés (Épiphanie, Pâques, Noël). Le
@@ -3737,7 +3737,7 @@
                              <thead>
                                 <tr>
                                    <th>Date</th>
-                                   <th>Ééquipement</th>
+                                   <th>Équipement</th>
                                    <th>Température</th>
                                    <th>Par</th>
                                    <th>Statut</th>
@@ -4004,7 +4004,7 @@
           
           <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.2rem; margin-bottom:1.5rem;">
             <div class="form-group">
-              <label data-i18n="haccp.temp.equipment" style="font-weight:700; color:var(--text); margin-bottom:0.5rem; display:block;"> Ééquipement</label>
+              <label data-i18n="haccp.temp.equipment" style="font-weight:700; color:var(--text); margin-bottom:0.5rem; display:block;"> Équipement</label>
               <select id="haccpTempEquip" class="form-select" style="width:100%; font-weight:600;">
                 <option value="Frigo 1">Frigo 1 (Vitrine)</option>
                 <option value="Frigo 2">Frigo 2 (Réserve)</option>
@@ -5955,7 +5955,7 @@
           `,
           'team': `
             <div style="font-size:3rem; margin-bottom:1rem;">👨👩</div>
-            <h2>Organisation & Ééquipe</h2>
+            <h2>Organisation & Équipe</h2>
             <p>Une production fluide commence par un planning sans failles.</p>
             <h3>Anticiper les pics :</h3>
             <p>Utilisez le calendrier des zones scolaires (A, B, C) intégré pour prévoir vos besoins en personnel pendant les vacances.</p>
@@ -6071,7 +6071,7 @@
         <div class="academy-card" onclick="GourmetAcademy.showArticle('team')">
           <div class="ac-icon">👨👩</div>
           <div class="ac-info">
-            <h3>Gestion d'Ééquipe</h3>
+            <h3>Gestion d'Équipe</h3>
             <p>Plannings, congés et organisation du laboratoire.</p>
             <span class="ac-action">Voir plus →</span>
           </div>

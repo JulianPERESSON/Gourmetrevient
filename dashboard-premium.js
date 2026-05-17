@@ -841,7 +841,7 @@ function updateOnlineStatus() {
     if (dot && text) {
         dot.classList.toggle('online', isOnline);
         dot.classList.toggle('offline', !isOnline);
-        text.textContent = isOnline ? 'Cloud Sync : Actif' : 'Mode Hors Ligne';
+        text.textContent = isOnline ? '☁️ 🟢' : '☁️ 🔴';
     }
     
     const legacyDot = document.getElementById('offlineStatusDot');
