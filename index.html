@@ -5238,7 +5238,7 @@
       const target = e.target;
 
       // 1. Handle Dropdown Triggers (L'Atelier, Pilotage, etc.)
-      const trigger = target.closest('.nav-dropdown-trigger');
+      const trigger = target.closest('.nav-dropdown .nav-dropdown-trigger');
       if (trigger) {
         e.preventDefault();
         e.stopPropagation();
