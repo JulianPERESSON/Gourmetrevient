@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧁</text></svg>">
+  
+  <title>Inflation et pâtisserie artisanale : comment protéger ses marges | Blog GourmetRevient</title>
+  <meta name="description" content="Protégez vos marges en pâtisserie face à l'inflation du beurre, des œufs et de la farine. Stratégies concrètes et outils de simulation de prix.">
+  <meta property="og:title" content="Inflation et pâtisserie artisanale : comment protéger ses marges">
+  <meta property="og:description" content="Beurre AOP, électricité, œufs... Comment faire face à la hausse des coûts en pâtisserie artisanale sans perdre vos clients.">
+  <meta property="og:image" content="https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=800">
+  <meta property="og:url" content="https://julianperesson.github.io/Gourmetrevient/article-inflation-marge-patisserie.html">
+  <link rel="canonical" href="https://julianperesson.github.io/Gourmetrevient/article-inflation-marge-patisserie.html">
+
+  <style>
+    /* Design system styles matched exactly with the template */
+    :root {
+      --primary: #4f46e5;
+      --primary-dark: #3730a3;
+      --primary-light: #e0e7ff;
+      --primary-accent: #818cf8;
+      --bg-main: #f8fafc;
+      --bg-card: #ffffff;
+      --text-main: #1e293b;
+      --text-dark: #0f172a;
+      --text-muted: #475569;
+      --border: #e2e8f0;
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 20px;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
+      --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      line-height: 1.8;
+      font-size: 17px;
+      -webkit-font-smoothing: antialiased;
+    }
+    .container { max-width: 800px; margin: 0 auto; padding: 0 1.5rem; }
+    .container-large { max-width: 1100px; margin: 0 auto; padding: 0 1.5rem; }
+    .progress-container { position: fixed; top: 0; left: 0; width: 100%; height: 4px; background: transparent; z-index: 150; }
+    .progress-bar { height: 100%; background: linear-gradient(to right, var(--primary-accent), var(--primary)); width: 0%; transition: width 0.1s ease-out; }
+    nav { position: sticky; top: 4px; z-index: 100; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); height: 80px; display: flex; align-items: center; }
+    .nav-inner { width: 100%; display: flex; justify-content: space-between; align-items: center; }
+    .logo-container { display: flex; align-items: center; gap: 0.75rem; text-decoration: none; }
+    .logo-icon { font-size: 2rem; }
+    .logo-text { font-size: 1.5rem; font-weight: 800; color: var(--primary-dark); }
+    .nav-links { display: flex; align-items: center; gap: 1.5rem; }
+    .nav-link { text-decoration: none; font-weight: 600; color: var(--text-muted); font-size: 0.95rem; padding: 0.5rem 1rem; border-radius: var(--radius-sm); transition: var(--transition); }
+    .nav-link:hover { color: var(--primary); background-color: var(--primary-light); }
+    .nav-link-primary { background-color: var(--primary); color: white !important; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2); }
+    .nav-link-primary:hover { background-color: var(--primary-dark); transform: translateY(-1px); }
+    .breadcrumbs { padding: 1.5rem 0; font-size: 0.85rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.5rem; }
+    .breadcrumbs a { color: var(--primary); text-decoration: none; font-weight: 600; }
+    .breadcrumbs span.separator { color: #94a3b8; }
+    .article-hero { text-align: center; padding: 2.5rem 0; }
+    .article-category { display: inline-block; padding: 0.4rem 1rem; background-color: var(--primary-light); color: var(--primary-dark); font-weight: 700; font-size: 0.85rem; border-radius: 50px; text-transform: uppercase; margin-bottom: 1.5rem; }
+    .article-hero h1 { font-size: 2.75rem; font-weight: 900; color: var(--text-dark); line-height: 1.2; margin-bottom: 1rem; }
+    .article-subtitle { font-size: 1.25rem; color: var(--text-muted); margin-bottom: 2rem; }
+    .article-meta { display: flex; align-items: center; justify-content: center; gap: 1.5rem; font-size: 0.9rem; color: var(--text-muted); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 1rem 0; margin-bottom: 2.5rem; }
+    .meta-avatar { width: 32px; height: 32px; border-radius: 50%; background-color: var(--primary-dark); color: white; font-weight: 700; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; }
+    .cover-image-container { width: 100%; max-height: 500px; border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 3.5rem; box-shadow: var(--shadow-lg); }
+    .cover-image { width: 100%; height: 100%; object-fit: cover; max-height: 500px; }
+    .article-body { color: var(--text-main); }
+    .article-body p { margin-bottom: 1.75rem; }
+    .article-body h2 { font-size: 1.85rem; font-weight: 800; color: var(--text-dark); margin: 3rem 0 1.25rem 0; }
+    .article-body h3 { font-size: 1.4rem; font-weight: 700; color: var(--text-dark); margin: 2.25rem 0 1rem 0; }
+    .callout { padding: 1.5rem; border-radius: var(--radius-md); margin: 2rem 0; border-left: 5px solid; box-shadow: var(--shadow-sm); }
+    .callout-title { font-weight: 800; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; text-transform: uppercase; font-size: 0.9rem; }
+    .callout-tips { background-color: #f5f3ff; border-left-color: var(--primary); color: #3730a3; }
+    .callout-warnings { background-color: #fffbeb; border-left-color: #d97706; color: #92400e; }
+    .callout-success { background-color: #ecfdf5; border-left-color: #059669; color: #065f46; }
+    .article-body ul, .article-body ol { margin-bottom: 2rem; padding-left: 1.75rem; }
+    .article-body li { margin-bottom: 0.75rem; }
+    .table-container { width: 100%; overflow-x: auto; margin: 2.5rem 0; border: 1px solid var(--border); border-radius: var(--radius-md); box-shadow: var(--shadow-sm); }
+    table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.95rem; }
+    th { background-color: #f1f5f9; color: var(--text-dark); font-weight: 700; padding: 1rem 1.25rem; border-bottom: 2px solid var(--border); }
+    td { padding: 1rem 1.25rem; border-bottom: 1px solid var(--border); color: var(--text-main); }
+    tr:last-child td { border-bottom: none; }
+    tr:nth-child(even) td { background-color: rgba(248, 250, 252, 0.5); }
+    .inline-cta { background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%); color: white; border-radius: var(--radius-lg); padding: 2.25rem; margin: 3rem 0; position: relative; overflow: hidden; }
+    .inline-cta-title { font-size: 1.35rem; font-weight: 800; margin-bottom: 0.75rem; }
+    .inline-cta-desc { font-size: 0.95rem; opacity: 0.9; margin-bottom: 1.5rem; }
+    .inline-cta-btn { display: inline-block; background: white; color: var(--primary-dark); padding: 0.75rem 1.5rem; font-weight: 800; font-size: 0.9rem; border-radius: var(--radius-sm); text-decoration: none; transition: var(--transition); }
+    .inline-cta-btn:hover { background: var(--primary-light); transform: translateY(-1px); }
+    .share-section { border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 1.5rem 0; margin: 3.5rem 0; display: flex; align-items: center; justify-content: space-between; }
+    .share-title { font-weight: 700; font-size: 0.95rem; color: var(--text-dark); }
+    .share-buttons { display: flex; gap: 0.75rem; }
+    .share-btn { padding: 0.5rem 1rem; border-radius: var(--radius-sm); font-size: 0.85rem; font-weight: 700; text-decoration: none; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; transition: var(--transition); border: 1px solid var(--border); background: white; color: var(--text-main); }
+    .share-btn:hover { background: var(--bg-main); }
+    .back-to-top { position: fixed; bottom: 2rem; right: 2rem; background: var(--primary); color: white; width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: var(--shadow-lg); opacity: 0; visibility: hidden; transition: var(--transition); z-index: 99; border: none; }
+    .back-to-top.visible { opacity: 1; visibility: visible; }
+    .similar-section { background-color: white; border-top: 1px solid var(--border); padding: 5rem 0; margin-top: 5rem; }
+    .similar-title { font-size: 1.75rem; font-weight: 800; color: var(--text-dark); margin-bottom: 2.5rem; text-align: center; }
+    .similar-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; }
+    .similar-card { background: var(--bg-main); border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--border); transition: var(--transition); text-decoration: none; color: inherit; display: flex; flex-direction: column; height: 100%; }
+    .similar-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); border-color: var(--primary-accent); }
+    .similar-img { height: 160px; width: 100%; object-fit: cover; }
+    .similar-body { padding: 1.25rem; display: flex; flex-direction: column; flex-grow: 1; }
+    .similar-category { font-size: 0.7rem; font-weight: 800; text-transform: uppercase; color: var(--primary); margin-bottom: 0.5rem; }
+    .similar-card-title { font-size: 1rem; font-weight: 800; color: var(--text-dark); margin-bottom: 0.5rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .similar-readtime { font-size: 0.75rem; color: var(--text-muted); margin-top: auto; padding-top: 0.75rem; }
+    footer { background-color: #0f172a; color: #94a3b8; padding: 4rem 0 2.5rem 0; }
+    .footer-inner { display: flex; flex-direction: column; align-items: center; gap: 2rem; text-align: center; }
+    .footer-logo { display: flex; align-items: center; gap: 0.5rem; text-decoration: none; color: white; font-size: 1.5rem; font-weight: 800; }
+    .footer-links { display: flex; gap: 2rem; }
+    .footer-link { color: #94a3b8; text-decoration: none; font-size: 0.95rem; }
+    .footer-bottom { width: 100%; border-top: 1px solid #1e293b; padding-top: 2rem; margin-top: 2rem; font-size: 0.85rem; display: flex; justify-content: space-between; }
+    @media (max-width: 768px) {
+      .similar-grid { grid-template-columns: 1fr; }
+      .article-hero h1 { font-size: 2.25rem; }
+      .footer-bottom { flex-direction: column; text-align: center; gap: 1rem; }
+      .nav-links { gap: 0.5rem; }
+    }
+  </style>
+  <script>const CURRENT_ARTICLE_ID = "inflation-marge-patisserie";</script>
+</head>
+<body>
+
+  <!-- Reading Progress Bar -->
+  <div class="progress-container">
+    <div class="progress-bar" id="progressBar"></div>
+  </div>
+
+  <!-- Navbar -->
+  <nav>
+    <div class="container-large nav-inner">
+      <a href="landing.html" class="logo-container">
+        <span class="logo-icon">🧁</span>
+        <span class="logo-text">GourmetRevient</span>
+      </a>
+      <div class="nav-links">
+        <a href="blog.html" class="nav-link">← Retour au Blog</a>
+        <a href="index.html" class="nav-link nav-link-primary">← Accéder à l'application</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Fil d'Ariane -->
+  <div class="container">
+    <div class="breadcrumbs">
+      <a href="landing.html">Accueil</a>
+      <span class="separator">/</span>
+      <a href="blog.html">Blog</a>
+      <span class="separator">/</span>
+      <span class="current">Inflation et pâtisserie artisanale</span>
+    </div>
+  </div>
+
+  <!-- Article Content -->
+  <article class="container">
+    <header class="article-hero">
+      <span class="article-category">📈 Rentabilité</span>
+      <h1>Inflation et pâtisserie artisanale : comment protéger ses marges</h1>
+      <p class="article-subtitle">Beurre à +40%, œufs, sucre, et factures d'énergie en hausse... Stratégies concrètes pour adapter vos fiches techniques sans faire fuir vos clients.</p>
+      
+      <div class="article-meta">
+        <div class="meta-item">
+          <div class="meta-avatar">JP</div>
+          <span>Julian Peresson</span>
+        </div>
+        <div class="meta-item">
+          <span>📅</span>
+          <span>25 Mars 2026</span>
+        </div>
+        <div class="meta-item">
+          <span>⏱️</span>
+          <span>7 min de lecture</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="cover-image-container">
+      <img class="cover-image" src="https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=800" alt="Viennoiseries croustillantes">
+    </div>
+
+    <div class="article-body">
+      <p>Depuis plusieurs saisons, la pâtisserie artisanale française traverse une tempête économique sans précédent. Habituellement habitués à des marges de matières premières confortables, les artisans doivent désormais faire face à une hausse généralisée et brutale du prix de leurs ingrédients de base : le beurre AOP de tournage a bondi de près de 40%, le sucre a doublé, tandis que la crise aviaire a régulièrement déstabilisé le marché des œufs frais. Ajoutez à cela l'envolée du coût de l'électricité nécessaire au fonctionnement des fours et des chambres froides, et vous obtenez un cocktail financier explosif.</p>
+      
+      <p>Face à cette inflation galopante, de nombreux artisans se sentent désarmés. Augmenter brutalement l'ensemble des prix en vitrine fait courir le risque de perdre une clientèle déjà soucieuse de son propre pouvoir d'achat. Subir la hausse sans réagir, c'est condamner sa rentabilité et risquer le dépôt de bilan. Comment s'adapter ? Cet article propose des <strong>stratégies opérationnelles et des leviers concrets</strong> pour défendre vos marges au laboratoire sans dégrader l'expérience de vos clients.</p>
+
+      <h2>1. Analyser l'impact réel de l'inflation sur ses fiches techniques</h2>
+      <p>La première erreur lors d'une période d'inflation est de réagir de manière globale en appliquant, par exemple, une hausse arbitraire de 5% sur tous vos tarifs. Certains de vos produits subissent de plein fouet la hausse du beurre (les viennoiseries) tandis que d'autres y sont presque insensibles (les sorbets ou les meringues).</p>
+      <p>Vous devez impérativement recalculer le <strong>coût matière réel actualisé</strong> de chaque fiche technique. Pour cela, mettez à jour votre base de prix d'achat fournisseurs Hors Taxes et observez l'impact direct sur votre marge brute unitaire.</p>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Ingrédient Clé</th>
+              <th>Prix HT Moyen 2024</th>
+              <th>Prix HT Actuel (2026)</th>
+              <th>Impact sur les recettes associées</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Beurre AOP 82% (Plaque de tournage)</td>
+              <td>6,80 € / kg</td>
+              <td>9,80 € / kg (+44%)</td>
+              <td>Impact maximal sur le croissant, pain au chocolat, pâte feuilletée</td>
+            </tr>
+            <tr>
+              <td>Œufs entiers frais (moyens)</td>
+              <td>2,90 € / kg</td>
+              <td>3,90 € / kg (+34%)</td>
+              <td>Impact élevé sur les cakes, flans, génoises, crèmes pâtissières</td>
+            </tr>
+            <tr>
+              <td>Sucre semoule blanc</td>
+              <td>1,10 € / kg</td>
+              <td>1,65 € / kg (+50%)</td>
+              <td>Impact modéré mais généralisé (meringues, caramels, sirops)</td>
+            </tr>
+            <tr>
+              <td>Électricité (Fours & Froid)</td>
+              <td>Ratio moyen 4% CA</td>
+              <td>Ratio moyen 8% CA (+100%)</td>
+              <td>Impact global sur les charges de structure du commerce</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="inline-cta">
+        <h3 class="inline-cta-title">Mesurez l'impact de l'inflation sur vos marges en 1 clic</h3>
+        <p class="inline-cta-desc">Grâce au simulateur d'inflation de GourmetRevient, mettez à jour le prix de vos ingrédients et observez instantanément la dégradation ou la préservation de vos marges sur l'ensemble de votre catalogue.</p>
+        <a href="landing.html" class="inline-cta-btn">Accéder au simulateur GourmetRevient →</a>
+      </div>
+
+      <h2>2. Les 3 stratégies d'adaptation pour défendre sa marge brute</h2>
+      <p>Une fois le diagnostic posé, l'artisan dispose de trois leviers d'action principaux en laboratoire :</p>
+      
+      <h3>Stratégie 1 : La reformulation intelligente des recettes</h3>
+      <p>Il ne s'agit pas de remplacer le beurre AOP par de la margarine bas de gamme (ce qui tuerait la réputation de votre commerce). Il s'agit plutôt d'adapter les proportions de manière subtile. Réduire la quantité de beurre de 5% dans une recette de biscuit en compensant par un peu plus de poudre d'amande ou adapter la quantité de ganache dans un entremets permet de diminuer le coût matière de manière invisible pour le palais du consommateur.</p>
+
+      <h3>Stratégie 2 : Modifier le design ou le format des gâteaux</h3>
+      <p>C'est ce qu'on appelle la « shrinkflation » positive dans le commerce. Si vous ne pouvez pas augmenter le prix de votre éclair au chocolat au-delà de 2,30 €, réduisez sa taille de 5% à 7% lors du pochage (par exemple en passant d'un éclair de 14 cm à 13 cm). Le coût matière baisse instantanément, la marge est préservée, et le produit reste accessible en vitrine.</p>
+
+      <h3>Stratégie 3 : Développer des produits à forte marge</h3>
+      <p>L'inflation touche principalement le beurre, les œufs et l'énergie. Développez activement des gammes de produits moins sensibles à ces ingrédients : sorbets aux fruits de saison, meringues décorées, biscuits secs (tuiles, sablés diamants sans œuf), ou confiseries de sucre (guimauves). Ces produits affichent des taux de marge brute supérieurs à 85% et équilibrent la baisse de rentabilité de vos viennoiseries.</p>
+
+      <div class="callout callout-warnings">
+        <div class="callout-title">⚠️ L'erreur de la baisse de qualité</div>
+        <p>Ne cédez jamais à la tentation d'acheter du chocolat de couverture industriel de piètre qualité pour économiser quelques centimes. Vos clients fidèles s'en rendront compte dès la première bouchée et iront chez vos concurrents. Défendez la qualité artisanale, mais optimisez le travail et les pertes au gramme près.</p>
+      </div>
+
+      <h2>3. Valoriser l'artisanat : Mieux communiquer sur ses prix</h2>
+      <p>Si vous devez impérativement augmenter le prix de vos viennoiseries (par exemple passer le croissant de 1,20 € à 1,35 €), assumez-le avec transparence auprès de votre clientèle. Les consommateurs français sont conscients de la crise de l'énergie et des hausses du prix du beurre.</p>
+      <p>Placez une jolie ardoise sur votre comptoir expliquant votre démarche : « Afin de préserver l'excellence de notre beurre AOP Charentes-Poitou et la qualité de notre fabrication 100% maison, nous avons dû ajuster nos tarifs de quelques centimes. Merci pour votre fidélité à l'artisanat d'excellence. » Cette transparence désarme les critiques et renforce le lien de confiance.</p>
+
+      <div class="callout callout-tips">
+        <div class="callout-title">💡 Conseil de pro</div>
+        <p>Traquez les kilowatts au laboratoire. Nettoyez régulièrement les grilles de vos condensateurs de chambres froides (une grille poussiéreuse augmente la consommation électrique de 20%), et optimisez vos plannings de cuisson pour que vos fours tournent à pleine charge en continu.</p>
+      </div>
+
+      <h2>4. Automatiser le pilotage de ses marges avec GourmetRevient</h2>
+      <p>Gérer manuellement l'impact de l'inflation sur 50 références de gâteaux est un travail d'analyste financier infaisable pour un artisan pâtissier au quotidien. C'est pourquoi nous avons développé <strong>GourmetRevient</strong>.</p>
+      <p>Notre simulateur d'inflation recalculé automatiquement en temps réel vous alerte immédiatement dès qu'un produit tombe en dessous de votre seuil de marge brute cible (par exemple 75%). L'application vous propose des recommandations de prix de vente cohérentes et vous aide à maintenir une rentabilité solide, même au cœur de la tempête économique.</p>
+
+      <div class="callout callout-success">
+        <div class="callout-title">✅ Résilience économique</div>
+        <p>Les boulangers-pâtissiers équipés de la solution de pilotage GourmetRevient maintiennent un taux de marge brute stable à 76% en moyenne, malgré les vagues d'inflation successives de ces dernières années.</p>
+      </div>
+
+      <div class="inline-cta">
+        <h3 class="inline-cta-title">Sécurisez l'avenir financier de votre laboratoire</h3>
+        <p class="inline-cta-desc">Rejoignez des centaines de pâtissiers artisans qui protègent activement leurs marges grâce à nos outils. Essayez GourmetRevient gratuitement pendant 14 jours.</p>
+        <a href="landing.html" class="inline-cta-btn">Créer mon compte GourmetRevient</a>
+      </div>
+    </div>
+
+    <!-- Partage social -->
+    <div class="share-section">
+      <span class="share-title">Partager ce guide :</span>
+      <div class="share-buttons">
+        <a href="#" id="shareWhatsApp" class="share-btn share-whatsapp" target="_blank"><span>💬</span> WhatsApp</a>
+        <a href="#" id="shareLinkedIn" class="share-btn share-linkedin" target="_blank"><span>💼</span> LinkedIn</a>
+        <button id="shareCopyLink" class="share-btn"><span>🔗</span> Copier le lien</button>
+      </div>
+    </div>
+  </article>
+
+  <!-- Section Articles Similaires (Dynamique) -->
+  <section class="similar-section">
+    <div class="container-large">
+      <h2 class="similar-title">Articles similaires qui pourraient vous intéresser</h2>
+      <div class="similar-grid" id="similarGrid">
+        <!-- Rendered dynamically by Javascript based on tags -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Button Back to Top -->
+  <button id="backToTop" class="back-to-top" title="Retour en haut">▲</button>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container-large footer-inner">
+      <a href="landing.html" class="footer-logo">
+        <span>🧁</span> GourmetRevient
+      </a>
+      <div class="footer-links">
+        <a href="landing.html" class="footer-link">Accueil</a>
+        <a href="blog.html" class="footer-link">Le Blog</a>
+        <a href="index.html" class="footer-link">Cockpit App</a>
+        <a href="legal.html" class="footer-link">Mentions Légales</a>
+      </div>
+      <div class="footer-bottom">
+        <p>© 2026 GourmetRevient. Tous droits réservés. Écrit par Julian Peresson.</p>
+        <p>Le pilotage moderne de la pâtisserie artisanale française.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Similar Articles Script & Scroll Script -->
+  <script src="blog-data.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      // Reading Progress Bar Logic
+      const progressBar = document.getElementById("progressBar");
+      window.addEventListener("scroll", () => {
+        const winScroll = document.documentElement.scrollTop || document.body.scrollTop;
+        const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        const scrolled = height > 0 ? (winScroll / height) * 100 : 0;
+        progressBar.style.width = scrolled + "%";
+
+        const backToTop = document.getElementById("backToTop");
+        if (winScroll > 400) {
+          backToTop.classList.add("visible");
+        } else {
+          backToTop.classList.remove("visible");
+        }
+      });
+
+      document.getElementById("backToTop").addEventListener("click", () => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
+
+      // Share Actions
+      const articleUrl = window.location.href;
+      const articleTitle = "Inflation et pâtisserie artisanale : comment protéger ses marges";
+      document.getElementById("shareWhatsApp").href = `https://api.whatsapp.com/send?text=${encodeURIComponent(articleTitle + " - " + articleUrl)}`;
+      document.getElementById("shareLinkedIn").href = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(articleUrl)}`;
+      
+      const copyBtn = document.getElementById("shareCopyLink");
+      copyBtn.addEventListener("click", () => {
+        navigator.clipboard.writeText(articleUrl).then(() => {
+          const original = copyBtn.innerHTML;
+          copyBtn.innerHTML = "<span>✅</span> Copié !";
+          setTimeout(() => { copyBtn.innerHTML = original; }, 2000);
+        });
+      });
+
+      // Similar Articles dynamic rendering
+      const similarGrid = document.getElementById("similarGrid");
+      if (similarGrid && typeof getSimilarArticles === 'function') {
+        const similar = getSimilarArticles(CURRENT_ARTICLE_ID, 3);
+        similarGrid.innerHTML = "";
+        similar.forEach(article => {
+          const card = document.createElement("a");
+          card.href = article.url;
+          card.className = "similar-card";
+          card.innerHTML = `
+            <img src="${article.image}" class="similar-img" alt="${article.title}">
+            <div class="similar-body">
+              <span class="similar-category">${article.category}</span>
+              <h3 class="similar-card-title">${article.title}</h3>
+              <span class="similar-readtime">⏱️ ${article.readTime} de lecture</span>
+            </div>
+          `;
+          similarGrid.appendChild(card);
+        });
+      }
+    });
+  </script>
+</body>
+</html>

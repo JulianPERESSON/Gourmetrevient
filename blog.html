@@ -4,170 +4,1012 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧁</text></svg>">
-  <title>Le Blog des Pâtissiers — GourmetRevient</title>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <title>Le Blog des Pâtissiers Artisans | GourmetRevient</title>
+  <meta name="description" content="Découvrez des guides, astuces et conseils de rentabilité rédigés pour les pâtissiers artisans français, les apprentis CAP Pâtisserie et les futurs créateurs.">
+  <meta property="og:title" content="Le Blog des Pâtissiers Artisans | GourmetRevient">
+  <meta property="og:description" content="Optimisez vos coûts de revient, préparez votre CAP Pâtisserie, gérez vos stocks et boostez votre marge avec des conseils professionnels.">
+  <meta property="og:image" content="https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=800">
+  <meta property="og:url" content="https://julianperesson.github.io/Gourmetrevient/blog.html">
+  <link rel="canonical" href="https://julianperesson.github.io/Gourmetrevient/blog.html">
+
   <style>
+    /* variables de design system */
     :root {
       --primary: #4f46e5;
       --primary-dark: #3730a3;
-      --text-main: #1e293b;
-      --text-muted: #64748b;
-      --font-display: 'Plus Jakarta Sans', sans-serif;
-      --font-body: 'Outfit', sans-serif;
+      --primary-light: #e0e7ff;
+      --primary-accent: #818cf8;
+      --bg-main: #f8fafc;
+      --bg-card: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #475569;
       --border: #e2e8f0;
-      --radius: 20px;
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 20px;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
+      --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
+      --shadow-premium: 0 25px 50px -12px rgba(79, 70, 229, 0.08);
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
     body {
-      font-family: var(--font-body);
-      background-color: #f8fafc;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      background-color: var(--bg-main);
       color: var(--text-main);
       line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
     }
-    header {
-      background: white;
-      padding: 4rem 0;
-      text-align: center;
-      border-bottom: 1px solid var(--border);
-    }
+
     .container {
-      max-width: 1000px;
+      max-width: 1200px;
       margin: 0 auto;
-      padding: 0 1.5rem;
+      padding: 0 2rem;
     }
-    h1 {
-      font-family: var(--font-display);
-      font-size: 3rem;
-      font-weight: 800;
-      margin-bottom: 1rem;
-    }
-    .subtitle {
-      font-size: 1.25rem;
-      color: var(--text-muted);
-    }
-    .blog-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 2rem;
-      padding: 4rem 0;
-    }
-    .blog-card {
-      background: white;
-      border-radius: var(--radius);
-      overflow: hidden;
-      border: 1px solid var(--border);
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-      text-decoration: none;
-      color: inherit;
-    }
-    .blog-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 20px 40px -10px rgba(0,0,0,0.1);
-    }
-    .blog-image {
-      height: 200px;
-      background-size: cover;
-      background-position: center;
-    }
-    .blog-content {
-      padding: 1.5rem;
-    }
-    .blog-tag {
-      display: inline-block;
-      padding: 0.25rem 0.75rem;
-      background: #eef2ff;
-      color: var(--primary);
-      border-radius: 50px;
-      font-size: 0.75rem;
-      font-weight: 700;
-      margin-bottom: 1rem;
-    }
-    .blog-card h3 {
-      font-family: var(--font-display);
-      font-size: 1.25rem;
-      margin-bottom: 0.75rem;
-    }
-    .blog-card p {
-      color: var(--text-muted);
-      font-size: 0.95rem;
-      display: -webkit-box;
-      -webkit-line-clamp: 3;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-    }
+
+    /* Navbar Premium */
     nav {
-      height: 72px;
-      background: white;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--border);
+      height: 80px;
       display: flex;
       align-items: center;
+      transition: var(--transition);
     }
+
     .nav-inner {
       width: 100%;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
-    .logo {
-      font-family: var(--font-display);
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+    }
+
+    .logo-icon {
+      font-size: 2rem;
+      transition: transform 0.3s ease;
+    }
+
+    .logo-container:hover .logo-icon {
+      transform: scale(1.15) rotate(-5deg);
+    }
+
+    .logo-text {
       font-size: 1.5rem;
       font-weight: 800;
       color: var(--primary-dark);
+      letter-spacing: -0.025em;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .nav-link {
       text-decoration: none;
+      font-weight: 600;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      border-radius: var(--radius-sm);
+    }
+
+    .nav-link:hover {
+      color: var(--primary);
+      background-color: var(--primary-light);
+    }
+
+    .nav-link-primary {
+      background-color: var(--primary);
+      color: white !important;
+      box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
+    }
+
+    .nav-link-primary:hover {
+      background-color: var(--primary-dark);
+      transform: translateY(-1px);
+    }
+
+    /* Hero Section */
+    .hero {
+      padding: 5rem 0 4rem 0;
+      background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);
+      border-bottom: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(79, 70, 229, 0.05) 0%, rgba(255, 255, 255, 0) 70%);
+      top: -300px;
+      right: -100px;
+      pointer-events: none;
+    }
+
+    .hero-content {
+      max-width: 800px;
+      margin: 0 auto;
+      text-align: center;
+      position: relative;
+      z-index: 10;
+    }
+
+    .hero-tag {
+      display: inline-block;
+      padding: 0.4rem 1rem;
+      background-color: var(--primary-light);
+      color: var(--primary-dark);
+      font-weight: 700;
+      font-size: 0.85rem;
+      border-radius: 50px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 1.5rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .hero h1 {
+      font-size: 3.5rem;
+      font-weight: 900;
+      color: #1e1b4b;
+      line-height: 1.15;
+      margin-bottom: 1.5rem;
+      letter-spacing: -0.025em;
+    }
+
+    .hero h1 span {
+      background: linear-gradient(to right, var(--primary), var(--primary-dark));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero .subtitle {
+      font-size: 1.25rem;
+      color: var(--text-muted);
+      margin-bottom: 2.5rem;
+      font-weight: 400;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* Search Bar */
+    .search-wrapper {
+      position: relative;
+      max-width: 600px;
+      margin: 0 auto;
+      box-shadow: var(--shadow-lg);
+      border-radius: var(--radius-lg);
+      background: white;
+      padding: 6px;
+      border: 1px solid var(--border);
+      transition: var(--transition);
+    }
+
+    .search-wrapper:focus-within {
+      border-color: var(--primary-accent);
+      box-shadow: 0 20px 25px -5px rgba(79, 70, 229, 0.15);
+      transform: translateY(-2px);
+    }
+
+    .search-input-container {
+      display: flex;
+      align-items: center;
+      position: relative;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 1.25rem;
+      color: var(--text-muted);
+      font-size: 1.25rem;
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 1rem 1rem 1rem 3.25rem;
+      border: none;
+      font-size: 1.05rem;
+      color: var(--text-main);
+      background: transparent;
+      outline: none;
+      font-family: inherit;
+    }
+
+    .search-input::placeholder {
+      color: #94a3b8;
+    }
+
+    .search-clear {
+      position: absolute;
+      right: 1.25rem;
+      background: #e2e8f0;
+      border: none;
+      color: var(--text-muted);
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 0.8rem;
+      transition: var(--transition);
+    }
+
+    .search-clear:hover {
+      background: #cbd5e1;
+      color: var(--text-main);
+    }
+
+    /* Filters System */
+    .filters-section {
+      padding: 2.5rem 0 1.5rem 0;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      position: relative;
+      z-index: 10;
+    }
+
+    .filter-pill {
+      background: white;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 0.75rem 1.5rem;
+      font-weight: 600;
+      font-size: 0.95rem;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: var(--transition);
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .filter-pill:hover {
+      border-color: var(--primary-accent);
+      color: var(--primary);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .filter-pill.active {
+      background-color: var(--primary);
+      color: white;
+      border-color: var(--primary);
+      box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+    }
+
+    /* Main Content */
+    .main-content {
+      padding: 3rem 0 6rem 0;
+    }
+
+    .section-header {
+      margin-bottom: 2.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      border-bottom: 2px solid #e2e8f0;
+      padding-bottom: 1rem;
+    }
+
+    .section-title {
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: #1e1b4b;
+    }
+
+    .results-count {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      font-weight: 500;
+    }
+
+    /* Grid layout */
+    .blog-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2.5rem;
+      transition: var(--transition);
+    }
+
+    /* Grid cards style */
+    .blog-card {
+      background: var(--bg-card);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      box-shadow: var(--shadow-md);
+      transition: var(--transition);
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .blog-card:hover {
+      transform: translateY(-8px);
+      box-shadow: var(--shadow-premium);
+      border-color: var(--primary-light);
+    }
+
+    .card-image-wrapper {
+      position: relative;
+      height: 220px;
+      overflow: hidden;
+      background-color: #e2e8f0;
+    }
+
+    .card-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s ease;
+    }
+
+    .blog-card:hover .card-image {
+      transform: scale(1.08);
+    }
+
+    .card-badge {
+      position: absolute;
+      top: 1.25rem;
+      left: 1.25rem;
+      padding: 0.4rem 0.85rem;
+      font-weight: 700;
+      font-size: 0.75rem;
+      border-radius: 50px;
+      text-transform: uppercase;
+      letter-spacing: 0.025em;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid transparent;
+    }
+
+    /* Badges colors per category */
+    .badge-rentabilite {
+      background-color: #eef2ff;
+      color: #4f46e5;
+      border-color: #c7d2fe;
+    }
+
+    .badge-haccp {
+      background-color: #ecfdf5;
+      color: #059669;
+      border-color: #a7f3d0;
+    }
+
+    .badge-gestion {
+      background-color: #fffbeb;
+      color: #d97706;
+      border-color: #fde68a;
+    }
+
+    .badge-formation {
+      background-color: #faf5ff;
+      color: #7c3aed;
+      border-color: #e9d5ff;
+    }
+
+    .badge-inspiration {
+      background-color: #fff1f2;
+      color: #e11d48;
+      border-color: #fecdd3;
+    }
+
+    .card-body {
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+    }
+
+    .card-meta {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 0.75rem;
+      font-weight: 500;
+    }
+
+    .meta-item {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    .card-title {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: #1e1b4b;
+      margin-bottom: 0.75rem;
+      line-height: 1.4;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      height: 3.5rem; /* Ensures alignment */
+      transition: color 0.2s ease;
+    }
+
+    .blog-card:hover .card-title {
+      color: var(--primary);
+    }
+
+    .card-excerpt {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      line-height: 1.5;
+      margin-bottom: 1.5rem;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      height: 2.8rem; /* alignment */
+    }
+
+    .card-footer {
+      margin-top: auto;
+      padding-top: 1.25rem;
+      border-top: 1px solid #f1f5f9;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .author-info {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .author-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background-color: var(--primary-light);
+      color: var(--primary-dark);
+      font-weight: 700;
+      font-size: 0.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--border);
+    }
+
+    .author-name {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .card-cta {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      transition: transform 0.2s ease;
+    }
+
+    .blog-card:hover .card-cta {
+      transform: translateX(3px);
+    }
+
+    /* Empty state */
+    .empty-state {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 4rem 2rem;
+      background: white;
+      border-radius: var(--radius-lg);
+      border: 1px dashed var(--border);
+      display: none;
+    }
+
+    .empty-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+
+    .empty-title {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #1e1b4b;
+      margin-bottom: 0.5rem;
+    }
+
+    .empty-desc {
+      color: var(--text-muted);
+      max-width: 400px;
+      margin: 0 auto 1.5rem auto;
+    }
+
+    /* CTA Section */
+    .cta-banner {
+      background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+      border-radius: var(--radius-lg);
+      padding: 3.5rem;
+      color: white;
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow-lg);
+      margin-top: 4rem;
+    }
+
+    .cta-banner::before {
+      content: '';
+      position: absolute;
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0) 70%);
+      top: -200px;
+      left: -100px;
+      pointer-events: none;
+    }
+
+    .cta-content {
+      position: relative;
+      z-index: 10;
+      max-width: 650px;
+    }
+
+    .cta-title {
+      font-size: 2.25rem;
+      font-weight: 900;
+      line-height: 1.2;
+      margin-bottom: 1rem;
+      letter-spacing: -0.025em;
+    }
+
+    .cta-desc {
+      font-size: 1.15rem;
+      color: rgba(243, 244, 246, 0.9);
+      margin-bottom: 2rem;
+    }
+
+    .cta-btn {
+      display: inline-block;
+      background: white;
+      color: var(--primary-dark);
+      padding: 1rem 2rem;
+      font-weight: 800;
+      font-size: 1.05rem;
+      border-radius: var(--radius-md);
+      text-decoration: none;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+      transition: var(--transition);
+      border: 2px solid transparent;
+    }
+
+    .cta-btn:hover {
+      background-color: var(--primary-light);
+      transform: translateY(-2px);
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.25);
+    }
+
+    /* Footer */
+    footer {
+      background-color: #0f172a;
+      color: #94a3b8;
+      padding: 4rem 0 2.5rem 0;
+      border-top: 1px solid #1e293b;
+      margin-top: 6rem;
+    }
+
+    .footer-inner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2rem;
+      text-align: center;
+    }
+
+    .footer-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      text-decoration: none;
+      color: white;
+      font-size: 1.5rem;
+      font-weight: 800;
+    }
+
+    .footer-links {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 2rem;
+    }
+
+    .footer-link {
+      color: #94a3b8;
+      text-decoration: none;
+      font-size: 0.95rem;
+      font-weight: 500;
+      transition: var(--transition);
+    }
+
+    .footer-link:hover {
+      color: white;
+    }
+
+    .footer-bottom {
+      width: 100%;
+      border-top: 1px solid #1e293b;
+      padding-top: 2rem;
+      margin-top: 2rem;
+      font-size: 0.85rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    /* Animations classes */
+    .fade-in {
+      animation: fadeIn 0.4s ease-out forwards;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(15px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* responsive grid breakpoints */
+    @media (max-width: 1024px) {
+      .blog-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 2rem;
+      }
+      .hero h1 {
+        font-size: 2.75rem;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .blog-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+      .container {
+        padding: 0 1.25rem;
+      }
+      .hero {
+        padding: 3.5rem 0 3rem 0;
+      }
+      .hero h1 {
+        font-size: 2.25rem;
+      }
+      .hero .subtitle {
+        font-size: 1.05rem;
+      }
+      .nav-links {
+        gap: 0.75rem;
+      }
+      .nav-link {
+        font-size: 0.85rem;
+        padding: 0.4rem 0.75rem;
+      }
+      .cta-banner {
+        padding: 2rem;
+      }
+      .cta-title {
+        font-size: 1.75rem;
+      }
+      .footer-bottom {
+        flex-direction: column;
+        text-align: center;
+      }
     }
   </style>
 </head>
 <body>
+
+  <!-- Premium Header & Navbar -->
   <nav>
     <div class="container nav-inner">
-      <a href="landing.html" class="logo">🧁 GourmetRevient</a>
-      <a href="landing.html" style="text-decoration: none; font-weight: 600; color: var(--primary);">← Retour à l'accueil</a>
+      <a href="landing.html" class="logo-container">
+        <span class="logo-icon">🧁</span>
+        <span class="logo-text">GourmetRevient</span>
+      </a>
+      <div class="nav-links">
+        <a href="landing.html" class="nav-link">← Accueil</a>
+        <a href="index.html" class="nav-link nav-link-primary">← Accéder à l'application</a>
+      </div>
     </div>
   </nav>
 
-  <header>
-    <div class="container">
-      <h1>Le Blog des Pâtissiers</h1>
-      <p class="subtitle">Conseils, astuces et actualités pour booster votre rentabilité.</p>
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container hero-content">
+      <span class="hero-tag">Savoir-faire & Gestion</span>
+      <h1>Le Blog des <span>Pâtissiers</span></h1>
+      <p class="subtitle">Conseils d'experts, guides de rentabilité HACCP et secrets de fabrication pour propulser votre laboratoire artisanal.</p>
+      
+      <!-- Barre de recherche -->
+      <div class="search-wrapper">
+        <div class="search-input-container">
+          <div class="search-icon">🔍</div>
+          <input type="text" id="searchInput" class="search-input" placeholder="Rechercher un article, un mot-clé ou un tag (ex: coût de revient, CAP, HACCP)...">
+          <button id="searchClear" class="search-clear" title="Effacer la recherche">×</button>
+        </div>
+      </div>
     </div>
-  </header>
+  </section>
 
   <div class="container">
-    <div class="blog-grid">
-      <!-- Article 1 -->
-      <a href="#" class="blog-card">
-        <div class="blog-image" style="background-image: url('https://images.unsplash.com/photo-1555507036-ab1f4038808a?auto=format&fit=crop&w=800&q=80')"></div>
-        <div class="blog-content">
-          <span class="blog-tag">Rentabilité</span>
-          <h3>Calculer son coût de revient : le guide ultime</h3>
-          <p>Le calcul du prix de revient est le fondement de toute pâtisserie rentable. Découvrez notre méthode pas à pas pour ne plus perdre d'argent sur vos recettes.</p>
-        </div>
-      </a>
-
-      <!-- Article 2 -->
-      <a href="#" class="blog-card">
-        <div class="blog-image" style="background-image: url('https://images.unsplash.com/photo-1558326567-98ae2405596b?auto=format&fit=crop&w=800&q=80')"></div>
-        <div class="blog-content">
-          <span class="blog-tag">Hygiène</span>
-          <h3>HACCP : Digitaliser ses relevés pour gagner du temps</h3>
-          <p>Fini les classeurs qui débordent ! Apprenez comment digitaliser vos relevés de température et votre traçabilité pour gagner du temps au quotidien.</p>
-        </div>
-      </a>
-
-      <!-- Article 3 -->
-      <a href="#" class="blog-card">
-        <div class="blog-image" style="background-image: url('https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=800&q=80')"></div>
-        <div class="blog-content">
-          <span class="blog-tag">Production</span>
-          <h3>Optimiser son planning de production en période de fêtes</h3>
-          <p>Astuces pour organiser votre laboratoire et vos fournées sans stress pendant les pics d'activité comme Noël ou Pâques.</p>
-        </div>
-      </a>
+    <!-- Category Filter System -->
+    <div class="filters-section" id="filtersSection">
+      <button class="filter-pill active" data-category="Tous">Tous les articles</button>
+      <button class="filter-pill" data-category="Rentabilité">📈 Rentabilité</button>
+      <button class="filter-pill" data-category="Hygiène & HACCP">🧼 Hygiène & HACCP</button>
+      <button class="filter-pill" data-category="Gestion">💼 Gestion</button>
+      <button class="filter-pill" data-category="Formation CAP">🎓 Formation CAP</button>
+      <button class="filter-pill" data-category="Inspiration">💡 Inspiration</button>
     </div>
+
+    <!-- Main Content Section -->
+    <main class="main-content">
+      <div class="section-header">
+        <h2 class="section-title" id="sectionTitle">Derniers articles publiés</h2>
+        <span class="results-count" id="resultsCount">13 articles disponibles</span>
+      </div>
+
+      <!-- Articles Grid -->
+      <div class="blog-grid" id="blogGrid">
+        <!-- Rendered dynamically by Javascript -->
+      </div>
+
+      <!-- Empty State -->
+      <div class="empty-state" id="emptyState">
+        <div class="empty-icon">🍰</div>
+        <h3 class="empty-title">Aucun article trouvé</h3>
+        <p class="empty-desc">Nous n'avons trouvé aucun article correspondant à vos critères de recherche. Essayez avec d'autres mots-clés.</p>
+        <button class="filter-pill active" id="resetFiltersBtn" style="margin: 0 auto;">Réinitialiser les filtres</button>
+      </div>
+
+      <!-- Encart CTA GourmetRevient -->
+      <section class="cta-banner">
+        <div class="cta-content">
+          <h2 class="cta-title">Gérez votre pâtisserie avec GourmetRevient</h2>
+          <p class="cta-desc">Pilotez vos coûts de revient, automatisez vos relevés HACCP et organisez votre production en quelques clics. Essayez gratuitement pendant 14 jours, sans engagement.</p>
+          <a href="landing.html" class="cta-btn">Commencer mon essai gratuit de 14 jours</a>
+        </div>
+      </section>
+    </main>
   </div>
 
-  <footer style="padding: 4rem 0; text-align: center; border-top: 1px solid var(--border); margin-top: 4rem;">
-    <p style="color: var(--text-muted);">© 2026 GourmetRevient. Tous droits réservés.</p>
+  <!-- Footer minimaliste -->
+  <footer>
+    <div class="container footer-inner">
+      <a href="landing.html" class="footer-logo">
+        <span>🧁</span> GourmetRevient
+      </a>
+      <div class="footer-links">
+        <a href="landing.html" class="footer-link">Accueil</a>
+        <a href="index.html" class="footer-link">Application Cockpit</a>
+        <a href="legal.html" class="footer-link">Mentions Légales & RGPD</a>
+      </div>
+      <div class="footer-bottom">
+        <p>© 2026 GourmetRevient. Tous droits réservés. Développé par Julian Peresson pour les artisans d'excellence.</p>
+        <p>Le pilotage moderne de la pâtisserie artisanale française.</p>
+      </div>
+    </div>
   </footer>
+
+  <!-- Inclusion de nos données et de la logique de filtrage dynamique -->
+  <script src="blog-data.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const searchInput = document.getElementById("searchInput");
+      const searchClear = document.getElementById("searchClear");
+      const filtersSection = document.getElementById("filtersSection");
+      const blogGrid = document.getElementById("blogGrid");
+      const sectionTitle = document.getElementById("sectionTitle");
+      const resultsCount = document.getElementById("resultsCount");
+      const emptyState = document.getElementById("emptyState");
+      const resetFiltersBtn = document.getElementById("resetFiltersBtn");
+
+      let currentCategory = "Tous";
+      let searchQuery = "";
+
+      // Convert category name to CSS badge class
+      const getBadgeClass = (category) => {
+        switch (category.toLowerCase()) {
+          case 'rentabilité': return 'badge-rentabilite';
+          case 'hygiène & haccp': return 'badge-haccp';
+          case 'gestion': return 'badge-gestion';
+          case 'formation cap': return 'badge-formation';
+          case 'inspiration': return 'badge-inspiration';
+          default: return 'badge-rentabilite';
+        }
+      };
+
+      // Get appropriate icon for category
+      const getCategoryEmoji = (category) => {
+        switch (category.toLowerCase()) {
+          case 'rentabilité': return '📈';
+          case 'hygiène & haccp': return '🧼';
+          case 'gestion': return '💼';
+          case 'formation cap': return '🎓';
+          case 'inspiration': return '💡';
+          default: return '📝';
+        }
+      };
+
+      // Function to render articles
+      const renderArticles = () => {
+        // Use filtering function from blog-data.js
+        const filtered = getFilteredArticles(currentCategory, searchQuery);
+        
+        // Clear grid
+        blogGrid.innerHTML = "";
+
+        if (filtered.length === 0) {
+          blogGrid.style.display = "none";
+          emptyState.style.display = "block";
+          resultsCount.textContent = "0 article trouvé";
+        } else {
+          blogGrid.style.display = "grid";
+          emptyState.style.display = "none";
+          resultsCount.textContent = `${filtered.length} article${filtered.length > 1 ? 's' : ''} disponible${filtered.length > 1 ? 's' : ''}`;
+
+          filtered.forEach((article, index) => {
+            const card = document.createElement("a");
+            card.href = article.url;
+            card.className = "blog-card fade-in";
+            // Add animation delay for premium sequential loading effect
+            card.style.animationDelay = `${index * 0.05}s`;
+
+            const badgeClass = getBadgeClass(article.category);
+            const categoryEmoji = getCategoryEmoji(article.category);
+
+            card.innerHTML = `
+              <div class="card-image-wrapper">
+                <img class="card-image" src="${article.image}" alt="${article.title}" loading="lazy">
+                <span class="card-badge ${badgeClass}">${categoryEmoji} ${article.category}</span>
+              </div>
+              <div class="card-body">
+                <div class="card-meta">
+                  <div class="meta-item">
+                    <span>📅</span>
+                    <span>${article.date}</span>
+                  </div>
+                  <div class="meta-item">
+                    <span>⏱️</span>
+                    <span>${article.readTime} de lecture</span>
+                  </div>
+                </div>
+                <h3 class="card-title">${article.title}</h3>
+                <p class="card-excerpt">${article.excerpt}</p>
+                <div class="card-footer">
+                  <div class="author-info">
+                    <div class="author-avatar">${article.author.split(' ').map(n => n[0]).join('')}</div>
+                    <span class="author-name">${article.author}</span>
+                  </div>
+                  <span class="card-cta">Lire l'article →</span>
+                </div>
+              </div>
+            `;
+            blogGrid.appendChild(card);
+          });
+        }
+
+        // Update Section Title depending on context
+        if (searchQuery.trim() !== "") {
+          sectionTitle.textContent = `Résultats de recherche pour "${searchQuery}"`;
+        } else if (currentCategory !== "Tous") {
+          sectionTitle.textContent = `Articles de la catégorie "${currentCategory}"`;
+        } else {
+          sectionTitle.textContent = "Derniers articles publiés";
+        }
+      };
+
+      // Handle category pill clicks
+      filtersSection.addEventListener("click", (e) => {
+        const target = e.target.closest(".filter-pill");
+        if (!target) return;
+
+        // Toggle active class in pills
+        document.querySelectorAll(".filter-pill").forEach(p => p.classList.remove("active"));
+        target.classList.add("active");
+
+        // Update current category and re-render
+        currentCategory = target.getAttribute("data-category");
+        renderArticles();
+      });
+
+      // Handle real-time search input
+      searchInput.addEventListener("input", (e) => {
+        searchQuery = e.target.value;
+        if (searchQuery.length > 0) {
+          searchClear.style.display = "flex";
+        } else {
+          searchClear.style.display = "none";
+        }
+        renderArticles();
+      });
+
+      // Clear search input
+      searchClear.addEventListener("click", () => {
+        searchInput.value = "";
+        searchQuery = "";
+        searchClear.style.display = "none";
+        renderArticles();
+        searchInput.focus();
+      });
+
+      // Reset filters button in empty state
+      resetFiltersBtn.addEventListener("click", () => {
+        searchInput.value = "";
+        searchQuery = "";
+        searchClear.style.display = "none";
+        currentCategory = "Tous";
+        
+        // Reset active pill to 'Tous'
+        document.querySelectorAll(".filter-pill").forEach(p => {
+          if (p.getAttribute("data-category") === "Tous") {
+            p.classList.add("active");
+          } else {
+            p.classList.remove("active");
+          }
+        });
+
+        renderArticles();
+      });
+
+      // Initial rendering
+      renderArticles();
+    });
+  </script>
 </body>
 </html>

@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧁</text></svg>">
+  
+  <title>Calculer son coût de revient en pâtisserie : le guide ultime | Blog GourmetRevient</title>
+  <meta name="description" content="Maîtrisez votre coût de revient en pâtisserie artisanale. Guide pratique étape par étape avec calcul d'un éclair au chocolat et conseils de marge.">
+  <meta property="og:title" content="Calculer son coût de revient en pâtisserie : le guide ultime">
+  <meta property="og:description" content="Découvrez la méthode pas à pas pour calculer le coût matière d'une recette, définir votre marge et fixer le bon prix de vente. Exemple complet d'un éclair au chocolat.">
+  <meta property="og:image" content="https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=800">
+  <meta property="og:url" content="https://julianperesson.github.io/Gourmetrevient/article-cout-de-revient-guide.html">
+  <link rel="canonical" href="https://julianperesson.github.io/Gourmetrevient/article-cout-de-revient-guide.html">
+
+  <style>
+    /* Design system styles matched exactly with the template */
+    :root {
+      --primary: #4f46e5;
+      --primary-dark: #3730a3;
+      --primary-light: #e0e7ff;
+      --primary-accent: #818cf8;
+      --bg-main: #f8fafc;
+      --bg-card: #ffffff;
+      --text-main: #1e293b;
+      --text-dark: #0f172a;
+      --text-muted: #475569;
+      --border: #e2e8f0;
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 20px;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
+      --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      line-height: 1.8;
+      font-size: 17px;
+      -webkit-font-smoothing: antialiased;
+    }
+    .container { max-width: 800px; margin: 0 auto; padding: 0 1.5rem; }
+    .container-large { max-width: 1100px; margin: 0 auto; padding: 0 1.5rem; }
+    .progress-container { position: fixed; top: 0; left: 0; width: 100%; height: 4px; background: transparent; z-index: 150; }
+    .progress-bar { height: 100%; background: linear-gradient(to right, var(--primary-accent), var(--primary)); width: 0%; transition: width 0.1s ease-out; }
+    nav { position: sticky; top: 4px; z-index: 100; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); height: 80px; display: flex; align-items: center; }
+    .nav-inner { width: 100%; display: flex; justify-content: space-between; align-items: center; }
+    .logo-container { display: flex; align-items: center; gap: 0.75rem; text-decoration: none; }
+    .logo-icon { font-size: 2rem; }
+    .logo-text { font-size: 1.5rem; font-weight: 800; color: var(--primary-dark); }
+    .nav-links { display: flex; align-items: center; gap: 1.5rem; }
+    .nav-link { text-decoration: none; font-weight: 600; color: var(--text-muted); font-size: 0.95rem; padding: 0.5rem 1rem; border-radius: var(--radius-sm); transition: var(--transition); }
+    .nav-link:hover { color: var(--primary); background-color: var(--primary-light); }
+    .nav-link-primary { background-color: var(--primary); color: white !important; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2); }
+    .nav-link-primary:hover { background-color: var(--primary-dark); transform: translateY(-1px); }
+    .breadcrumbs { padding: 1.5rem 0; font-size: 0.85rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.5rem; }
+    .breadcrumbs a { color: var(--primary); text-decoration: none; font-weight: 600; }
+    .breadcrumbs span.separator { color: #94a3b8; }
+    .article-hero { text-align: center; padding: 2.5rem 0; }
+    .article-category { display: inline-block; padding: 0.4rem 1rem; background-color: var(--primary-light); color: var(--primary-dark); font-weight: 700; font-size: 0.85rem; border-radius: 50px; text-transform: uppercase; margin-bottom: 1.5rem; }
+    .article-hero h1 { font-size: 2.75rem; font-weight: 900; color: var(--text-dark); line-height: 1.2; margin-bottom: 1rem; }
+    .article-subtitle { font-size: 1.25rem; color: var(--text-muted); margin-bottom: 2rem; }
+    .article-meta { display: flex; align-items: center; justify-content: center; gap: 1.5rem; font-size: 0.9rem; color: var(--text-muted); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 1rem 0; margin-bottom: 2.5rem; }
+    .meta-avatar { width: 32px; height: 32px; border-radius: 50%; background-color: var(--primary-dark); color: white; font-weight: 700; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; }
+    .cover-image-container { width: 100%; max-height: 500px; border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 3.5rem; box-shadow: var(--shadow-lg); }
+    .cover-image { width: 100%; height: 100%; object-fit: cover; max-height: 500px; }
+    .article-body { color: var(--text-main); }
+    .article-body p { margin-bottom: 1.75rem; }
+    .article-body h2 { font-size: 1.85rem; font-weight: 800; color: var(--text-dark); margin: 3rem 0 1.25rem 0; }
+    .article-body h3 { font-size: 1.4rem; font-weight: 700; color: var(--text-dark); margin: 2.25rem 0 1rem 0; }
+    .callout { padding: 1.5rem; border-radius: var(--radius-md); margin: 2rem 0; border-left: 5px solid; box-shadow: var(--shadow-sm); }
+    .callout-title { font-weight: 800; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; text-transform: uppercase; font-size: 0.9rem; }
+    .callout-tips { background-color: #f5f3ff; border-left-color: var(--primary); color: #3730a3; }
+    .callout-warnings { background-color: #fffbeb; border-left-color: #d97706; color: #92400e; }
+    .callout-success { background-color: #ecfdf5; border-left-color: #059669; color: #065f46; }
+    .article-body ul, .article-body ol { margin-bottom: 2rem; padding-left: 1.75rem; }
+    .article-body li { margin-bottom: 0.75rem; }
+    .table-container { width: 100%; overflow-x: auto; margin: 2.5rem 0; border: 1px solid var(--border); border-radius: var(--radius-md); box-shadow: var(--shadow-sm); }
+    table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.95rem; }
+    th { background-color: #f1f5f9; color: var(--text-dark); font-weight: 700; padding: 1rem 1.25rem; border-bottom: 2px solid var(--border); }
+    td { padding: 1rem 1.25rem; border-bottom: 1px solid var(--border); color: var(--text-main); }
+    tr:last-child td { border-bottom: none; }
+    tr:nth-child(even) td { background-color: rgba(248, 250, 252, 0.5); }
+    .inline-cta { background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%); color: white; border-radius: var(--radius-lg); padding: 2.25rem; margin: 3rem 0; position: relative; overflow: hidden; }
+    .inline-cta-title { font-size: 1.35rem; font-weight: 800; margin-bottom: 0.75rem; }
+    .inline-cta-desc { font-size: 0.95rem; opacity: 0.9; margin-bottom: 1.5rem; }
+    .inline-cta-btn { display: inline-block; background: white; color: var(--primary-dark); padding: 0.75rem 1.5rem; font-weight: 800; font-size: 0.9rem; border-radius: var(--radius-sm); text-decoration: none; transition: var(--transition); }
+    .inline-cta-btn:hover { background: var(--primary-light); transform: translateY(-1px); }
+    .share-section { border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 1.5rem 0; margin: 3.5rem 0; display: flex; align-items: center; justify-content: space-between; }
+    .share-title { font-weight: 700; font-size: 0.95rem; color: var(--text-dark); }
+    .share-buttons { display: flex; gap: 0.75rem; }
+    .share-btn { padding: 0.5rem 1rem; border-radius: var(--radius-sm); font-size: 0.85rem; font-weight: 700; text-decoration: none; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; transition: var(--transition); border: 1px solid var(--border); background: white; color: var(--text-main); }
+    .share-btn:hover { background: var(--bg-main); }
+    .back-to-top { position: fixed; bottom: 2rem; right: 2rem; background: var(--primary); color: white; width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: var(--shadow-lg); opacity: 0; visibility: hidden; transition: var(--transition); z-index: 99; border: none; }
+    .back-to-top.visible { opacity: 1; visibility: visible; }
+    .similar-section { background-color: white; border-top: 1px solid var(--border); padding: 5rem 0; margin-top: 5rem; }
+    .similar-title { font-size: 1.75rem; font-weight: 800; color: var(--text-dark); margin-bottom: 2.5rem; text-align: center; }
+    .similar-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; }
+    .similar-card { background: var(--bg-main); border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--border); transition: var(--transition); text-decoration: none; color: inherit; display: flex; flex-direction: column; height: 100%; }
+    .similar-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); border-color: var(--primary-accent); }
+    .similar-img { height: 160px; width: 100%; object-fit: cover; }
+    .similar-body { padding: 1.25rem; display: flex; flex-direction: column; flex-grow: 1; }
+    .similar-category { font-size: 0.7rem; font-weight: 800; text-transform: uppercase; color: var(--primary); margin-bottom: 0.5rem; }
+    .similar-card-title { font-size: 1rem; font-weight: 800; color: var(--text-dark); margin-bottom: 0.5rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .similar-readtime { font-size: 0.75rem; color: var(--text-muted); margin-top: auto; padding-top: 0.75rem; }
+    footer { background-color: #0f172a; color: #94a3b8; padding: 4rem 0 2.5rem 0; }
+    .footer-inner { display: flex; flex-direction: column; align-items: center; gap: 2rem; text-align: center; }
+    .footer-logo { display: flex; align-items: center; gap: 0.5rem; text-decoration: none; color: white; font-size: 1.5rem; font-weight: 800; }
+    .footer-links { display: flex; gap: 2rem; }
+    .footer-link { color: #94a3b8; text-decoration: none; font-size: 0.95rem; }
+    .footer-bottom { width: 100%; border-top: 1px solid #1e293b; padding-top: 2rem; margin-top: 2rem; font-size: 0.85rem; display: flex; justify-content: space-between; }
+    @media (max-width: 768px) {
+      .similar-grid { grid-template-columns: 1fr; }
+      .article-hero h1 { font-size: 2.25rem; }
+      .footer-bottom { flex-direction: column; text-align: center; gap: 1rem; }
+      .nav-links { gap: 0.5rem; }
+    }
+  </style>
+  <script>const CURRENT_ARTICLE_ID = "cout-de-revient-guide";</script>
+</head>
+<body>
+
+  <!-- Reading Progress Bar -->
+  <div class="progress-container">
+    <div class="progress-bar" id="progressBar"></div>
+  </div>
+
+  <!-- Navbar -->
+  <nav>
+    <div class="container-large nav-inner">
+      <a href="landing.html" class="logo-container">
+        <span class="logo-icon">🧁</span>
+        <span class="logo-text">GourmetRevient</span>
+      </a>
+      <div class="nav-links">
+        <a href="blog.html" class="nav-link">← Retour au Blog</a>
+        <a href="index.html" class="nav-link nav-link-primary">← Accéder à l'application</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Fil d'Ariane -->
+  <div class="container">
+    <div class="breadcrumbs">
+      <a href="landing.html">Accueil</a>
+      <span class="separator">/</span>
+      <a href="blog.html">Blog</a>
+      <span class="separator">/</span>
+      <span class="current">Calculer son coût de revient en pâtisserie</span>
+    </div>
+  </div>
+
+  <!-- Article Content -->
+  <article class="container">
+    <header class="article-hero">
+      <span class="article-category">📈 Rentabilité</span>
+      <h1>Calculer son coût de revient en pâtisserie : le guide ultime</h1>
+      <p class="article-subtitle">Découvrez notre méthode mathématique pas à pas pour maîtriser le coût matière de vos fiches techniques et optimiser votre rentabilité artisanale.</p>
+      
+      <div class="article-meta">
+        <div class="meta-item">
+          <div class="meta-avatar">JP</div>
+          <span>Julian Peresson</span>
+        </div>
+        <div class="meta-item">
+          <span>📅</span>
+          <span>12 Mai 2026</span>
+        </div>
+        <div class="meta-item">
+          <span>⏱️</span>
+          <span>8 min de lecture</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="cover-image-container">
+      <img class="cover-image" src="https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=800" alt="Croissants frais en laboratoire">
+    </div>
+
+    <div class="article-body">
+      <p>Pour un pâtissier artisan, maîtriser ses recettes ne suffit plus. Dans un contexte économique de forte fluctuation du prix des matières premières (beurre, crème, chocolat, œufs), la survie de votre laboratoire dépend directement de la rigueur de vos calculs financiers. L'erreur la plus fréquente chez les jeunes créateurs ou les apprentis en CAP est de fixer un prix de vente au « ressenti » ou en s'alignant simplement sur la concurrence. Pourtant, chaque gâteau a sa propre réalité de coûts.</p>
+      
+      <p>Le calcul du coût de revient n'est pas une corvée administrative, c'est l'outil le plus puissant pour piloter sereinement votre activité artisanale. Dans ce guide complet, nous allons décortiquer la méthode mathématique pour évaluer le coût de vos matières premières, intégrer les autres facteurs de charges et fixer des marges viables, avec un exemple d'application réel sur l'un des piliers de la pâtisserie française : <strong>l'éclair au chocolat</strong>.</p>
+
+      <h2>1. Qu'est-ce que le coût de revient en pâtisserie ?</h2>
+      <p>Le coût de revient global d'un produit représente l'ensemble des dépenses nécessaires à sa fabrication et à sa commercialisation. En pâtisserie artisanale, on le décompose généralement en trois grands piliers :</p>
+      
+      <ul>
+        <li><strong>Le Coût Matière (ou Food Cost) :</strong> Le prix d'achat HT des ingrédients réellement utilisés dans la recette. C'est la variable sur laquelle vous avez le contrôle le plus direct.</li>
+        <li><strong>Le Coût de Main d'œuvre :</strong> Le temps passé par le pâtissier ou l'équipe du laboratoire pour fabriquer le gâteau, multiplié par le taux horaire chargé.</li>
+        <li><strong>Les Frais Généraux (Overheads) :</strong> Le loyer de la boutique, l'électricité des fours, l'amortissement du matériel (mélangeurs, chambres froides) et les emballages.</li>
+      </ul>
+
+      <div class="callout callout-tips">
+        <div class="callout-title">💡 Conseil de pro</div>
+        <p>Pour débuter et sécuriser rapidement vos bénéfices, commencez par calculer précisément le <strong>coût matière</strong> de chacune de vos recettes. C'est l'indicateur clé le plus simple à suivre et le plus sensible aux variations de prix.</p>
+      </div>
+
+      <h2>2. Calculer le Coût Matière : La Méthode Pas à Pas</h2>
+      <p>Le calcul se base sur votre fiche technique. Pour chaque ingrédient, vous devez connaître son prix d'achat unitaire Hors Taxes (HT) au kilogramme ou au litre, et le convertir selon la quantité exacte requise par votre recette.</p>
+      <p>Attention à bien distinguer la quantité <em>brute d'achat</em> de la quantité <em>nette utilisée</em>. Par exemple, si vous épluchez des pommes, le coût doit être calculé sur le poids brut acheté, car les épluchures représentent une perte inhérente que vous devez facturer indirectement au client.</p>
+
+      <!-- Tableau Éclair au chocolat -->
+      <h3>Étude de cas : Le coût d'une fournée de 20 Éclairs au Chocolat</h3>
+      <p>Prenons une recette classique d'éclair au chocolat composée d'une pâte à choux, d'une crème pâtissière au chocolat noir et d'un fondant de glaçage. Voici l'évaluation ingrédient par ingrédient :</p>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Ingrédient</th>
+              <th>Poids dans la recette</th>
+              <th>Prix d'achat HT / kg ou l</th>
+              <th>Coût de l'ingrédient HT</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Lait demi-écrémé (Crème & Pâte)</td>
+              <td>500 g (0,5 l)</td>
+              <td>1,20 € / l</td>
+              <td>0,60 €</td>
+            </tr>
+            <tr>
+              <td>Beurre AOP 82% (Pâte à choux)</td>
+              <td>150 g</td>
+              <td>9,50 € / kg</td>
+              <td>1,43 €</td>
+            </tr>
+            <tr>
+              <td>Farine T55 (Pâte à choux)</td>
+              <td>200 g</td>
+              <td>1,40 € / kg</td>
+              <td>0,28 €</td>
+            </tr>
+            <tr>
+              <td>Œufs entiers frais (Pâte & Crème)</td>
+              <td>350 g (env. 7 œufs)</td>
+              <td>4,20 € / kg</td>
+              <td>1,47 €</td>
+            </tr>
+            <tr>
+              <td>Chocolat de couverture Noir 66%</td>
+              <td>300 g</td>
+              <td>15,80 € / kg</td>
+              <td>4,74 €</td>
+            </tr>
+            <tr>
+              <td>Sucre en poudre</td>
+              <td>250 g</td>
+              <td>1,60 € / kg</td>
+              <td>0,40 €</td>
+            </tr>
+            <tr>
+              <td>Fondant blanc (Glaçage)</td>
+              <td>200 g</td>
+              <td>3,80 € / kg</td>
+              <td>0,76 €</td>
+            </tr>
+            <tr style="font-weight: bold; background-color: #f1f5f9;">
+              <td>TOTAL RECETTE (20 éclairs)</td>
+              <td>-</td>
+              <td>-</td>
+              <td>9,68 €</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>Ainsi, le coût matière brut de notre fournée de 20 éclairs est de <strong>9,68 € HT</strong>, ce qui donne un coût matière unitaire de <strong>0,48 € HT par éclair</strong>.</p>
+
+      <div class="inline-cta">
+        <h3 class="inline-cta-title">Marre des fichiers Excel fastidieux pour vos recettes ?</h3>
+        <p class="inline-cta-desc">GourmetRevient calcule automatiquement le coût de revient de vos fiches techniques en direct avec vos prix fournisseurs réels. Plus d'erreurs, plus d'oubli.</p>
+        <a href="landing.html" class="inline-cta-btn">Tester GourmetRevient gratuitement pendant 14 jours →</a>
+      </div>
+
+      <h2>3. Du Coût Matière au Prix de Vente public</h2>
+      <p>Une fois que vous connaissez votre coût matière (0,48 € dans notre cas), comment définir le prix de vente en vitrine ? C'est ici qu'intervient le coefficient multiplicateur ou le taux de marge.</p>
+      
+      <h3>La méthode du coefficient multiplicateur</h3>
+      <p>Dans la pâtisserie artisanale française, la règle empirique classique veut que l'on applique un coefficient compris entre <strong>4 et 5</strong> sur le coût matière pour couvrir les charges et dégager un bénéfice convenable. Si vous vendez en boutique avec une TVA à 5,5% :</p>
+      <p><code>Prix de Vente TTC = Coût Matière HT x Coefficient x (1 + Taux TVA)</code></p>
+      <p>Pour notre éclair au chocolat avec un coefficient de 4,5 :<br>
+      <code>0,48 € x 4,5 x 1,055 = 2,28 € TTC</code>.</p>
+      <p>Vous fixerez donc votre éclair à <strong>2,30 €</strong> en vitrine. Ce prix est parfaitement cohérent avec le marché artisanal tout en garantissant que vos charges de main-d'œuvre et frais fixes seront confortablement absorbées par la marge brute dégagée.</p>
+
+      <div class="callout callout-warnings">
+        <div class="callout-title">⚠️ Attention aux faux amis</div>
+        <p>N'oubliez pas d'inclure le coût des emballages jetables (boîtes pâtissières, caissettes papier, supports en carton). Une boîte pour 4 gâteaux qui coûte 0,45 € HT représente une charge directe qui doit être calculée dans votre coût de revient final !</p>
+      </div>
+
+      <h2>4. Automatiser ses calculs pour pérenniser son entreprise</h2>
+      <p>Faire ces calculs à la main sur papier ou sur un vieux fichier Excel est extrêmement chronophage et propice aux erreurs de frappe ou de formules. De plus, à chaque fois que votre fournisseur de beurre augmente ses tarifs de 5%, vous devriez théoriquement recalculer l'intégralité de vos fiches techniques. C'est humainement infaisable au quotidien pour un artisan débordé.</p>
+      
+      <p>C'est précisément la raison pour laquelle nous avons conçu <strong>GourmetRevient</strong>. Cet outil SaaS développé spécifiquement pour les pâtissiers artisans français gère vos ingrédients, met à jour instantanément les coûts de toutes vos recettes lors d'une hausse tarifaire fournisseur, et vous indique visuellement si votre marge de profit est en danger.</p>
+
+      <div class="callout callout-success">
+        <div class="callout-title">✅ Résultats mesurés</div>
+        <p>Les artisans utilisant un outil automatisé comme GourmetRevient réduisent leur taux de perte de matières premières de 15% et augmentent leur rentabilité globale de 5 points de marge dès les 3 premiers mois.</p>
+      </div>
+
+      <div class="inline-cta">
+        <h3 class="inline-cta-title">Reprenez le contrôle de vos marges dès aujourd'hui</h3>
+        <p class="inline-cta-desc">Pilotez votre laboratoire de pâtisserie avec les outils des grands chefs. Lancez votre essai de 14 jours, sans carte bancaire requise et commencez à optimiser vos recettes.</p>
+        <a href="landing.html" class="inline-cta-btn">Créer mon compte GourmetRevient</a>
+      </div>
+    </div>
+
+    <!-- Partage social -->
+    <div class="share-section">
+      <span class="share-title">Partager ce guide :</span>
+      <div class="share-buttons">
+        <a href="#" id="shareWhatsApp" class="share-btn share-whatsapp" target="_blank"><span>💬</span> WhatsApp</a>
+        <a href="#" id="shareLinkedIn" class="share-btn share-linkedin" target="_blank"><span>💼</span> LinkedIn</a>
+        <button id="shareCopyLink" class="share-btn"><span>🔗</span> Copier le lien</button>
+      </div>
+    </div>
+  </article>
+
+  <!-- Section Articles Similaires (Dynamique) -->
+  <section class="similar-section">
+    <div class="container-large">
+      <h2 class="similar-title">Articles similaires qui pourraient vous intéresser</h2>
+      <div class="similar-grid" id="similarGrid">
+        <!-- Rendered dynamically by Javascript based on tags -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Button Back to Top -->
+  <button id="backToTop" class="back-to-top" title="Retour en haut">▲</button>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container-large footer-inner">
+      <a href="landing.html" class="footer-logo">
+        <span>🧁</span> GourmetRevient
+      </a>
+      <div class="footer-links">
+        <a href="landing.html" class="footer-link">Accueil</a>
+        <a href="blog.html" class="footer-link">Le Blog</a>
+        <a href="index.html" class="footer-link">Cockpit App</a>
+        <a href="legal.html" class="footer-link">Mentions Légales</a>
+      </div>
+      <div class="footer-bottom">
+        <p>© 2026 GourmetRevient. Tous droits réservés. Écrit par Julian Peresson.</p>
+        <p>Le pilotage moderne de la pâtisserie artisanale française.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Similar Articles Script & Scroll Script -->
+  <script src="blog-data.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      // 1. Reading Progress Bar Logic
+      const progressBar = document.getElementById("progressBar");
+      window.addEventListener("scroll", () => {
+        const winScroll = document.documentElement.scrollTop || document.body.scrollTop;
+        const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        const scrolled = height > 0 ? (winScroll / height) * 100 : 0;
+        progressBar.style.width = scrolled + "%";
+
+        const backToTop = document.getElementById("backToTop");
+        if (winScroll > 400) {
+          backToTop.classList.add("visible");
+        } else {
+          backToTop.classList.remove("visible");
+        }
+      });
+
+      document.getElementById("backToTop").addEventListener("click", () => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
+
+      // 2. Share Actions
+      const articleUrl = window.location.href;
+      const articleTitle = "Calculer son coût de revient en pâtisserie : le guide ultime";
+      document.getElementById("shareWhatsApp").href = `https://api.whatsapp.com/send?text=${encodeURIComponent(articleTitle + " - " + articleUrl)}`;
+      document.getElementById("shareLinkedIn").href = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(articleUrl)}`;
+      
+      const copyBtn = document.getElementById("shareCopyLink");
+      copyBtn.addEventListener("click", () => {
+        navigator.clipboard.writeText(articleUrl).then(() => {
+          const original = copyBtn.innerHTML;
+          copyBtn.innerHTML = "<span>✅</span> Copié !";
+          setTimeout(() => { copyBtn.innerHTML = original; }, 2000);
+        });
+      });
+
+      // 3. Similar Articles dynamic rendering
+      const similarGrid = document.getElementById("similarGrid");
+      if (similarGrid && typeof getSimilarArticles === 'function') {
+        const similar = getSimilarArticles(CURRENT_ARTICLE_ID, 3);
+        similarGrid.innerHTML = "";
+        similar.forEach(article => {
+          const card = document.createElement("a");
+          card.href = article.url;
+          card.className = "similar-card";
+          card.innerHTML = `
+            <img src="${article.image}" class="similar-img" alt="${article.title}">
+            <div class="similar-body">
+              <span class="similar-category">${article.category}</span>
+              <h3 class="similar-card-title">${article.title}</h3>
+              <span class="similar-readtime">⏱️ ${article.readTime} de lecture</span>
+            </div>
+          `;
+          similarGrid.appendChild(card);
+        });
+      }
+    });
+  </script>
+</body>
+</html>

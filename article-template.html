@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧁</text></svg>">
+  
+  <title>[Titre de l'article] | Blog GourmetRevient</title>
+  <meta name="description" content="[Description 155 caractères max, naturelle et ciblée pâtissiers]">
+  <meta property="og:title" content="[Titre]">
+  <meta property="og:description" content="[Description]">
+  <meta property="og:image" content="https://julianperesson.github.io/Gourmetrevient/img/blog/[nom-article].jpg">
+  <meta property="og:url" content="https://julianperesson.github.io/Gourmetrevient/[nom-fichier].html">
+  <link rel="canonical" href="https://julianperesson.github.io/Gourmetrevient/[nom-fichier].html">
+
+  <style>
+    /* variables de design system */
+    :root {
+      --primary: #4f46e5;
+      --primary-dark: #3730a3;
+      --primary-light: #e0e7ff;
+      --primary-accent: #818cf8;
+      --bg-main: #f8fafc;
+      --bg-card: #ffffff;
+      --text-main: #1e293b;
+      --text-dark: #0f172a;
+      --text-muted: #475569;
+      --border: #e2e8f0;
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 20px;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
+      --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
+      --shadow-premium: 0 25px 50px -12px rgba(79, 70, 229, 0.08);
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      line-height: 1.8;
+      font-size: 17px;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+
+    .container-large {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+
+    /* Reading Progress Bar */
+    .progress-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: transparent;
+      z-index: 150;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(to right, var(--primary-accent), var(--primary));
+      width: 0%;
+      transition: width 0.1s ease-out;
+    }
+
+    /* Navbar Premium */
+    nav {
+      position: sticky;
+      top: 4px; /* leaves room for progress bar */
+      z-index: 100;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      height: 80px;
+      display: flex;
+      align-items: center;
+      transition: var(--transition);
+    }
+
+    .nav-inner {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+    }
+
+    .logo-icon {
+      font-size: 2rem;
+      transition: transform 0.3s ease;
+    }
+
+    .logo-container:hover .logo-icon {
+      transform: scale(1.15) rotate(-5deg);
+    }
+
+    .logo-text {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--primary-dark);
+      letter-spacing: -0.025em;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .nav-link {
+      text-decoration: none;
+      font-weight: 600;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      border-radius: var(--radius-sm);
+    }
+
+    .nav-link:hover {
+      color: var(--primary);
+      background-color: var(--primary-light);
+    }
+
+    .nav-link-primary {
+      background-color: var(--primary);
+      color: white !important;
+      box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
+    }
+
+    .nav-link-primary:hover {
+      background-color: var(--primary-dark);
+      transform: translateY(-1px);
+    }
+
+    /* Breadcrumbs */
+    .breadcrumbs {
+      padding: 1.5rem 0;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .breadcrumbs a {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 600;
+      transition: var(--transition);
+    }
+
+    .breadcrumbs a:hover {
+      color: var(--primary-dark);
+      text-decoration: underline;
+    }
+
+    .breadcrumbs span.separator {
+      color: #94a3b8;
+    }
+
+    .breadcrumbs span.current {
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+
+    /* Article Hero */
+    .article-hero {
+      text-align: center;
+      padding: 2.5rem 0 3rem 0;
+    }
+
+    .article-category {
+      display: inline-block;
+      padding: 0.4rem 1rem;
+      background-color: var(--primary-light);
+      color: var(--primary-dark);
+      font-weight: 700;
+      font-size: 0.85rem;
+      border-radius: 50px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 1.5rem;
+    }
+
+    .article-hero h1 {
+      font-size: 2.75rem;
+      font-weight: 900;
+      color: var(--text-dark);
+      line-height: 1.2;
+      margin-bottom: 1rem;
+      letter-spacing: -0.025em;
+    }
+
+    .article-subtitle {
+      font-size: 1.25rem;
+      color: var(--text-muted);
+      margin-bottom: 2rem;
+      font-weight: 400;
+    }
+
+    .article-meta {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1.5rem;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      font-weight: 500;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 0;
+      margin-bottom: 2.5rem;
+    }
+
+    .meta-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .meta-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background-color: var(--primary-dark);
+      color: white;
+      font-weight: 700;
+      font-size: 0.8rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Cover Image */
+    .cover-image-container {
+      width: 100%;
+      max-height: 500px;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      margin-bottom: 3.5rem;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .cover-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      max-height: 500px;
+    }
+
+    /* Article Body */
+    .article-body {
+      color: var(--text-main);
+    }
+
+    .article-body p {
+      margin-bottom: 1.75rem;
+    }
+
+    .article-body h2 {
+      font-size: 1.85rem;
+      font-weight: 800;
+      color: var(--text-dark);
+      margin: 3rem 0 1.25rem 0;
+      line-height: 1.3;
+      letter-spacing: -0.02em;
+    }
+
+    .article-body h3 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--text-dark);
+      margin: 2.25rem 0 1rem 0;
+      line-height: 1.3;
+    }
+
+    /* Callout Blocks */
+    .callout {
+      padding: 1.5rem;
+      border-radius: var(--radius-md);
+      margin: 2rem 0;
+      border-left: 5px solid;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .callout-title {
+      font-weight: 800;
+      font-size: 1rem;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      text-transform: uppercase;
+      letter-spacing: 0.025em;
+    }
+
+    .callout-tips {
+      background-color: #f5f3ff;
+      border-left-color: var(--primary);
+      color: #3730a3;
+    }
+    .callout-tips .callout-title { color: var(--primary-dark); }
+
+    .callout-warnings {
+      background-color: #fffbeb;
+      border-left-color: #d97706;
+      color: #92400e;
+    }
+    .callout-warnings .callout-title { color: #b45309; }
+
+    .callout-success {
+      background-color: #ecfdf5;
+      border-left-color: #059669;
+      color: #065f46;
+    }
+    .callout-success .callout-title { color: #047857; }
+
+    /* Lists styling */
+    .article-body ul, .article-body ol {
+      margin-bottom: 2rem;
+      padding-left: 1.75rem;
+    }
+
+    .article-body li {
+      margin-bottom: 0.75rem;
+    }
+
+    /* Tables styling */
+    .table-container {
+      width: 100%;
+      overflow-x: auto;
+      margin: 2.5rem 0;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-sm);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.95rem;
+    }
+
+    th {
+      background-color: #f1f5f9;
+      color: var(--text-dark);
+      font-weight: 700;
+      padding: 1rem 1.25rem;
+      border-bottom: 2px solid var(--border);
+    }
+
+    td {
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-main);
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tr:nth-child(even) td {
+      background-color: rgba(248, 250, 252, 0.5);
+    }
+
+    /* Image with Captions */
+    .article-image-box {
+      margin: 2.5rem 0;
+      text-align: center;
+    }
+
+    .article-image-box img {
+      max-width: 100%;
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-md);
+    }
+
+    .article-image-caption {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 0.75rem;
+      font-style: italic;
+    }
+
+    /* Social Sharing */
+    .share-section {
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 1.5rem 0;
+      margin: 3.5rem 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .share-title {
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--text-dark);
+    }
+
+    .share-buttons {
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    .share-btn {
+      padding: 0.5rem 1rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: var(--transition);
+      border: 1px solid var(--border);
+      background: white;
+      color: var(--text-main);
+    }
+
+    .share-btn:hover {
+      background: var(--bg-main);
+      transform: translateY(-1px);
+    }
+
+    .share-whatsapp:hover {
+      background-color: #e8f9f0;
+      color: #128c7e;
+      border-color: #25d366;
+    }
+
+    .share-linkedin:hover {
+      background-color: #e8f4f9;
+      color: #0077b5;
+      border-color: #0077b5;
+    }
+
+    .share-link-copied {
+      background-color: var(--primary-light) !important;
+      color: var(--primary-dark) !important;
+      border-color: var(--primary) !important;
+    }
+
+    /* Premium Inline CTA Cards */
+    .inline-cta {
+      background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+      color: white;
+      border-radius: var(--radius-lg);
+      padding: 2.25rem;
+      margin: 3rem 0;
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .inline-cta::before {
+      content: '🧁';
+      position: absolute;
+      font-size: 7rem;
+      opacity: 0.08;
+      bottom: -20px;
+      right: -10px;
+      transform: rotate(15deg);
+      pointer-events: none;
+    }
+
+    .inline-cta-title {
+      font-size: 1.35rem;
+      font-weight: 800;
+      margin-bottom: 0.75rem;
+      line-height: 1.3;
+    }
+
+    .inline-cta-desc {
+      font-size: 0.95rem;
+      opacity: 0.9;
+      margin-bottom: 1.5rem;
+      line-height: 1.5;
+    }
+
+    .inline-cta-btn {
+      display: inline-block;
+      background: white;
+      color: var(--primary-dark);
+      padding: 0.75rem 1.5rem;
+      font-weight: 800;
+      font-size: 0.9rem;
+      border-radius: var(--radius-sm);
+      text-decoration: none;
+      transition: var(--transition);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    .inline-cta-btn:hover {
+      background: var(--primary-light);
+      transform: translateY(-1px);
+    }
+
+    /* Back to Top Button */
+    .back-to-top {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: var(--primary);
+      color: white;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: var(--shadow-lg);
+      opacity: 0;
+      visibility: hidden;
+      transition: var(--transition);
+      z-index: 99;
+      border: none;
+      font-size: 1.25rem;
+    }
+
+    .back-to-top.visible {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .back-to-top:hover {
+      background: var(--primary-dark);
+      transform: translateY(-3px);
+    }
+
+    /* Similar Articles Section */
+    .similar-section {
+      background-color: white;
+      border-top: 1px solid var(--border);
+      padding: 5rem 0;
+      margin-top: 5rem;
+    }
+
+    .similar-title {
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: var(--text-dark);
+      margin-bottom: 2.5rem;
+      text-align: center;
+    }
+
+    .similar-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
+    }
+
+    .similar-card {
+      background: var(--bg-main);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      border: 1px solid var(--border);
+      transition: var(--transition);
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    .similar-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-md);
+      border-color: var(--primary-accent);
+    }
+
+    .similar-img {
+      height: 160px;
+      width: 100%;
+      object-fit: cover;
+    }
+
+    .similar-body {
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+    }
+
+    .similar-category {
+      font-size: 0.7rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      color: var(--primary);
+      margin-bottom: 0.5rem;
+      letter-spacing: 0.05em;
+    }
+
+    .similar-card-title {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--text-dark);
+      line-height: 1.4;
+      margin-bottom: 0.5rem;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .similar-readtime {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: auto;
+      padding-top: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    /* Footer */
+    footer {
+      background-color: #0f172a;
+      color: #94a3b8;
+      padding: 4rem 0 2.5rem 0;
+      border-top: 1px solid #1e293b;
+    }
+
+    .footer-inner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2rem;
+      text-align: center;
+    }
+
+    .footer-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      text-decoration: none;
+      color: white;
+      font-size: 1.5rem;
+      font-weight: 800;
+    }
+
+    .footer-links {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 2rem;
+    }
+
+    .footer-link {
+      color: #94a3b8;
+      text-decoration: none;
+      font-size: 0.95rem;
+      font-weight: 500;
+      transition: var(--transition);
+    }
+
+    .footer-link:hover {
+      color: white;
+    }
+
+    .footer-bottom {
+      width: 100%;
+      border-top: 1px solid #1e293b;
+      padding-top: 2rem;
+      margin-top: 2rem;
+      font-size: 0.85rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      body {
+        font-size: 16px;
+      }
+      .article-hero h1 {
+        font-size: 2.25rem;
+      }
+      .similar-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+      .share-section {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .back-to-top {
+        bottom: 1.5rem;
+        right: 1.5rem;
+        width: 40px;
+        height: 40px;
+      }
+      .inline-cta {
+        padding: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Reading Progress Bar -->
+  <div class="progress-container">
+    <div class="progress-bar" id="progressBar"></div>
+  </div>
+
+  <!-- Navbar -->
+  <nav>
+    <div class="container-large nav-inner">
+      <a href="landing.html" class="logo-container">
+        <span class="logo-icon">🧁</span>
+        <span class="logo-text">GourmetRevient</span>
+      </a>
+      <div class="nav-links">
+        <a href="blog.html" class="nav-link">← Retour au Blog</a>
+        <a href="index.html" class="nav-link nav-link-primary">← Accéder à l'application</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Fil d'Ariane -->
+  <div class="container">
+    <div class="breadcrumbs">
+      <a href="landing.html">Accueil</a>
+      <span class="separator">/</span>
+      <a href="blog.html">Blog</a>
+      <span class="separator">/</span>
+      <span class="current" id="breadcrumbCurrent">[Titre de l'article]</span>
+    </div>
+  </div>
+
+  <!-- Article Container -->
+  <article class="container">
+    
+    <!-- Hero Article -->
+    <header class="article-hero">
+      <span class="article-category" id="articleCategory">Catégorie</span>
+      <h1 id="articleTitle">Calculer son coût de revient en pâtisserie : le guide ultime</h1>
+      <p class="article-subtitle" id="articleSubtitle">Maîtrisez vos marges et fixez vos prix de vente de manière professionnelle pour assurer la viabilité de votre laboratoire.</p>
+      
+      <div class="article-meta">
+        <div class="meta-item">
+          <div class="meta-avatar">JP</div>
+          <span id="articleAuthor">Julian Peresson</span>
+        </div>
+        <div class="meta-item">
+          <span>📅</span>
+          <span id="articleDate">12 Mai 2026</span>
+        </div>
+        <div class="meta-item">
+          <span>⏱️</span>
+          <span id="articleReadTime">8 min de lecture</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Cover Image -->
+    <div class="cover-image-container">
+      <img class="cover-image" id="articleCover" src="https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=800" alt="Couverture de l'article">
+    </div>
+
+    <!-- Body Content -->
+    <div class="article-body" id="articleBody">
+      <p>C'est ici que s'écrit le corps de l'article. Il utilise une typographie soignée et aérée, spécialement optimisée pour le confort de lecture prolongée des artisans, apprentis ou futurs créateurs.</p>
+      
+      <h2>Titre H2 - Les fondamentaux de l'organisation</h2>
+      <p>Voici un paragraphe standard. Dans la pâtisserie artisanale française, la rentabilité repose sur l'équilibre délicat entre la qualité irréprochable des matières premières et un contrôle rigoureux des dépenses en laboratoire. Nombre d'artisans sous-estiment l'importance des relevés et du calcul précis des fiches techniques.</p>
+
+      <!-- Tip Callout -->
+      <div class="callout callout-tips">
+        <div class="callout-title">💡 Conseil de pro</div>
+        <p>Utilisez des balances de précision en laboratoire pour peser vos fiches techniques au gramme près. Même un écart de 5 grammes de beurre par croissant peut représenter des centaines d'euros de perte sur une année complète de production.</p>
+      </div>
+
+      <h3>Titre H3 - Zoom sur les matières premières</h3>
+      <p>Un sous-titre de niveau 3 permet d'approfondir un point spécifique de la démonstration, comme les fluctuations de cours du beurre ou du chocolat.</p>
+
+      <ul>
+        <li><strong>La méthode FIFO :</strong> Premier entré, premier sorti pour une rotation parfaite des stocks.</li>
+        <li><strong>L'ordonnancement :</strong> Le plan d'attaque logique de votre journée en laboratoire.</li>
+        <li><strong>La traçabilité HACCP :</strong> Une obligation légale qui garantit l'hygiène de votre laboratoire.</li>
+      </ul>
+
+      <!-- Table stylée -->
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Ingrédient</th>
+              <th>Quantité brute</th>
+              <th>Prix au kg / l</th>
+              <th>Coût matière réel</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Chocolat Noir 64%</td>
+              <td>250g</td>
+              <td>14,50 €</td>
+              <td>3,63 €</td>
+            </tr>
+            <tr>
+              <td>Beurre AOP Charentes-Poitou</td>
+              <td>125g</td>
+              <td>8,90 €</td>
+              <td>1,11 €</td>
+            </tr>
+            <tr>
+              <td>Crème Fleurette 35%</td>
+              <td>200g</td>
+              <td>4,20 €</td>
+              <td>0,84 €</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Inline CTA 1 (au milieu) -->
+      <div class="inline-cta">
+        <h3 class="inline-cta-title">Marre de calculer vos coûts de revient à la main ?</h3>
+        <p class="inline-cta-desc">GourmetRevient automatise le calcul de vos coûts de revient ingrédient par ingrédient, gère vos stocks et assure la conformité de vos fiches techniques en temps réel.</p>
+        <a href="landing.html" class="inline-cta-btn">Découvrir GourmetRevient gratuitement →</a>
+      </div>
+
+      <h2>Titre H2 - Passer à l'action en laboratoire</h2>
+      <p>Mettre en pratique ces méthodes permet de rapidement redresser la barre en cas d'inflation ou d'augmentation des charges de fonctionnement.</p>
+
+      <!-- Warning Callout -->
+      <div class="callout callout-warnings">
+        <div class="callout-title">⚠️ Attention aux erreurs</div>
+        <p>Ne basez jamais vos tarifs uniquement sur les prix de vos concurrents locaux. Leurs charges de structure, leurs loyers et leurs contrats d'approvisionnement peuvent différer radicalement des vôtres.</p>
+      </div>
+
+      <!-- Success Callout -->
+      <div class="callout callout-success">
+        <div class="callout-title">✅ Résultat attendu</div>
+        <p>En appliquant un coefficient multiplicateur juste et en traquant les pertes, vous pouvez espérer accroître votre marge brute en pâtisserie de 4% à 7% dès le premier mois.</p>
+      </div>
+
+      <!-- Inline CTA 2 (en fin d'article) -->
+      <div class="inline-cta">
+        <h3 class="inline-cta-title">Prêt à digitaliser votre laboratoire ?</h3>
+        <p class="inline-cta-desc">Rejoignez des centaines de pâtissiers artisans qui font confiance à GourmetRevient pour piloter leur rentabilité au quotidien. Essai gratuit de 14 jours, sans carte bancaire.</p>
+        <a href="landing.html" class="inline-cta-btn">Lancer mon essai gratuit de 14 jours</a>
+      </div>
+    </div>
+
+    <!-- Social Share Buttons -->
+    <div class="share-section">
+      <span class="share-title">Partager cet article :</span>
+      <div class="share-buttons">
+        <a href="#" id="shareWhatsApp" class="share-btn share-whatsapp" target="_blank">
+          <span>💬</span> WhatsApp
+        </a>
+        <a href="#" id="shareLinkedIn" class="share-btn share-linkedin" target="_blank">
+          <span>💼</span> LinkedIn
+        </a>
+        <button id="shareCopyLink" class="share-btn">
+          <span>🔗</span> Copier le lien
+        </button>
+      </div>
+    </div>
+
+  </article>
+
+  <!-- Section Articles Similaires (Dynamique) -->
+  <section class="similar-section">
+    <div class="container-large">
+      <h2 class="similar-title">Articles similaires qui pourraient vous intéresser</h2>
+      <div class="similar-grid" id="similarGrid">
+        <!-- Rendered dynamically by Javascript based on tags -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Back to Top Floating Button -->
+  <button id="backToTop" class="back-to-top" title="Retour en haut">▲</button>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container-large footer-inner">
+      <a href="landing.html" class="footer-logo">
+        <span>🧁</span> GourmetRevient
+      </a>
+      <div class="footer-links">
+        <a href="landing.html" class="footer-link">Accueil</a>
+        <a href="blog.html" class="footer-link">Le Blog des Pâtissiers</a>
+        <a href="index.html" class="footer-link">Application Cockpit</a>
+        <a href="legal.html" class="footer-link">Mentions Légales & RGPD</a>
+      </div>
+      <div class="footer-bottom">
+        <p>© 2026 GourmetRevient. Tous droits réservés. Rédigé et conçu pour la réussite des artisans.</p>
+        <p>Le pilotage moderne de la pâtisserie artisanale française.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Similar Articles Rendering & Social Sharing Script -->
+  <script src="blog-data.js"></script>
+  <script>
+    // Define the current article ID to dynamically pull similar articles
+    // This value must be set in each article page (e.g. const CURRENT_ARTICLE_ID = "...")
+    if (typeof CURRENT_ARTICLE_ID === 'undefined') {
+      window.CURRENT_ARTICLE_ID = "cout-de-revient-guide"; // Fallback placeholder
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      // 1. Reading Progress Bar Logic
+      const progressBar = document.getElementById("progressBar");
+      window.addEventListener("scroll", () => {
+        const winScroll = document.documentElement.scrollTop || document.body.scrollTop;
+        const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        const scrolled = height > 0 ? (winScroll / height) * 100 : 0;
+        progressBar.style.width = scrolled + "%";
+
+        // Show/hide Back to Top Button
+        const backToTop = document.getElementById("backToTop");
+        if (winScroll > 400) {
+          backToTop.classList.add("visible");
+        } else {
+          backToTop.classList.remove("visible");
+        }
+      });
+
+      // 2. Back to Top Click Action
+      document.getElementById("backToTop").addEventListener("click", () => {
+        window.scrollTo({
+          top: 0,
+          behavior: "smooth"
+        });
+      });
+
+      // 3. Social Sharing Actions
+      const articleUrl = window.location.href;
+      const articleTitle = document.getElementById("articleTitle") ? document.getElementById("articleTitle").textContent : document.title;
+
+      // WhatsApp share
+      const waShare = document.getElementById("shareWhatsApp");
+      if (waShare) {
+        waShare.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(articleTitle + " - " + articleUrl)}`;
+      }
+
+      // LinkedIn share
+      const liShare = document.getElementById("shareLinkedIn");
+      if (liShare) {
+        liShare.href = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(articleUrl)}`;
+      }
+
+      // Copy Link button
+      const copyBtn = document.getElementById("shareCopyLink");
+      if (copyBtn) {
+        copyBtn.addEventListener("click", () => {
+          navigator.clipboard.writeText(articleUrl).then(() => {
+            const originalHTML = copyBtn.innerHTML;
+            copyBtn.innerHTML = "<span>✅</span> Lien copié !";
+            copyBtn.classList.add("share-link-copied");
+            setTimeout(() => {
+              copyBtn.innerHTML = originalHTML;
+              copyBtn.classList.remove("share-link-copied");
+            }, 2000);
+          }).catch(err => {
+            console.error("Impossible de copier le lien: ", err);
+          });
+        });
+      }
+
+      // 4. Render Similar Articles dynamically
+      const similarGrid = document.getElementById("similarGrid");
+      if (similarGrid && typeof getSimilarArticles === 'function') {
+        const similarArticles = getSimilarArticles(window.CURRENT_ARTICLE_ID, 3);
+        similarGrid.innerHTML = "";
+
+        if (similarArticles.length === 0) {
+          // If no articles found, grab the first 3 general ones that are not the current one
+          const fallback = blogArticles.filter(a => a.id !== window.CURRENT_ARTICLE_ID).slice(0, 3);
+          fallback.forEach(article => renderSimilarCard(article));
+        } else {
+          similarArticles.forEach(article => renderSimilarCard(article));
+        }
+      }
+
+      function renderSimilarCard(article) {
+        const card = document.createElement("a");
+        card.href = article.url;
+        card.className = "similar-card";
+        card.innerHTML = `
+          <img src="${article.image}" class="similar-img" alt="${article.title}" loading="lazy">
+          <div class="similar-body">
+            <span class="similar-category">${article.category}</span>
+            <h3 class="similar-card-title">${article.title}</h3>
+            <span class="similar-readtime">⏱️ ${article.readTime} de lecture</span>
+          </div>
+        `;
+        similarGrid.appendChild(card);
+      }
+    });
+  </script>
+</body>
+</html>

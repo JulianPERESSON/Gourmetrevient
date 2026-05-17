@@ -1508,8 +1508,12 @@
         <div class="nav-dropdown-content">
           <button class="nav-link nav-dropdown-link" id="navPortfolio"><span data-i18n="nav.portfolio">Mon Portfolio</span></button>
           <button class="nav-link nav-dropdown-link" id="navAbout"><span data-i18n="nav.about">À propos du projet</span></button>
+          <a href="blog.html" class="nav-link nav-dropdown-link" style="text-decoration:none;"><span data-i18n="nav.blog">Le Blog des Pâtissiers</span></a>
         </div>
       </div>
+
+      <!-- 5. Blog -->
+      <a href="blog.html" class="nav-dropdown-trigger" style="text-decoration:none;">📰 <span data-i18n="nav.blog">Le Blog des Pâtissiers</span></a>
 
       <button class="nav-link" id="navAdmin" style="display:none;"><span data-i18n="nav.admin">Admin</span></button>
     </div>
@@ -5442,7 +5446,8 @@
           { id: 'mLinkSuppliers', icon: '¢', label: 'nav.suppliers', action: showSuppliers },
           { id: 'mLinkHygiene', icon: '🧴', label: 'nav.hygiene', action: showHygiene },
           { id: 'mLinkLabo', icon: '🎚️', label: 'nav.lab', action: showLabo },
-          { id: 'mLinkAbout', icon: '📖', label: 'nav.about', action: showAPropos }
+          { id: 'mLinkAbout', icon: '📖', label: 'nav.about', action: showAPropos },
+          { id: 'mLinkBlog', icon: '📰', label: 'nav.blog', action: () => { window.location.href = 'blog.html'; } }
         ];
       } else if (category === 'more') {
         moreMenuTitle.textContent = "🧼 Outils Métier";
