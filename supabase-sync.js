@@ -1,9 +1,13 @@
 /**
- * GOURMETREVIENT — Supabase Sync Engine v2.0
- * ✅ Conflit LWW (Last-Write-Wins) via updated_at
- * ✅ Retry exponentiel (max 5 tentatives)
- * ✅ deleteFullAccount — RGPD cascade complète
- * ✅ Indicateur visuel offline/sync
+ * GOURMETREVIENT — Supabase Sync Engine v3.0
+ * ============================================================
+ * ✅ Table "recipes" (schéma réel Supabase)
+ * ✅ Mapping bidirectionnel app ↔ base (prepTime ↔ prep_time, etc.)
+ * ✅ Realtime cross-device : recipes + ingredients
+ * ✅ Cloud-first : le cloud est TOUJOURS la source de vérité
+ * ✅ Retry exponentiel offline (max 5 tentatives)
+ * ✅ Isolation par user_id (jamais de fuite inter-utilisateurs)
+ * ============================================================
  */
 
 const GourmetSync = {
@@ -11,63 +15,148 @@ const GourmetSync = {
 
     async init() {
         window.addEventListener('online', () => {
-            console.log('🌐 GourmetSync : Retour en ligne...');
+            console.log('🌐 GourmetSync : Retour en ligne, vidage de la file...');
             this.processQueue();
         });
         window.addEventListener('offline', () => this.updateOfflineBanner());
-        navigator.serviceWorker?.addEventListener('message', (ev) => {
-            if (ev.data?.type === 'SYNC_OP') this._replayOp(ev.data.payload);
-            if (ev.data?.type === 'SYNC_COMPLETE') this.updateOfflineBanner();
-        });
         if (navigator.onLine) this.processQueue();
     },
 
-    // ── CHARGER (Last-Write-Wins) ─────────────────────────────────────────────
-    async charger(table, localStorageKey) {
-        const cached = localStorage.getItem(localStorageKey);
-        let localData = cached ? JSON.parse(cached) : null;
+    // ══════════════════════════════════════════════════════════════
+    // MAPPING RECETTE : App Object ↔ Ligne Supabase
+    // ══════════════════════════════════════════════════════════════
 
-        if (navigator.onLine && window.gourmetSupabase) {
-            try {
-                const { data: cloudData, error } = await gourmetSupabase
-                    .from(table).select('*').order('updated_at', { ascending: false });
-                if (error) throw error;
-
-                if (cloudData && cloudData.length > 0) {
-                    if (!localData || !Array.isArray(localData)) {
-                        localData = cloudData;
-                    } else {
-                        // Fusionner : garder l'item le plus récent (LWW)
-                        const cloudMap = new Map(cloudData.map(r => [r.id, r]));
-                        const localMap = new Map(localData.map(r => [r.id, r]));
-                        const merged = [];
-                        for (const id of new Set([...cloudMap.keys(), ...localMap.keys()])) {
-                            const c = cloudMap.get(id), l = localMap.get(id);
-                            if (c && l) {
-                                merged.push(new Date(c.updated_at||0) >= new Date(l.updated_at||0) ? c : l);
-                            } else {
-                                merged.push(c || l);
-                            }
-                        }
-                        localData = merged;
-                    }
-                    localStorage.setItem(localStorageKey, JSON.stringify(localData));
-                }
-            } catch (err) {
-                console.error(`GourmetSync — Erreur chargement ${table}:`, err);
-            }
-        }
-        return localData;
+    /**
+     * Convertit un objet recette de l'app vers le format de la table Supabase `recipes`
+     */
+    _recipeToRow(recipe, userId) {
+        return {
+            id: recipe.id,
+            user_id: userId,
+            name: recipe.name,
+            category: recipe.category || null,
+            portions: parseInt(recipe.portions) || 1,
+            prep_time: Math.round(parseFloat(recipe.prepTime) || 0),
+            cook_time: Math.round(parseFloat(recipe.cookTime) || 0),
+            ingredients: recipe.ingredients || [],
+            procedure: recipe.procedure || [],
+            // On stocke les métadonnées dans costs (margin, advanced, savedAt)
+            costs: {
+                ...(recipe.costs || {}),
+                margin: recipe.margin || 70,
+                advanced: recipe.advanced || null,
+                savedAt: recipe.savedAt || new Date().toISOString()
+            },
+            updated_at: new Date().toISOString()
+        };
     },
 
-    // ── SAUVEGARDER (Optimistic UI + timestamp LWW) ────────────────────────────
+    /**
+     * Convertit une ligne Supabase `recipes` vers le format objet de l'app
+     */
+    _rowToRecipe(row) {
+        return {
+            id: row.id,
+            name: row.name,
+            category: row.category || '',
+            portions: row.portions || 1,
+            prepTime: row.prep_time || 0,
+            cookTime: row.cook_time || 0,
+            ingredients: row.ingredients || [],
+            procedure: row.procedure || [],
+            costs: row.costs || {},
+            margin: row.costs?.margin || 70,
+            advanced: row.costs?.advanced || null,
+            savedAt: row.costs?.savedAt || row.created_at,
+            updated_at: row.updated_at || row.created_at
+        };
+    },
+
+    // ══════════════════════════════════════════════════════════════
+    // RECETTES — Lecture & Écriture
+    // ══════════════════════════════════════════════════════════════
+
+    /**
+     * Charge toutes les recettes depuis le cloud (cloud-first).
+     * Retourne null en cas d'erreur ou si non connecté.
+     */
+    async chargerRecettes() {
+        if (!navigator.onLine || !window.gourmetSupabase) return null;
+        try {
+            const { data: { session } } = await gourmetSupabase.auth.getSession();
+            if (!session?.user?.id) return null;
+
+            const { data, error } = await gourmetSupabase
+                .from('recipes')
+                .select('*')
+                .eq('user_id', session.user.id)
+                .order('updated_at', { ascending: false });
+
+            if (error) throw error;
+            return (data || []).map(row => this._rowToRecipe(row));
+        } catch (err) {
+            console.error('[GourmetSync] Erreur chargement recettes:', err.message);
+            return null;
+        }
+    },
+
+    /**
+     * Sauvegarde une recette dans le cloud.
+     * Si hors ligne, met en file d'attente.
+     */
+    async sauvegarderRecette(recipe) {
+        if (!window.gourmetSupabase) return;
+        try {
+            const { data: { session } } = await gourmetSupabase.auth.getSession();
+            if (!session?.user?.id) return;
+
+            const row = this._recipeToRow(recipe, session.user.id);
+
+            if (navigator.onLine) {
+                const { error } = await gourmetSupabase
+                    .from('recipes')
+                    .upsert(row, { onConflict: 'id' });
+                if (error) throw error;
+            } else {
+                this.addToQueue('recipes', 'upsert', row);
+            }
+        } catch (err) {
+            console.warn('[GourmetSync] Mise en queue recipe:', err.message);
+            // On essaie de récupérer l'objet row si la session a échoué
+            this.addToQueue('recipes', 'upsert', recipe);
+        }
+    },
+
+    /**
+     * Supprime une recette du cloud.
+     */
+    async supprimerRecette(id) {
+        if (!window.gourmetSupabase) return;
+        if (navigator.onLine) {
+            try {
+                const { error } = await gourmetSupabase.from('recipes').delete().eq('id', id);
+                if (error) throw error;
+            } catch (err) {
+                this.addToQueue('recipes', 'delete', { id });
+            }
+        } else {
+            this.addToQueue('recipes', 'delete', { id });
+        }
+    },
+
+    // ══════════════════════════════════════════════════════════════
+    // GÉNÉRIQUE — Sauvegarder / Supprimer (autres tables)
+    // ══════════════════════════════════════════════════════════════
+
     async sauvegarder(table, item, localStorageKey) {
-        const session = await gourmetSupabase.auth.getSession();
-        const user = session.data.session?.user;
-        if (user) item.user_id = user.id;
+        if (!window.gourmetSupabase) return;
+        try {
+            const { data: { session } } = await gourmetSupabase.auth.getSession();
+            if (session?.user?.id) item.user_id = session.user.id;
+        } catch (e) {}
         item.updated_at = new Date().toISOString();
 
-        // Mise à jour locale optimiste
+        // Mise à jour locale optimiste (affichage immédiat)
         if (localStorageKey) {
             try {
                 const cached = JSON.parse(localStorage.getItem(localStorageKey) || '[]');
@@ -82,7 +171,7 @@ const GourmetSync = {
                 const { error } = await gourmetSupabase.from(table).upsert(item, { onConflict: 'id' });
                 if (error) throw error;
             } catch (err) {
-                console.warn(`GourmetSync — Mise en queue ${table}:`, err.message);
+                console.warn(`[GourmetSync] Mise en queue ${table}:`, err.message);
                 this.addToQueue(table, 'upsert', item);
             }
         } else {
@@ -107,7 +196,10 @@ const GourmetSync = {
         }
     },
 
-    // ── QUEUE + RETRY EXPONENTIEL ─────────────────────────────────────────────
+    // ══════════════════════════════════════════════════════════════
+    // FILE D'ATTENTE OFFLINE — Retry exponentiel
+    // ══════════════════════════════════════════════════════════════
+
     addToQueue(table, action, data) {
         this.queue.push({ table, action, data, timestamp: Date.now(), attempts: 0 });
         localStorage.setItem('gourmet_sync_queue', JSON.stringify(this.queue));
@@ -122,7 +214,7 @@ const GourmetSync = {
     },
 
     async processQueue() {
-        if (this.queue.length === 0) return;
+        if (this.queue.length === 0) { this.updateOfflineBanner(); return; }
         console.log(`🔄 GourmetSync : ${this.queue.length} opération(s) en attente...`);
         const MAX = 5;
         const remaining = [];
@@ -144,7 +236,7 @@ const GourmetSync = {
                 op.attempts = (op.attempts || 0) + 1;
                 op.timestamp = Date.now();
                 if (op.attempts < MAX) { remaining.push(op); }
-                else { console.error(`GourmetSync — Opération abandonnée (${MAX} tentatives):`, op); }
+                else { console.error(`[GourmetSync] Opération abandonnée (${MAX} tentatives):`, op); }
             }
         }
 
@@ -154,17 +246,13 @@ const GourmetSync = {
         if (remaining.length > 0) this._scheduleRetry();
     },
 
-    async _replayOp(op) {
-        if (!op?.table || !op?.action) return;
-        try {
-            if (op.action === 'upsert') await gourmetSupabase.from(op.table).upsert(op.data);
-            if (op.action === 'delete') await gourmetSupabase.from(op.table).delete().eq('id', op.data?.id);
-        } catch (e) { this.addToQueue(op.table, op.action, op.data); }
-    },
+    // ══════════════════════════════════════════════════════════════
+    // INDICATEUR VISUEL OFFLINE / SYNC
+    // ══════════════════════════════════════════════════════════════
 
     updateOfflineBanner() {
         const badge = document.getElementById('syncPendingBadge');
-        const dot   = document.getElementById('offlineStatusDot');
+        const dot = document.getElementById('offlineStatusDot');
         const count = this.queue.length;
         const online = navigator.onLine;
         if (badge) {
@@ -177,48 +265,58 @@ const GourmetSync = {
                 : 'sync-dot sync-dot--offline';
             dot.title = online
                 ? (count > 0 ? `${count} op. en attente de sync` : 'Synchronisé ✓')
-                : 'Hors ligne — modifs sauvegardées localement';
+                : 'Hors ligne — modifications sauvegardées localement';
         }
     },
 
-    // ── MODULE RECETTES ───────────────────────────────────────────────────────
-    async chargerRecettes() {
-        const recettes = await this.charger('recettes', 'gourmet_recettes');
-        if (recettes && navigator.onLine && window.gourmetSupabase) {
-            for (let r of recettes) {
-                try {
-                    const { data: ing } = await gourmetSupabase
-                        .from('recette_ingredients').select('*').eq('recette_id', r.id);
-                    r.ingredients = ing || [];
-                } catch (e) { r.ingredients = r.ingredients || []; }
-            }
-        }
-        return recettes;
-    },
+    // ══════════════════════════════════════════════════════════════
+    // REALTIME — Sync instantanée entre appareils
+    // ══════════════════════════════════════════════════════════════
 
-    async sauvegarderRecette(recette) {
-        const { ingredients, ...recetteData } = recette;
-        await this.sauvegarder('recettes', recetteData, 'gourmet_recettes');
-        if (ingredients?.length > 0) {
-            const ings = ingredients.map(i => ({ ...i, recette_id: recette.id, updated_at: new Date().toISOString() }));
-            if (navigator.onLine && window.gourmetSupabase) {
-                try {
-                    await gourmetSupabase.from('recette_ingredients').upsert(ings, { onConflict: 'id' });
-                } catch (e) { ings.forEach(ing => this.addToQueue('recette_ingredients', 'upsert', ing)); }
-            } else {
-                ings.forEach(ing => this.addToQueue('recette_ingredients', 'upsert', ing));
-            }
-        }
-    },
-
-    // ── REALTIME ──────────────────────────────────────────────────────────────
     initRealtime() {
         if (!window.gourmetSupabase) return;
+
+        // ── Recettes : sync temps réel ───────────────────────────
+        gourmetSupabase.channel('recipes-realtime')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'recipes' }, async (payload) => {
+                // Filtrer : ne réagir qu'aux changements de cet utilisateur
+                const uid = localStorage.getItem('gourmet_user_id');
+                const changedUid = payload.new?.user_id || payload.old?.user_id;
+                if (uid && changedUid && uid !== changedUid) return;
+
+                console.info('[Realtime] Recette modifiée sur un autre appareil → rechargement');
+                if (typeof loadSavedRecipes === 'function') {
+                    await loadSavedRecipes();
+                    if (typeof renderRecipeList === 'function') renderRecipeList();
+                    if (typeof updateDashboard === 'function') updateDashboard();
+                    if (typeof showToast === 'function') showToast('🔄 Recettes synchronisées depuis un autre appareil', 'info');
+                }
+            }).subscribe();
+
+        // ── Inventaire : sync temps réel ────────────────────────
+        gourmetSupabase.channel('ingredients-realtime')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'ingredients' }, async (payload) => {
+                const uid = localStorage.getItem('gourmet_user_id');
+                const changedUid = payload.new?.user_id || payload.old?.user_id;
+                if (uid && changedUid && uid !== changedUid) return;
+
+                console.info('[Realtime] Inventaire modifié sur un autre appareil → rechargement');
+                if (typeof loadInventory === 'function') {
+                    await loadInventory();
+                    if (typeof renderInventory === 'function') renderInventory();
+                }
+            }).subscribe();
+
+        // ── Alertes stock critique ───────────────────────────────
         gourmetSupabase.channel('stock-alerts')
             .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'ingredients' }, payload => {
-                if (payload.new.stock_actuel <= payload.new.seuil_alerte)
-                    if (typeof showToast === 'function') showToast(`⚠️ Stock critique : ${payload.new.name}`, 'warning');
+                const seuil = payload.new.seuil_alerte || 0;
+                if (payload.new.stock_actuel <= seuil)
+                    if (typeof showToast === 'function')
+                        showToast(`⚠️ Stock critique : ${payload.new.nom}`, 'warning');
             }).subscribe();
+
+        // ── Nouvelles commandes ──────────────────────────────────
         gourmetSupabase.channel('new-orders')
             .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'commandes' }, () => {
                 if (typeof showToast === 'function') showToast(`🔔 Nouvelle commande reçue !`, 'success');
@@ -226,38 +324,52 @@ const GourmetSync = {
             }).subscribe();
     },
 
-    // ── MIGRATION localStorage → Supabase ────────────────────────────────────
+    // ══════════════════════════════════════════════════════════════
+    // MIGRATION localStorage → Supabase (exécutée une seule fois)
+    // ══════════════════════════════════════════════════════════════
+
     async migrerLocalStorageVersSupabase() {
-        if (localStorage.getItem('gourmet_migration_done') === 'true') return;
-        const user = (await gourmetSupabase.auth.getSession()).data.session?.user;
-        if (!user) return;
-        console.info('🚀 Migration localStorage → Supabase...');
-        if (typeof showToast === 'function') showToast('Migration vers le Cloud... ⏳', 'info');
-        const mappings = [
-            { key: 'gourmet_recettes', table: 'recettes' },
-            { key: 'gourmet_ingredients', table: 'ingredients' },
-            { key: 'gourmet_haccp_temperatures', table: 'haccp_temperatures' },
-            { key: 'gourmet_commandes', table: 'commandes' },
-            { key: 'gourmet_clients', table: 'clients' },
-            { key: 'gourmet_team_members', table: 'team_members' },
-            { key: 'gourmet_staff_leaves', table: 'staff_leaves' },
-            { key: 'gourmet_deliveries', table: 'deliveries' }
-        ];
-        for (const m of mappings) {
-            const data = JSON.parse(localStorage.getItem(m.key) || '[]');
-            if (Array.isArray(data) && data.length > 0) {
-                for (const item of data) {
-                    item.user_id = user.id;
-                    item.updated_at = item.updated_at || new Date().toISOString();
-                    await gourmetSupabase.from(m.table).upsert(item, { onConflict: 'id' });
-                }
+        if (localStorage.getItem('gourmet_migration_done_v3') === 'true') return;
+        if (!window.gourmetSupabase) return;
+
+        const { data: { session } } = await gourmetSupabase.auth.getSession();
+        if (!session?.user?.id) return;
+
+        const uid = session.user.id;
+        console.info('🚀 Migration localStorage → Supabase v3...');
+        if (typeof showToast === 'function') showToast('Synchronisation Cloud... ⏳', 'info');
+
+        // Chercher les recettes dans localStorage (ancienne ou nouvelle clé)
+        const newKey = `gourmet_recettes_${uid}`;
+        const owner = localStorage.getItem('gourmet_current_user') || '';
+        const oldKey = `gourmetrevient_recipes_${owner.toLowerCase()}`;
+        const localRecipes = JSON.parse(
+            localStorage.getItem(newKey) || localStorage.getItem(oldKey) || '[]'
+        );
+
+        if (localRecipes.length > 0) {
+            // Vérifier ce qui existe déjà sur le cloud
+            const { data: existing } = await gourmetSupabase
+                .from('recipes').select('id').eq('user_id', uid);
+            const existingIds = new Set((existing || []).map(r => r.id));
+
+            for (const recipe of localRecipes) {
+                if (existingIds.has(recipe.id)) continue; // Ne pas écraser
+                try {
+                    const row = this._recipeToRow(recipe, uid);
+                    await gourmetSupabase.from('recipes').upsert(row, { onConflict: 'id' });
+                } catch (e) { console.warn('[Migration] Erreur recipe:', e.message); }
             }
         }
-        localStorage.setItem('gourmet_migration_done', 'true');
-        if (typeof showToast === 'function') showToast('✅ Migration terminée !', 'success');
+
+        localStorage.setItem('gourmet_migration_done_v3', 'true');
+        if (typeof showToast === 'function') showToast('✅ Synchronisation terminée !', 'success');
     },
 
-    // ── RESET DONNÉES ─────────────────────────────────────────────────────────
+    // ══════════════════════════════════════════════════════════════
+    // RESET DONNÉES UTILISATEUR
+    // ══════════════════════════════════════════════════════════════
+
     async resetUserData(skipConfirm = false) {
         const { data: { session } } = await gourmetSupabase.auth.getSession();
         const user = session?.user;
@@ -265,70 +377,33 @@ const GourmetSync = {
         if (!skipConfirm && !confirm('⚠️ Êtes-vous sûr de vouloir vider TOUTES vos données ?\n\nCette action est irréversible.')) return;
         if (typeof showToast === 'function') showToast('Nettoyage en cours... ⏳', 'info');
 
-        const tables = ['recettes','recette_ingredients','commandes','clients','fournisseurs',
-            'planning_production','haccp_temperatures','haccp_nettoyage','pertes','team_members','staff_leaves','deliveries'];
+        const tables = ['recipes', 'clients', 'commandes', 'fournisseurs',
+            'planning_production', 'haccp_temperatures', 'haccp_nettoyage', 'pertes'];
         for (const table of tables) {
             try { await gourmetSupabase.from(table).delete().eq('user_id', user.id); } catch (e) {}
         }
-        try { await gourmetSupabase.from('ingredients').update({ stock_actuel: 0 }).eq('user_id', user.id); } catch (e) {}
+        try {
+            await gourmetSupabase.from('ingredients')
+                .update({ stock_actuel: 0, updated_at: new Date().toISOString() })
+                .eq('user_id', user.id);
+        } catch (e) {}
 
-        const userPrefix = (user.email.split('@')[0]).toLowerCase();
-        const protectedKeys = ['gourmet_auth','gourmet_current_user','gourmet_demo_mode','gourmet_ingredient_db'];
+        // Nettoyage localStorage (préserver auth et UUID)
+        const protectedKeys = ['gourmet_auth', 'gourmet_current_user', 'gourmet_user_id',
+            'gourmet_demo_mode', 'gourmet_ingredient_db'];
         Object.keys(localStorage).forEach(key => {
-            const k = key.toLowerCase();
-            if (protectedKeys.includes(k)) return;
-            if (k.includes('gourmet_inventory')) {
-                try { const inv = JSON.parse(localStorage.getItem(key)||'[]'); inv.forEach(i => i.stock = 0); localStorage.setItem(key, JSON.stringify(inv)); } catch(e) {}
-                return;
-            }
-            if (k.includes('gourmet') || k.includes('labpatiss') || k.includes(userPrefix)) localStorage.removeItem(key);
+            if (protectedKeys.includes(key)) return;
+            if (key.includes('gourmet') || key.includes('labpatiss')) localStorage.removeItem(key);
         });
-
-        // Nettoyage forcé des clés spécifiques à l'utilisateur qui pourraient avoir été oubliées
-        localStorage.removeItem(`gourmet_team_members_${userPrefix}`);
-        localStorage.removeItem(`gourmet_staff_leaves_${userPrefix}`);
-        localStorage.removeItem(`gourmet_deliveries`);
-        localStorage.removeItem(`gourmet_production_plan`);
-        localStorage.removeItem(`gourmet_custom_priorities_${userPrefix}`);
 
         if (typeof showToast === 'function') showToast('✅ Espace de travail réinitialisé.', 'success');
         setTimeout(() => window.location.reload(), 1200);
     },
 
-    // ── SUPPRESSION RGPD COMPLÈTE ────────────────────────────────────────────
-    /**
-     * resetCloudData — Vide les données métier du Cloud (sauf Profil/Subscription)
-     * Utile pour "Vider mes données" sans supprimer le compte.
-     */
-    async resetCloudData() {
-        const { data: { session } } = await gourmetSupabase.auth.getSession();
-        const user = session?.user;
-        if (!user) return;
+    // ══════════════════════════════════════════════════════════════
+    // SUPPRESSION COMPLÈTE DU COMPTE (Art. 17 RGPD)
+    // ══════════════════════════════════════════════════════════════
 
-        const tablesToDelete = [
-            'recette_ingredients', 'recettes', 'commandes', 'clients',
-            'fournisseurs', 'planning_production', 'haccp_temperatures',
-            'haccp_nettoyage', 'pertes', 'staff_leaves', 'team_members', 'deliveries'
-        ];
-
-        for (const table of tablesToDelete) {
-            try {
-                await gourmetSupabase.from(table).delete().eq('user_id', user.id);
-            } catch (e) { console.warn(`resetCloudData — ${table}:`, e); }
-        }
-
-        try {
-            await gourmetSupabase.from('ingredients').update({ 
-                stock_actuel: 0,
-                updated_at: new Date().toISOString()
-            }).eq('user_id', user.id);
-        } catch (e) { console.warn(`resetCloudData — ingredients:`, e); }
-    },
-
-    /**
-     * deleteFullAccount — Art. 17 RGPD (Droit à l'effacement)
-     * Nettoie en cascade toutes les tables + localStorage + ferme la session.
-     */
     async deleteFullAccount() {
         const { data: { session } } = await gourmetSupabase.auth.getSession();
         const user = session?.user;
@@ -340,10 +415,7 @@ const GourmetSync = {
         const ok1 = confirm(
             '⚠️ SUPPRESSION DÉFINITIVE DU COMPTE\n\n' +
             'Toutes vos données seront effacées :\n' +
-            '• Recettes, ingrédients, inventaire\n' +
-            '• CRM (clients, commandes, fournisseurs)\n' +
-            '• Planning, HACCP, profil\n\n' +
-            'Continuez ?'
+            '• Recettes, inventaire\n• CRM, commandes\n• Planning, HACCP, profil\n\nContinuez ?'
         );
         if (!ok1) return false;
 
@@ -356,34 +428,25 @@ const GourmetSync = {
         if (typeof showToast === 'function') showToast('🗑️ Suppression en cours... ⏳', 'info');
 
         const cascadeTables = [
-            'recette_ingredients', 'recettes', 'ingredients',
-            'commandes', 'clients', 'fournisseurs',
+            'recipes', 'ingredients', 'commandes', 'clients', 'fournisseurs',
             'planning_production', 'haccp_temperatures', 'haccp_nettoyage',
-            'pertes', 'team_members', 'staff_leaves',
-            'subscriptions', 'profiles'
+            'pertes', 'subscriptions', 'profiles'
         ];
 
         for (const table of cascadeTables) {
             try {
-                const { error } = await gourmetSupabase.from(table).delete().eq('user_id', user.id);
-                if (error && !error.message?.includes('does not exist'))
-                    console.warn(`deleteFullAccount — ${table}:`, error.message);
+                await gourmetSupabase.from(table).delete().eq('user_id', user.id);
             } catch (e) { console.warn(`deleteFullAccount — ${table}:`, e.message); }
         }
 
-        // Nettoyage localStorage intégral
-        const toRemove = Object.keys(localStorage).filter(k =>
-            k.toLowerCase().includes('gourmet') ||
-            k.toLowerCase().includes('labpatiss') ||
-            k.toLowerCase().includes('gourmetrevient')
-        );
-        toRemove.forEach(k => localStorage.removeItem(k));
+        // Nettoyage total localStorage
+        Object.keys(localStorage)
+            .filter(k => k.includes('gourmet') || k.includes('labpatiss'))
+            .forEach(k => localStorage.removeItem(k));
         this.queue = [];
         localStorage.removeItem('gourmet_sync_queue');
 
-        // Fermer la session
         await gourmetSupabase.auth.signOut();
-
         if (typeof showToast === 'function') showToast('✅ Compte supprimé définitivement. Au revoir !', 'success');
         setTimeout(() => { window.location.href = './landing.html'; }, 2000);
         return true;

@@ -24,6 +24,8 @@ function setCurrentUser(profile) {
     window.GOURMET_PLAN = profile.plan || 'free';
     localStorage.setItem('gourmet_auth', 'true');
     localStorage.setItem('gourmet_current_user', profile.email);
+    // UUID universel — clé stable sur tous les appareils pour le même compte
+    if (profile.id) localStorage.setItem('gourmet_user_id', profile.id);
 }
 
 function afficherDashboard() {
@@ -93,6 +95,7 @@ gourmetSupabase.auth.onAuthStateChange((event, session) => {
     if (event === 'SIGNED_OUT') {
         localStorage.removeItem('gourmet_auth');
         localStorage.removeItem('gourmet_current_user');
+        localStorage.removeItem('gourmet_user_id'); // Nettoyage UUID
         afficherLandingPage();
     }
 });

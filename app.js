@@ -493,31 +493,44 @@ function getViewOwner() {
 }
 
 function getUserRecipesKey() {
+  const uid = localStorage.getItem('gourmet_user_id');
+  if (uid) return `gourmet_recettes_${uid}`;
+  // Fallback legacy (avant connexion Supabase)
   const owner = getViewOwner();
   return `gourmetrevient_recipes_${owner.toLowerCase()}`;
 }
 
 function getUserTeamKey() {
+  const uid = localStorage.getItem('gourmet_user_id');
+  if (uid) return `gourmet_team_${uid}`;
   const owner = getViewOwner();
   return `${STORAGE_KEYS.teamMembers}_${owner.toLowerCase()}`;
 }
 
 function getUserInventoryKey() {
+  const uid = localStorage.getItem('gourmet_user_id');
+  if (uid) return `gourmet_inventory_${uid}`;
   const owner = getViewOwner();
   return `gourmet_inventory_${owner.toLowerCase()}`;
 }
 
 function getUserLeavesKey() {
+  const uid = localStorage.getItem('gourmet_user_id');
+  if (uid) return `gourmet_leaves_${uid}`;
   const owner = getViewOwner();
   return `${STORAGE_KEYS.staffLeaves}_${owner.toLowerCase()}`;
 }
 
 function getUserLabPlanKey() {
+  const uid = localStorage.getItem('gourmet_user_id');
+  if (uid) return `gourmet_lab_${uid}`;
   const owner = getViewOwner();
   return `gourmet_lab_plan_${owner.toLowerCase()}`;
 }
 
 function getUserPlacementsKey() {
+  const uid = localStorage.getItem('gourmet_user_id');
+  if (uid) return `gourmet_placements_${uid}`;
   const owner = getViewOwner();
   return `labpatiss_placements_${owner.toLowerCase()}`;
 }
@@ -525,15 +538,32 @@ function getUserPlacementsKey() {
 async function loadSavedRecipes() {
   try {
     const key = getUserRecipesKey();
-    
-    // 1. Charger du cache local (Immédiat)
+
+    // Migration automatique : si des données existent sous l'ancienne clé (username)
+    // et que la nouvelle clé (UUID) est vide, on les transfère une seule fois
+    const uid = localStorage.getItem('gourmet_user_id');
+    if (uid) {
+      const newKey = `gourmet_recettes_${uid}`;
+      if (!localStorage.getItem(newKey)) {
+        const owner = getViewOwner();
+        const oldKey = `gourmetrevient_recipes_${owner.toLowerCase()}`;
+        const oldData = localStorage.getItem(oldKey);
+        if (oldData) {
+          localStorage.setItem(newKey, oldData);
+          console.info('[GourmetSync] Migration clé localStorage : username → UUID');
+        }
+      }
+    }
+
+    // 1. Charger du cache local (Immédiat pour affichage instantané)
     const localData = localStorage.getItem(key);
     if (localData) APP.savedRecipes = JSON.parse(localData);
 
-    // 2. Synchroniser avec Supabase si possible
+    // 2. Le cloud est la source de vérité si connecté
     if (window.GourmetSync && navigator.onLine) {
         const cloudData = await GourmetSync.chargerRecettes();
-        if (cloudData) {
+        // Accepter le cloud même si vide (l'utilisateur a pu tout supprimer sur un autre appareil)
+        if (cloudData !== null && cloudData !== undefined) {
             APP.savedRecipes = cloudData;
             localStorage.setItem(key, JSON.stringify(cloudData));
         }
@@ -634,7 +664,7 @@ async function loadInventory() {
     try { APP.inventory = JSON.parse(userData); } catch(e) { APP.inventory = []; }
   }
 
-  // 2. If online + Supabase, cloud is the source of truth
+  // 2. Cloud = source de vérité si connecté
   if (navigator.onLine && window.gourmetSupabase) {
     try {
       const { data: { session } } = await gourmetSupabase.auth.getSession();
@@ -644,25 +674,24 @@ async function loadInventory() {
           .from('ingredients')
           .select('*')
           .eq('user_id', userId)
-          .order('name', { ascending: true });
+          .order('nom', { ascending: true }); // colonne réelle : 'nom'
 
         if (!error && cloudItems !== null) {
           if (cloudItems.length > 0) {
-            // Cloud has data → use it directly
+            // Cloud a des données → vérité absolue
             APP.inventory = cloudItems.map(row => ({
-              id: row.id || ('inv_' + row.name.replace(/\s/g, '_')),
-              name: row.name,
+              id: row.id,
+              name: row.nom || row.name || '',   // 'nom' est la colonne réelle
               stock: row.stock_actuel || 0,
-              unit: row.unite || row.unit || 'g',
-              price: row.prix_unitaire || row.price || 0,
+              unit: row.unite || 'g',
+              price: row.prix_unitaire || 0,
               alertThreshold: row.seuil_alerte || (row.unite === 'g' || row.unite === 'ml' ? 1000 : 5),
               lastUpdate: row.updated_at || new Date().toISOString(),
               priceHistory: row.price_history || []
             }));
             localStorage.setItem(userKey, JSON.stringify(APP.inventory));
           } else {
-            // Cloud returned 0 rows → user never saved any inventory
-            // Load structure from DB with stock=0 (don't trust local cache)
+            // Cloud vide → nouveau compte, initialiser à stock 0
             APP.inventory = [];
             DEFAULT_INGREDIENT_DB.forEach(ing => {
               APP.inventory.push({
@@ -680,7 +709,7 @@ async function loadInventory() {
         }
       }
     } catch (e) {
-      console.warn('[Inventory] Cloud load failed, using local cache:', e.message);
+      console.warn('[Inventory] Erreur cloud, cache local utilisé:', e.message);
     }
   }
 
@@ -734,20 +763,20 @@ async function syncInventoryWithCloud() {
       .from('ingredients')
       .select('*')
       .eq('user_id', userId)
-      .order('name', { ascending: true });
+      .order('nom', { ascending: true }); // colonne réelle : 'nom'
 
     if (error) throw error;
 
     const userKey = getUserInventoryKey();
 
     if (cloudItems && cloudItems.length > 0) {
-      // Cloud has data → this is the truth
+      // Cloud a des données → source de vérité
       APP.inventory = cloudItems.map(row => ({
-        id: row.id || ('inv_' + row.name.replace(/\s/g, '_')),
-        name: row.name,
+        id: row.id,
+        name: row.nom || row.name || '',   // 'nom' est la colonne réelle
         stock: row.stock_actuel || 0,
-        unit: row.unite || row.unit || 'g',
-        price: row.prix_unitaire || row.price || 0,
+        unit: row.unite || 'g',
+        price: row.prix_unitaire || 0,
         alertThreshold: row.seuil_alerte || (row.unite === 'g' || row.unite === 'ml' ? 1000 : 5),
         lastUpdate: row.updated_at || new Date().toISOString(),
         priceHistory: row.price_history || []
@@ -814,7 +843,7 @@ async function saveInventory() {
           await gourmetSupabase.from('ingredients').upsert({
             id: item.id,
             user_id: userId,
-            name: item.name,
+            nom: item.name,            // colonne réelle : 'nom'
             stock_actuel: item.stock,
             unite: item.unit,
             prix_unitaire: item.price,
