@@ -3908,6 +3908,26 @@ function loadTeamMembers() {
     nameInput.value = teamName;
     nameInput.disabled = (localStorage.getItem(STORAGE_KEYS.currentUser)?.toLowerCase() !== owner);
   }
+
+  // Cloud sync en arrière-plan
+  if (navigator.onLine && window.GourmetSync) {
+    Promise.all([
+      GourmetSync.chargerTeam(),
+      GourmetSync.chargerLeaves()
+    ]).then(([cloudTeam, cloudLeaves]) => {
+      if (cloudTeam !== null && cloudTeam.length > 0) {
+        APP.teamMembers = cloudTeam;
+        APP.teamMembers.forEach((m, i) => { if (m.colorIdx === undefined) m.colorIdx = i; });
+        localStorage.setItem(getUserTeamKey(), JSON.stringify(APP.teamMembers));
+        if (typeof renderTeamList === 'function') renderTeamList();
+      }
+      if (cloudLeaves !== null && cloudLeaves.length > 0) {
+        APP.staffLeaves = cloudLeaves;
+        localStorage.setItem(getUserLeavesKey(), JSON.stringify(APP.staffLeaves));
+        if (typeof renderLeaveCalendar === 'function') renderLeaveCalendar();
+      }
+    }).catch(() => {});
+  }
 }
 
 function saveTeamMembers() {
@@ -3922,6 +3942,12 @@ function saveTeamMembers() {
     const teamName = $('#teamNameInput')?.value || '';
     localStorage.setItem(`gourmet_team_name_${owner}`, teamName);
     renderSharedList();
+  }
+
+  // Sync cloud chaque membre & absence
+  if (window.GourmetSync) {
+    APP.teamMembers.forEach(m => GourmetSync.sauvegarderMember(m).catch(() => {}));
+    APP.staffLeaves.forEach(l => GourmetSync.sauvegarderLeave(l).catch(() => {}));
   }
 }
 
@@ -4252,9 +4278,29 @@ function loadSuppliers() {
     { id: 8, name: 'Matfer Bourgeat', contact: '01 43 62 60 40', email: 'info@matferbourgeat.com', categories: ['Matériel Ops'], leadTime: 5 }
   ];
   if (!saved) saveSuppliers();
+
+  // Charger les fournisseurs cloud en arrière-plan et les fusionner avec les démos locaux
+  if (navigator.onLine && window.GourmetSync) {
+    GourmetSync.chargerFournisseurs().then(cloudSuppliers => {
+      if (cloudSuppliers !== null && cloudSuppliers.length > 0) {
+        // Garder les démos locaux (id numériques 1-8) + ajouter les fournisseurs cloud
+        const demos = APP.suppliers.filter(s => typeof s.id === 'number' && s.id <= 8);
+        APP.suppliers = [...demos, ...cloudSuppliers];
+        localStorage.setItem('gourmet_suppliers', JSON.stringify(APP.suppliers));
+        if (typeof renderSuppliers === 'function') renderSuppliers();
+      }
+    }).catch(() => {});
+  }
 }
 
-function saveSuppliers() { localStorage.setItem('gourmet_suppliers', JSON.stringify(APP.suppliers)); }
+function saveSuppliers() {
+  localStorage.setItem('gourmet_suppliers', JSON.stringify(APP.suppliers));
+  // Syncer uniquement les fournisseurs non-démos (uuid)
+  if (window.GourmetSync) {
+    const isValidUUID = str => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str);
+    APP.suppliers.filter(s => isValidUUID(s.id)).forEach(s => GourmetSync.sauvegarderFournisseur(s).catch(() => {}));
+  }
+}
 
 window.currentSupplierCat = 'all';
 
@@ -4346,8 +4392,8 @@ function renderSuppliers() {
           </div>
           <div class="supplier-card-footer">
             <button class="btn btn-outline" style="padding:6px 12px; font-size:0.75rem;" onclick="window.location.href='mailto:${s.email}'">📧 ${i18n.t('suppliers.btn.contact') || 'Email'}</button>
-            <button class="btn-icon" title="Modifier" onclick="editSupplier(${s.id})">✏️</button>
-            <button class="btn-icon" title="Supprimer" onclick="deleteSupplier(${s.id})" style="color:var(--danger); opacity:0.6;">🗑️</button>
+            <button class="btn-icon" title="Modifier" onclick="editSupplier('${s.id}')">✏️</button>
+            <button class="btn-icon" title="Supprimer" onclick="deleteSupplier('${s.id}')" style="color:var(--danger); opacity:0.6;">🗑️</button>
           </div>
         </div>
       `;
@@ -4970,44 +5016,47 @@ function saveSupplier() {
     return;
   }
 
+  let targetSupplier;
   if (id) {
-    // Edit mode
-    const s = APP.suppliers.find(sup => sup.id.toString() === id);
+    // Edit mode — chercher par id string ou number
+    const s = APP.suppliers.find(sup => sup.id == id || sup.id.toString() === id.toString());
     if (s) {
       s.name = name;
       s.contact = contact;
       s.email = email;
       s.categories = [category];
       s.rating = rating;
+      targetSupplier = s;
     }
   } else {
-    // Add mode
-    APP.suppliers.push({
-      id: Date.now(),
-      name,
-      contact,
-      email,
-      categories: [category],
-      rating,
-      leadTime: 3
-    });
+    // Add mode — UUID pour sync cloud
+    const newUUID = window.GourmetSync ? GourmetSync.uuid() : ('sup_' + Date.now());
+    const newSup = { id: newUUID, name, contact, email, categories: [category], rating, leadTime: 3 };
+    APP.suppliers.push(newSup);
+    targetSupplier = newSup;
   }
 
   saveSuppliers();
+  // Sync cloud immédiat pour ce fournisseur
+  if (window.GourmetSync && targetSupplier) {
+    const isValidUUID = str => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(str));
+    if (isValidUUID(targetSupplier.id)) GourmetSync.sauvegarderFournisseur(targetSupplier).catch(() => {});
+  }
   renderSuppliers();
   closeSupplierModal();
   showToast(id ? "Fournisseur mis à jour" : "Fournisseur ajouté", "success");
 }
 
 function editSupplier(id) {
-  const s = APP.suppliers.find(sup => sup.id === id);
+  // Gérer à la fois les IDs numériques (démos) et UUIDs (cloud)
+  const s = APP.suppliers.find(sup => sup.id == id || sup.id.toString() === id.toString());
   if (!s) return;
 
   $('#editSupplierId').value = s.id;
   $('#supName').value = s.name;
   $('#supContact').value = s.contact || '';
   $('#supEmail').value = s.email || '';
-  $('#supCategory').value = s.categories[0] || 'Général';
+  $('#supCategory').value = (s.categories && s.categories[0]) || 'Général';
   $('#supRating').value = Math.round(s.rating || 5).toString();
 
   $('#supplierModalTitle').textContent = '✏️ Modifier ' + s.name;
@@ -5016,8 +5065,13 @@ function editSupplier(id) {
 
 function deleteSupplier(id) {
   if (!confirm("Voulez-vous vraiment supprimer ce fournisseur ?")) return;
-  APP.suppliers = APP.suppliers.filter(s => s.id !== id);
+  APP.suppliers = APP.suppliers.filter(s => s.id != id && s.id.toString() !== id.toString());
   saveSuppliers();
+  // Supprimer du cloud (seulement pour les UUIDs)
+  if (window.GourmetSync) {
+    const isValidUUID = str => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(str));
+    if (isValidUUID(id)) GourmetSync.supprimerFournisseur(id).catch(() => {});
+  }
   renderSuppliers();
   showToast("Fournisseur supprimé", "info");
 }
@@ -6471,7 +6525,7 @@ function addTempLog() {
     return;
   }
   var log = {
-    id: 't_log_' + Date.now(),
+    id: window.GourmetSync ? GourmetSync.uuid() : ('t_log_' + Date.now()),
     date: new Date().toISOString(),
     equipKey: equipKey,
     val: val,
@@ -6483,6 +6537,8 @@ function addTempLog() {
   APP.haccpLogs.temp.unshift(log);
   if (APP.haccpLogs.temp.length > 50) APP.haccpLogs.temp.pop();
   saveHaccpLogs();
+  // Sync cloud
+  if (window.GourmetSync) GourmetSync.sauvegarderTemp(log).catch(() => {});
   hideAddTempModal();
   valInput.value = '';
   if (actionField) actionField.value = '';
@@ -7403,6 +7459,7 @@ function logWaste() {
   const lossAmount = costData.costPerPortion * qty;
 
   const entry = {
+    id: window.GourmetSync ? GourmetSync.uuid() : ('waste_' + Date.now()),
     date: new Date().toISOString(),
     recipeId: id,
     recipeName: recipe.name,
@@ -7414,6 +7471,9 @@ function logWaste() {
 
   APP.wasteLogs.push(entry);
   localStorage.setItem(STORAGE_KEYS.wasteLogs, JSON.stringify(APP.wasteLogs));
+
+  // Sync cloud
+  if (window.GourmetSync) GourmetSync.sauvegarderPerte(entry).catch(() => {});
 
   showToast(`${t('mgmt.toast.loss') || 'Perte enregistrée'} (${lossAmount.toFixed(2)} €)`, "warning");
   
@@ -7572,6 +7632,18 @@ function renderWasteChart(logs) {
 function loadWasteLogs() {
   const saved = localStorage.getItem(STORAGE_KEYS.wasteLogs);
   APP.wasteLogs = saved ? JSON.parse(saved) : [];
+
+  // Charger depuis Supabase en arrière-plan
+  if (navigator.onLine && window.GourmetSync) {
+    GourmetSync.chargerPertes().then(cloudLogs => {
+      if (cloudLogs !== null && cloudLogs.length > 0) {
+        APP.wasteLogs = cloudLogs;
+        localStorage.setItem(STORAGE_KEYS.wasteLogs, JSON.stringify(APP.wasteLogs));
+        if (typeof renderWasteAnalysis === 'function') renderWasteAnalysis();
+        if (typeof updateMgmtKpis === 'function') updateMgmtKpis();
+      }
+    }).catch(() => {});
+  }
 }
 
 function exportWasteHistory() {
@@ -7822,15 +7894,21 @@ function addProductionItem() {
   
   // Pick first recipe as default
   const defaultRecipe = allAvailable[0];
-  plan.push({
+  const newItem = {
+    id: window.GourmetSync ? GourmetSync.uuid() : ('prod_' + Date.now()),
     name: defaultRecipe.name,
     recipeId: defaultRecipe.id,
     qty: 10,
     status: 'todo',
     date: new Date().toLocaleDateString()
-  });
+  };
+  plan.push(newItem);
 
   localStorage.setItem('gourmet_production_plan', JSON.stringify(plan));
+
+  // Sync cloud
+  if (window.GourmetSync) GourmetSync.sauvegarderPlanning(newItem).catch(() => {});
+
   renderProductionPlan();
   showToast(t('mgmt.production.added') || "Production ajoutée !", "success");
 }
@@ -7840,14 +7918,22 @@ function updateProductionStatus(idx, status) {
   if (plan[idx]) {
     plan[idx].status = status;
     localStorage.setItem('gourmet_production_plan', JSON.stringify(plan));
+    // Sync cloud
+    if (window.GourmetSync) GourmetSync.sauvegarderPlanning(plan[idx]).catch(() => {});
     renderProductionPlan();
   }
 }
 
 function removeProductionItem(idx) {
   const plan = JSON.parse(localStorage.getItem('gourmet_production_plan') || '[]');
+  const removed = plan[idx];
   plan.splice(idx, 1);
   localStorage.setItem('gourmet_production_plan', JSON.stringify(plan));
+  // Supprimer du cloud si l'item a un UUID
+  if (window.GourmetSync && removed && removed.id) {
+    const isValidUUID = str => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(str));
+    if (isValidUUID(removed.id)) GourmetSync.supprimerPlanning(removed.id).catch(() => {});
+  }
   renderProductionPlan();
 }
 

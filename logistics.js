@@ -1,23 +1,45 @@
 /**
- * GOURMETREVIENT — Module Logistique & Radar
+ * GOURMETREVIENT — Module Logistique & Radar v2.0 (Cloud-First)
  * Gestion des passages fournisseurs et commerciaux
+ * ✅ Bidirectionnel Supabase via GourmetSync.sauvegarderDelivery / supprimerDelivery
+ * ✅ UUIDs natifs pour tous les passages
+ * ✅ Chargement cloud en arrière-plan au démarrage
  */
 
 const LogisticsManager = (() => {
     const STORAGE_KEY = 'gourmet_deliveries';
 
+    /** Retourne les livraisons depuis le cache local */
     function getDeliveries() {
         return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
     }
 
+    /** Sauvegarde la liste locale ET synce chaque item vers Supabase */
     function saveDeliveries(deliveries) {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(deliveries));
-        // Trigger sync if enabled
-        if (window.GourmetSync && typeof window.GourmetSync.sauvegarder === 'function') {
-            window.GourmetSync.sauvegarder('deliveries', STORAGE_KEY);
+        // Syncer chaque livraison individuellement via GourmetSync
+        if (window.GourmetSync) {
+            deliveries.forEach(d => {
+                GourmetSync.sauvegarderDelivery(d).catch(() => {});
+            });
         }
         hydrateLogistics();
         if (typeof hydratePremiumDashboard === 'function') hydratePremiumDashboard();
+    }
+
+    /** Charge les livraisons depuis Supabase en arrière-plan et met à jour le cache */
+    async function loadFromCloud() {
+        if (!navigator.onLine || !window.GourmetSync) return;
+        try {
+            const cloudDeliveries = await GourmetSync.chargerDeliveries();
+            if (cloudDeliveries !== null && cloudDeliveries.length > 0) {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(cloudDeliveries));
+                hydrateLogistics();
+                if (typeof hydratePremiumDashboard === 'function') hydratePremiumDashboard();
+            }
+        } catch (e) {
+            console.warn('[LogisticsManager] Erreur chargement cloud:', e);
+        }
     }
 
     function hydrateLogistics() {
@@ -60,21 +82,29 @@ const LogisticsManager = (() => {
     function addDelivery(data) {
         const deliveries = getDeliveries();
         const newDelivery = {
-            id: Date.now().toString(),
+            id: window.GourmetSync ? GourmetSync.uuid() : ('dlv_' + Date.now()),
             supplier: data.supplier,
-            eta: data.eta,
-            items: data.items,
+            eta: data.eta || '',
+            items: data.items || '',
             status: 'planned',
             delivery_date: new Date().toISOString().split('T')[0]
         };
         deliveries.push(newDelivery);
-        saveDeliveries(deliveries);
+        // Sauvegarder localement + cloud
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(deliveries));
+        if (window.GourmetSync) GourmetSync.sauvegarderDelivery(newDelivery).catch(() => {});
+        hydrateLogistics();
+        if (typeof hydratePremiumDashboard === 'function') hydratePremiumDashboard();
     }
 
     function deleteDelivery(id) {
         if (!confirm('Supprimer ce passage ?')) return;
         const deliveries = getDeliveries().filter(d => d.id !== id);
-        saveDeliveries(deliveries);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(deliveries));
+        // Supprimer du cloud
+        if (window.GourmetSync) GourmetSync.supprimerDelivery(id).catch(() => {});
+        hydrateLogistics();
+        if (typeof hydratePremiumDashboard === 'function') hydratePremiumDashboard();
     }
 
     function toggleStatus(id) {
@@ -84,7 +114,10 @@ const LogisticsManager = (() => {
             if (d.status === 'planned') d.status = 'confirmed';
             else if (d.status === 'confirmed') d.status = 'delivered';
             else d.status = 'planned';
-            saveDeliveries(deliveries);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(deliveries));
+            // Sync cloud uniquement ce delivery mis à jour
+            if (window.GourmetSync) GourmetSync.sauvegarderDelivery(d).catch(() => {});
+            hydrateLogistics();
         }
     }
 
@@ -102,7 +135,7 @@ const LogisticsManager = (() => {
                     </div>
                     <div style="text-align:right;">
                         <p style="margin:0; font-weight:bold;">Date: ${new Date().toLocaleDateString('fr-FR')}</p>
-                        <p style="margin:5px 0;">Réf: CMD-${d.id.substring(0,6)}</p>
+                        <p style="margin:5px 0;">Réf: CMD-${d.id.substring(0,8)}</p>
                     </div>
                 </div>
 
@@ -140,14 +173,17 @@ const LogisticsManager = (() => {
             jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
         };
 
-        const worker = html2pdf().from(content).set(opt).save();
+        html2pdf().from(content).set(opt).save();
         if (typeof showToast === 'function') showToast('📄 Export PDF lancé...', 'success');
     }
 
-    return { hydrateLogistics, addDelivery, deleteDelivery, toggleStatus, exportDelivery };
+    return { hydrateLogistics, loadFromCloud, addDelivery, deleteDelivery, toggleStatus, exportDelivery };
 })();
 
 window.LogisticsManager = LogisticsManager;
+
+// Charger les livraisons depuis le cloud au démarrage (après un court délai)
+setTimeout(() => LogisticsManager.loadFromCloud(), 2500);
 
 // Modal Logic
 window.openAddDeliveryModal = function() {
