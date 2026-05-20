@@ -5783,6 +5783,7 @@ function init() {
   loadNotifications();
   loadSuppliers();
   loadWasteLogs();
+  loadProductionPlan();
   bindEvents();
   renderSavedRecipes();
   renderInvitations();
@@ -6384,6 +6385,28 @@ function loadHaccpLogs() {
     APP.haccpLogs.cleanLastDate = todayStr;
     saveHaccpLogs();
   }
+
+  // Cloud sync en arrière-plan
+  if (navigator.onLine && window.GourmetSync) {
+    Promise.all([
+      GourmetSync.chargerTemps(),
+      GourmetSync.chargerNettoyage()
+    ]).then(([cloudTemps, cloudClean]) => {
+      let changed = false;
+      if (cloudTemps !== null && cloudTemps.length > 0) {
+        APP.haccpLogs.temp = cloudTemps;
+        changed = true;
+      }
+      if (cloudClean !== null && cloudClean.length > 0) {
+        APP.haccpLogs.clean = cloudClean;
+        changed = true;
+      }
+      if (changed) {
+        saveHaccpLogs();
+        renderHygiene();
+      }
+    }).catch(err => console.warn('[GourmetSync] Erreur chargement HACCP:', err));
+  }
 }
 
 const EQUIP_KEY_MAP = {
@@ -6549,6 +6572,7 @@ function addTempLog() {
 function deleteTempLog(id) {
   APP.haccpLogs.temp = APP.haccpLogs.temp.filter(function (l) { return l.id !== id; });
   saveHaccpLogs();
+  if (window.GourmetSync) GourmetSync.supprimerTemp(id).catch(() => {});
   renderTempLogs();
 }
 
@@ -6659,6 +6683,7 @@ function toggleCleaning(id) {
   if (task) {
     task.done = !task.done;
     saveHaccpLogs();
+    if (window.GourmetSync) GourmetSync.sauvegarderNettoyage(task).catch(() => {});
     renderCleaningChecklist();
   }
 }
@@ -7826,6 +7851,17 @@ function calculateBreakingPoint() {
 }
 
 // --- Production Planning ---
+function loadProductionPlan() {
+  if (navigator.onLine && window.GourmetSync) {
+    GourmetSync.chargerPlanning().then(cloudPlan => {
+      if (cloudPlan !== null && cloudPlan.length > 0) {
+        localStorage.setItem('gourmet_production_plan', JSON.stringify(cloudPlan));
+        if (typeof renderProductionPlan === 'function') renderProductionPlan();
+      }
+    }).catch(err => console.warn('[GourmetSync] Erreur lors du chargement du planning:', err));
+  }
+}
+
 function renderProductionPlan() {
   const grid = document.getElementById('productionPlanGrid');
   if (!grid) return;

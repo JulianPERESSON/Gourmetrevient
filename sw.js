@@ -3,7 +3,7 @@
 // Stratégie : Cache-First assets statiques + SWR Google Fonts/CDN + IDB Queue
 // =============================================================================
 
-const CACHE_VERSION = '12.2.0'; // Zero-Bug & Conformité — Help Guide & Planning Fixes + Blog Updates
+const CACHE_VERSION = '12.3.0'; // Zero-Bug & Conformité — Precache CRM Fix & Planning Sync Updates
 const CACHE_STATIC  = `gourmet-static-v${CACHE_VERSION}`;
 const CACHE_RUNTIME = `gourmet-runtime-v${CACHE_VERSION}`;
 const CACHE_FONTS   = `gourmet-fonts-v${CACHE_VERSION}`;
@@ -28,6 +28,7 @@ const PRECACHE_ASSETS = [
   './exam-scheduler.js',
   './creative-tools.js',
   './advanced-modules.js',
+  './crm.js',
   './crm-enhanced-v2.js',
   './equipment.js',
   './master-converter.js',
