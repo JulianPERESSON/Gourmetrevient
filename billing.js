@@ -355,7 +355,7 @@ const GourmetBilling = {
         const data = {
             user: {
                 name: user?.user_metadata?.full_name || 'Chef Gourmet',
-                email: user?.email || 'contact@gourmetrevient.fr'
+                email: user?.email || 'support@gourmetrevient.fr'
             },
             invoiceId: id,
             date: new Date().toISOString(),

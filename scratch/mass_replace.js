@@ -4,9 +4,7 @@ const path = require('path');
 const directory = 'c:\\Users\\julia\\Desktop\\cout de revient';
 
 const searchTerms = [
-    { from: /https:\/\/julianperesson\.github\.io\/Gourmetrevient\/?/g, to: 'https://gourmetrevient.fr/' },
-    { from: /julian31\.peresson@gmail\.com/g, to: 'contact@gourmetrevient.fr' },
-    { from: /julian31\.peresson/g, to: 'contact' }
+    { from: /contact@gourmetrevient\.fr/g, to: 'support@gourmetrevient.fr' }
 ];
 
 // Avoid replacing in .git or scratch or node_modules

@@ -9,7 +9,7 @@ const AuthUI = (() => {
 
   let _currentUser = null;
   let _currentPlan = 'free';
-  const ADMIN_EMAIL = 'contact@gourmetrevient.fr';
+  const ADMIN_EMAIL = 'support@gourmetrevient.fr';
   const WHITELIST = [ADMIN_EMAIL, 'ju2503', 'ju 2503'];
 
   function isAuthorized(user) {
@@ -239,7 +239,7 @@ const AuthUI = (() => {
       
       // Nettoyage legacy en cas de déconnexion UNIQUEMENT si ce n'est pas un admin legacy
       const legacyUser = localStorage.getItem('gourmet_current_user') || '';
-      const isLegacyAdmin = ['ju 2503', 'ju', 'contact@gourmetrevient.fr', 'contact'].includes(legacyUser.toLowerCase());
+      const isLegacyAdmin = ['ju 2503', 'ju', 'support@gourmetrevient.fr', 'contact'].includes(legacyUser.toLowerCase());
       
       if (!isLegacyAdmin) {
         localStorage.removeItem('gourmet_auth');
@@ -718,7 +718,7 @@ const AuthUI = (() => {
     if (_currentUser) return _currentUser;
     // Support du Pass Admin local
     if (localStorage.getItem('gourmet_auth') === 'true' && localStorage.getItem('gourmet_current_user') === 'Ju 2503') {
-      return { email: 'contact@gourmetrevient.fr', user_metadata: { full_name: 'Julian Peresson' } };
+      return { email: 'support@gourmetrevient.fr', user_metadata: { full_name: 'Julian Peresson' } };
     }
     return null; 
   }

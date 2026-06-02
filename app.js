@@ -3705,7 +3705,7 @@ function updateDashboard() {
   if (headerName) headerName.textContent = displayName;
 
   // Gestion du plan pour l'utilisateur local
-  const isAdminLocal = ['ju 2503', 'ju', 'contact@gourmetrevient.fr', 'contact'].includes(name.toLowerCase());
+  const isAdminLocal = ['ju 2503', 'ju', 'support@gourmetrevient.fr', 'contact'].includes(name.toLowerCase());
   if (isAdminLocal) {
     window.GOURMET_PLAN = 'admin';
     const proBtn = document.getElementById('btnSubscribePro');
