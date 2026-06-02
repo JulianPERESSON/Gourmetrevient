@@ -22,9 +22,9 @@ serve(async (req) => {
   try {
     const { priceId, userEmail, userId } = await req.json()
 
-    let origin = req.headers.get('origin') || 'https://julianperesson.github.io/Gourmetrevient'
+    let origin = req.headers.get('origin') || 'https://gourmetrevient.fr/'
     if (origin === 'null' || !origin.startsWith('http')) {
-      origin = 'https://julianperesson.github.io/Gourmetrevient'
+      origin = 'https://gourmetrevient.fr/'
     }
 
     console.log('--- Origin détectée :', origin)

@@ -58,7 +58,7 @@ DECLARE
 BEGIN
   SELECT id INTO v_admin_id
   FROM auth.users
-  WHERE email = 'julian31.peresson@gmail.com'
+  WHERE email = 'contact@gourmetrevient.fr'
   LIMIT 1;
 
   IF v_admin_id IS NOT NULL THEN
@@ -82,7 +82,7 @@ BEGIN
 
     RAISE NOTICE '✅ Abonnement admin créé/mis à jour pour : %', v_admin_id;
   ELSE
-    RAISE WARNING '⚠️ Compte admin non trouvé (julian31.peresson@gmail.com). Créez-le d''abord dans Supabase Auth.';
+    RAISE WARNING '⚠️ Compte admin non trouvé (contact@gourmetrevient.fr). Créez-le d''abord dans Supabase Auth.';
   END IF;
 END $$;
 

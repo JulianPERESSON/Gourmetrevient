@@ -1258,6 +1258,153 @@ const GourmetSync = {
      */
     async supprimerIngredientPrice(id) {
         await this.supprimerRow('ingredient_prices', id);
+    },
+
+    // ══════════════════════════════════════════════════════════════
+    // PARTAGE COLLABORATIF DE LABORATOIRE (lab_shares)
+    // ══════════════════════════════════════════════════════════════
+
+    /**
+     * Invite un membre à accéder au labo courant par email
+     * @param {string} email - Email du membre invité
+     * @param {string} role  - 'viewer' ou 'editor'
+     */
+    async inviterMembreLab(email, role = 'viewer') {
+        if (!window.gourmetSupabase) return { success: false, error: 'Non connecté' };
+        try {
+            const { data: { session } } = await gourmetSupabase.auth.getSession();
+            if (!session?.user?.id) return { success: false, error: 'Session expirée' };
+
+            const row = {
+                id: this.uuid(),
+                owner_user_id: session.user.id,
+                member_email: email.toLowerCase().trim(),
+                role,
+                status: 'pending',
+                updated_at: new Date().toISOString()
+            };
+            const { error } = await gourmetSupabase
+                .from('lab_shares')
+                .upsert(row, { onConflict: 'owner_user_id,member_email' });
+            if (error) throw error;
+            return { success: true };
+        } catch (err) {
+            console.error('[GourmetSync] Erreur invitation lab:', err.message);
+            return { success: false, error: err.message };
+        }
+    },
+
+    /**
+     * Charge tous les partages émis par le labo courant (membres invités)
+     * @returns {Array} membres invités
+     */
+    async chargerMembresPartages() {
+        if (!navigator.onLine || !window.gourmetSupabase) return [];
+        try {
+            const { data: { session } } = await gourmetSupabase.auth.getSession();
+            if (!session?.user?.id) return [];
+            const { data, error } = await gourmetSupabase
+                .from('lab_shares')
+                .select('*')
+                .eq('owner_user_id', session.user.id)
+                .order('created_at', { ascending: false });
+            if (error) throw error;
+            return data || [];
+        } catch (err) {
+            console.error('[GourmetSync] Erreur chargement membres partagés:', err.message);
+            return [];
+        }
+    },
+
+    /**
+     * Charge tous les labs auxquels l'utilisateur a été invité
+     * @returns {Array} labs partagés avec moi
+     */
+    async chargerLabsPartagesAvecMoi() {
+        if (!navigator.onLine || !window.gourmetSupabase) return [];
+        try {
+            const { data, error } = await gourmetSupabase.rpc('get_my_shared_labs');
+            if (error) throw error;
+            return data || [];
+        } catch (err) {
+            console.error('[GourmetSync] Erreur chargement labs partagés:', err.message);
+            return [];
+        }
+    },
+
+    /**
+     * Accepte une invitation au labo
+     * @param {string} shareId - UUID de l'invitation
+     */
+    async accepterInvitationLab(shareId) {
+        if (!window.gourmetSupabase) return { success: false };
+        try {
+            const { data, error } = await gourmetSupabase.rpc('accept_lab_invitation', { p_share_id: shareId });
+            if (error) throw error;
+            return data;
+        } catch (err) {
+            console.error('[GourmetSync] Erreur acceptation invitation:', err.message);
+            return { success: false, error: err.message };
+        }
+    },
+
+    /**
+     * Refuse ou révoque un accès (owner ou member peut l'appeler)
+     * @param {string} shareId - UUID du partage
+     */
+    async revoquerAccesLab(shareId) {
+        await this.supprimerRow('lab_shares', shareId);
+    },
+
+    /**
+     * Charge le planning de production d'un autre labo (lab partagé)
+     * @param {string} ownerUserId - user_id du propriétaire du labo
+     * @returns {Array} liste des éléments de planning
+     */
+    async chargerPlanningPartage(ownerUserId) {
+        if (!navigator.onLine || !window.gourmetSupabase) return null;
+        try {
+            const { data, error } = await gourmetSupabase
+                .from('planning_production')
+                .select('*')
+                .eq('user_id', ownerUserId)
+                .order('date_prod', { ascending: true });
+            if (error) throw error;
+            return (data || []).map(row => this._rowToPlanning(row));
+        } catch (err) {
+            console.error('[GourmetSync] Erreur planning partagé:', err.message);
+            return null;
+        }
+    },
+
+    /**
+     * Charge l'inventaire d'un autre labo (lab partagé)
+     * @param {string} ownerUserId - user_id du propriétaire du labo
+     * @returns {Array} liste des ingrédients
+     */
+    async chargerInventairePartage(ownerUserId) {
+        if (!navigator.onLine || !window.gourmetSupabase) return null;
+        try {
+            const { data, error } = await gourmetSupabase
+                .from('ingredients')
+                .select('*')
+                .eq('user_id', ownerUserId)
+                .order('nom', { ascending: true });
+            if (error) throw error;
+            return (data || []).map(row => ({
+                id: row.id,
+                name: row.nom || row.name || '',
+                stock: row.stock_actuel || 0,
+                unit: row.unite || 'g',
+                price: row.prix_unitaire || 0,
+                alertThreshold: row.seuil_alerte || 0,
+                lastUpdate: row.updated_at || new Date().toISOString(),
+                priceHistory: row.price_history || []
+            }));
+        } catch (err) {
+            console.error('[GourmetSync] Erreur inventaire partagé:', err.message);
+            return null;
+        }
     }
 };
 

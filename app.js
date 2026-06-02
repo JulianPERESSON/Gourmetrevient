@@ -20,6 +20,9 @@ const APP = {
   staffLeaves: [],
   inventory: [],
   ingredientPrices: [],
+  labShares: [],           // Labs partagés avec moi
+  membresPartages: [],     // Membres que j'ai invités dans mon labo
+  activeLab: null,         // { share_id, owner_user_id, owner_name, role } ou null (= mon propre labo)
   suppliers: [
     { id: 101, name: 'Metro Cash & Carry', contact: 'M. Lefebvre', email: 'service-client@metro.fr', categories: ['Général', 'Frais', 'Sec'], rating: 4.8 },
     { id: 102, name: 'Valrhona', contact: 'Claire Val', email: 'pro@valrhona.com', categories: ['Chocolat', 'Praliné', 'Couverture'], rating: 5.0 },
@@ -740,7 +743,14 @@ async function loadInventory() {
     }
   }
 
-  // 3. If still empty offline + not demo, load structure at stock=0
+  // 3. Charger les labs partagés avec moi
+  if (typeof GourmetSync !== 'undefined' && typeof GourmetSync.chargerLabsPartagesAvecMoi === 'function') {
+    const shared = await GourmetSync.chargerLabsPartagesAvecMoi();
+    APP.labShares = shared || [];
+    refreshLabSwitcher();
+  }
+
+  // 4. If still empty offline, load structure at stock=0
   if (APP.inventory.length === 0) {
     const isDemo = localStorage.getItem('gourmet_demo_mode') === 'true';
     if (isDemo) {
@@ -763,10 +773,298 @@ async function loadInventory() {
   }
 }
 
+
+// ============================================================================
+// PARTAGE COLLABORATIF DE LABORATOIRE
+// ============================================================================
+
+/**
+ * Met à jour le bouton de changement de labo dans la barre supérieure.
+ * Visible uniquement si l'utilisateur a au moins un labo partagé actif.
+ */
+function refreshLabSwitcher() {
+  const activeShares = APP.labShares.filter(s => s.status === 'active');
+  const pendingShares = APP.labShares.filter(s => s.status === 'pending');
+  let btn = $('#labSwitcherBtn');
+
+  if (activeShares.length === 0 && pendingShares.length === 0) {
+    if (btn) btn.style.display = 'none';
+    return;
+  }
+
+  if (!btn) {
+    // Créer le bouton dynamiquement dans la barre de navigation
+    const navRight = document.querySelector('.nav-right') || document.querySelector('.nav-actions');
+    if (navRight) {
+      btn = document.createElement('button');
+      btn.id = 'labSwitcherBtn';
+      btn.className = 'btn btn-outline btn-sm';
+      btn.style = 'position:relative; display:flex; align-items:center; gap:6px; font-size:0.8rem;';
+      btn.onclick = () => openLabSwitcherModal();
+      navRight.insertBefore(btn, navRight.firstChild);
+    }
+  }
+
+  if (btn) {
+    const isOnSharedLab = APP.activeLab !== null;
+    const badgeCount = pendingShares.length;
+    btn.innerHTML = `
+      🏭 ${isOnSharedLab ? `<strong>${escapeHtml(APP.activeLab.owner_name || 'Lab Partagé')}</strong>` : 'Mon Labo'}
+      ${badgeCount > 0 ? `<span style="background:var(--danger);color:white;border-radius:50%;width:16px;height:16px;font-size:0.65rem;display:inline-flex;align-items:center;justify-content:center;font-weight:800;">${badgeCount}</span>` : ''}
+    `;
+    btn.title = isOnSharedLab ? 'Cliquer pour changer de laboratoire' : 'Vous visualisez votre propre laboratoire';
+    btn.style.display = 'flex';
+  }
+
+  // ── Mettre à jour le widget sidebar ──
+  const badge = $('#labPendingBadge');
+  if (badge) {
+    if (pendingShares.length > 0) {
+      badge.textContent = pendingShares.length;
+      badge.style.display = 'inline-block';
+    } else {
+      badge.style.display = 'none';
+    }
+  }
+
+  const indicator = $('#activeLabIndicator');
+  const activeLabel = $('#activeLabLabel');
+  const btnLabel = $('#btnLabSwitcherLabel');
+  if (indicator) {
+    if (APP.activeLab !== null) {
+      indicator.style.display = 'block';
+      if (activeLabel) activeLabel.textContent = APP.activeLab.owner_name || 'Lab Partagé';
+      if (btnLabel) btnLabel.textContent = 'Changer de laboratoire';
+    } else {
+      indicator.style.display = 'none';
+      if (btnLabel) btnLabel.textContent = 'Gérer les accès partagés';
+    }
+  }
+}
+
+/**
+ * Ouvre le modal de gestion des labs partagés
+ */
+async function openLabSwitcherModal() {
+  const modal = $('#labSwitcherModal');
+  if (!modal) return;
+  // Charger les membres invités à l'ouverture
+  if (typeof GourmetSync !== 'undefined' && typeof GourmetSync.chargerMembresPartages === 'function') {
+    const membres = await GourmetSync.chargerMembresPartages();
+    APP.membresPartages = membres || [];
+  }
+  // Mettre à jour la bannière du lab actif
+  const banner = $('#labActiveBanner');
+  if (banner) {
+    if (APP.activeLab !== null) {
+      banner.style.display = 'flex';
+      const nameEl = $('#labActiveName');
+      if (nameEl) nameEl.textContent = `🏭 ${APP.activeLab.owner_name || 'Lab Partagé'}`;
+    } else {
+      banner.style.display = 'none';
+    }
+  }
+  renderLabSwitcherModal();
+  modal.style.display = 'flex';
+}
+
+/**
+ * Génère le contenu du modal de gestion des labs partagés
+ */
+function renderLabSwitcherModal() {
+  const activeShares = APP.labShares.filter(s => s.status === 'active');
+  const pendingShares = APP.labShares.filter(s => s.status === 'pending');
+  const membresInvites = APP.membresPartages || [];
+  const isOnMine = APP.activeLab === null;
+
+  const labsHtml = `
+    <div style="margin-bottom:1.5rem;">
+      <h4 style="font-weight:800; margin:0 0 0.8rem 0; color:var(--text-main);">📌 Labs disponibles</h4>
+      <div style="display:flex; flex-direction:column; gap:8px;">
+        <div class="lab-option ${isOnMine ? 'active' : ''}"
+             onclick="switchToLab(null)"
+             style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:12px;cursor:pointer;border:2px solid ${isOnMine ? 'var(--accent)' : 'var(--border)'};background:${isOnMine ? 'rgba(var(--accent-rgb),0.08)' : 'var(--surface)'};">
+          <span style="font-size:1.5rem;">🏠</span>
+          <div style="flex:1;">
+            <strong style="display:block;">Mon Laboratoire</strong>
+            <small style="color:var(--text-muted);">Mes propres recettes, planning et inventaire</small>
+          </div>
+          ${isOnMine ? '<span style="color:var(--accent);font-weight:800;">✓ Actif</span>' : ''}
+        </div>
+        ${activeShares.map(s => `
+          <div class="lab-option ${APP.activeLab?.share_id === s.share_id ? 'active' : ''}"
+               onclick="switchToLab('${s.share_id}', '${s.owner_user_id}', '${escapeHtml(s.owner_name || s.owner_email)}', '${s.role}')"
+               style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:12px;cursor:pointer;border:2px solid ${APP.activeLab?.share_id === s.share_id ? 'var(--accent)' : 'var(--border)'};background:${APP.activeLab?.share_id === s.share_id ? 'rgba(var(--accent-rgb),0.08)' : 'var(--surface)'};">
+            <span style="font-size:1.5rem;">🏭</span>
+            <div style="flex:1;">
+              <strong style="display:block;">${escapeHtml(s.owner_name || s.owner_email)}</strong>
+              <small style="color:var(--text-muted);">Rôle : ${s.role === 'editor' ? '✏️ Éditeur' : '👁️ Observateur'}</small>
+            </div>
+            ${APP.activeLab?.share_id === s.share_id ? '<span style="color:var(--accent);font-weight:800;">✓ Actif</span>' : ''}
+            <button class="btn btn-sm" style="background:transparent;color:var(--danger);border:none;font-size:0.8rem;cursor:pointer;" 
+                    onclick="event.stopPropagation(); quitterLab('${s.share_id}')">Quitter</button>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+    ${pendingShares.length > 0 ? `
+      <div style="margin-bottom:1.5rem;">
+        <h4 style="font-weight:800; margin:0 0 0.8rem 0; color:var(--warning);">🔔 Invitations en attente</h4>
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          ${pendingShares.map(s => `
+            <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:12px;border:2px dashed var(--warning);background:rgba(245,158,11,0.05);">
+              <span style="font-size:1.5rem;">✉️</span>
+              <div style="flex:1;">
+                <strong style="display:block;">${escapeHtml(s.owner_name || s.owner_email)}</strong>
+                <small style="color:var(--text-muted);">Rôle proposé : ${s.role === 'editor' ? '✏️ Éditeur' : '👁️ Observateur'}</small>
+              </div>
+              <div style="display:flex;gap:6px;">
+                <button class="btn btn-sm btn-primary" onclick="accepterInvitation('${s.share_id}')">✓ Accepter</button>
+                <button class="btn btn-sm btn-outline" onclick="refuserInvitation('${s.share_id}')" style="color:var(--danger);">✕ Refuser</button>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    ` : ''}
+    <div>
+      <h4 style="font-weight:800; margin:0 0 0.8rem 0; color:var(--text-main);">👥 Membres invités dans mon labo</h4>
+      ${membresInvites.length === 0 ? `<p style="color:var(--text-muted);font-size:0.85rem;">Aucun membre invité pour l'instant.</p>` : `
+        <div style="display:flex; flex-direction:column; gap:6px; margin-bottom:1rem;">
+          ${membresInvites.map(m => `
+            <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:10px;background:var(--surface);border:1px solid var(--border);">
+              <span style="font-size:1.2rem;">${m.status === 'active' ? '✅' : m.status === 'pending' ? '⏳' : '❌'}</span>
+              <div style="flex:1;">
+                <strong style="font-size:0.9rem;">${escapeHtml(m.member_email)}</strong>
+                <small style="color:var(--text-muted); display:block;">${m.role === 'editor' ? 'Éditeur' : 'Observateur'} — ${m.status === 'active' ? 'Actif' : m.status === 'pending' ? 'En attente' : 'Refusé'}</small>
+              </div>
+              <button class="btn btn-sm" style="color:var(--danger);background:transparent;border:none;cursor:pointer;" 
+                      onclick="revoquerMembre('${m.id}')">✕ Révoquer</button>
+            </div>
+          `).join('')}
+        </div>
+      `}
+      <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        <input type="email" id="inviteEmailInput" class="form-input" placeholder="email@collaborateur.fr" style="flex:1;min-width:200px;" />
+        <select id="inviteRoleSelect" class="form-input" style="width:130px;">
+          <option value="viewer">👁️ Observateur</option>
+          <option value="editor">✏️ Éditeur</option>
+        </select>
+        <button class="btn btn-primary" onclick="envoyerInvitation()">📨 Inviter</button>
+      </div>
+    </div>
+  `;
+
+  const body = $('#labSwitcherBody');
+  if (body) body.innerHTML = labsHtml;
+}
+
+/**
+ * Bascule vers un lab partagé ou vers son propre lab
+ */
+async function switchToLab(shareId, ownerUserId = null, ownerName = null, role = null) {
+  if (shareId === null) {
+    APP.activeLab = null;
+    await loadInventory();
+    if (typeof renderPlanning === 'function') renderPlanning();
+    showToast('✅ Vous consultez votre propre laboratoire', 'success');
+  } else {
+    APP.activeLab = { share_id: shareId, owner_user_id: ownerUserId, owner_name: ownerName, role };
+    showToast(`🔄 Chargement du labo de ${ownerName}…`, 'info');
+
+    // Charger planning partagé
+    if (typeof GourmetSync !== 'undefined') {
+      const planning = await GourmetSync.chargerPlanningPartage(ownerUserId);
+      if (planning !== null) {
+        APP.productionPlanning = planning;
+        if (typeof renderPlanning === 'function') renderPlanning();
+      }
+      // Charger inventaire partagé
+      const inventory = await GourmetSync.chargerInventairePartage(ownerUserId);
+      if (inventory !== null) {
+        APP.inventory = inventory;
+        if (typeof renderInventory === 'function') renderInventory();
+      }
+    }
+    showToast(`✅ Vous consultez le labo de ${ownerName}`, 'success');
+  }
+
+  refreshLabSwitcher();
+  const modal = $('#labSwitcherModal');
+  if (modal) modal.style.display = 'none';
+}
+
+/** Accepte une invitation de labo */
+async function accepterInvitation(shareId) {
+  const result = await GourmetSync.accepterInvitationLab(shareId);
+  if (result?.success) {
+    showToast('✅ Invitation acceptée ! Rechargement des labs…', 'success');
+    const shared = await GourmetSync.chargerLabsPartagesAvecMoi();
+    APP.labShares = shared || [];
+    refreshLabSwitcher();
+    renderLabSwitcherModal();
+  } else {
+    showToast('⚠️ Erreur : ' + (result?.error || 'Impossible d\'accepter'), 'error');
+  }
+}
+
+/** Refuse une invitation de labo */
+async function refuserInvitation(shareId) {
+  await GourmetSync.revoquerAccesLab(shareId);
+  APP.labShares = APP.labShares.filter(s => s.share_id !== shareId);
+  showToast('Invitation refusée', 'info');
+  refreshLabSwitcher();
+  renderLabSwitcherModal();
+}
+
+/** Quitte un labo partagé */
+async function quitterLab(shareId) {
+  await GourmetSync.revoquerAccesLab(shareId);
+  if (APP.activeLab?.share_id === shareId) {
+    await switchToLab(null);
+  }
+  APP.labShares = APP.labShares.filter(s => s.share_id !== shareId);
+  refreshLabSwitcher();
+  renderLabSwitcherModal();
+  showToast('Vous avez quitté ce laboratoire', 'info');
+}
+
+/** Révoque l'accès d'un membre invité */
+async function revoquerMembre(shareId) {
+  await GourmetSync.revoquerAccesLab(shareId);
+  APP.membresPartages = APP.membresPartages.filter(m => m.id !== shareId);
+  renderLabSwitcherModal();
+  showToast('✅ Accès révoqué', 'success');
+}
+
+/** Envoie une invitation à un collaborateur */
+async function envoyerInvitation() {
+  const email = ($('#inviteEmailInput')?.value || '').trim();
+  const role = $('#inviteRoleSelect')?.value || 'viewer';
+  if (!email || !email.includes('@')) {
+    showToast('⚠️ Veuillez entrer un email valide', 'warning');
+    return;
+  }
+  const btn = document.querySelector('#labSwitcherModal button[onclick="envoyerInvitation()"]');
+  if (btn) { btn.textContent = '⏳ Envoi…'; btn.disabled = true; }
+  const result = await GourmetSync.inviterMembreLab(email, role);
+  if (btn) { btn.textContent = '📨 Inviter'; btn.disabled = false; }
+  if (result?.success) {
+    showToast(`✅ Invitation envoyée à ${email}`, 'success');
+    if ($('#inviteEmailInput')) $('#inviteEmailInput').value = '';
+    const membres = await GourmetSync.chargerMembresPartages();
+    APP.membresPartages = membres || [];
+    renderLabSwitcherModal();
+  } else {
+    showToast('⚠️ Erreur : ' + (result?.error || 'Envoi échoué'), 'error');
+  }
+}
+
 /**
  * Synchronise l'inventaire avec le cloud (bouton "Synchronisation Ingrédients").
  * Le cloud est la source de vérité : si aucune donnée cloud, stocks = 0.
  */
+
 async function syncInventoryWithCloud() {
   if (typeof showToast === 'function') showToast('🔄 Synchronisation en cours…', 'info');
 
@@ -3407,7 +3705,7 @@ function updateDashboard() {
   if (headerName) headerName.textContent = displayName;
 
   // Gestion du plan pour l'utilisateur local
-  const isAdminLocal = ['ju 2503', 'ju', 'julian31.peresson@gmail.com', 'julian31.peresson'].includes(name.toLowerCase());
+  const isAdminLocal = ['ju 2503', 'ju', 'contact@gourmetrevient.fr', 'contact'].includes(name.toLowerCase());
   if (isAdminLocal) {
     window.GOURMET_PLAN = 'admin';
     const proBtn = document.getElementById('btnSubscribePro');

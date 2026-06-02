@@ -653,7 +653,7 @@ window.generateVitrineLabels = function() {
     const finalPrice = smartPrice.toFixed(2).replace('.', ',');
     
     const allergens = detectAllergens(r);
-    const qrData = `https://julianperesson.github.io/Gourmetrevient/?product=${encodeURIComponent(r.name)}`;
+    const qrData = `https://gourmetrevient.fr/?product=${encodeURIComponent(r.name)}`;
     const nutri = typeof calculateNutriScore === 'function' ? calculateNutriScore(r) : null;
     
     const portions = parseInt(r.portions) || 10;

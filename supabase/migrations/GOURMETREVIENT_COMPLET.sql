@@ -551,7 +551,7 @@ DECLARE
 BEGIN
   SELECT id INTO v_admin_id
   FROM auth.users
-  WHERE email = 'julian31.peresson@gmail.com'
+  WHERE email = 'contact@gourmetrevient.fr'
   LIMIT 1;
 
   IF v_admin_id IS NOT NULL THEN
@@ -581,7 +581,7 @@ BEGIN
     RAISE NOTICE '✅ Compte Admin Pro configuré pour UUID : %', v_admin_id;
 
   ELSE
-    RAISE WARNING '⚠️ Compte julian31.peresson@gmail.com introuvable. Créez le compte dans Supabase Auth puis relancez ce script.';
+    RAISE WARNING '⚠️ Compte contact@gourmetrevient.fr introuvable. Créez le compte dans Supabase Auth puis relancez ce script.';
   END IF;
 END $$;
 
