@@ -69,10 +69,7 @@ async function initApp() {
             }
             afficherDashboard();
         } else {
-            // Mode démo fallback (autorisé par le client)
-            if (localStorage.getItem('gourmet_demo_mode') === 'true') {
-                return; // On laisse faire auth-ui.js
-            }
+            // Aucune session Supabase → redirection obligatoire vers la landing
             afficherLandingPage();
         }
     } catch (err) {

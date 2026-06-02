@@ -345,8 +345,22 @@ window.hydratePremiumDashboard = function () {
     }
 
     // 4. DYNAMIC AI Expert Advice (generates insight from real data)
-    const aiAdvice = document.getElementById('dashAIAdvice');
+    const aiAdvice = document.getElementById('dashAIAdvice') || document.getElementById('assistant-expert');
     if (aiAdvice) {
+        const userPlan = window.GOURMET_PLAN || localStorage.getItem('gourmet_plan') || 'free';
+        if (userPlan === 'free') {
+            aiAdvice.innerHTML = `
+                <div style="text-align:center; padding:1.5rem;">
+                  <p style="font-size:14px; font-weight:500; margin:0 0 8px;">🧠 Assistant Expert</p>
+                  <p style="font-size:13px; color:var(--color-text-secondary); margin:0 0 14px;">
+                    Obtenez des recommandations personnalisées sur vos recettes, vos marges et votre production.
+                  </p>
+                  <button onclick="afficherPageAbonnement()" style="background:#4f46e5; color:#fff; border:none; padding:8px 18px; border-radius:8px; font-size:13px; cursor:pointer;">
+                    Passer en Pro — 19,90€/mois →
+                  </button>
+                </div>`;
+            return;
+        }
         let insights = [];
         
         // Insight: Worst margin recipe
@@ -740,7 +754,28 @@ document.addEventListener('DOMContentLoaded', () => {
             ease: "expo.out"
         });
     }
+
+    // CORRECTION 3 — Chargement infini "Analyse de vos données en cours"
+    setTimeout(() => {
+        const el = document.getElementById('priorites-chargement') || document.getElementById('dashPriorityList');
+        if (el && (el.innerHTML.includes('Analyse de vos données') || el.innerHTML.includes('Chargement...'))) {
+            el.innerHTML = `
+              <div style="text-align:center; padding:1rem; color:var(--color-text-secondary); font-size:13px;">
+                🎉 Aucune priorité critique aujourd'hui — votre atelier est en ordre !
+              </div>`;
+        }
+    }, 3000);
 });
+
+// Helper for free plan redirection
+window.afficherPageAbonnement = function() {
+    if (typeof showMgmt === 'function') {
+        showMgmt('billing');
+    } else {
+        const btn = document.getElementById('navBilling');
+        if (btn) btn.click();
+    }
+};
 
 function updateThemeIcons(isDark) {
     const sun = document.querySelector('.theme-icon-sun');
@@ -900,7 +935,29 @@ window.showWeeklyReport = function() {
 };
 
 // 12. ONBOARDING CHECKLIST LOGIC
+function verifierChecklistTerminee() {
+    const cases = document.querySelectorAll('.checklist-item input[type="checkbox"], .check-item input[type="checkbox"]');
+    const toutes_cochees = Array.from(cases).every(c => c.checked);
+    if (toutes_cochees) {
+        const el = document.getElementById('checklist-demarrage') || document.getElementById('onboardingChecklist');
+        if (el) el.style.display = 'none';
+        localStorage.setItem('gourmet_checklist_done', 'true');
+    }
+}
+window.verifierChecklistTerminee = verifierChecklistTerminee;
+
+if (localStorage.getItem('gourmet_checklist_done') === 'true') {
+    const el = document.getElementById('checklist-demarrage') || document.getElementById('onboardingChecklist');
+    if (el) el.style.display = 'none';
+}
+
 function updateOnboardingChecklist() {
+    const checklistCard = document.getElementById('checklist-demarrage') || document.getElementById('onboardingChecklist');
+    if (localStorage.getItem('gourmet_checklist_done') === 'true') {
+        if (checklistCard) checklistCard.style.display = 'none';
+        return;
+    }
+
     const currUser = (localStorage.getItem('gourmet_current_user') || 'chef').toLowerCase();
     const inventory = JSON.parse(localStorage.getItem(`gourmet_inventory_${currUser}`) || localStorage.getItem('gourmet_inventory') || '[]');
     const recipes = JSON.parse(localStorage.getItem(`gourmetrevient_recipes_${currUser}`) || '[]');
@@ -917,7 +974,7 @@ function updateOnboardingChecklist() {
     let completedCount = 0;
     tasks.forEach(task => {
         const checkbox = document.getElementById(task.el);
-        const parent = checkbox ? checkbox.closest('.check-item') : null;
+        const parent = checkbox ? checkbox.closest('.check-item, .checklist-item') : null;
         if (checkbox) {
             checkbox.checked = task.done;
             if (task.done) {
@@ -932,16 +989,14 @@ function updateOnboardingChecklist() {
     const pct = Math.round((completedCount / tasks.length) * 100);
     const progressBar = document.getElementById('onboardingProgressBar');
     const pctText = document.getElementById('onboardingPctText');
-    const checklistCard = document.getElementById('onboardingChecklist');
 
     if (progressBar) progressBar.style.width = pct + '%';
     if (pctText) pctText.textContent = pct + '% complété';
     
-    // Hide checklist if 100% completed after some time
+    // Hide checklist if 100% completed
     if (pct === 100 && checklistCard) {
-        setTimeout(() => {
-            checklistCard.style.display = 'none';
-        }, 5000);
+        checklistCard.style.display = 'none';
+        localStorage.setItem('gourmet_checklist_done', 'true');
     }
 }
 

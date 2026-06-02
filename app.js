@@ -19,6 +19,7 @@ const APP = {
   teamMembers: [],
   staffLeaves: [],
   inventory: [],
+  ingredientPrices: [],
   suppliers: [
     { id: 101, name: 'Metro Cash & Carry', contact: 'M. Lefebvre', email: 'service-client@metro.fr', categories: ['Général', 'Frais', 'Sec'], rating: 4.8 },
     { id: 102, name: 'Valrhona', contact: 'Claire Val', email: 'pro@valrhona.com', categories: ['Chocolat', 'Praliné', 'Couverture'], rating: 5.0 },
@@ -381,18 +382,28 @@ function calcIngredientCost(ing, depth = 0) {
       subWeightGrams += subQty;
     });
 
+    if (window.SousRecettes && subRecipe.sousRecettes) {
+      subRecipe.sousRecettes.forEach(sr => {
+        subCost += SousRecettes.calcCoutSousRecette(sr);
+        subWeightGrams += parseFloat(sr.quantiteUtilisee) || 0;
+      });
+    }
+
     if (subWeightGrams === 0) return 0;
 
     // Convert requested qty to grams
     let reqQtyInGrams = qty;
     if (unit === 'kg' || unit === 'L') reqQtyInGrams *= 1000;
+
+    const rendement = parseFloat(ing.rendement) || 100;
+
     // If unit is 'piece', we fallback to treating qty as chunks of total weight (e.g. 1 piece = 1 whole recipe).
     if (unit === 'pièce') {
-       return subCost * qty; // Total sub-recipe cost * number of pieces
+       return (subCost * qty) / (rendement / 100); // Total sub-recipe cost * number of pieces
     }
 
     // Cost per gram * requested grams
-    return (subCost / subWeightGrams) * reqQtyInGrams;
+    return ((subCost / subWeightGrams) * reqQtyInGrams) / (rendement / 100);
   }
 
   let price = parseFloat(ing.pricePerUnit);
@@ -407,7 +418,11 @@ function calcIngredientCost(ing, depth = 0) {
 }
 
 function calcTotalMaterialCost() {
-  return APP.recipe.ingredients.reduce((sum, ing) => sum + calcIngredientCost(ing), 0);
+  const ingCost = APP.recipe.ingredients.reduce((sum, ing) => sum + calcIngredientCost(ing), 0);
+  const srCost = (window.SousRecettes && APP.recipe.sousRecettes)
+    ? APP.recipe.sousRecettes.reduce((sum, sr) => sum + SousRecettes.calcCoutSousRecette(sr), 0)
+    : 0;
+  return ingCost + srCost;
 }
 
 function calcFullCost(margin, customRecipe = null, forcedInflation = null) {
@@ -418,7 +433,11 @@ function calcFullCost(margin, customRecipe = null, forcedInflation = null) {
   const portions = r.portions || 10;
   const infl = (forcedInflation !== null) ? forcedInflation : (window.inflationFactor || 0);
   const costMultiplier = infl / 100 + 1;
-  const totalMaterial = r.ingredients.reduce((sum, ing) => sum + calcIngredientCost(ing), 0) * costMultiplier;
+  const ingCost = r.ingredients ? r.ingredients.reduce((sum, ing) => sum + calcIngredientCost(ing), 0) : 0;
+  const srCost = (window.SousRecettes && r.sousRecettes)
+    ? r.sousRecettes.reduce((sum, sr) => sum + SousRecettes.calcCoutSousRecette(sr), 0)
+    : 0;
+  const totalMaterial = (ingCost + srCost) * costMultiplier;
 
   // Use either live UI values or saved values
   let laborRate = 0, fixedCharges = 0, productions = 1, energyRate = 0, amortization = 0;
@@ -677,7 +696,7 @@ async function loadInventory() {
           .order('nom', { ascending: true }); // colonne réelle : 'nom'
 
         if (!error && cloudItems !== null) {
-          if (cloudItems.length > 0) {
+            if (cloudItems.length > 0) {
             // Cloud a des données → vérité absolue
             APP.inventory = cloudItems.map(row => ({
               id: row.id,
@@ -705,6 +724,14 @@ async function loadInventory() {
               });
             });
             localStorage.setItem(userKey, JSON.stringify(APP.inventory));
+          }
+        }
+
+        // --- CHARGEMENT DES PRIX PAR FOURNISSEUR ---
+        if (typeof GourmetSync !== 'undefined' && typeof GourmetSync.chargerIngredientPrices === 'function') {
+          const prices = await GourmetSync.chargerIngredientPrices();
+          if (prices !== null) {
+            APP.ingredientPrices = prices;
           }
         }
       }
@@ -1043,8 +1070,12 @@ function renderIngredients() {
     container.appendChild(row);
   });
 
+  if (window.SousRecettes) {
+    SousRecettes.renderSousRecetteRows();
+  }
+
   // GSAP Stagger Animation (Guaranteed opacity 1)
-  if (window.gsap && APP.recipe.ingredients.length > 0) {
+  if (window.gsap && (APP.recipe.ingredients.length > 0 || (APP.recipe.sousRecettes && APP.recipe.sousRecettes.length > 0))) {
     gsap.fromTo('#ingredientsList .ing-row', 
       { opacity: 0, y: 15 },
       { opacity: 1, y: 0, duration: 0.4, stagger: 0.05, ease: 'power2.out' }
@@ -1166,15 +1197,18 @@ function addIngredient(preset = null) {
 function collectIngredients() {
   const container = $('#ingredientsList');
   if (!container) return;
-  const rows = container.querySelectorAll('.ing-row');
+  const rows = container.querySelectorAll('.ing-row:not(.sr-row)');
+  const allRows = container.querySelectorAll('.ing-row');
 
   // SÉCURITÉ : Si aucune ligne n'est présente dans le DOM (UI non initialisée), 
   // on ne vide pas APP.recipe.ingredients pour éviter d'effacer les données chargées en mémoire.
-  if (rows.length === 0) return;
+  if (allRows.length === 0) return;
 
   APP.recipe.ingredients = [];
   rows.forEach(row => {
-    const name = GourmetSecurity.sanitize(row.querySelector('[data-field="name"]').value.trim());
+    const nameInput = row.querySelector('[data-field="name"]');
+    if (!nameInput) return;
+    const name = GourmetSecurity.sanitize(nameInput.value.trim());
     const quantity = parseFloat(row.querySelector('[data-field="quantity"]').value) || 0;
     const unit = row.querySelector('[data-field="unit"]').value;
     const pricePerUnit = parseFloat(row.querySelector('[data-field="pricePerUnit"]').value) || 0;
@@ -1189,10 +1223,35 @@ function showAutocomplete(input, listEl, idx) {
   const val = input.value.toLowerCase().trim();
   if (val.length < 1) { listEl.classList.remove('show'); return; }
 
-  // 1. Core ingredients
-  let matches = APP.ingredientDb.filter(i =>
-    i.name.toLowerCase().includes(val)
-  ).map(i => ({...i, isRecipe: false}));
+  // 1. Core ingredients + Supplier-specific prices
+  let matches = [];
+  const matchingDb = APP.ingredientDb.filter(i => i.name.toLowerCase().includes(val));
+  
+  matchingDb.forEach(i => {
+    // Check if we have supplier prices configured for this ingredient name
+    const supplierPrices = (APP.ingredientPrices || []).filter(ip => 
+      ip.ingredient_name.toLowerCase().trim() === i.name.toLowerCase().trim()
+    );
+    
+    // Add supplier-specific options first
+    supplierPrices.forEach(ip => {
+      const supplier = (APP.suppliers || []).find(s => String(s.id) === String(ip.fournisseur_id));
+      const supplierName = supplier ? supplier.name : 'Fournisseur';
+      matches.push({
+        name: `${i.name} (${supplierName})`,
+        unit: ip.unite || i.unit,
+        pricePerUnit: ip.prix_unitaire,
+        priceRef: ip.unite || i.unit,
+        isRecipe: false
+      });
+    });
+    
+    // Add default option
+    matches.push({
+      ...i,
+      isRecipe: false
+    });
+  });
 
   // 2. Saved Recipes & Library Recipes (Compositions)
   const savedRecipes = JSON.parse(localStorage.getItem(getUserRecipesKey()) || '[]');
@@ -1716,6 +1775,25 @@ function renderSummary() {
       </tr>`;
     }).join('');
 
+    // Append sub-recipes rows
+    if (window.SousRecettes && r.sousRecettes && r.sousRecettes.length > 0) {
+      const savedRecipesForSummary = JSON.parse(localStorage.getItem(getUserRecipesKey()) || '[]');
+      const srRows = r.sousRecettes.map(sr => {
+        const cost = SousRecettes.calcCoutSousRecette(sr);
+        const enfant = savedRecipesForSummary.find(re => re.id === sr.recetteEnfantId);
+        const poidsTotal = enfant ? SousRecettes.getPoidsTotal(enfant) : 0;
+        const priceRef = poidsTotal > 0 ? (SousRecettes.calcCoutSousRecette({ recetteEnfantId: sr.recetteEnfantId, quantiteUtilisee: poidsTotal, rendement: 100 }) / poidsTotal * 1000).toFixed(2) + ' €/kg' : '— €/kg';
+        const rdtLabel = (parseFloat(sr.rendement) || 100) < 100 ? ` (rdt ${sr.rendement}%)` : '';
+        return `<tr class="sr-summary-row" style="background-color: rgba(230, 126, 34, 0.04); cursor: pointer;" onclick="if(window.loadRecipe && '${sr.recetteEnfantId}') { loadRecipe('${sr.recetteEnfantId}'); if(window.goToStep) goToStep(5); }">
+          <td><span class="sr-badge" style="font-size:0.75rem; margin-right:0.4rem; padding: 2px 6px; background-color: var(--primary); color: white; border-radius: 4px;">🔗 Sous-recette</span> <em>${escapeHtml(sr.recetteEnfantNom)}</em></td>
+          <td>${sr.quantiteUtilisee} g${rdtLabel}</td>
+          <td>${priceRef}</td>
+          <td style="font-weight:700; color:var(--accent)">${cost.toFixed(2)} €</td>
+        </tr>`;
+      }).join('');
+      ingRows += srRows;
+    }
+
     // Procedure list
     let procHtml = '';
     if (r.steps && r.steps.length > 0) {
@@ -1879,7 +1957,9 @@ async function saveCurrentRecipe() {
   }
 
   saveSavedRecipes();
-
+  if (window.SousRecettes) {
+    SousRecettes.syncToSupabase(r.id);
+  }
   // Save new ingredients to DB
   r.ingredients.forEach(ing => {
     if (ing.name.trim() && ing.pricePerUnit > 0) {
@@ -1892,7 +1972,7 @@ async function saveCurrentRecipe() {
   updateDashboard();
 }
 
-function loadRecipe(id) {
+async function loadRecipe(id) {
   const recipe = APP.savedRecipes.find(r => r.id === id);
   if (!recipe) return;
 
@@ -1910,6 +1990,10 @@ function loadRecipe(id) {
 
   goToStep(1);
   showToast(t('recipe.toast.loaded', { name: recipe.name }), 'success');
+
+  if (window.SousRecettes) {
+    await SousRecettes.loadFromSupabase(recipe.id);
+  }
 }
 
 function deleteRecipe(id) {
@@ -2810,6 +2894,12 @@ function renderNutritionAnalysis() {
     if (n.includes('noisette') || n.includes('amande') || n.includes('noix') || n.includes('pistache')) foundAllergens.add('Fruits à coque');
   });
 
+  // Get all allergens (including sub-recipes recursively)
+  if (window.SousRecettes) {
+    const cascadeAllergens = SousRecettes.getAllergenesFromRecipe(APP.recipe);
+    cascadeAllergens.forEach(a => foundAllergens.add(a));
+  }
+
   // Calculate per 100g
   if (weightInGrams > 0) {
     const factor = 100 / weightInGrams;
@@ -2961,6 +3051,20 @@ function bindEvents() {
   // Ingredients
   const btnAddIng = $('#btnAddIngredient');
   if (btnAddIng) btnAddIng.addEventListener('click', () => addIngredient());
+
+  const btnAddSousRecette = $('#btnAddSousRecette');
+  if (btnAddSousRecette) {
+    btnAddSousRecette.addEventListener('click', () => {
+      if (window.SousRecettes) SousRecettes.openAddModal();
+    });
+  }
+
+  const btnVoirStructure = $('#btnVoirStructure');
+  if (btnVoirStructure) {
+    btnVoirStructure.addEventListener('click', () => {
+      if (window.SousRecettes) SousRecettes.openTreeModal();
+    });
+  }
 
   const btnAddFromDb = $('#btnAddFromDb');
   if (btnAddFromDb) btnAddFromDb.addEventListener('click', showIngredientDbModal);
@@ -3718,12 +3822,121 @@ function editInventoryItem(id) {
   const item = APP.inventory.find(i => i.id === id);
   if (!item) return;
 
-  const newVal = prompt(`Modifier le seuil d'alerte pour ${item.name} (${item.unit}):`, item.alertThreshold);
-  if (newVal !== null) {
-    item.alertThreshold = parseFloat(newVal) || 0;
-    saveInventory();
-    renderInventory();
-    updateDashboard();
+  $('#ingConfigId').value = item.id;
+  $('#ingConfigTitle').textContent = `Configuration de ${t(item.name)}`;
+  $('#ingConfigAlert').value = item.alertThreshold;
+  $('#ingConfigUnit').textContent = item.unit;
+  $('#ingConfigPrice').value = item.price || 0;
+  $('#ingConfigPriceUnit').textContent = getPriceRef(item.unit);
+
+  const container = $('#ingConfigSuppliersList');
+  if (container) {
+    container.innerHTML = '';
+    
+    // Sort suppliers
+    const activeSuppliers = APP.suppliers || [];
+    if (activeSuppliers.length === 0) {
+      container.innerHTML = `<p style="font-size:0.8rem; text-align:center; color:var(--text-muted);">Aucun fournisseur enregistré. <br/>Ajoutez des fournisseurs dans l'onglet "Fournisseurs".</p>`;
+    } else {
+      activeSuppliers.forEach(sup => {
+        // Find existing price configuration
+        const existing = (APP.ingredientPrices || []).find(ip => 
+          ip.ingredient_name.toLowerCase().trim() === item.name.toLowerCase().trim() &&
+          String(ip.fournisseur_id) === String(sup.id)
+        );
+        
+        const priceVal = existing ? existing.prix_unitaire : '';
+        const unitVal = existing ? existing.unite : getPriceRef(item.unit);
+        
+        const div = document.createElement('div');
+        div.className = 'supplier-price-row';
+        div.style = 'display:flex; justify-content:space-between; align-items:center; gap:10px; border-bottom: 1px solid var(--border-light); padding-bottom: 8px;';
+        div.innerHTML = `
+          <div style="flex:1;">
+            <strong style="font-size:0.9rem; display:block;">${escapeHtml(sup.name)}</strong>
+            <small style="color:var(--text-muted); font-size:0.7rem;">${escapeHtml(sup.categories?.join(', ') || 'Fournisseur')}</small>
+          </div>
+          <div style="display:flex; align-items:center; gap:6px; max-width:200px;">
+            <input type="number" class="form-input supplier-price-input" data-supplier-id="${sup.id}" value="${priceVal}" placeholder="Défaut" style="width:90px;" min="0" step="0.0001" />
+            <select class="form-input supplier-unit-select" data-supplier-id="${sup.id}" style="width:70px;">
+              <option value="kg" ${unitVal === 'kg' ? 'selected' : ''}>kg</option>
+              <option value="L" ${unitVal === 'L' ? 'selected' : ''}>L</option>
+              <option value="pièce" ${unitVal === 'pièce' ? 'selected' : ''}>pièce</option>
+            </select>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    }
+  }
+
+  $('#ingredientConfigModal').style.display = 'flex';
+}
+
+async function saveIngredientConfig() {
+  const id = $('#ingConfigId').value;
+  const item = APP.inventory.find(i => i.id === id);
+  if (!item) return;
+
+  // 1. Update ingredient base data
+  item.alertThreshold = parseFloat($('#ingConfigAlert').value) || 0;
+  item.price = parseFloat($('#ingConfigPrice').value) || 0;
+
+  // Save base inventory
+  await saveInventory();
+
+  // 2. Save supplier prices
+  const inputs = $$('.supplier-price-input');
+  for (const input of inputs) {
+    const supplierId = input.dataset.supplierId;
+    const priceVal = parseFloat(input.value);
+    const unitSelect = document.querySelector(`.supplier-unit-select[data-supplier-id="${supplierId}"]`);
+    const unitVal = unitSelect ? unitSelect.value : 'kg';
+
+    // Find existing to update or create
+    const existingIdx = (APP.ingredientPrices || []).findIndex(ip => 
+      ip.ingredient_name.toLowerCase().trim() === item.name.toLowerCase().trim() &&
+      String(ip.fournisseur_id) === String(supplierId)
+    );
+
+    if (!isNaN(priceVal) && priceVal >= 0) {
+      const priceData = {
+        ingredient_name: item.name,
+        fournisseur_id: String(supplierId),
+        prix_unitaire: priceVal,
+        unite: unitVal
+      };
+      
+      if (existingIdx !== -1) {
+        priceData.id = APP.ingredientPrices[existingIdx].id;
+        APP.ingredientPrices[existingIdx] = { ...APP.ingredientPrices[existingIdx], ...priceData };
+      } else {
+        priceData.id = GourmetSync.uuid();
+        APP.ingredientPrices.push(priceData);
+      }
+
+      if (window.GourmetSync && typeof GourmetSync.sauvegarderIngredientPrice === 'function') {
+        await GourmetSync.sauvegarderIngredientPrice(priceData);
+      }
+    } else {
+      // If empty/invalid and existing, we delete it
+      if (existingIdx !== -1) {
+        const toDelete = APP.ingredientPrices[existingIdx];
+        if (window.GourmetSync && typeof GourmetSync.supprimerIngredientPrice === 'function') {
+          await GourmetSync.supprimerIngredientPrice(toDelete.id);
+        }
+        APP.ingredientPrices.splice(existingIdx, 1);
+      }
+    }
+  }
+
+  // Reload UI
+  renderInventory();
+  updateDashboard();
+  
+  $('#ingredientConfigModal').style.display = 'none';
+  if (typeof showToast === 'function') {
+    showToast('✅ Configuration enregistrée !', 'success');
   }
 }
 
@@ -4391,7 +4604,7 @@ function renderSuppliers() {
             ` : ''}
           </div>
           <div class="supplier-card-footer">
-            <button class="btn btn-outline" style="padding:6px 12px; font-size:0.75rem;" onclick="window.location.href='mailto:${s.email}'">📧 ${i18n.t('suppliers.btn.contact') || 'Email'}</button>
+            <button class="btn btn-outline" style="padding:6px 12px; font-size:0.75rem;" onclick="window.openSupplierOrderGenerator('${s.id}')">📝 Commander</button>
             <button class="btn-icon" title="Modifier" onclick="editSupplier('${s.id}')">✏️</button>
             <button class="btn-icon" title="Supprimer" onclick="deleteSupplier('${s.id}')" style="color:var(--danger); opacity:0.6;">🗑️</button>
           </div>

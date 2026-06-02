@@ -71,9 +71,8 @@
       if (window.location.search.includes('action=login') || window.location.search.includes('tab=signup')) return;
       
       const isAuth = localStorage.getItem('gourmet_auth') === 'true' || localStorage.getItem('sb-hogfrddigcojdmjjpbno-auth-token');
-      const isDemo = localStorage.getItem('gourmet_demo_mode') === 'true';
       
-      if (!isAuth && !isDemo) {
+      if (!isAuth) {
         window.location.href = 'landing.html';
       }
     })();
@@ -373,7 +372,7 @@
     }
 
     /* ·······························································
-       BANNIƒÆ’Ëâ€ RE OFFLINE PWA
+       BANNIÈRE OFFLINE PWA
        ······························································· */
 
     #offlineBanner {
@@ -1651,7 +1650,7 @@
             </button>
           </div>
           <div class="priority-list" id="dashPriorityList">
-            <div class="priority-item info">
+            <div class="priority-item info" id="priorites-chargement">
               <div class="p-icon"></div>
               <div class="p-content">
                 <div class="p-title">Chargement...</div>
@@ -1736,6 +1735,21 @@
               <span class="hub-team-label">HACCP</span>
               <span class="hub-team-value" id="dashHACCPStatus">—</span>
             </div>
+          </div>
+        </div>
+
+        <!-- °CARD 7: Calendrier Saisonnier & Anticipation -->
+        <div class="hub-bento-card hub-card-seasonal" style="cursor: pointer;" onclick="window.openSeasonalTimelineModal()">
+          <div class="hub-card-header">
+            <div class="hub-card-title-group">
+              <span class="hub-card-icon" style="color:#f43f5e;">🗓️</span>
+              <h3>Prévisions Saisonnières</h3>
+            </div>
+            <span class="hub-badge-pro">PRO</span>
+          </div>
+          <div class="hub-seasonal-body" id="dashSeasonalAlerts" style="margin-top:10px; display:flex; flex-direction:column; gap:8px;">
+            <!-- Populated dynamically by JS -->
+            <p style="font-size:0.8rem; color:var(--cockpit-text-muted);">Chargement...</p>
           </div>
         </div>
 
@@ -2258,19 +2272,19 @@
                <div id="onboardingChecklist" class="mgmt-glass-card" style="padding:1.5rem; background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(16, 185, 129, 0.1)); border: 1px solid var(--accent-glow) !important;">
                   <h3 style="font-size:1rem; margin:0 0 1rem 0; display:flex; align-items:center; gap:0.5rem;">🚀 Checklist de Démarrage</h3>
                   <div id="checklistItems" style="display:flex; flex-direction:column; gap:0.8rem;">
-                     <div class="check-item" data-id="recipe">
+                     <div class="check-item checklist-item" data-id="recipe">
                         <input type="checkbox" id="chkRecipe" disabled>
                         <label for="chkRecipe">Créer ma 1ère recette</label>
                      </div>
-                     <div class="check-item" data-id="stock">
+                     <div class="check-item checklist-item" data-id="stock">
                         <input type="checkbox" id="chkStock" disabled>
                         <label for="chkStock">Ajouter un ingrédient en stock</label>
                      </div>
-                     <div class="check-item" data-id="team">
+                     <div class="check-item checklist-item" data-id="team">
                         <input type="checkbox" id="chkTeam" disabled>
                         <label for="chkTeam">Ajouter un membre d'équipe</label>
                      </div>
-                     <div class="check-item" data-id="haccp">
+                     <div class="check-item checklist-item" data-id="haccp">
                         <input type="checkbox" id="chkHaccp" disabled>
                         <label for="chkHaccp">Saisir un relevé HACCP</label>
                      </div>
@@ -2426,7 +2440,7 @@
               <button class="btn btn-primary btn-sm" onclick="openAddDeliveryModal()">+ Ajouter un passage</button>
             </div>
             <div class="mgmt-card-body">
-              <table class="mgmt-table">
+              <table class="mgmt-table" id="radar-logistique">
                 <thead>
                   <tr>
                     <th>Grossiste / Commercial</th>
@@ -2622,7 +2636,7 @@
       <!-- ================================================ -->
       <div class="step-content" id="step2">
         <div class="card">
-          <div class="card-title" data-i18n="s2.title">¥“ Ingrédients</div>
+          <div class="card-title" data-i18n="s2.title">🥄 Ingrédients</div>
           <div class="card-subtitle" data-i18n="s2.subtitle">Ajoutez les ingrédients de votre recette. Les coûts se
             calculent automatiquement.
           </div>
@@ -2647,6 +2661,7 @@
           <div style="margin-top: 0.8rem; display: flex; gap: 0.6rem; flex-wrap: wrap;">
             <button class="btn btn-outline btn-sm" id="btnAddIngredient" data-i18n="s2.btn.add">+ Ajouter un
               ingrédient</button>
+            <button class="btn btn-outline btn-sm" id="btnAddSousRecette" style="border-color: var(--primary); color: var(--primary);">🔗 + Sous-recette</button>
             <button class="btn btn-outline btn-sm" id="btnAddFromDb" data-i18n="s2.btn.from_db">📦 Depuis la
               base</button>
             <button class="btn btn-outline btn-sm" id="btnSearchOff" data-i18n="s2.btn.off"
@@ -2829,6 +2844,7 @@
             <button class="btn btn-primary" id="btnLaunchProd" data-i18n="s5.btn.production" style="background:#8b5cf6; color:white; border-color:#8b5cf6; font-weight:700;">🚀 Lancer la production</button>
             <button class="btn btn-primary" id="btnExportPdf" data-i18n="s5.btn.pdf">📄 Exporter en PDF</button>
             <button class="btn btn-outline" id="btnGenerateQR" style="display: flex; align-items: center; gap: 8px;">🏷️ Étiquette Vitrine</button>
+            <button class="btn btn-outline" id="btnVoirStructure" style="display: flex; align-items: center; gap: 8px; border-color: var(--primary); color: var(--primary);">🌳 Structure</button>
             <button class="btn btn-success" id="btnSaveRecipe" data-i18n="s5.btn.save">💾 Sauvegarder la recette</button>
           </div>
         </div>
@@ -3224,7 +3240,7 @@
                   <h2 id="prevRecipeName" style="margin: 0; font-size: 1.4rem; font-weight: 900;">NOM DU PRODUIT</h2>
                   <div id="prevProducer"
                     style="font-size: 0.75rem; color: #555; text-transform: uppercase; letter-spacing: 1px; margin-top: 4px;">
-                    ARTISAN PƒÆ’“Å¡TISSIER</div>
+                    ARTISAN PÂTISSIER</div>
                 </div>
 
                 <div style="flex: 1; font-size: 0.85rem; line-height: 1.4;">
@@ -3596,7 +3612,7 @@
                 };
 
                 const events = {
-                  '01-01': ' Nouvel An', '01-06': ' Épiphanie', '02-02': '¥…¾ Chandeleur', '02-14': ' Valentin',
+                  '01-01': ' Nouvel An', '01-06': ' Épiphanie', '02-02': '🥞 Chandeleur', '02-14': ' Valentin',
                   '03-01': ' Fête G-Mères', '04-05': '£ Pâques', '04-06': '« Lundi Pâques', '05-01': ' Fête Travail',
                   '05-08': ' Victoire 1945', '05-14': ' Ascension', '05-24': '  Pentecà´te', '05-31': ' Fête Mères',
                   '06-21': ' Fête Pères', '07-14': '  Fête Nationale', '08-15': ' Assomption', '11-01': ' Toussaint',
@@ -3651,7 +3667,7 @@
     </section>
 
     <!-- ================================================ -->
-    <!-- HYGIƒÆ’Ëâ€ NE & HACCP APP -->
+    <!-- HYGIÈNE & HACCP APP -->
     <!-- ================================================ -->
     <section class="haccp-container" id="appHygiene" style="display:none; margin: 0 auto; padding: 0;">
         <!-- Premium Section Header -->
@@ -4219,10 +4235,15 @@
     <section class="saved-recipes-section" id="savedSection"
       style="display:none; padding: 2rem 1.5rem; max-width: 1300px; margin: 0 auto;">
       <h3
-        style="font-family:var(--font-heading); font-size:1.4rem; margin-bottom:1.5rem; display:flex; align-items:center; gap:0.6rem;">
-        <span data-i18n="saved.title"> Mes Recettes</span> <small
-          style="font-weight:400; font-size:0.8rem; color:var(--text-muted); opacity:0.8;"
-          data-i18n="saved.personal">(Personnel)</small>
+        style="font-family:var(--font-heading); font-size:1.4rem; margin-bottom:1.5rem; display:flex; align-items:center; gap:0.6rem; justify-content:space-between; flex-wrap:wrap;">
+        <div>
+          <span data-i18n="saved.title"> Mes Recettes</span> <small
+            style="font-weight:400; font-size:0.8rem; color:var(--text-muted); opacity:0.8;"
+            data-i18n="saved.personal">(Personnel)</small>
+        </div>
+        <button class="btn btn-outline btn-sm" onclick="window.openRecipeComparatorModal()" style="border-color:var(--accent); color:var(--accent); font-weight:700;">
+          🔬 Comparer A/B
+        </button>
       </h3>
       <div class="saved-grid" id="savedGrid"></div>
       <div id="savedEmpty"
@@ -5202,6 +5223,7 @@
   <script src="./billing.js?v=11.5.0" defer></script>
   <script src="./cloud-sync.js?v=11.5.0" defer></script>
   <script src="./app.js?v=11.6.0" defer></script>
+  <script src="./sous-recettes.js" defer></script>
   <script src="./core-upgrade.js?v=1.0.0" defer></script>
   <script src="./pro-features.js?v=1.0.8" defer></script>
   <script src="./equipment.js?v=2.1.1" defer></script>
@@ -5216,6 +5238,7 @@
   <script src="./exam-scheduler.js?v=2.2.0" defer></script>
   <script src="./crm-enhanced-v2.js?v=2.2.0" defer></script>
   <script src="./premium-effects.js?v=1.0.2" defer></script>
+  <script src="./roadmap-v2-features.js" defer></script>
 
   <script>
     function switchLabTab(tab) {
@@ -5790,12 +5813,12 @@
           <div class="mc-side mc-from">
             <div class="mc-side-title"> Moule Initial</div>
             <select class="mc-shape-select form-input" id="mcFromShape" onchange="mcChangeFromShape(this.value)">
-              <option value="cercle"> Cercle</option>
-              <option value="carre"> Carré</option>
-              <option value="rectangle"> Rectangle / Cadre</option>
-              <option value="buche">ªµ Bûche</option>
-              <option value="verrine">¥†’ Verrine</option>
-              <option value="tarte">à Moule à tarte</option>
+              <option value="cercle">⭕ Cercle</option>
+              <option value="carre">⬜ Carré</option>
+              <option value="rectangle">🟩 Rectangle / Cadre</option>
+              <option value="buche">🪵 Bûche</option>
+              <option value="verrine">🥃 Verrine</option>
+              <option value="tarte">🥧 Moule à tarte</option>
             </select>
             <div class="mc-fields" id="mcFromFields">
               <!-- Dynamically populated by JS -->
@@ -5812,12 +5835,12 @@
           <div class="mc-side mc-to">
             <div class="mc-side-title" style="color:var(--accent-dark);"> Nouveau Moule</div>
             <select class="mc-shape-select form-input" id="mcToShape" onchange="mcChangeToShape(this.value)">
-              <option value="cercle"> Cercle</option>
-              <option value="carre"> Carré</option>
-              <option value="rectangle"> Rectangle / Cadre</option>
-              <option value="buche">ªµ Bûche</option>
-              <option value="verrine">¥†’ Verrine</option>
-              <option value="tarte">à Moule à tarte</option>
+              <option value="cercle">⭕ Cercle</option>
+              <option value="carre">⬜ Carré</option>
+              <option value="rectangle">🟩 Rectangle / Cadre</option>
+              <option value="buche">🪵 Bûche</option>
+              <option value="verrine">🥃 Verrine</option>
+              <option value="tarte">🥧 Moule à tarte</option>
             </select>
             <div class="mc-fields" id="mcToFields">
               <!-- Dynamically populated by JS -->
@@ -6250,6 +6273,49 @@
       <div style="display: flex; gap: 1rem;">
         <button class="btn btn-primary" onclick="exportQRLabelPdf()" style="flex: 1;">📥 Télécharger le PDF</button>
         <button class="btn btn-outline" onclick="window.print()" style="flex: 1;">🖨️ Imprimer</button>
+      </div>
+    </div>
+  </div>
+  <!-- INGREDIENT CONFIG MODAL -->
+  <div id="ingredientConfigModal" class="modal-overlay" style="display:none; z-index: 10006;">
+    <div class="modal-content glass-panel" style="max-width: 600px; width: 95%; padding: 2rem;">
+      <div class="modal-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
+        <h3 style="margin:0;">⚙️ <span id="ingConfigTitle">Configurer l'ingrédient</span></h3>
+        <button class="btn-icon" onclick="document.getElementById('ingredientConfigModal').style.display='none'">✖</button>
+      </div>
+      
+      <input type="hidden" id="ingConfigId" />
+      
+      <div class="form-group" style="margin-bottom: 1rem;">
+        <label style="font-weight: 700; display:block; margin-bottom:4px;">Seuil d'alerte de stock</label>
+        <div style="display:flex; gap:10px; align-items:center;">
+          <input type="number" id="ingConfigAlert" class="form-input" style="flex:1;" min="0" step="any" />
+          <span id="ingConfigUnit" style="font-weight:600; width:40px; text-align:right;">g</span>
+        </div>
+      </div>
+      
+      <div class="form-group" style="margin-bottom: 1.5rem;">
+        <label style="font-weight: 700; display:block; margin-bottom:4px;">Prix standard (Défaut)</label>
+        <div style="display:flex; gap:10px; align-items:center;">
+          <input type="number" id="ingConfigPrice" class="form-input" style="flex:1;" min="0" step="0.0001" />
+          <span style="font-weight:600; width:70px; text-align:right;">€ / <span id="ingConfigPriceUnit">kg</span></span>
+        </div>
+      </div>
+      
+      <h4 style="margin: 1.5rem 0 0.5rem 0; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; font-weight:800; color:var(--text-main);">
+        🏷️ Prix par Fournisseur
+      </h4>
+      <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 1rem;">
+        Configurez des prix spécifiques pour vos fournisseurs. Ces prix écraseront le prix par défaut dans le calculateur si vous les choisissez.
+      </p>
+      
+      <div id="ingConfigSuppliersList" style="max-height: 200px; overflow-y: auto; margin-bottom: 1.5rem; display:flex; flex-direction:column; gap:12px; padding-right:6px;">
+        <!-- Dynamically filled -->
+      </div>
+      
+      <div style="display: flex; gap: 1rem;">
+        <button class="btn btn-primary" onclick="saveIngredientConfig()" style="flex: 1;">💾 Enregistrer</button>
+        <button class="btn btn-outline" onclick="document.getElementById('ingredientConfigModal').style.display='none'" style="flex: 1;">Annuler</button>
       </div>
     </div>
   </div>

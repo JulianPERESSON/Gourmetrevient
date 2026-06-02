@@ -124,6 +124,73 @@ function openInvoiceGenerator(orderId = null) {
         </div>
       </div>
 
+      <!-- 🎂 Commande Spéciale (Événementiel) -->
+      <div style="background:var(--bg-alt); padding:1rem; border-radius:14px; border:1px solid var(--surface-border); margin-bottom:1rem;">
+        <h4 style="margin:0 0 0.8rem; font-size:0.9rem; color:var(--primary);">🎂 Commande Spéciale (Événementiel)</h4>
+        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:0.8rem;">
+          <div class="form-group" style="margin:0;">
+            <label class="form-label" style="font-size:0.75rem;">Type d'événement</label>
+            <select id="invEventType" class="form-input">
+              <option value="">— Aucun —</option>
+              <option value="Mariage">👰 Mariage</option>
+              <option value="Baptême">👼 Baptême</option>
+              <option value="Anniversaire">🎉 Anniversaire</option>
+              <option value="Autre">✨ Autre Événement</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin:0;">
+            <label class="form-label" style="font-size:0.75rem;">Lieu & Heure de livraison</label>
+            <input type="text" id="invDeliveryDetails" class="form-input" placeholder="ex: Château du Lac, 14h">
+          </div>
+          <div class="form-group" style="margin:0;">
+            <label class="form-label" style="font-size:0.75rem;">Thème / Couleurs</label>
+            <input type="text" id="invEventTheme" class="form-input" placeholder="ex: Rose et Blanc, Bohème">
+          </div>
+        </div>
+      </div>
+
+      <!-- ⚡ Chiffrage rapide depuis vos Recettes -->
+      <div style="background:var(--bg-alt); padding:1rem; border-radius:14px; border:1px solid var(--surface-border); margin-bottom:1rem;">
+        <h4 style="margin:0 0 0.8rem; font-size:0.9rem; color:var(--primary);">⚡ Chiffrage rapide depuis vos Recettes</h4>
+        <div style="display:grid; grid-template-columns:2fr 1fr 1fr; gap:0.8rem; align-items:flex-end;">
+          <div class="form-group" style="margin:0;">
+            <label class="form-label" style="font-size:0.75rem;">Recette de base</label>
+            <select id="invFastRecipeSel" class="form-input">
+              <option value="">— Sélectionner une recette —</option>
+              ${((window.APP && window.APP.savedRecipes) || []).map(r => `<option value="${r.id}">${_escHtml(r.name)}</option>`).join('')}
+            </select>
+          </div>
+          <div class="form-group" style="margin:0;">
+            <label class="form-label" style="font-size:0.75rem;">Nb parts / pièces</label>
+            <input type="number" id="invFastRecipeQty" class="form-input" value="10" min="1">
+          </div>
+          <button class="btn btn-outline btn-full" onclick="window.addFastRecipeToInvoice()" style="height:42px; border-color:var(--primary); color:var(--primary); font-weight:700;">✚ Insérer</button>
+        </div>
+      </div>
+
+      <!-- 📸 Photo de Référence / Croquis -->
+      <div style="background:var(--bg-alt); padding:1rem; border-radius:14px; border:1px solid var(--surface-border); margin-bottom:1rem; display:grid; grid-template-columns:1fr 120px; gap:1rem; align-items:center;">
+        <div>
+          <h4 style="margin:0 0 0.4rem; font-size:0.9rem; color:var(--primary);">📸 Photo de Référence / Croquis</h4>
+          <p style="font-size:0.75rem; color:var(--text-secondary); margin-bottom:0.8rem;">Associez une photo d'inspiration ou un croquis de votre création.</p>
+          <input type="file" id="invPhotoFile" accept="image/*" class="form-input" style="padding:6px 10px;" onchange="window.handleDevisPhotoUpload(this)">
+        </div>
+        <div id="invPhotoPreview" style="width:100px; height:100px; border:2px dashed var(--surface-border); border-radius:10px; display:flex; align-items:center; justify-content:center; overflow:hidden;">
+          <span style="font-size:1.5rem; opacity:0.3;">🖼️</span>
+        </div>
+      </div>
+
+      <!-- ✍️ Signature Numérique Client -->
+      <div style="background:var(--bg-alt); padding:1rem; border-radius:14px; border:1px solid var(--surface-border); margin-bottom:1rem;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.8rem;">
+          <h4 style="margin:0; font-size:0.9rem; color:var(--primary);">✍️ Signature Numérique Client</h4>
+          <button class="btn btn-sm btn-outline" onclick="window.clearSignatureCanvas()" style="padding:4px 10px; font-size:0.75rem;">✕ Effacer</button>
+        </div>
+        <div style="border:1px solid var(--surface-border); background:#fff; border-radius:10px; overflow:hidden;">
+          <canvas id="signatureCanvas" height="120" style="width:100%; display:block; cursor:crosshair;"></canvas>
+        </div>
+      </div>
+
       <!-- Notes + Signature block for devis -->
       <div class="form-group" style="margin-bottom:1.5rem;">
         <label class="form-label">Conditions / Mentions légales</label>
@@ -146,6 +213,14 @@ function openInvoiceGenerator(orderId = null) {
     }
 
     modal.style.display = 'flex';
+    
+    // Init tactile signature
+    setTimeout(() => {
+        if (typeof window._initSignatureCanvas === 'function') {
+            window._initSignatureCanvas();
+        }
+    }, 200);
+
     // Save address on blur
     setTimeout(() => {
         const addrInput = document.getElementById('invShopAddress');
@@ -292,6 +367,30 @@ function _buildInvoiceHTML(docType) {
     const expiryDate = new Date(docDate);
     expiryDate.setDate(expiryDate.getDate() + parseInt(validity || 30));
 
+    // V2 Event details
+    const eventType = document.getElementById('invEventType') ? document.getElementById('invEventType').value : '';
+    const deliveryDetails = document.getElementById('invDeliveryDetails') ? document.getElementById('invDeliveryDetails').value : '';
+    const eventTheme = document.getElementById('invEventTheme') ? document.getElementById('invEventTheme').value : '';
+
+    // V2 Reference Photo
+    const photoImgHtml = window._devisPhotoBase64 ? `
+      <div style="margin-top:24px; border:1px solid #e2e8f0; border-radius:12px; padding:16px; max-width:280px; background:#fff; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+        <div style="font-size:0.75rem; text-transform:uppercase; color:#6366f1; font-weight:700; margin-bottom:8px; letter-spacing:0.05em;">📸 Modèle de Référence / Croquis</div>
+        <img src="${window._devisPhotoBase64}" style="width:100%; border-radius:6px; max-height:200px; object-fit:contain; display:block;">
+      </div>` : '';
+
+    // V2 Client signature
+    const canvas = document.getElementById('signatureCanvas');
+    const isCanvasBlank = function(c) {
+        if (!c) return true;
+        const blank = document.createElement('canvas');
+        blank.width = c.width;
+        blank.height = c.height;
+        return c.toDataURL() === blank.toDataURL();
+    };
+    const signatureBase64 = canvas && !isCanvasBlank(canvas) ? canvas.toDataURL() : '';
+    const signatureImgHtml = signatureBase64 ? `<img src="${signatureBase64}" style="max-height:80px; width:auto; display:block; margin:8px auto 0;">` : '<span style="color:#cbd5e1; font-style:italic; font-size:0.8rem; display:block; margin-top:20px;">En attente de signature</span>';
+
     return `<!DOCTYPE html>
 <html lang="fr"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -357,6 +456,17 @@ tbody td:last-child, tbody td:nth-child(n+2) { text-align: right; }
       <h4>${isDevis ? 'Validité jusqu\'au' : 'Date d\'échéance'}</h4>
       <p>${expiryDate.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
     </div>
+
+    ${eventType ? `
+    <div class="meta-block" style="grid-column: 1 / -1; background:#f8fafc; padding:12px 16px; border-radius:8px; border-left:4px solid #6366f1; display:block; margin-top:12px;">
+      <div style="font-size:0.72rem; font-weight:900; color:#6366f1; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:6px;">🎉 Commande Spéciale Événementielle</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; font-size:0.85rem; line-height:1.4;">
+        <div><strong>Événement :</strong> ${eventType}</div>
+        <div><strong>Livraison :</strong> ${deliveryDetails || 'À l\\'atelier'}</div>
+        <div><strong>Thème / Couleurs :</strong> ${eventTheme || 'Aucun'}</div>
+      </div>
+    </div>
+    ` : ''}
   </div>
 
   <table>
@@ -382,6 +492,8 @@ tbody td:last-child, tbody td:nth-child(n+2) { text-align: right; }
     <div class="totals-row grand"><span>Total TTC</span><span>${fmt(total)}</span></div>
   </div>
 
+  ${photoImgHtml}
+
   ${notes ? `<div class="notes-block"><strong>Conditions :</strong><br>${_escHtml(notes)}</div>` : ''}
 
   ${isDevis ? `
@@ -393,6 +505,7 @@ tbody td:last-child, tbody td:nth-child(n+2) { text-align: right; }
     <div class="sign-box">
       <div class="sign-label">Signature du client</div>
       <div class="sign-mention">Lu et approuvé — ${_escHtml(client ? client.name : '')}</div>
+      ${signatureImgHtml}
     </div>
   </div>` : ''}
 

@@ -1125,7 +1125,7 @@ const GourmetSync = {
         if (!skipConfirm && !confirm('⚠️ Êtes-vous sûr de vouloir vider TOUTES vos données ?\n\nCette action est irréversible.')) return;
         if (typeof showToast === 'function') showToast('Nettoyage en cours... ⏳', 'info');
 
-        const tables = ['recipes', 'clients', 'commandes', 'fournisseurs',
+        const tables = ['recipes', 'recette_sous_recettes', 'clients', 'commandes', 'fournisseurs',
             'planning_production', 'haccp_temperatures', 'haccp_nettoyage', 'pertes', 'team_members', 'staff_leaves', 'deliveries'];
         for (const table of tables) {
             try { await gourmetSupabase.from(table).delete().eq('user_id', user.id); } catch (e) {}
@@ -1175,7 +1175,7 @@ const GourmetSync = {
         if (typeof showToast === 'function') showToast('🗑️ Suppression en cours... ⏳', 'info');
 
         const cascadeTables = [
-            'recipes', 'ingredients', 'commandes', 'clients', 'fournisseurs',
+            'recipes', 'recette_sous_recettes', 'ingredients', 'commandes', 'clients', 'fournisseurs',
             'planning_production', 'haccp_temperatures', 'haccp_nettoyage',
             'pertes', 'team_members', 'staff_leaves', 'deliveries', 'subscriptions', 'profiles'
         ];
@@ -1196,6 +1196,68 @@ const GourmetSync = {
         if (typeof showToast === 'function') showToast('✅ Compte supprimé définitivement. Au revoir !', 'success');
         setTimeout(() => { window.location.href = './landing.html'; }, 2000);
         return true;
+    },
+
+    // ══════════════════════════════════════════════════════════════
+    // PRIX INGRÉDIENTS PAR FOURNISSEUR (ingredient_prices)
+    // ══════════════════════════════════════════════════════════════
+
+    /**
+     * Charge tous les prix fournisseurs de l'utilisateur connecté
+     * @returns {Array} liste de { id, ingredient_name, fournisseur_id, prix_unitaire, unite }
+     */
+    async chargerIngredientPrices() {
+        if (!navigator.onLine || !window.gourmetSupabase) return null;
+        try {
+            const { data: { session } } = await gourmetSupabase.auth.getSession();
+            if (!session?.user?.id) return null;
+            const { data, error } = await gourmetSupabase
+                .from('ingredient_prices')
+                .select('*')
+                .eq('user_id', session.user.id);
+            if (error) throw error;
+            return data || [];
+        } catch (err) {
+            console.error('[GourmetSync] Erreur chargement ingredient_prices:', err.message);
+            return null;
+        }
+    },
+
+    /**
+     * Sauvegarde (upsert) un prix fournisseur pour un ingrédient
+     * @param {Object} price - { ingredient_name, fournisseur_id, prix_unitaire, unite }
+     */
+    async sauvegarderIngredientPrice(price) {
+        if (!window.gourmetSupabase) return;
+        try {
+            const { data: { session } } = await gourmetSupabase.auth.getSession();
+            if (!session?.user?.id) return;
+            const row = {
+                id: price.id || this.uuid(),
+                user_id: session.user.id,
+                ingredient_name: price.ingredient_name,
+                fournisseur_id: price.fournisseur_id,
+                prix_unitaire: parseFloat(price.prix_unitaire) || 0,
+                unite: price.unite || 'kg',
+                updated_at: new Date().toISOString()
+            };
+            const { error } = await gourmetSupabase
+                .from('ingredient_prices')
+                .upsert(row, { onConflict: 'user_id,ingredient_name,fournisseur_id' });
+            if (error) throw error;
+            return row;
+        } catch (err) {
+            console.error('[GourmetSync] Erreur sauvegarde ingredient_prices:', err.message);
+            if (typeof showToast === 'function') showToast('⚠️ Erreur sauvegarde prix fournisseur', 'warning');
+        }
+    },
+
+    /**
+     * Supprime un prix fournisseur par id
+     * @param {string} id
+     */
+    async supprimerIngredientPrice(id) {
+        await this.supprimerRow('ingredient_prices', id);
     }
 };
 

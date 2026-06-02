@@ -1,0 +1,17 @@
+name: Keep Supabase Alive
+
+on:
+  schedule:
+    # S'exécute chaque jour à 06:00 UTC pour simuler de l'activité
+    - cron: '0 6 * * *'
+  workflow_dispatch: # Permet de lancer le ping manuellement depuis l'interface GitHub Actions
+
+jobs:
+  ping_supabase:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Supabase API to prevent pause
+        run: |
+          curl -i -H "apikey: sb_publishable_9iePEQdGSdnjXaw4I1s0Nw_wyitVBla" \
+                  -H "Authorization: Bearer sb_publishable_9iePEQdGSdnjXaw4I1s0Nw_wyitVBla" \
+                  https://hogfrddigcojdmjjpbno.supabase.co/rest/v1/profiles?limit=1

@@ -1,6 +1,6 @@
 -- ============================================================
---  GOURMETREVIENT — SCRIPT SQL COMPLET & CONSOLIDÉ v2.0
---  Version finale de production
+--  GOURMETREVIENT — SCRIPT SQL COMPLET & CONSOLIDÉ v3.0
+--  Version finale de production avec gestion des prix fournisseurs
 --  À exécuter dans : Supabase Dashboard → SQL Editor
 -- ============================================================
 --  ✅ IDEMPOTENT : peut être relancé sans risque
@@ -27,6 +27,7 @@ DROP TABLE IF EXISTS public.planning_production   CASCADE;
 DROP TABLE IF EXISTS public.staff_leaves          CASCADE;
 DROP TABLE IF EXISTS public.team_members          CASCADE;
 DROP TABLE IF EXISTS public.deliveries            CASCADE;
+DROP TABLE IF EXISTS public.ingredient_prices     CASCADE;
 DROP TABLE IF EXISTS public.fournisseurs          CASCADE;
 DROP TABLE IF EXISTS public.commandes             CASCADE;
 DROP TABLE IF EXISTS public.clients               CASCADE;
@@ -141,6 +142,30 @@ CREATE INDEX idx_ingredients_updated_at ON public.ingredients(updated_at DESC);
 
 CREATE TRIGGER trg_ingredients_updated_at
   BEFORE UPDATE ON public.ingredients
+  FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+
+
+-- ════════════════════════════════════════════════════════════
+-- ÉTAPE 5b — TABLE INGREDIENT_PRICES (Prix par fournisseur)
+-- ════════════════════════════════════════════════════════════
+
+CREATE TABLE public.ingredient_prices (
+  id              uuid          PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id         uuid          REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+  ingredient_name text          NOT NULL,
+  fournisseur_id  text          NOT NULL,
+  prix_unitaire   numeric(10,4) NOT NULL DEFAULT 0,
+  unite           text          NOT NULL DEFAULT 'kg',
+  updated_at      timestamptz   DEFAULT now(),
+  created_at      timestamptz   DEFAULT now(),
+  UNIQUE(user_id, ingredient_name, fournisseur_id)
+);
+
+CREATE INDEX idx_ing_prices_user_id   ON public.ingredient_prices(user_id);
+CREATE INDEX idx_ing_prices_ing_name  ON public.ingredient_prices(ingredient_name);
+
+CREATE TRIGGER trg_ingredient_prices_updated_at
+  BEFORE UPDATE ON public.ingredient_prices
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
 
@@ -418,6 +443,7 @@ CREATE TRIGGER trg_subscriptions_updated_at
 ALTER TABLE public.profiles            ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.recipes             ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.ingredients         ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.ingredient_prices   ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.clients             ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.commandes           ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.fournisseurs        ENABLE ROW LEVEL SECURITY;
@@ -446,6 +472,7 @@ CREATE POLICY "profiles_admin_all"    ON public.profiles FOR ALL USING (
 -- Tables métier : propriétaire uniquement
 CREATE POLICY "recipes_own"           ON public.recipes             FOR ALL USING (auth.uid() = user_id);
 CREATE POLICY "ingredients_own"       ON public.ingredients         FOR ALL USING (auth.uid() = user_id);
+CREATE POLICY "ingredient_prices_own" ON public.ingredient_prices   FOR ALL USING (auth.uid() = user_id);
 CREATE POLICY "clients_own"           ON public.clients             FOR ALL USING (auth.uid() = user_id);
 CREATE POLICY "commandes_own"         ON public.commandes           FOR ALL USING (auth.uid() = user_id);
 CREATE POLICY "fournisseurs_own"      ON public.fournisseurs        FOR ALL USING (auth.uid() = user_id);
@@ -510,6 +537,7 @@ GRANT EXECUTE ON FUNCTION public.get_user_count() TO authenticated;
 
 ALTER PUBLICATION supabase_realtime ADD TABLE public.recipes;
 ALTER PUBLICATION supabase_realtime ADD TABLE public.ingredients;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.ingredient_prices;
 ALTER PUBLICATION supabase_realtime ADD TABLE public.commandes;
 
 

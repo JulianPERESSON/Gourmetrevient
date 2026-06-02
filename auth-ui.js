@@ -109,23 +109,9 @@ const AuthUI = (() => {
     // Vérification de la session existante au chargement
     const { data: { session } } = await gourmetSupabase.auth.getSession();
     _currentUser = session?.user || null;
-
-    // Support du mode démo (si pas de session réelle)
-    if (!_currentUser && localStorage.getItem('gourmet_demo_mode') === 'true') {
-      console.info('🚀 Mode Démo actif');
-      _currentPlan = 'pro';
-      window.GOURMET_PLAN = 'pro';
-      _currentUser = { 
-        id: 'demo-user', 
-        email: 'demo@gourmetrevient.fr', 
-        user_metadata: { full_name: 'Visiteur Chef' } 
-      };
-    }
     
     if (_currentUser) {
-      if (_currentUser.id !== 'demo-user') {
-        _currentPlan = await _checkSubscription(_currentUser);
-      }
+      _currentPlan = await _checkSubscription(_currentUser);
       window.GOURMET_PLAN = _currentPlan;
     }
 

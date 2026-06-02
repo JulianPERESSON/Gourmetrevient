@@ -6,6 +6,20 @@
  * ✅ Chargement cloud en arrière-plan au démarrage
  */
 
+// CORRECTION 6 — Radar Logistique vide
+function afficherEtatVideRadar() {
+  const tbody = document.querySelector('#radar-logistique tbody') || document.getElementById('logisticsListBody');
+  if (tbody && (tbody.children.length === 0 || tbody.innerHTML.includes('Aucun passage planifié') || tbody.innerHTML.includes('Aucun passage planifié.'))) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="5" style="text-align:center; padding:2rem; color:var(--color-text-secondary); font-size:13px;">
+          📦 Aucun passage planifié — cliquez sur "+ Ajouter un passage" pour commencer
+        </td>
+      </tr>`;
+  }
+}
+window.afficherEtatVideRadar = afficherEtatVideRadar;
+
 const LogisticsManager = (() => {
     const STORAGE_KEY = 'gourmet_deliveries';
 
@@ -48,7 +62,7 @@ const LogisticsManager = (() => {
 
         const deliveries = getDeliveries();
         if (deliveries.length === 0) {
-            listBody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:2rem; color:var(--text-muted);">Aucun passage planifié.</td></tr>`;
+            afficherEtatVideRadar();
             return;
         }
 

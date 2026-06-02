@@ -11045,3 +11045,287 @@ input:checked + .slider:before {
 .floating-support:hover { transform: scale(1.1) rotate(5deg); box-shadow: 0 12px 30px rgba(37, 211, 102, 0.4); }
 .support-tooltip { position: absolute; right: 70px; background: white; color: #333; padding: 8px 15px; border-radius: 12px; font-size: 0.85rem; font-weight: 700; white-space: nowrap; box-shadow: 0 4px 15px rgba(0,0,0,0.1); opacity: 0; transform: translateX(10px); transition: all 0.3s ease; pointer-events: none; }
 .floating-support:hover .support-tooltip { opacity: 1; transform: translateX(0); }
+
+/* ============================================================================
+   SOUS-RECETTES (SUB-RECIPES) SYSTEM
+   ============================================================================ */
+
+.sr-row {
+  background-color: rgba(230, 126, 34, 0.04) !important;
+  border-left: 4px solid var(--primary, #e67e22) !important;
+  padding-left: 12px !important;
+  margin-left: 8px !important;
+  border-radius: var(--radius-sm, 6px);
+}
+
+.sr-row:hover {
+  background-color: rgba(230, 126, 34, 0.08) !important;
+}
+
+.sr-badge {
+  display: inline-block;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  background-color: var(--primary, #e67e22);
+  color: white;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-left: 6px;
+  vertical-align: middle;
+  letter-spacing: 0.5px;
+}
+
+.sr-rendement-badge {
+  display: inline-block;
+  font-size: 0.65rem;
+  font-weight: 700;
+  background-color: #f1f5f9;
+  color: #475569;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-left: 6px;
+  vertical-align: middle;
+  border: 1px dashed #cbd5e1;
+}
+
+.sr-name-block {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.sr-name {
+  font-style: italic;
+  font-weight: 600;
+  color: var(--primary, #e67e22);
+  text-decoration: underline;
+}
+
+.sr-name:hover {
+  color: var(--accent, #d35400);
+}
+
+.sr-ratio {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--text-muted, #7f8c8d);
+  margin-bottom: 2px;
+}
+
+.sr-rendement-input {
+  border-style: dashed !important;
+  text-align: center;
+}
+
+/* Modals overlays and box overrides */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.modal-overlay.modal-visible {
+  opacity: 1;
+}
+
+.modal-box {
+  background-color: var(--surface, #ffffff);
+  border-radius: var(--radius-lg, 12px);
+  box-shadow: var(--shadow-xl);
+  border: 1px solid var(--surface-border, #e2e8f0);
+  width: 90%;
+  max-width: 500px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  transform: translateY(20px);
+  transition: transform 0.25s ease;
+  overflow: hidden;
+}
+
+.modal-overlay.modal-visible .modal-box {
+  transform: translateY(0);
+}
+
+.modal-header {
+  padding: 1.2rem 1.5rem;
+  border-bottom: 1px solid var(--surface-border, #e2e8f0);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--primary, #e67e22);
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 1.25rem;
+  cursor: pointer;
+  color: var(--text-muted, #7f8c8d);
+  transition: color 0.2s;
+}
+
+.modal-close:hover {
+  color: var(--text, #2c3e50);
+}
+
+.modal-body {
+  padding: 1.5rem;
+  overflow-y: auto;
+}
+
+.modal-footer {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--surface-border, #e2e8f0);
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  background-color: var(--bg-alt, #f8fafc);
+}
+
+.sr-cout-preview {
+  margin-top: 1.2rem;
+  padding: 1rem;
+  background-color: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  color: #065f46;
+}
+
+.sr-cout-icon {
+  font-size: 1.2rem;
+}
+
+/* Tree composition container */
+.sr-tree-modal-box {
+  max-width: 650px;
+}
+
+.tree-container {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.9rem;
+  background: var(--bg-alt, #f8fafc);
+  padding: 1.2rem;
+  border-radius: 8px;
+  border: 1px solid var(--surface-border, #e2e8f0);
+  overflow-x: auto;
+  line-height: 1.6;
+}
+
+.tree-root {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 0.6rem;
+  border-bottom: 1px solid var(--surface-border, #e2e8f0);
+  padding-bottom: 0.4rem;
+}
+
+.tree-root-icon {
+  font-size: 1.2rem;
+}
+
+.tree-line {
+  display: flex;
+  align-items: flex-start;
+  white-space: pre;
+}
+
+.tree-connector {
+  color: #94a3b8;
+  user-select: none;
+}
+
+.tree-sr-name {
+  color: var(--primary, #e67e22);
+  font-weight: 700;
+}
+
+.tree-ing-name {
+  color: var(--text, #2c3e50);
+}
+
+.tree-detail {
+  color: var(--text-muted, #7f8c8d);
+}
+
+.tree-sr-line {
+  background-color: rgba(230, 126, 34, 0.03);
+  border-radius: 4px;
+}
+
+.sr-summary-row:hover td {
+  color: var(--primary, #e67e22);
+}
+
+/* ============================================================================
+   ROADMAP V2 PREMIUM STYLES
+   ============================================================================ */
+
+/* Signature Canvas */
+#signatureCanvas {
+  background-color: #ffffff;
+  transition: box-shadow 0.2s ease;
+  touch-action: none;
+}
+#signatureCanvas:active {
+  box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
+}
+
+/* Seasonal Timeline & Gantt tracks */
+.seasonal-pill-track {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  transform: translateY(0);
+}
+.seasonal-pill-track:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  border-color: var(--accent) !important;
+}
+.seasonal-pill-track:active {
+  transform: translateY(0);
+}
+
+/* Comparator Scorecard Card */
+.comparator-scorecard {
+  transition: all 0.3s ease;
+}
+.comparator-scorecard:hover {
+  box-shadow: 0 10px 25px rgba(0,0,0,0.04);
+  border-color: var(--primary) !important;
+}
+
+/* Bento Card Seasonal Specific Adjustments */
+.hub-card-seasonal {
+  background: linear-gradient(135deg, var(--cockpit-card-bg), rgba(244, 63, 94, 0.02));
+}
+.hub-card-seasonal:hover {
+  border-color: rgba(244, 63, 94, 0.3) !important;
+  box-shadow: 0 8px 40px rgba(244, 63, 94, 0.08) !important;
+}
+.hub-card-seasonal::after {
+  background: var(--accent-shimmer, linear-gradient(90deg, transparent, #f43f5e, transparent)) !important;
+}
+
