@@ -10,19 +10,20 @@ const AuthUI = (() => {
   let _currentUser = null;
   let _currentPlan = 'free';
   const ADMIN_EMAIL = 'support@gourmetrevient.fr';
-  const WHITELIST = [ADMIN_EMAIL, 'ju2503', 'ju 2503'];
+  const WHITELIST = [ADMIN_EMAIL, 'ju2503', 'ju 2503', 'julian31.peresson@gmail.com'];
 
   function isAuthorized(user) {
     if (!user) return false;
     const email = user.email?.toLowerCase();
     
     // 1. Root Admin permanent
-    if (email === ADMIN_EMAIL) return true;
+    if (email === ADMIN_EMAIL || email === 'julian31.peresson@gmail.com') return true;
 
     // 2. Liste blanche stricte (Emails uniquement)
     const STRICT_WHITELIST = [
       'ju2503@gmail.com', // Exemple d'email complet si besoin
-      'ju 2503'           // Gardé temporairement pour vos tests si vous utilisez cet identifiant comme email
+      'ju 2503',           // Gardé temporairement pour vos tests si vous utilisez cet identifiant comme email
+      'julian31.peresson@gmail.com'
     ];
 
     return STRICT_WHITELIST.includes(email);
@@ -30,7 +31,8 @@ const AuthUI = (() => {
 
   function isAdmin(user) {
     if (!user) return false;
-    return user.email?.toLowerCase().trim() === ADMIN_EMAIL;
+    const email = user.email?.toLowerCase().trim();
+    return email === ADMIN_EMAIL || email === 'julian31.peresson@gmail.com';
   }
 
   // ── VÉRIFICATION ABONNEMENT SUPABASE ────────────────────────────────────────
