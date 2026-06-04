@@ -196,6 +196,30 @@ serve(async (req) => {
       console.log(`🚫 Abonnement résilié : ${subscription.id}`);
     }
 
+    if (event.type === 'invoice.paid') {
+      const invoice = event.data.object as any;
+      const customerId = invoice.customer;
+      await supabase
+        .from('profiles')
+        .update({
+          subscription_status: 'active',
+          updated_at: new Date().toISOString()
+        })
+        .eq('stripe_customer_id', customerId);
+    }
+
+    if (event.type === 'invoice.payment_failed') {
+      const invoice = event.data.object as any;
+      const customerId = invoice.customer;
+      await supabase
+        .from('profiles')
+        .update({
+          subscription_status: 'past_due',
+          updated_at: new Date().toISOString()
+        })
+        .eq('stripe_customer_id', customerId);
+    }
+
     return new Response(JSON.stringify({ received: true }), { 
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 200 

@@ -125,7 +125,7 @@ function seedDemoData() {
 }
 
 // =============================================================================
-// CATALOGUE DES ASTUCES DU CHEF (ROTATION)
+// CATALOGUE DES ASTUCES DU CHEF (ROTATION — 22 conseils)
 // =============================================================================
 const CHEF_TIPS = [
     "Récupérez vos chutes de biscuits pour créer des fonds de verrines ou des entremets.",
@@ -137,16 +137,42 @@ const CHEF_TIPS = [
     "Les zestes d'agrumes peuvent être séchés ou confits pour aromatiser vos sucres.",
     "Utilisez vos surplus de ganache pour créer des truffes ou des inserts 'surprise'.",
     "Réutilisez le sirop de vos fruits au sirop pour imbiber vos génoises et biscuits.",
-    "Pratiquez la rotation 'FIFO' (Premier Entré, Premier Sorti) pour limiter les pertes."
+    "Pratiquez la rotation 'FIFO' (Premier Entré, Premier Sorti) pour limiter les pertes.",
+    "Une marge brute de 70 % est la norme en pâtisserie artisanale pour couvrir toutes vos charges.",
+    "Pesez systématiquement vos pertes sèches (farine, chutes) : elles représentent souvent 8 à 12 % du coût matière.",
+    "Negociez des tarifs dégressifs avec vos fournisseurs dès que vous commandez plus de 25 kg à la fois.",
+    "Calculez toujours votre seuil de rentabilité avant de lancer une nouvelle gamme de produits.",
+    "Un entretien préventif mensuel de votre four vous évitera des pannes en pleine peak saison.",
+    "Photographiez chaque nouveau produit pour votre vitrine : les belles photos augmentent les ventes de 30 %.",
+    "Planifiez vos achats sur 4 semaines pour lisser votre trésorerie et éviter les ruptures de stock.",
+    "L'étiquetage allergènes est obligatoire depuis 2014 : une erreur peut coûter bien plus qu'une amende.",
+    "Gardez toujours 10 % de votre stock de sécurité : les ruptures de beurre ou de farine peuvent doubler leurs prix du jour au lendemain.",
+    "Un bon ratio de productivité : un artisan expérimenté réalise environ 3 à 4 entremets complets à la journée.",
+    "Notez les météos locales : les jours de pluie augmentent les ventes de gourmandises réconfortantes de 20 à 40 %.",
+    "Valorisez vos invendus en fin de journée avec des promotions flash plutôt qu'en les jetant — c'est du chiffre d'affaires retrouvé."
 ];
+
+let _lastTipIndex = -1;
 
 function rotateChefTip() {
     const tipEl = document.getElementById('dashTipBody');
     if (!tipEl) return;
-    const randomIndex = Math.floor(Math.random() * CHEF_TIPS.length);
-    const selectedTip = CHEF_TIPS[randomIndex];
-    const prefix = tipEl.querySelector('strong')?.outerHTML || "Astuce du Chef";
-    tipEl.innerHTML = `${prefix} — ${selectedTip}`;
+
+    // Choisir un conseil différent du dernier affiché
+    let idx;
+    do { idx = Math.floor(Math.random() * CHEF_TIPS.length); } while (idx === _lastTipIndex && CHEF_TIPS.length > 1);
+    _lastTipIndex = idx;
+
+    const selectedTip = CHEF_TIPS[idx];
+    const prefix = tipEl.querySelector('strong')?.outerHTML || '<strong>Astuce du Chef</strong>';
+
+    // Fade out → swap → fade in
+    tipEl.style.transition = 'opacity 0.35s ease';
+    tipEl.style.opacity = '0';
+    setTimeout(() => {
+        tipEl.innerHTML = `${prefix} — ${selectedTip}`;
+        tipEl.style.opacity = '1';
+    }, 370);
 }
 
 // =============================================================================
@@ -956,21 +982,29 @@ window.showWeeklyReport = function() {
     document.body.appendChild(modal);
 };
 
-// 12. ONBOARDING CHECKLIST LOGIC
 function verifierChecklistTerminee() {
-    const cases = document.querySelectorAll('.checklist-item input[type="checkbox"], .check-item input[type="checkbox"]');
-    const toutes_cochees = Array.from(cases).every(c => c.checked);
-    if (toutes_cochees) {
-        const el = document.getElementById('checklist-demarrage') || document.getElementById('onboardingChecklist');
-        if (el) el.style.display = 'none';
-        localStorage.setItem('gourmet_checklist_done', 'true');
+  const cases = document.querySelectorAll('.checklist-item input[type="checkbox"]');
+  if (!cases.length) return;
+  const toutesTerminees = Array.from(cases).every(c => c.checked);
+  if (toutesTerminees) {
+    const section = document.getElementById('checklist-demarrage') ||
+                    document.getElementById('onboardingChecklist') ||
+                    document.querySelector('.checklist-section');
+    if (section) {
+      section.style.transition = 'opacity 0.5s';
+      section.style.opacity = '0';
+      setTimeout(() => section.style.display = 'none', 500);
     }
+    localStorage.setItem('gourmet_checklist_done', 'true');
+  }
 }
 window.verifierChecklistTerminee = verifierChecklistTerminee;
 
 if (localStorage.getItem('gourmet_checklist_done') === 'true') {
-    const el = document.getElementById('checklist-demarrage') || document.getElementById('onboardingChecklist');
-    if (el) el.style.display = 'none';
+  const section = document.getElementById('checklist-demarrage') ||
+                  document.getElementById('onboardingChecklist') ||
+                  document.querySelector('.checklist-section');
+  if (section) section.style.display = 'none';
 }
 
 function updateOnboardingChecklist() {

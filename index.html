@@ -5,7 +5,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\"><text y=\".9em\" font-size=\"90\">🧁</text></svg>">
-  <title>GourmetRevient — 🧁 Le Copilote des Artisans Pâtissiers</title>
+  <title>GourmetRevient — Le Copilote des Artisans Boulangers-Pâtissiers</title>
   <link rel="stylesheet" href="css/tool-guide.css?v=11.5.1">
   <meta name="description"
     content="Logiciel de gestion tout-en-un pour artisans pâtissiers : calcul de coût de revient, conformité HACCP, planning d'équipe et agencement de laboratoire." />
@@ -1231,7 +1231,7 @@
            </a>
         </div>
       </div>
-      <p class="auth-legal-note">Plateforme sécurisée pour les artisans pâtissiers.</p>
+      <p class="auth-legal-note">Plateforme sécurisée pour les artisans boulangers-pâtissiers.</p>
     </div>
   </div>
 
@@ -1350,7 +1350,7 @@
       }
 
       // --- PASS ADMIN PRIORITAIRE (Accès instantané sans Supabase) ---
-      if ((email.toLowerCase() === 'support@gourmetrevient.fr' || email.toLowerCase() === 'julian31.peresson@gmail.com') && pass === 'GourmetAdmin@2503!') {
+      if ((email.toLowerCase() === 'contact@gourmetrevient.fr' || email.toLowerCase() === 'julian31.peresson@gmail.com') && pass === 'GourmetAdmin@2503!') {
          console.info('🛡️ Accès Admin Prioritaire activé.');
          localStorage.setItem('gourmet_auth', 'true');
          localStorage.setItem('gourmet_current_user', 'Ju 2503');
@@ -1972,9 +1972,9 @@
                            <div class="form-group">
                               <label style="font-size:0.8rem; font-weight:800; color:var(--text-muted); text-transform:uppercase; margin-bottom:0.8rem; display:block;">Motif du signalement</label>
                               <select id="wasteReason" class="form-input" style="width:100%; height:50px; border-radius:15px; border:2px solid rgba(99,102,241,0.1); font-weight:700;">
-                                 <option value="invendu">¥ Invendu (Surproduction)</option>
+                                 <option value="invendu">🥐 Invendu (Surproduction)</option>
                                  <option value="casse">🗑️ Casse / Erreur technique</option>
-                                 <option value="degustation">¥“ Dégustation / Client</option>
+                                 <option value="degustation">🍽️ Dégustation / Client</option>
                                  <option value="peremption"> Périmé / Stock</option>
                               </select>
                            </div>
@@ -2129,7 +2129,7 @@
                 <p data-i18n="inco.card.desc">Générez des étiquettes réglementaires conformes UE n°1169/2011 avec allergènes en gras.</p>
               </div>
               <div class="protools-card-footer">
-                <span class="protools-tag">Format 60ƒÆ’—40mm</span>
+                <span class="protools-tag">Format 60×40mm</span>
                 <span class="protools-arrow">→</span>
               </div>
             </div>
@@ -2234,7 +2234,7 @@
                      <p id="v2MarginAnalysis" style="font-size:0.75rem; color:var(--text-muted); margin-top:1rem; text-align:center;"></p>
                   </div>
                   <div class="mgmt-glass-card" style="padding:1.5rem;">
-                     <h3 style="font-size:1rem; margin:0 0 1rem 0; font-family:var(--font-display);">“   Top 5 Performance</h3>
+                     <h3 style="font-size:1rem; margin:0 0 1rem 0; font-family:var(--font-display);">🏆 Top 5 Performance</h3>
                      <div style="height:220px;"><canvas id="v2PerformanceChart"></canvas></div>
                   </div>
                </div>
@@ -2284,7 +2284,7 @@
                   </div>
                </div>
                <div class="mgmt-glass-card" style="padding:1.5rem; background:rgba(99, 102, 241, 0.05); border:1px solid rgba(99, 102, 241, 0.3) !important;">
-                  <h3 style="font-size:1.1rem; margin:0 0 1rem 0; display:flex; align-items:center; gap:0.5rem;"><span>😡 Assistant de Labo IA</span></h3>
+                  <h3 style="font-size:1.1rem; margin:0 0 1rem 0; display:flex; align-items:center; gap:0.5rem;"><span>🧠 Assistant de Labo IA</span></h3>
                   <p id="statsInsightText" style="font-size:0.85rem; line-height:1.6; color:var(--text-secondary);">
                     Chargement des prévisions... </p></div><div class="pastry-timer" style="background:var(--surface); border:1px solid var(--surface-border); border-radius:12px; padding:1rem; text-align:center;"><div style="font-size:0.6rem; text-transform:uppercase; color:var(--text-muted); font-weight:700; margin-bottom:5px;">â²ïÂ¸ Minuteur de Labo</div><div id="timerDisplay" style="font-family:monospace; font-size:1.8rem; font-weight:800; color:var(--primary); margin-bottom:10px;">00:00</div><div style="display:flex; justify-content:center; gap:0.5rem;"><button class="btn btn-sm btn-outline" style="padding:4px 10px;" onclick="window.adjustTimer(5)">+5m</button><button class="btn btn-sm btn-primary" style="padding:4px 15px;" id="btnTimerToggle" onclick="window.toggleTimer()">Start</button><button class="btn btn-sm btn-outline" style="padding:4px 10px;" onclick="window.resetTimer()">Reset</button></div></div>
                   </p>
@@ -2762,7 +2762,7 @@
         <!-- Advanced Cost Parameters -->
         <div class="card" style="margin-bottom: 1.2rem; border: 1px dashed var(--accent); max-width: 100%;">
           <div class="card-title" data-i18n="s4.advanced">­ Paramètres avancés de production</div>
-          <div class="card-subtitle" data-i18n="s4.advanced.desc">Intégérez la main d'Å“Å“uvre, les charges fixes et
+          <div class="card-subtitle" data-i18n="s4.advanced.desc">Intégrez la main d'œuvre, les charges fixes et
             l'amortissement pour un coût complet.</div>
 
           <div
@@ -2898,19 +2898,19 @@
               style="flex:1; min-width:120px; cursor:pointer; text-align:center; padding:1rem; border-color:var(--accent); box-shadow:var(--shadow-accent);">
               <br><span data-i18n="lab.mode.standard">Standard</span></div>
             <div class="card" data-mode="patisserie"
-              style="flex:1; min-width:120px; cursor:pointer; text-align:center; padding:1rem;">🧵<br><span
+              style="flex:1; min-width:120px; cursor:pointer; text-align:center; padding:1rem;">🍰<br><span
                 data-i18n="lab.mode.patisserie">P&acirc;tisserie</span></div>
             <div class="card" data-mode="chocolatier"
-              style="flex:1; min-width:120px; cursor:pointer; text-align:center; padding:1rem;">«<br><span
+              style="flex:1; min-width:120px; cursor:pointer; text-align:center; padding:1rem;">🍫<br><span
                 data-i18n="lab.mode.chocolatier">Chocolatier</span></div>
             <div class="card" data-mode="viennoiserie"
-              style="flex:1; min-width:120px; cursor:pointer; text-align:center; padding:1rem;">¥<br><span
+              style="flex:1; min-width:120px; cursor:pointer; text-align:center; padding:1rem;">🥐<br><span
                 data-i18n="lab.mode.viennoiserie">Viennoiserie</span></div>
             <div class="card" data-mode="traiteur"
-              style="flex:1; min-width:120px; cursor:pointer; text-align:center; padding:1rem;">é<br><span
+              style="flex:1; min-width:120px; cursor:pointer; text-align:center; padding:1rem;">🍳<br><span
                 data-i18n="lab.mode.traiteur">Traiteur</span></div>
             <div class="card" data-mode="boulangerie"
-              style="flex:1; min-width:120px; cursor:pointer; text-align:center; padding:1rem;">¥“<br><span
+              style="flex:1; min-width:120px; cursor:pointer; text-align:center; padding:1rem;">🥖<br><span
                 data-i18n="lab.mode.boulangerie">Boulangerie</span></div>
           </div>
         </section>
@@ -3617,7 +3617,7 @@
 
                 const events = {
                   '01-01': ' Nouvel An', '01-06': ' Épiphanie', '02-02': '🥞 Chandeleur', '02-14': ' Valentin',
-                  '03-01': ' Fête G-Mères', '04-05': '£ Pâques', '04-06': '« Lundi Pâques', '05-01': ' Fête Travail',
+                  '03-01': ' Fête G-Mères', '04-05': '£ Pâques', '04-06': '🍫 Lundi Pâques', '05-01': ' Fête Travail',
                   '05-08': ' Victoire 1945', '05-14': ' Ascension', '05-24': '  Pentecà´te', '05-31': ' Fête Mères',
                   '06-21': ' Fête Pères', '07-14': '  Fête Nationale', '08-15': ' Assomption', '11-01': ' Toussaint',
                   '12-25': ' Noël', '12-31': '¾ St Sylvestre'
@@ -3874,8 +3874,8 @@
     <div id="modalHaccpReception" class="modal-overlay" style="display:none;">
       <div class="modal-card">
         <div class="modal-header">
-          <h3 data-i18n="haccp.reception.title">Nouveau Contrà´le Réception</h3>
-          <button onclick="hideAddReceptionModal()">ƒÆ’—</button>
+          <h3 data-i18n="haccp.reception.title">Nouveau Contrôle Réception</h3>
+          <button onclick="hideAddReceptionModal()">×</button>
         </div>
         <div class="modal-body" style="padding:2rem;">
           <div class="form-group" style="margin-bottom:1rem;">
@@ -4665,7 +4665,7 @@
               automatique des stocks et des prix</p>
           </div>
         </div>
-        <button class="close-btn-premium" onclick="hideRestockModal()">ƒÆ’—</button>
+        <button class="close-btn-premium" onclick="hideRestockModal()">×</button>
       </div>
       <div class="modal-body restock-form-premium">
         <div class="form-group">
@@ -4736,7 +4736,7 @@
     <div class="modal-card glass-card">
       <div class="premium-modal-header">
         <h3 id="supplierModalTitle">📦 Ajouter un Fournisseur</h3>
-        <button class="close-btn-premium" onclick="closeSupplierModal()">ƒÆ’—</button>
+        <button class="close-btn-premium" onclick="closeSupplierModal()">×</button>
       </div>
       <div class="modal-body restock-form-premium">
         <div style="display:flex; flex-direction:column; gap:1.2rem;">
@@ -4803,7 +4803,7 @@
               style="font-weight:800; font-family:monospace; font-size:1.2rem;">00:00:00</span>
             <button class="btn btn-sm btn-outline" onclick="toggleProdTimer()" id="btnProdTimer">Play</button>
           </div>
-          <button class="close-btn-premium" onclick="hideProductionMode()">ƒÆ’—</button>
+          <button class="close-btn-premium" onclick="hideProductionMode()">×</button>
         </div>
       </div>
       <div class="production-body">
@@ -5345,9 +5345,9 @@
           'navCatalogue': () => { if (typeof window.generateECatalogue === 'function') window.generateECatalogue(); },
           'navBilling': () => showMgmt('billing'),
           'navCRM': showCRM, 'mLinkCRM': showCRM,
-          'navChefsBrain': () => { if (typeof window.openChefsBrain === 'function') window.openChefsBrain(); },
-          'navAssembly': () => { if (typeof window.openAssemblySimulator === 'function') window.openAssemblySimulator(); },
-          'navConverter': () => { if (typeof window.openMasterConverter === 'function') window.openMasterConverter(); },
+          'navChefsBrain': () => { setTimeout(() => { if (typeof window.openChefsBrain === 'function') window.openChefsBrain(); }, 50); },
+          'navAssembly': () => { setTimeout(() => { if (typeof window.openAssemblySimulator === 'function') window.openAssemblySimulator(); }, 50); },
+          'navConverter': () => { setTimeout(() => { if (typeof window.openMasterConverter === 'function') window.openMasterConverter(); }, 50); },
           'navOmniSearch': () => { if (typeof toggleOmniSearch === 'function') toggleOmniSearch(); }
         };
 
@@ -5482,9 +5482,9 @@
         moreMenuTitle.textContent = i18n.t('nav.category.atelier');
         items = [
           { id: 'mLinkRecettes', icon: '📖', label: 'nav.recipes', action: showRecettes },
-          { id: 'mLinkChefsBrain', icon: '🧠', label: 'nav.creative.brain', action: () => { if (typeof window.openChefsBrain === 'function') window.openChefsBrain(); } },
-          { id: 'mLinkAssembly', icon: '🍰', label: 'nav.creative.assembly', action: () => { if (typeof window.openAssemblySimulator === 'function') window.openAssemblySimulator(); } },
-          { id: 'mLinkConverter', icon: '🎚️', label: 'nav.creative.converter', action: () => { if (typeof window.openMasterConverter === 'function') window.openMasterConverter(); } },
+          { id: 'mLinkChefsBrain', icon: '🧠', label: 'nav.creative.brain', action: () => { setTimeout(() => { if (typeof window.openChefsBrain === 'function') window.openChefsBrain(); }, 100); } },
+          { id: 'mLinkAssembly', icon: '🍰', label: 'nav.creative.assembly', action: () => { setTimeout(() => { if (typeof window.openAssemblySimulator === 'function') window.openAssemblySimulator(); }, 100); } },
+          { id: 'mLinkConverter', icon: '🎚️', label: 'nav.creative.converter', action: () => { setTimeout(() => { if (typeof window.openMasterConverter === 'function') window.openMasterConverter(); }, 100); } },
           { id: 'mLinkPortfolio', icon: '📍', label: 'nav.portfolio', action: showPortfolio },
           { id: 'mLinkScheduler', icon: '🎓', label: 'nav.scheduler', action: showScheduler }
         ];
@@ -5643,7 +5643,7 @@
       </div>
       <div id="incoLabelPreview" class="inco-preview-container" style="margin-top:1.5rem;"></div>
       <div style="margin-top:1.5rem; display:flex; gap:10px;">
-        <button class="btn btn-primary btn-full" onclick="exportINCOPdf()" data-i18n="inco.btn.export">📥 Exporter PDF (60ƒÆ’—40mm)</button>
+        <button class="btn btn-primary btn-full" onclick="exportINCOPdf()" data-i18n="inco.btn.export">📥 Exporter PDF (60×40mm)</button>
         <button class="btn btn-outline btn-full" onclick="window.print()" data-i18n="ui.btn.print"> Imprimer</button>
       </div>
     </div>
@@ -5705,7 +5705,7 @@
       <!-- Selected ingredient display -->
       <div id="chefBrainSelected" style="display:none; margin-bottom:1.5rem;">
         <div class="cb-selected-card">
-          <span class="cb-selected-icon" id="cbSelectedIcon">“Å“</span>
+          <span class="cb-selected-icon" id="cbSelectedIcon">🥚</span>
           <div>
             <strong id="cbSelectedName">—</strong>
             <span class="cb-selected-price" id="cbSelectedPrice">— </span>
@@ -5900,7 +5900,7 @@
 
       <!-- STEP 4: Recipe selector + Ingredient Scaling -->
       <div class="mc-recipe-zone">
-        <label> é Adapter une Recette (optionnel)</label>
+        <label> 🍳 Adapter une Recette (optionnel)</label>
         <select class="form-input" id="mcRecipeSelect" onchange="mcSelectRecipe(this.value)">
           <option value="">— Aucune recette sélectionnée —</option>
         </select>
@@ -6136,7 +6136,7 @@
       </div>
 
       <div class="academy-footer">
-        <p>Besoin d'une formation personnalisée ? <a href="mailto:support@gourmetrevient.fr">Contactez le Chef Expert</a></p>
+        <p>Besoin d'une formation personnalisée ? <a href="mailto:contact@gourmetrevient.fr">Contactez le Chef Expert</a></p>
       </div>
     </div>
   </div>
@@ -6242,11 +6242,11 @@
       <div style="padding: 2.5rem;">
         <div style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 2rem;">
           
-          <a href="mailto:support@gourmetrevient.fr" style="display: flex; align-items: center; gap: 1rem; background: #f1f5f9; color: #1e293b; padding: 1.2rem 1.5rem; border-radius: 18px; text-decoration: none; font-weight: 700; transition: all 0.3s;" onmouseover="this.style.background='#e2e8f0'; this.style.transform='translateY(-2px)'" onmouseout="this.style.background='#f1f5f9'; this.style.transform='translateY(0)'">
+          <a href="mailto:contact@gourmetrevient.fr" style="display: flex; align-items: center; gap: 1rem; background: #f1f5f9; color: #1e293b; padding: 1.2rem 1.5rem; border-radius: 18px; text-decoration: none; font-weight: 700; transition: all 0.3s;" onmouseover="this.style.background='#e2e8f0'; this.style.transform='translateY(-2px)'" onmouseout="this.style.background='#f1f5f9'; this.style.transform='translateY(0)'">
             <span style="font-size: 1.5rem;">📧</span>
             <div style="display: flex; flex-direction: column;">
               <span style="font-size: 0.9rem;">Email Support</span>
-              <span style="font-size: 0.75rem; color: #64748b; font-weight: 500;">support@gourmetrevient.fr</span>
+              <span style="font-size: 0.75rem; color: #64748b; font-weight: 500;">contact@gourmetrevient.fr</span>
             </div>
           </a>
 

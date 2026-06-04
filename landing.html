@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧁</text></svg>">
   <title>GourmetRevient — 🧁 Le Copilote Rentabilité des Pâtissiers Artisans</title>
-  <meta name="description" content="Calculez vos coûts de revient, gérez votre production et assurez votre conformité HACCP. La plateforme SaaS n°1 pour les artisans pâtissiers.">
+  <meta name="description" content="Calculez vos coûts de revient, gérez votre production et assurez votre conformité HACCP. La plateforme SaaS pour les artisans boulangers-pâtissiers.">
   
   <!-- JSON-LD Structured Data -->
   <script type="application/ld+json">
@@ -32,14 +32,14 @@
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://gourmetrevient.fr/landing.html">
   <meta property="og:title" content="GourmetRevient — Le Copilote des Artisans Pâtissiers">
-  <meta property="og:description" content="Gérez votre pâtisserie comme un chef : coût de revient, HACCP, Planning et CRM.">
+  <meta property="og:description" content="Gerez votre boulangerie-pâtisserie comme un chef : coût de revient, HACCP, Planning et CRM. Essai gratuit 14 jours.">
   <meta property="og:image" content="https://gourmetrevient.fr/img/og-preview.png">
 
   <!-- Twitter -->
   <meta property="twitter:card" content="summary_large_image">
   <meta property="twitter:url" content="https://gourmetrevient.fr/landing.html">
   <meta property="twitter:title" content="GourmetRevient — Le Copilote des Artisans Pâtissiers">
-  <meta property="twitter:description" content="Gérez votre pâtisserie comme un chef : coût de revient, HACCP, Planning et CRM.">
+  <meta name="twitter:description" content="Gerez votre boulangerie-pâtisserie comme un chef : coût de revient, HACCP, Planning et CRM. Essai gratuit 14 jours.">
   <meta property="twitter:image" content="https://gourmetrevient.fr/img/og-preview.png">
 
   <!-- Google Fonts -->
@@ -600,18 +600,18 @@
 
   <section class="hero">
     <div class="container">
-      <div class="hero-badge animate-fade-in">Indispensable pour Pâtissiers Artisans</div>
+      <div class="hero-badge animate-fade-in">Indispensable pour Boulangers-Pâtissiers Artisans</div>
       <h1 class="animate-fade-in delay-1">Ne laissez plus vos marges s'évaporer au four.</h1>
       <p class="animate-fade-in delay-2">La plateforme tout-en-un pour piloter votre laboratoire : coût de revient précis, conformité HACCP simplifiée et gestion de production intelligente.</p>
       
-      <div class="social-proof animate-fade-in delay-2" style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-bottom: 2rem;">
+      <div class="social-proof animate-fade-in delay-2" style="display: none; align-items: center; justify-content: center; gap: 0.5rem; margin-bottom: 2rem;">
         <div style="display: flex; -webkit-mask-image: linear-gradient(to right, black 80%, transparent); mask-image: linear-gradient(to right, black 80%, transparent);">
           <span style="font-size: 1.2rem; margin-right: -8px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));">👨‍🍳</span>
           <span style="font-size: 1.2rem; margin-right: -8px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));">👩‍🍳</span>
           <span style="font-size: 1.2rem; margin-right: -8px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));">🥐</span>
           <span style="font-size: 1.2rem; margin-right: -8px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));">🍰</span>
         </div>
-        <span id="userCounter" style="font-size: 0.95rem; font-weight: 600; color: #475569;">+120 pâtissiers nous font déjà confiance</span>
+        <span class="social-proof">Rejoignez les premiers artisans qui digitalisent leur laboratoire</span>
       </div>
       
       <div class="hero-ctas animate-fade-in delay-3">
@@ -712,7 +712,7 @@
     </div>
   </section>
 
-  <section class="demo-video" style="padding: 100px 0; background: white; text-align: center;">
+  <section class="demo-video" id="demo-video" style="display:none; padding: 100px 0; background: white; text-align: center;">
     <div class="container">
       <div class="section-header">
         <span class="hero-badge">Démo Vidéo</span>
@@ -735,7 +735,7 @@
     <div class="container">
       <div class="section-header">
         <h2>Une suite d'outils professionnels</h2>
-        <p>Tout ce dont vous avez besoin pour gérer votre pâtisserie comme un chef d'entreprise.</p>
+        <p>Tout ce dont vous avez besoin pour gérer votre boulangerie-pâtisserie comme un chef d'entreprise.</p>
       </div>
 
       <div class="features-grid">
@@ -785,95 +785,103 @@
   </section>
 
 
-  <section class="testimonials" id="testimonials" style="padding: 8rem 0; background: #f8fafc;">
+    <section class="testimonials" id="testimonials" style="padding: 8rem 0; background: #f8fafc;">
     <div class="container">
       <div class="section-header" style="text-align: center; margin-bottom: 5rem;">
         <span class="hero-badge">Témoignages</span>
-        <h2>Ils pâtissent avec GourmetRevient</h2>
-        <p>Découvrez pourquoi les artisans choisissent notre solution.</p>
+        <h2>Ils digitalisent leur labo avec GourmetRevient</h2>
+        <p>Découvrez les retours d'expérience de nos premiers utilisateurs.</p>
       </div>
       <div class="testimonials-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
+        <!-- Témoignage 1 -->
         <div class="testimonial-card" style="background: white; padding: 2.5rem; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid #e2e8f0;">
-          <p style="font-style: italic; color: #475569; margin-bottom: 1.5rem;">"GourmetRevient a radicalement changé ma façon de piloter ma marge. Je sais enfin exactement ce que me coûte chaque entremets au centime près."</p>
-          <div style="display: flex; align-items: center; gap: 12px;">
-            <div style="width: 48px; height: 48px; border-radius: 50%; overflow: hidden; background: #eef2ff; border: 2px solid #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
-              <img src="https://ui-avatars.com/api/?name=Jean+Luc+M&background=4f46e5&color=fff" alt="Jean-Luc M." style="width:100%; height:100%; object-fit:cover;">
-            </div>
-            <div>
-              <h4 style="font-size: 1rem; margin: 0;">Jean-Luc Marteau</h4>
-              <p style="font-size: 0.85rem; color: #64748b; margin: 0;">Pâtisserie "L'Écrin Sucré", Lille</p>
-            </div>
-          </div>
+          <blockquote style="font-style: italic; color: #475569; margin: 0 0 1.5rem 0; border: none; padding: 0; font-size: 1rem; line-height: 1.6;">"Je sais enfin exactement ce que me coûte chaque entremets au centime près. Un outil indispensable."</blockquote>
+          <p style="font-size: 0.85rem; color: #64748b; margin: 0; font-weight: 600;">Pâtissier artisan — Région Nord</p>
         </div>
+        <!-- Témoignage 2 -->
         <div class="testimonial-card" style="background: white; padding: 2.5rem; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid #e2e8f0;">
-          <p style="font-style: italic; color: #475569; margin-bottom: 1.5rem;">"Le module HACCP digital est un gain de temps énorme. Plus de feuilles volantes dans le labo, tout est sur ma tablette et mes relevés sont impeccables."</p>
-          <div style="display: flex; align-items: center; gap: 12px;">
-            <div style="width: 48px; height: 48px; border-radius: 50%; overflow: hidden; background: #ecfdf5; border: 2px solid #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
-              <img src="https://ui-avatars.com/api/?name=Sophie+L&background=10b981&color=fff" alt="Sophie L." style="width:100%; height:100%; object-fit:cover;">
-            </div>
-            <div>
-              <h4 style="font-size: 1rem; margin: 0;">Sophie Larroque</h4>
-              <p style="font-size: 0.85rem; color: #64748b; margin: 0;">Boulangerie "Le Fournil des Saveurs", Toulouse</p>
-            </div>
-          </div>
+          <blockquote style="font-style: italic; color: #475569; margin: 0 0 1.5rem 0; border: none; padding: 0; font-size: 1rem; line-height: 1.6;">"Le module HACCP digital a éliminé toutes mes feuilles volantes. Mes relevés sont impeccables en cas de contrôle."</blockquote>
+          <p style="font-size: 0.85rem; color: #64748b; margin: 0; font-weight: 600;">Boulangère-pâtissière — Région Occitanie</p>
         </div>
+        <!-- Témoignage 3 -->
         <div class="testimonial-card" style="background: white; padding: 2.5rem; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid #e2e8f0;">
-          <p style="font-style: italic; color: #475569; margin-bottom: 1.5rem;">"L'outil d'agencement 2D m'a permis de repenser mon laboratoire pour Noël. On a gagné 15% de productivité sur la ligne de production."</p>
-          <div style="display: flex; align-items: center; gap: 12px;">
-            <div style="width: 48px; height: 48px; border-radius: 50%; overflow: hidden; background: #fff7ed; border: 2px solid #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
-              <img src="https://ui-avatars.com/api/?name=Marc+D&background=f59e0b&color=fff" alt="Marc D." style="width:100%; height:100%; object-fit:cover;">
-            </div>
-            <div>
-              <h4 style="font-size: 1rem; margin: 0;">Marc Dupont</h4>
-              <p style="font-size: 0.85rem; color: #64748b; margin: 0;">Chocolaterie "L'Atelier du Cacao", Lyon</p>
-            </div>
-          </div>
+          <blockquote style="font-style: italic; color: #475569; margin: 0 0 1.5rem 0; border: none; padding: 0; font-size: 1rem; line-height: 1.6;">"L'outil d'agencement 2D m'a permis de repenser mon labo. On a gagné en productivité sur la ligne de production."</blockquote>
+          <p style="font-size: 0.85rem; color: #64748b; margin: 0; font-weight: 600;">Chocolatier artisan — Région Auvergne-Rhône-Alpes</p>
         </div>
       </div>
     </div>
   </section>
 
-  <section class="pricing" id="pricing" style="padding: 8rem 0; background: white;">
+    <section class="pricing" id="pricing" style="padding: 8rem 0; background: white;">
     <div class="container">
       <div class="section-header" style="text-align: center; margin-bottom: 5rem;">
         <span class="hero-badge">Tarification simple</span>
-        <h2>Un seul plan, tout illimité</h2>
-        <p>14 jours d'essai offerts pour tester l'intégralité des fonctionnalités.</p>
+        <h2>Tarifs simples et transparents</h2>
+        <p>14 jours d'essai offerts sur tous les plans payants. Sans engagement.</p>
       </div>
 
-      <div class="pricing-card" style="max-width: 500px; margin: 0 auto; background: white; border: 2px solid var(--primary); border-radius: 32px; padding: 3rem; position: relative; box-shadow: 0 40px 80px -15px rgba(79, 70, 229, 0.15);">
-        <div style="position: absolute; top: -15px; left: 50%; transform: translateX(-50%); background: var(--primary); color: white; padding: 6px 20px; border-radius: 50px; font-size: 0.8rem; font-weight: 800; letter-spacing: 0.05em;">PLAN PRO CHEF</div>
-        
-        <div style="text-align: center; margin-bottom: 2.5rem;">
-          <div style="font-size: 3.5rem; font-weight: 900; color: #1e293b; margin-bottom: 0.5rem;">29,99€ <span style="font-size: 1.2rem; font-weight: 500; color: #64748b;">/ mois HT</span></div>
-          <p style="color: #64748b; font-weight: 600;">Sans engagement · Annulable en un clic</p>
+      <div class="pricing-grid"> <!-- 3 colonnes -->
+
+        <!-- Plan Gratuit -->
+        <div class="plan-card">
+          <h3>Découverte</h3>
+          <p class="price">0 € <span>/ mois</span></p>
+          <p class="desc">Pour tester sans risque</p>
+          <ul>
+            <li><span style="color: #10b981;">✓</span> 5 recettes max</li>
+            <li><span style="color: #10b981;">✓</span> Calculateur de coût basique</li>
+            <li><span style="color: #10b981;">✓</span> 1 relevé HACCP / jour</li>
+            <li><span style="color: #ef4444;">✗</span> Exports PDF</li>
+            <li><span style="color: #ef4444;">✗</span> Sync cloud</li>
+          </ul>
+          <a href="index.html?tab=signup" class="btn-secondary">Commencer gratuitement</a>
         </div>
 
-        <ul style="list-style: none; padding: 0; margin-bottom: 3rem;">
-          <li style="display: flex; align-items: center; gap: 12px; margin-bottom: 1.2rem; font-weight: 500; color: #334155;">
-            <span style="color: #10b981; font-size: 1.2rem;">✓</span> Recettes & Ingrédients illimités
-          </li>
-          <li style="display: flex; align-items: center; gap: 12px; margin-bottom: 1.2rem; font-weight: 500; color: #334155;">
-            <span style="color: #10b981; font-size: 1.2rem;">✓</span> Synchronisation Cloud sécurisée
-          </li>
-          <li style="display: flex; align-items: center; gap: 12px; margin-bottom: 1.2rem; font-weight: 500; color: #334155;">
-            <span style="color: #10b981; font-size: 1.2rem;">✓</span> Gestion HACCP & Traçabilité
-          </li>
-          <li style="display: flex; align-items: center; gap: 12px; margin-bottom: 1.2rem; font-weight: 500; color: #334155;">
-            <span style="color: #10b981; font-size: 1.2rem;">✓</span> Planning Équipe & Labo 2D
-          </li>
-          <li style="display: flex; align-items: center; gap: 12px; margin-bottom: 1.2rem; font-weight: 500; color: #334155;">
-            <span style="color: #10b981; font-size: 1.2rem;">✓</span> Export PDF Premium avec Logo
-          </li>
-          <li style="display: flex; align-items: center; gap: 12px; margin-bottom: 1.2rem; font-weight: 500; color: #334155;">
-            <span style="color: #10b981; font-size: 1.2rem;">✓</span> Support prioritaire 7j/7
-          </li>
-        </ul>
+        <!-- Plan Pro — mis en avant -->
+        <div class="plan-card featured">
+          <span class="badge-popular">Le plus populaire</span>
+          <h3>Pro Chef</h3>
+          <p class="price">29,99 € <span>/ mois HT</span></p>
+          <p class="desc">Pour les artisans qui veulent tout piloter</p>
+          <ul>
+            <li><span style="color: #10b981;">✓</span> Recettes & ingrédients illimités</li>
+            <li><span style="color: #10b981;">✓</span> Sous-recettes imbriquées</li>
+            <li><span style="color: #10b981;">✓</span> HACCP Pro complet</li>
+            <li><span style="color: #10b981;">✓</span> Planning & équipe</li>
+            <li><span style="color: #10b981;">✓</span> CRM & commandes</li>
+            <li><span style="color: #10b981;">✓</span> Exports PDF premium</li>
+            <li><span style="color: #10b981;">✓</span> Sync cloud multi-appareils</li>
+            <li><span style="color: #10b981;">✓</span> Devis avec signature client</li>
+            <li><span style="color: #10b981;">✓</span> Calendrier saisonnier</li>
+            <li><span style="color: #10b981;">✓</span> Support prioritaire 7j/7</li>
+          </ul>
+          <a href="index.html?tab=signup" class="btn-primary">Démarrer 14 jours gratuits</a>
+        </div>
 
-        <a href="index.html?tab=signup" class="btn btn-primary btn-shine" style="width: 100%; text-align: center; padding: 1.2rem; font-size: 1.1rem; border-radius: 16px;">
-          Démarrer mes 14 jours gratuits
-        </a>
+        <!-- Plan Labo -->
+        <div class="plan-card">
+          <h3>Labo Pro</h3>
+          <p class="price">49,99 € <span>/ mois HT</span></p>
+          <p class="desc">Pour les équipes et laboratoires</p>
+          <ul>
+            <li><span style="color: #10b981;">✓</span> Tout du plan Pro Chef</li>
+            <li><span style="color: #10b981;">✓</span> Jusqu'à 5 comptes équipe</li>
+            <li><span style="color: #10b981;">✓</span> Onboarding personnalisé</li>
+            <li><span style="color: #10b981;">✓</span> Support WhatsApp dédié</li>
+            <li><span style="color: #10b981;">✓</span> Rapport mensuel automatique</li>
+            <li><span style="color: #10b981;">✓</span> Export données sur demande</li>
+          </ul>
+          <a href="mailto:contact@gourmetrevient.fr" class="btn-secondary">Nous contacter</a>
+        </div>
+
       </div>
+
+      <!-- Comparatif vs concurrence -->
+      <div class="vs-competitors">
+        <p>💡 <strong>Koust</strong> facture 69-79 €/mois pour moins de fonctionnalités.<br>
+        GourmetRevient vous offre plus, spécialement conçu pour la pâtisserie-boulangerie artisanale.</p>
+      </div>
+
     </div>
   </section>
 
@@ -917,7 +925,7 @@
         <a href="legal.html#rgpd">Politique de Confidentialité</a>
         <a href="blog.html">Blog</a>
         <a href="index.html?action=login">Espace Client</a>
-        <a href="mailto:support@gourmetrevient.fr">Support</a>
+        <a href="mailto:contact@gourmetrevient.fr">Support</a>
       </div>
       <p style="opacity: 0.6; font-size: 0.8rem;">© 2026 GourmetRevient. Conçu avec passion pour l'artisanat.</p>
     </div>

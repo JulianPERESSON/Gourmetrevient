@@ -8,17 +8,27 @@
 
 // CORRECTION 6 — Radar Logistique vide
 function afficherEtatVideRadar() {
-  const tbody = document.querySelector('#radar-logistique tbody') || document.getElementById('logisticsListBody');
-  if (tbody && (tbody.children.length === 0 || tbody.innerHTML.includes('Aucun passage planifié') || tbody.innerHTML.includes('Aucun passage planifié.'))) {
-    tbody.innerHTML = `
-      <tr>
-        <td colspan="5" style="text-align:center; padding:2rem; color:var(--color-text-secondary); font-size:13px;">
-          📦 Aucun passage planifié — cliquez sur "+ Ajouter un passage" pour commencer
-        </td>
-      </tr>`;
-  }
+  const tbody = document.querySelector('#radar-logistique tbody') ||
+                document.querySelector('.radar-table tbody') ||
+                document.getElementById('logisticsListBody');
+  if (!tbody || tbody.children.length > 0) return;
+  tbody.innerHTML = `
+    <tr>
+      <td colspan="5" style="text-align:center; padding:2rem; color:var(--color-muted); font-size:13px; line-height:2;">
+        📦 Aucun passage grossiste planifié<br>
+        <button onclick="ouvrirFormulaireRadar()" style="margin-top:8px; background:#4f46e5; color:#fff; border:none; padding:8px 16px; border-radius:8px; cursor:pointer; font-size:13px;">
+          + Ajouter un passage
+        </button>
+      </td>
+    </tr>`;
 }
+document.addEventListener('DOMContentLoaded', afficherEtatVideRadar);
 window.afficherEtatVideRadar = afficherEtatVideRadar;
+window.ouvrirFormulaireRadar = function() {
+    if (typeof openAddDeliveryModal === 'function') {
+        openAddDeliveryModal();
+    }
+};
 
 const LogisticsManager = (() => {
     const STORAGE_KEY = 'gourmet_deliveries';
