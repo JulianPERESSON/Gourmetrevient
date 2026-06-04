@@ -333,6 +333,23 @@ const $ = (sel) => document.querySelector(sel);
 const $$ = (sel) => document.querySelectorAll(sel);
 // round2 is already defined in data.js
 
+// Global helper: close any modal by ID (used by CRM, index.html onclick handlers)
+window.closeModal = function(id) {
+  const m = document.getElementById(id);
+  if (!m) return;
+  m.classList.remove('modal-visible');
+  // Wait for CSS transition then hide
+  setTimeout(() => { if (!m.classList.contains('modal-visible')) m.style.display = 'none'; }, 260);
+};
+
+// Global helper: open any modal-overlay by ID (adds modal-visible for fade-in)
+window.openModal = function(id) {
+  const m = document.getElementById(id);
+  if (!m) return;
+  m.style.display = 'flex';
+  requestAnimationFrame(() => m.classList.add('modal-visible'));
+};
+
 function generateId() {
   return 'r_' + Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
 }
@@ -3978,7 +3995,7 @@ function renderInventory() {
         </td>
         <td style="text-align:center;"><span class="badge ${statusClass}">${statusLabel}</span></td>
         <td style="text-align:center;">
-          <button class="btn btn-sm btn-outline btn-round" onclick="editInventoryItem('${item.id}')" title="Seuil d'alerte">⚙️</button>
+          <button class="btn btn-sm btn-outline btn-round" onclick="event.stopPropagation(); editInventoryItem('${item.id}')" title="Seuil d'alerte">⚙️</button>
         </td>
       </tr>
     `;
@@ -4138,7 +4155,8 @@ function editInventoryItem(id) {
     } else {
       activeSuppliers.forEach(sup => {
         // Find existing price configuration
-        const existing = (APP.ingredientPrices || []).find(ip => 
+        const existing = (APP.ingredientPrices || []).find(ip =>
+          ip && ip.ingredient_name && item.name &&
           ip.ingredient_name.toLowerCase().trim() === item.name.toLowerCase().trim() &&
           String(ip.fournisseur_id) === String(sup.id)
         );
@@ -4168,7 +4186,12 @@ function editInventoryItem(id) {
     }
   }
 
-  $('#ingredientConfigModal').style.display = 'flex';
+  // Show the modal: set display first, then add modal-visible to trigger opacity transition
+  const _icModal = $('#ingredientConfigModal');
+  if (_icModal) {
+    _icModal.style.display = 'flex';
+    requestAnimationFrame(() => _icModal.classList.add('modal-visible'));
+  }
 }
 
 async function saveIngredientConfig() {
@@ -4192,7 +4215,8 @@ async function saveIngredientConfig() {
     const unitVal = unitSelect ? unitSelect.value : 'kg';
 
     // Find existing to update or create
-    const existingIdx = (APP.ingredientPrices || []).findIndex(ip => 
+    const existingIdx = (APP.ingredientPrices || []).findIndex(ip =>
+      ip && ip.ingredient_name && item.name &&
       ip.ingredient_name.toLowerCase().trim() === item.name.toLowerCase().trim() &&
       String(ip.fournisseur_id) === String(supplierId)
     );
@@ -4232,7 +4256,12 @@ async function saveIngredientConfig() {
   renderInventory();
   updateDashboard();
   
-  $('#ingredientConfigModal').style.display = 'none';
+  // Close modal with fade-out transition
+  const _icModalClose = $('#ingredientConfigModal');
+  if (_icModalClose) {
+    _icModalClose.classList.remove('modal-visible');
+    setTimeout(() => { if (!_icModalClose.classList.contains('modal-visible')) _icModalClose.style.display = 'none'; }, 260);
+  }
   if (typeof showToast === 'function') {
     showToast('✅ Configuration enregistrée !', 'success');
   }

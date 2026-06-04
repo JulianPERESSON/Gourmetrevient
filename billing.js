@@ -256,7 +256,7 @@ const GourmetBilling = {
                 <div class="pricing-card" style="background:var(--surface); border:2px solid var(--primary); border-radius:16px; padding:2rem; text-align:center; position:relative;">
                     <div style="position:absolute; top:-12px; left:50%; transform:translateX(-50%); background:var(--primary); color:white; padding:2px 12px; border-radius:20px; font-size:0.75rem; font-weight:800;">14 JOURS D'ESSAI OFFERTS</div>
                     <h3 style="margin-bottom:1rem;">👨‍🍳 Pro Chef</h3>
-                    <div style="font-size:2rem; font-weight:800; margin-bottom:1.5rem;">14,99€ <small style="font-size:1rem; font-weight:400;">/mois</small></div>
+                    <div style="font-size:2rem; font-weight:800; margin-bottom:1.5rem;">29,99€ <small style="font-size:1rem; font-weight:400;">/mois</small></div>
                     <ul style="text-align:left; margin-bottom:2rem; list-style:none; padding:0; color:var(--muted);">
                         <li style="margin-bottom:0.5rem;">✅ Essai gratuit de 14 jours</li>
                         <li style="margin-bottom:0.5rem;">✅ Recettes Illimitées</li>
@@ -309,7 +309,7 @@ const GourmetBilling = {
                     id: 'INV-' + Math.random().toString(36).substr(2, 9).toUpperCase(),
                     date: new Date().toISOString(),
                     desc: `Abonnement GourmetRevient ${status.plan.toUpperCase()}`,
-                    amount: status.plan === 'pro' ? 14.99 : 49.99,
+                    amount: status.plan === 'pro' ? 29.99 : 49.99,
                     status: 'payé'
                 });
             }

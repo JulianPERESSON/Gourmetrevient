@@ -3067,9 +3067,9 @@
                 </div>
               </div>
               <div class="header-actions" style="display:flex; gap:0.8rem;">
-                <button class="btn btn-sm btn-outline" onclick="simulateInvoiceScan()"
+                <button class="btn btn-sm btn-outline" onclick="event.stopPropagation(); simulateInvoiceScan()"
                   data-i18n="inv.btn.scan_invoice">📹 Scanner Facture</button>
-                <button class="btn btn-sm btn-primary" onclick="showRestockModal()" data-i18n="inv.btn.restock"> Nouvel
+                <button class="btn btn-sm btn-primary" onclick="event.stopPropagation(); showRestockModal()" data-i18n="inv.btn.restock"> Nouvel
                   Arrivage</button>
                 <button class="btn btn-sm btn-outline" onclick="syncInventoryWithCloud()"
                   title="Synchroniser avec le cloud (source de vérité)" data-i18n-title="inv.btn.sync"
@@ -3750,7 +3750,7 @@
                     <div class="card glass-widget" style="padding: 2.5rem;">
                        <div class="flex-title" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2rem;">
                           <h3 class="widget-title-modern"> Relevés de Température</h3>
-                          <button class="btn btn-primary btn-sm" onclick="showAddTempModal()"> Nouveau Relevé</button>
+                          <button class="btn btn-primary btn-sm" onclick="event.stopPropagation(); showAddTempModal()"> Nouveau Relevé</button>
                        </div>
                        <div class="table-responsive">
                           <table class="premium-table">
@@ -3820,7 +3820,7 @@
                              <h3 style="margin:0; font-family:var(--font-display); font-size:1.4rem; color:var(--primary);"> Contrà´les à la Réception</h3>
                              <p style="font-size:0.85rem; color:var(--text-muted); margin:5px 0 0 0;">Vérification des marchandises à l'arrivée (température, hygiène).</p>
                           </div>
-                          <button class="btn btn-primary" onclick="showAddReceptionModal()" style="border-radius:12px; padding:0.8rem 1.6rem; font-weight:700;"> Nouveau Contrà´le</button>
+                          <button class="btn btn-primary" onclick="event.stopPropagation(); showAddReceptionModal()" style="border-radius:12px; padding:0.8rem 1.6rem; font-weight:700;"> Nouveau Contrà´le</button>
                        </div>
                        <div class="table-responsive">
                           <table class="premium-table">
@@ -5247,9 +5247,7 @@
 
   </script>
 
-  <!-- Floating WhatsApp removed -->
-    <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp Support" width="30">
-  </div>
+  <!-- Floating WhatsApp button removed -->
 
   <!-- °Core Scripts -->
   <script src="./data.js?v=2.2.6" defer></script>
@@ -6317,7 +6315,7 @@
     <div class="modal-content glass-panel" style="max-width: 600px; width: 95%; padding: 2rem;">
       <div class="modal-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
         <h3 style="margin:0;">⚙️ <span id="ingConfigTitle">Configurer l'ingrédient</span></h3>
-        <button class="btn-icon" onclick="document.getElementById('ingredientConfigModal').style.display='none'">✖</button>
+        <button class="btn-icon" onclick="closeModal('ingredientConfigModal')">✖</button>
       </div>
       
       <input type="hidden" id="ingConfigId" />
@@ -6351,7 +6349,7 @@
       
       <div style="display: flex; gap: 1rem;">
         <button class="btn btn-primary" onclick="saveIngredientConfig()" style="flex: 1;">💾 Enregistrer</button>
-        <button class="btn btn-outline" onclick="document.getElementById('ingredientConfigModal').style.display='none'" style="flex: 1;">Annuler</button>
+        <button class="btn btn-outline" onclick="closeModal('ingredientConfigModal')" style="flex: 1;">Annuler</button>
       </div>
     </div>
   </div>
