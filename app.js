@@ -8507,9 +8507,10 @@ function calculateBreakingPoint() {
 function loadProductionPlan() {
   if (navigator.onLine && window.GourmetSync) {
     GourmetSync.chargerPlanning().then(cloudPlan => {
-      if (cloudPlan !== null && cloudPlan.length > 0) {
+      if (cloudPlan !== null) {
         localStorage.setItem('gourmet_production_plan', JSON.stringify(cloudPlan));
         if (typeof renderProductionPlan === 'function') renderProductionPlan();
+        if (typeof updateDashboard === 'function') updateDashboard();
       }
     }).catch(err => console.warn('[GourmetSync] Erreur lors du chargement du planning:', err));
   }
@@ -8589,7 +8590,7 @@ function addProductionItem() {
     recipeId: defaultRecipe.id,
     qty: 10,
     status: 'todo',
-    date: new Date().toLocaleDateString()
+    date: new Date().toISOString().split('T')[0]
   };
   plan.push(newItem);
 
@@ -8645,7 +8646,7 @@ function launchProductionFromRecipe() {
     recipeId: APP.recipe.id,
     qty: APP.recipe.portions || 10,
     status: 'todo',
-    date: new Date().toLocaleDateString()
+    date: new Date().toISOString().split('T')[0]
   });
   localStorage.setItem('gourmet_production_plan', JSON.stringify(plan));
   

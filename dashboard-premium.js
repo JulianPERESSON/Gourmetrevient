@@ -23,6 +23,7 @@ function seedDemoData() {
     console.log('🌱 Seeding demo data...');
     // Use the same user-scoped keys as hydratePremiumDashboard
     const currUser = (localStorage.getItem('gourmet_current_user') || 'chef').toLowerCase();
+    const today = new Date().toISOString().split('T')[0];
 
     // ── Production Plan ─────────────────────────────────────────────────
     const existingPlan = JSON.parse(localStorage.getItem('gourmet_production_plan') || '[]');
@@ -217,10 +218,28 @@ window.hydratePremiumDashboard = function () {
 
     let stockAlerts = inv.filter(item => (item.stock || 0) <= (item.alertThreshold || 5));
     
+    // Helper to normalize DD/MM/YYYY to YYYY-MM-DD
+    const normalizeDateStr = (dateStr) => {
+        if (!dateStr) return '';
+        if (dateStr.includes('/')) {
+            const parts = dateStr.split('/');
+            if (parts.length === 3) {
+                const d = parts[0].padStart(2, '0');
+                const m = parts[1].padStart(2, '0');
+                const y = parts[2];
+                return `${y}-${m}-${d}`;
+            }
+        }
+        return dateStr.substring(0, 10);
+    };
+
     // REAL production count from production plan
     const todayStr = now.toISOString().split('T')[0];
-    const todayProds = productionPlan.filter(p => p.date === todayStr);
-    let prodCountToday = todayProds.length > 0 ? todayProds.reduce((s, p) => s + (p.qty || 1), 0) : recipes.length;
+    const todayProds = productionPlan.filter(p => {
+        const itemDate = p.date && p.date.includes('/') ? normalizeDateStr(p.date) : (p.date || '');
+        return itemDate.split('T')[0] === todayStr;
+    });
+    let prodCountToday = todayProds.length;
 
     // Update Briefing Stats
     const bProd = document.getElementById('briefingProdCount');
@@ -425,8 +444,11 @@ window.hydratePremiumDashboard = function () {
         if (dateFilter === 'tomorrow') filterDate.setDate(filterDate.getDate() + 1);
         const filterStr = filterDate.toISOString().split('T')[0];
         
-        // Get real production plan items for the filtered date
-        const dayProds = productionPlan.filter(p => p.date === filterStr);
+        // Get real production plan items for the filtered date (with date normalization)
+        const dayProds = productionPlan.filter(p => {
+            const itemDate = p.date && p.date.includes('/') ? normalizeDateStr(p.date) : (p.date || '');
+            return itemDate.split('T')[0] === filterStr;
+        });
         
         if (dayProds.length > 0) {
             prodTimeline.innerHTML = dayProds.slice(0, 4).map((p, i) => {
