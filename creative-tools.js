@@ -104,8 +104,12 @@ let cbSelectedIngredient = null;
 let cbSelectedPairings = [];
 
 function openChefsBrain() {
-  const modal = document.getElementById('chefsBrainModal');
-  if (modal) modal.style.display = 'flex';
+  if (typeof window.openModal === 'function') {
+    window.openModal('chefsBrainModal');
+  } else {
+    const modal = document.getElementById('chefsBrainModal');
+    if (modal) modal.style.display = 'flex';
+  }
   document.getElementById('chefBrainSearch').value = '';
   document.getElementById('chefBrainSelected').style.display = 'none';
   document.getElementById('chefBrainCost').style.display = 'none';
@@ -116,8 +120,12 @@ function openChefsBrain() {
 }
 
 function closeChefsBrain() {
-  const modal = document.getElementById('chefsBrainModal');
-  if (modal) modal.style.display = 'none';
+  if (typeof window.closeModal === 'function') {
+    window.closeModal('chefsBrainModal');
+  } else {
+    const modal = document.getElementById('chefsBrainModal');
+    if (modal) modal.style.display = 'none';
+  }
 }
 
 function searchChefsBrain(query) {
@@ -333,8 +341,12 @@ function loadAssemblyTemplate() {
 
 // --- Open / Close -------------------------------------------------------
 function openAssemblySimulator() {
-  const modal = document.getElementById('assemblyModal');
-  if (modal) modal.style.display = 'flex';
+  if (typeof window.openModal === 'function') {
+    window.openModal('assemblyModal');
+  } else {
+    const modal = document.getElementById('assemblyModal');
+    if (modal) modal.style.display = 'flex';
+  }
   loadAssemblyFromStorage(); 
   initAssemblyPalette();
   initAssemblyDragDrop();
@@ -343,8 +355,12 @@ function openAssemblySimulator() {
 }
 
 function closeAssemblySimulator() {
-  const modal = document.getElementById('assemblyModal');
-  if (modal) modal.style.display = 'none';
+  if (typeof window.closeModal === 'function') {
+    window.closeModal('assemblyModal');
+  } else {
+    const modal = document.getElementById('assemblyModal');
+    if (modal) modal.style.display = 'none';
+  }
 }
 
 // --- View Switching -----------------------------------------------------
@@ -620,6 +636,9 @@ function selectLayerForAnnotation(instanceId) {
   var nameEl = document.getElementById('asmAnnotLayerName');
   if (nameEl) nameEl.textContent = layer.icon + ' ' + layer.name;
   var heightEl = document.getElementById('asmAnnotHeight');
+  var tempEl = document.getElementById('asmAnnotTemp');
+  var restEl = document.getElementById('asmAnnotRest');
+  var noteEl = document.getElementById('asmAnnotNote');
   if (tempEl) tempEl.value = (layer.annotation && layer.annotation.temp) || '';
   if (restEl) restEl.value = (layer.annotation && layer.annotation.rest) || '';
   if (noteEl) noteEl.value = (layer.annotation && layer.annotation.note) || '';

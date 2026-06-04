@@ -95,16 +95,24 @@ let mcFilteredRecipes = [];
 // ============================================================================
 
 function openMasterConverter() {
-  const modal = document.getElementById('masterConverterModal');
-  if (modal) modal.style.display = 'flex';
+  if (typeof window.openModal === 'function') {
+    window.openModal('masterConverterModal');
+  } else {
+    const modal = document.getElementById('masterConverterModal');
+    if (modal) modal.style.display = 'flex';
+  }
   initMCShapeSelectors();
   populateMCRecipeSelect();
   mcCalculate();
 }
 
 function closeMasterConverter() {
-  const modal = document.getElementById('masterConverterModal');
-  if (modal) modal.style.display = 'none';
+  if (typeof window.closeModal === 'function') {
+    window.closeModal('masterConverterModal');
+  } else {
+    const modal = document.getElementById('masterConverterModal');
+    if (modal) modal.style.display = 'none';
+  }
 }
 
 window.openMasterConverter = openMasterConverter;

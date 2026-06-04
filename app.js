@@ -348,6 +348,42 @@ window.openModal = function(id) {
   if (!m) return;
   m.style.display = 'flex';
   requestAnimationFrame(() => m.classList.add('modal-visible'));
+
+  // Enregistrer le moment de l'ouverture pour éviter les fermetures intempestives (ghost clicks mobiles)
+  m._openedAt = Date.now();
+
+  // Liste des modals devant se fermer au clic sur l'arrière-plan (backdrop)
+  const closeOnBackdrop = ['chefsBrainModal', 'assemblyModal', 'masterConverterModal', 'labSwitcherModal'];
+  if (closeOnBackdrop.includes(id) && !m._backdropHandlerBound) {
+    let mousedownOnSelf = false;
+    m.addEventListener('mousedown', (e) => {
+      // Le clic doit impérativement commencer sur le fond du modal lui-même
+      mousedownOnSelf = (e.target === m);
+    });
+    
+    m.addEventListener('click', (e) => {
+      // Le clic doit également se terminer sur le fond du modal lui-même
+      if (e.target === m && mousedownOnSelf) {
+        // Bloquer les fermetures immédiates dans les 300ms suivant l'ouverture (anti-rebond tactile)
+        if (Date.now() - (m._openedAt || 0) < 300) {
+          return;
+        }
+        if (id === 'chefsBrainModal' && typeof window.closeChefsBrain === 'function') {
+          window.closeChefsBrain();
+        } else if (id === 'assemblyModal' && typeof window.closeAssemblySimulator === 'function') {
+          window.closeAssemblySimulator();
+        } else if (id === 'masterConverterModal' && typeof window.closeMasterConverter === 'function') {
+          window.closeMasterConverter();
+        } else if (id === 'labSwitcherModal') {
+          m.style.display = 'none';
+          m.classList.remove('modal-visible');
+        } else {
+          window.closeModal(id);
+        }
+      }
+    });
+    m._backdropHandlerBound = true;
+  }
 };
 
 function generateId() {
@@ -3606,11 +3642,11 @@ function bindEvents() {
       const mainNav = $('#mainNav');
       const mobNav = $('#mobileNavBar');
       if (window.innerWidth <= 768) {
-        if (mainNav) mainNav.style.display = 'none';
-        if (mobNav) mobNav.style.display = 'flex';
+        if (mainNav) mainNav.style.setProperty('display', 'none', 'important');
+        if (mobNav) mobNav.style.setProperty('display', 'flex', 'important');
       } else {
-        if (mainNav) mainNav.style.display = 'flex';
-        if (mobNav) mobNav.style.display = 'none';
+        if (mainNav) mainNav.style.setProperty('display', 'flex', 'important');
+        if (mobNav) mobNav.style.setProperty('display', 'none', 'important');
       }
     }
   });
@@ -3724,11 +3760,18 @@ function checkAuth() {
     document.body.classList.remove('auth-pending');
 
     // On s'assure que le menu et la zone utilisateur sont visibles dès qu'on est logué
+    const isMobile = window.innerWidth <= 768;
     ['mainNav', 'mobileNavBar', 'userProfileArea', 'headerBrand', 'appMain'].forEach(id => {
       const el = document.getElementById(id);
       if (el) {
-        const displayType = (id === 'appMain') ? 'block' : 'flex';
-        el.style.setProperty('display', displayType, 'important');
+        if (id === 'mobileNavBar') {
+          el.style.setProperty('display', isMobile ? 'flex' : 'none', 'important');
+        } else if (id === 'mainNav') {
+          el.style.setProperty('display', isMobile ? 'none' : 'flex', 'important');
+        } else {
+          const displayType = (id === 'appMain') ? 'block' : 'flex';
+          el.style.setProperty('display', displayType, 'important');
+        }
       }
     });
 
