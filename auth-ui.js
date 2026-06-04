@@ -99,6 +99,7 @@ const AuthUI = (() => {
       }
 
       _updateUI(_currentUser);
+      if (typeof window.checkAuth === 'function') window.checkAuth();
 
       if (event === 'SIGNED_IN') {
         console.info('%c[Auth] ✅ Connecté :', 'color:#10b981', _currentUser?.email);
@@ -119,6 +120,7 @@ const AuthUI = (() => {
 
     _renderButton();
     _updateUI(_currentUser);
+    if (typeof window.checkAuth === 'function') window.checkAuth();
 
     // Ouverture automatique du modal si demandé par l'URL (Inscription)
     const urlParams = new URLSearchParams(window.location.search);

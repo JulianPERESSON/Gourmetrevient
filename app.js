@@ -3644,11 +3644,81 @@ function bindEvents() {
 // AUTHENTICATION — Bridged to AuthUI.js (Supabase)
 // ============================================================================
 
+function showSubscriptionRequiredOverlay(email) {
+  let overlay = document.getElementById('stripeSubscriptionRequiredOverlay');
+  if (overlay) return;
+
+  overlay = document.createElement('div');
+  overlay.id = 'stripeSubscriptionRequiredOverlay';
+  overlay.className = 'glass-modal-overlay';
+  overlay.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15,23,42,0.85); backdrop-filter:blur(16px); z-index:99999; display:flex; justify-content:center; align-items:center; color:#fff; font-family:Inter, sans-serif;';
+  
+  overlay.innerHTML = `
+    <div style="background:var(--surface, #1e293b); border:1px solid var(--border, #334155); border-radius:24px; padding:3rem; max-width:480px; width:90%; text-align:center; box-shadow:0 25px 50px -12px rgba(0,0,0,0.5);">
+      <div style="font-size:3rem; margin-bottom:1.5rem;">🧁</div>
+      <h2 style="font-size:1.8rem; font-weight:800; margin-bottom:1rem; color:#fff;">Abonnement requis</h2>
+      <p style="color:#94a3b8; font-size:0.95rem; margin-bottom:2rem; line-height:1.5;">
+        Bienvenue ! GourmetRevient est un outil professionnel. Pour accéder à votre laboratoire et commencer vos calculs, veuillez activer votre abonnement Pro Chef.
+      </p>
+      
+      <div style="background:rgba(99,102,241,0.1); border:1px solid rgba(99,102,241,0.3); border-radius:16px; padding:1.25rem; margin-bottom:2rem;">
+        <div style="font-weight:700; font-size:1.1rem; color:#818cf8; margin-bottom:4px;">👨‍🍳 Offre Pro Chef</div>
+        <div style="font-size:1.5rem; font-weight:900; color:#fff;">29,99 € <span style="font-size:0.9rem; font-weight:400; color:#94a3b8;">/ mois HT</span></div>
+        <div style="font-size:0.8rem; color:#a5b4fc; margin-top:6px; font-weight:600;">14 jours d'essai gratuits · Sans engagement</div>
+      </div>
+      
+      <button class="btn btn-primary" onclick="GourmetBilling.checkout('pro_monthly', '${email}')" style="width:100%; padding:1rem; font-size:1.1rem; font-weight:700; border-radius:12px; background:linear-gradient(135deg, #6366f1, #4f46e5); color:#fff; border:none; cursor:pointer; margin-bottom:1rem; box-shadow:0 10px 20px -5px rgba(99,102,241,0.4);">
+        Commencer l'essai gratuit (14 jours)
+      </button>
+      
+      <button id="authOverlayLogoutBtn" style="background:none; border:none; color:#94a3b8; cursor:pointer; font-size:0.9rem; text-decoration:underline;">
+        Se déconnecter
+      </button>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+
+  const logoutBtn = document.getElementById('authOverlayLogoutBtn');
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', () => {
+      if (window.AuthUI && typeof window.AuthUI.logout === 'function') {
+        window.AuthUI.logout();
+      } else {
+        localStorage.removeItem('gourmet_auth');
+        location.reload();
+      }
+    });
+  }
+
+  // Masquer les conteneurs de l'app
+  ['mainNav', 'mobileNavBar', 'appMain', 'hubSection'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
+}
+
+function removeSubscriptionRequiredOverlay() {
+  const overlay = document.getElementById('stripeSubscriptionRequiredOverlay');
+  if (overlay) overlay.remove();
+}
+
 function checkAuth() {
   const user = window.AuthUI?.getCurrentUser();
   const isLegacyAuth = localStorage.getItem('gourmet_auth') === 'true';
 
   if (user || isLegacyAuth) {
+    // Vérifier l'abonnement
+    const isProOrAdmin = window.AuthUI && typeof window.AuthUI.isPro === 'function' ? window.AuthUI.isPro() : false;
+    const name = localStorage.getItem('gourmet_current_user') || '';
+    const isAdminBypass = ['ju 2503', 'ju', 'support@gourmetrevient.fr', 'contact'].includes(name.toLowerCase());
+
+    if (!isProOrAdmin && !isAdminBypass && user) {
+      console.info('🔒 Abonnement requis. Accès bloqué.');
+      showSubscriptionRequiredOverlay(user.email);
+      return;
+    }
+
+    removeSubscriptionRequiredOverlay();
     console.info('🔓 Authentification confirmée, déverrouillage de l\'interface...');
     const wasPending = document.body.classList.contains('auth-pending');
     document.body.classList.remove('auth-pending');
