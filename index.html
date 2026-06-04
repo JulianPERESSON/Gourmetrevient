@@ -1339,8 +1339,8 @@
     // Fonction de secours ultra-robuste insérée directement dans le HTML
     async function loginDirect() {
       const btn = document.querySelector('#authManualOverlay .auth-btn-primary');
-      const email = document.getElementById('authEmailManual').value;
-      const pass = document.getElementById('authPasswordManual').value;
+      const email = document.getElementById('authEmailManual').value.trim();
+      const pass = document.getElementById('authPasswordManual').value.trim();
       const err = document.getElementById('authErrorManual');
 
       if (!email || !pass) {
