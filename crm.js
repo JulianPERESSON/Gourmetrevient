@@ -21,41 +21,6 @@ async function loadCrm() {
   if (!APP.crm.clients) APP.crm.clients = [];
   if (!APP.crm.orders) APP.crm.orders = [];
 
-  // Demo Data — ensure all 5 demo contacts exist and stay up-to-date
-  const demoClients = [
-    { id: 'c1', name: 'Hôtel de la Cité', contact: '06 12 34 56 78', notes: 'Livraison par l\'arrière' },
-    { id: 'c2', name: 'Mme Dupont (Mariage)', contact: 'lucie@email.com', notes: 'Allergie fruits à coque' },
-    { id: 'c4', name: 'CMA Muret', contact: 'lpelletier@cm-toulouse.fr', notes: 'Un chef qui maîtrise le chocolat … et les baguettes du diabolo 🪀🍫' },
-    { id: 'c5', name: 'Mr Bouvier-Gaz', contact: '', notes: 'Un chef qui soigne plus son image que ses productions ✌️😎' },
-    { id: 'c3', name: 'Restaurant Le Gourmet', contact: 'facturation@gourmet.fr', notes: 'Facturation fin de mois' }
-  ];
-
-  let clientsChanged = false;
-  demoClients.forEach(dc => {
-    const existing = APP.crm.clients.find(c => c.id === dc.id);
-    if (!existing) {
-      APP.crm.clients.push(dc);
-      clientsChanged = true;
-    } else if (existing.name !== dc.name || existing.contact !== dc.contact || existing.notes !== dc.notes) {
-      existing.name = dc.name;
-      existing.contact = dc.contact;
-      existing.notes = dc.notes;
-      clientsChanged = true;
-    }
-  });
-
-  if (!APP.crm.orders || APP.crm.orders.length === 0) {
-    const now = new Date();
-    const tmrw = new Date(now.getTime() + 24 * 60 * 60 * 1000);
-    APP.crm.orders = [
-      { id: 'o1', clientId: 'c1', products: '10x Tartes Citron, 15x Éclairs', date: tmrw.toISOString().slice(0,16), price: '120.00', status: 'pending' },
-      { id: 'o2', clientId: 'c2', products: 'Pièce Montée 50 pers.', date: new Date(now.getTime() + 48 * 60 * 60 * 1000).toISOString().slice(0,16), price: '450.00', status: 'paid' }
-    ];
-    clientsChanged = true;
-  }
-
-  if (clientsChanged) saveCrm();
-
   // Chargement bidirectionnel en ligne avec Supabase
   if (navigator.onLine && window.gourmetSupabase && typeof GourmetSync !== 'undefined') {
     try {
@@ -66,28 +31,10 @@ async function loadCrm() {
 
         if (cloudClients !== null) {
           APP.crm.clients = cloudClients;
-          // Réinjecter les démos locaux s'ils manquent dans le cloud
-          demoClients.forEach(dc => {
-            if (!APP.crm.clients.some(c => c.id === dc.id)) {
-              APP.crm.clients.push(dc);
-            }
-          });
         }
 
         if (cloudOrders !== null) {
           APP.crm.orders = cloudOrders;
-          // Réinjecter les démos locaux s'ils manquent dans le cloud
-          const now = new Date();
-          const tmrw = new Date(now.getTime() + 24 * 60 * 60 * 1000);
-          const demoOrders = [
-            { id: 'o1', clientId: 'c1', products: '10x Tartes Citron, 15x Éclairs', date: tmrw.toISOString().slice(0,16), price: '120.00', status: 'pending' },
-            { id: 'o2', clientId: 'c2', products: 'Pièce Montée 50 pers.', date: new Date(now.getTime() + 48 * 60 * 60 * 1000).toISOString().slice(0,16), price: '450.00', status: 'paid' }
-          ];
-          demoOrders.forEach(demoOrder => {
-            if (!APP.crm.orders.some(o => o.id === demoOrder.id)) {
-              APP.crm.orders.push(demoOrder);
-            }
-          });
           APP.crm.orders.sort((a,b) => new Date(a.date) - new Date(b.date));
         }
 
