@@ -8,10 +8,10 @@ const GourmetBilling = {
     // - publishableKey (pk_test_...) = clé PUBLIQUE, safe côté client ✅
     // - La clé SECRÈTE (sk_test_...) ne va JAMAIS ici → uniquement dans les Edge Functions Supabase
     CONFIG: {
-        publishableKey: 'pk_test_51TT7DsID7zmqELy5HGzmqoqfB88FMRZVQtyhXWzNxBlpGKPW8nI86GVbVqXtl4xLGIetnRLyM8zYwTOpyVYOxUo2004TJZJEVV',
+        publishableKey: 'pk_live_51TT7DfINXyAsJzvqUftXnEv3BqQ33Y6qBQqBFHA0cqq3SaueyzQ4Hfe8O5SoqWlS4nU0PrvIN2K9pqkBMrAwjqVx00A9LASMej',
         pricing: {
             pro: {
-                monthly: 'price_1TT7I6ID7zmqELy5ZmnFJa6C', // Abonnement Pro Chef - Mensuel
+                monthly: 'price_1Tef08INXyAsJzvqQ6ZJ9Kl4', // Abonnement Pro Chef - Mensuel
                 yearly: 'price_placeholder_yearly'
             }
         }
