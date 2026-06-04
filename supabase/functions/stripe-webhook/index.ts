@@ -88,11 +88,13 @@ serve(async (req) => {
         updated_at: new Date().toISOString()
       }, { onConflict: 'user_id' });
 
-      // Mise à jour du profil
-      await supabase.from('profiles').update({
+      // Mise à jour ou création du profil (sécurité anti-désynchronisation)
+      await supabase.from('profiles').upsert({
+        id: userId,
         plan: 'pro',
-        subscription_status: planStatus
-      }).eq('id', userId);
+        subscription_status: planStatus,
+        updated_at: new Date().toISOString()
+      }, { onConflict: 'id' });
 
       console.log(`✅ Abonnement ${planStatus} activé pour : ${userId} (fin : ${periodEnd ?? 'N/A'}, trial fin : ${trialEnd ?? 'aucun'}`);
     }
