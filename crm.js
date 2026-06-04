@@ -17,9 +17,12 @@ async function loadCrm() {
     console.error('Error loading CRM data', e);
   }
 
-  // S'assurer que les tableaux existent
+  // S'assurer que les tableaux existent et nettoyer les anciennes données de démo locales
   if (!APP.crm.clients) APP.crm.clients = [];
+  else APP.crm.clients = APP.crm.clients.filter(c => !['c1', 'c2', 'c3', 'c4', 'c5'].includes(c.id));
+  
   if (!APP.crm.orders) APP.crm.orders = [];
+  else APP.crm.orders = APP.crm.orders.filter(o => !['o1', 'o2'].includes(o.id));
 
   // Chargement bidirectionnel en ligne avec Supabase
   if (navigator.onLine && window.gourmetSupabase && typeof GourmetSync !== 'undefined') {
