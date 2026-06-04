@@ -315,91 +315,113 @@ window.renderPredictiveMarginAlert = function() {
   const tips = [
     {
       text: "<strong>Calcul du Coût Matière :</strong> Pour une rentabilité optimale, votre coût matière (Food Cost) ne doit pas dépasser 25% à 30% du prix de vente HT.",
-      pills: ["💡 Fiches techniques", "💡 Prix de vente HT"]
+      pills: ["💡 Fiches techniques", "💡 Prix de vente HT"],
+      actions: ["showRecettes()", "showRecettes()"]
     },
     {
       text: "<strong>Valorisation des invendus :</strong> Recyclez vos viennoiseries de la veille en croissants aux amandes ou bostocks. Zéro perte et marge maximale !",
-      pills: ["💡 Antigaspi", "💡 Marge maximale"]
+      pills: ["💡 Antigaspi", "💡 Marge maximale"],
+      actions: ["showRecettes()", "showStats()"]
     },
     {
       text: "<strong>Production rationalisée :</strong> Regroupez la fabrication de vos pâtes (sablée, feuilletée) sur une seule journée et stockez-les au congélateur.",
-      pills: ["💡 Planification", "💡 Gain de temps"]
+      pills: ["💡 Planification", "💡 Gain de temps"],
+      actions: ["showPlanning()", "showPlanning()"]
     },
     {
       text: "<strong>Négociation Fournisseur :</strong> Négociez des remises sur volume pour vos ingrédients clés (beurre, crème, chocolat) pour stabiliser vos marges.",
-      pills: ["💡 Achats en gros", "💡 Négocier les prix"]
+      pills: ["💡 Fournisseurs", "💡 Négocier les prix"],
+      actions: ["showSuppliers()", "showSuppliers()"]
     },
     {
       text: "<strong>Marge brute globale :</strong> Visez un coefficient multiplicateur de 4 à 5 sur vos matières premières pour couvrir vos frais de personnel et charges.",
-      pills: ["💡 Coefficient de vente", "💡 Marge brute"]
+      pills: ["💡 Rentabilité", "💡 Marge brute"],
+      actions: ["showStats()", "showStats()"]
     },
     {
       text: "<strong>Chaîne du froid :</strong> Relevez vos températures quotidiennement. 1°C de moins dans un congélateur peut augmenter sa consommation de 5%.",
-      pills: ["💡 HACCP", "💡 Économie d'énergie"]
+      pills: ["💡 Registre HACCP", "💡 Économie d'énergie"],
+      actions: ["showHygiene()", "showHygiene()"]
     },
     {
       text: "<strong>Saisonnalité des fruits :</strong> Adaptez votre carte aux saisons. Les fraises en hiver coûtent 3 fois plus cher et manquent cruellement de goût.",
-      pills: ["💡 Fruits locaux", "💡 Fraîcheur saisonnière"]
+      pills: ["💡 Inventaire", "💡 Fiches techniques"],
+      actions: ["showInventaire()", "showRecettes()"]
     },
     {
       text: "<strong>Poids constant :</strong> Pesez chaque ingrédient au gramme près, y compris les finitions (glaçage, décor). Les petits écarts ruinent à terme votre marge.",
-      pills: ["💡 Rigueur de pesée", "💡 Finitions standard"]
+      pills: ["💡 Fiches techniques", "💡 Finitions standard"],
+      actions: ["showRecettes()", "showRecettes()"]
     },
     {
       text: "<strong>Gamme d'ingrédients courte :</strong> Limitez le nombre de références de matières premières en stock pour réduire les pertes et simplifier vos commandes.",
-      pills: ["💡 Moins de références", "💡 Rotation de stock"]
+      pills: ["💡 Inventaire", "💡 Rotation de stock"],
+      actions: ["showInventaire()", "showInventaire()"]
     },
     {
       text: "<strong>Cuisson optimisée :</strong> Enfournez vos plaques au maximum de la capacité de votre four pour rentabiliser chaque cycle de préchauffage.",
-      pills: ["💡 Énergie intelligente", "💡 Cuisson groupée"]
+      pills: ["💡 Planning de production", "💡 Cuisson groupée"],
+      actions: ["showPlanning()", "showPlanning()"]
     },
     {
       text: "<strong>Glaçage miroir réutilisable :</strong> Récupérez l'excédent de glaçage sur votre grille pour vos prochains entremets après l'avoir filtré.",
-      pills: ["💡 Zéro gâchis", "💡 Finition soignée"]
+      pills: ["💡 Fiches techniques", "💡 Finition soignée"],
+      actions: ["showRecettes()", "showRecettes()"]
     },
     {
       text: "<strong>Coût Main-d'œuvre (Labor Cost) :</strong> Chronométrez le dressage. Une recette complexe en main-d'œuvre doit être vendue plus cher.",
-      pills: ["💡 Chronométrage", "💡 Coût horaire"]
+      pills: ["💡 Chronométrage", "💡 Coût horaire"],
+      actions: ["showRecettes()", "showStats()"]
     },
     {
       text: "<strong>Boissons et compléments :</strong> Proposez systématiquement une boisson ou un sachet de biscuits secs. Ce sont les produits à plus forte marge.",
-      pills: ["💡 Vente additionnelle", "💡 Produits d'appel"]
+      pills: ["💡 Commandes CRM", "💡 Produits d'appel"],
+      actions: ["showCRM('orders')", "showStats()"]
     },
     {
       text: "<strong>Taux de foisonnement :</strong> Maîtrisez l'air incorporé dans vos mousses. Trop d'air altère la texture, pas assez réduit le volume visuel.",
-      pills: ["💡 Foisonnement", "💡 Texture parfaite"]
+      pills: ["💡 Fiches techniques", "💡 Texture parfaite"],
+      actions: ["showRecettes()", "showRecettes()"]
     },
     {
       text: "<strong>Inventaire mensuel :</strong> Réalisez un inventaire précis chaque fin de mois pour détecter les écarts de coulage ou les pertes anormales.",
-      pills: ["💡 Contrôle de stock", "💡 Calcul de perte"]
+      pills: ["💡 Inventaire de stock", "💡 Calcul de perte"],
+      actions: ["showInventaire()", "showInventaire()"]
     },
     {
       text: "<strong>Règle d'or de la vitrine :</strong> Placez vos gâteaux les plus rentables à hauteur des yeux de vos clients pour déclencher l'achat impulsif.",
-      pills: ["💡 Vente visuelle", "💡 Produits phares"]
+      pills: ["💡 Rentabilité", "💡 Produits phares"],
+      actions: ["showStats()", "showStats()"]
     },
     {
       text: "<strong>Recyclage vanille :</strong> Rincez, séchez et mixez vos gousses de vanille épuisées avec du sucre pour créer votre propre sucre vanillé maison.",
-      pills: ["💡 Vanille maison", "💡 Upcycling"]
+      pills: ["💡 Recette maison", "💡 Anti-gaspillage"],
+      actions: ["showRecettes()", "showRecettes()"]
     },
     {
       text: "<strong>Bases prêtes à l'emploi :</strong> Créez des sous-recettes pour vos biscuits joconde ou pâtes à choux. Cela facilite le chiffrage de vos créations.",
-      pills: ["💡 Fiches de base", "💡 Chiffrage rapide"]
+      pills: ["💡 Sous-recettes", "💡 Chiffrage rapide"],
+      actions: ["showRecettes()", "showRecettes()"]
     },
     {
       text: "<strong>Marche en avant :</strong> Organisez votre labo pour éviter les croisements de flux de production. Moins de pas équivaut à moins de fatigue.",
-      pills: ["💡 Organisation", "💡 Gain d'efficacité"]
+      pills: ["💡 Gestion labo", "💡 Efficacité"],
+      actions: ["showLabo()", "showLabo()"]
     },
     {
       text: "<strong>Conservation du croustillant :</strong> Protégez vos fonds de tarte en les chablonnant avec du beurre de cacao fondu avant le garnissage.",
-      pills: ["💡 Chablonnage", "💡 Texture préservée"]
+      pills: ["💡 Fiches techniques", "💡 Texture préservée"],
+      actions: ["showRecettes()", "showRecettes()"]
     },
     {
       text: "<strong>Changement de moule :</strong> Utilisez le convertisseur géométrique pour recalculer vos recettes lors du passage d'un moule rond à un cadre carré.",
-      pills: ["💡 Ratios géométriques", "💡 Zéro reste de pâte"]
+      pills: ["💡 Ratios géométriques", "💡 Zéro reste de pâte"],
+      actions: ["openMasterConverter()", "openMasterConverter()"]
     },
     {
       text: "<strong>Test de marge préalable :</strong> Ne lancez jamais un nouveau gâteau sans avoir calculé son coût de revient exact au préalable.",
-      pills: ["💡 Rentabilité validée", "💡 R&D Pâtissière"]
+      pills: ["💡 Rentabilité validée", "💡 R&D Pâtissière"],
+      actions: ["showStats()", "showRecettes()"]
     }
   ];
 
@@ -423,7 +445,10 @@ window.renderPredictiveMarginAlert = function() {
         <p>🧠 <strong>Assistant Chef :</strong> ${activeTip.text}</p>
      </div>
      <div class="ai-tips" style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px;">
-        ${activeTip.pills.map(p => `<div class="ai-tip-pill ai-tip" style="cursor: pointer; display: flex; align-items: center; gap: 4px;">${p}</div>`).join('')}
+        ${activeTip.pills.map((p, idx) => {
+          const action = activeTip.actions && activeTip.actions[idx] ? activeTip.actions[idx] : "";
+          return `<div class="ai-tip-pill ai-tip" onclick="${action}" style="cursor: pointer; display: flex; align-items: center; gap: 4px;">${p}</div>`;
+        }).join('')}
      </div>
   `;
 };
