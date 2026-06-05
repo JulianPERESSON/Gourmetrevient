@@ -536,7 +536,22 @@ function calcFullCost(margin, customRecipe = null, forcedInflation = null) {
   const marginPerPortion = sellingPrice - costPerPortion;
   const marginPct = sellingPrice > 0 ? (marginPerPortion / sellingPrice) * 100 : 0;
 
+  // TVA calculations
+  let tvaRate = 5.5;
+  const isCurrent = (r === APP.recipe);
+  const tvaEl = document.getElementById('recipeTvaRate');
+  if (isCurrent && tvaEl) {
+    tvaRate = parseFloat(tvaEl.value) || 5.5;
+  } else if (r && r.tvaRate !== undefined) {
+    tvaRate = parseFloat(r.tvaRate) || 5.5;
+  }
+  const tvaAmount = sellingPrice * (tvaRate / 100);
+  const sellingPriceTTC = sellingPrice + tvaAmount;
+
   return {
+    tvaRate,
+    tvaAmount: round2(tvaAmount),
+    sellingPriceTTC: round2(sellingPriceTTC),
     totalMaterial: round2(totalMaterial),
     additionalCosts: round2(additionalCosts),
     laborCost: round2(laborCost),
@@ -1392,6 +1407,9 @@ function collectCurrentStepData() {
         amortization: parseFloat($('#advAmortization').value) || 0
       };
     }
+    if ($('#recipeTvaRate')) {
+      APP.recipe.tvaRate = parseFloat($('#recipeTvaRate').value) || 5.5;
+    }
   }
 }
 
@@ -1792,6 +1810,14 @@ function renderCostAnalysis() {
       setVal('advAmortization', adv.amortization);
     }
 
+    if (APP.recipe.tvaRate !== undefined) {
+      const el = document.getElementById('recipeTvaRate');
+      if (el && !el.dataset.initialized) {
+        el.value = APP.recipe.tvaRate;
+        el.dataset.initialized = 'true';
+      }
+    }
+
     const costs = calcFullCost(APP.margin);
 
     // KPI Cards
@@ -1808,9 +1834,9 @@ function renderCostAnalysis() {
           <div class="kpi-sub">${t('label.cost')} / ${t('unit.portion')}</div>
         </div>
         <div class="kpi-card success">
-          <div class="kpi-label">${t('ui.kpi.suggested_price')}</div>
+          <div class="kpi-label">${t('ui.kpi.suggested_price')} HT</div>
           <div class="kpi-value ticker-val" data-val="${costs.sellingPrice}" data-suffix=" €">${costs.sellingPrice.toFixed(2)} €</div>
-          <div class="kpi-sub">${t('s4.margin')} ${APP.margin}%</div>
+          <div class="kpi-sub">TTC: ${costs.sellingPriceTTC.toFixed(2)} € (TVA ${costs.tvaRate}%)</div>
         </div>
         <div class="kpi-card warning">
           <div class="kpi-label">${t('ui.kpi.margin_portion')}</div>
@@ -2334,7 +2360,7 @@ async function loadRecipe(id) {
   populateStep1();
 
   // Reset initialization for advanced inputs
-  ['advLaborRate', 'advFixedCharges', 'advProductions', 'advEnergy', 'advAmortization'].forEach(id => {
+  ['advLaborRate', 'advFixedCharges', 'advProductions', 'advEnergy', 'advAmortization', 'recipeTvaRate'].forEach(id => {
     const el = document.getElementById(id);
     if (el) delete el.dataset.initialized;
   });
@@ -2462,7 +2488,7 @@ function loadExampleRecipe(idOrIdx) {
   populateStep1();
 
   // Reset initialization for advanced inputs
-  ['advLaborRate', 'advFixedCharges', 'advProductions', 'advEnergy', 'advAmortization'].forEach(id => {
+  ['advLaborRate', 'advFixedCharges', 'advProductions', 'advEnergy', 'advAmortization', 'recipeTvaRate'].forEach(id => {
     const el = document.getElementById(id);
     if (el) delete el.dataset.initialized;
   });
@@ -2783,7 +2809,9 @@ function exportPdf() {
   const margin = Math.round(costs.marginPct || APP.margin || 70);
   const totalMat = (costs.totalMaterial || 0).toFixed(2);
   const sellPrice = (costs.sellingPrice || 0).toFixed(2);
-  const tvaTTC = ((costs.sellingPrice || 0) * 1.055).toFixed(2);
+  const tvaRate = costs.tvaRate !== undefined ? costs.tvaRate : 5.5;
+  const tvaAmount = (costs.tvaAmount !== undefined ? costs.tvaAmount : ((costs.sellingPrice || 0) * 0.055)).toFixed(2);
+  const tvaTTC = (costs.sellingPriceTTC !== undefined ? costs.sellingPriceTTC : ((costs.sellingPrice || 0) * 1.055)).toFixed(2);
   const portions = r.portions || 10;
   const prepTime = r.prepTime ? `${r.prepTime} min` : '—';
   const cookTime = r.cookTime ? `${r.cookTime} min` : '—';
@@ -2828,7 +2856,7 @@ function exportPdf() {
   const html = `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><title>Fiche Technique</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:Arial,Helvetica,sans-serif;background:#fff;color:#1a202c;-webkit-print-color-adjust:exact;print-color-adjust:exact}.header{background:linear-gradient(135deg,#0f1923 0%,#1a3040 60%,#12232e 100%);color:#fff;padding:28px 38px 22px}.header-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px}.brand{display:flex;align-items:center;gap:10px}.brand-name{font-size:1.15rem;font-weight:800;color:#6366f1;letter-spacing:.04em}.brand-sub{font-size:.6rem;color:rgba(255,255,255,.45);letter-spacing:.12em;text-transform:uppercase}.doc-meta{text-align:right;font-size:.7rem;color:rgba(255,255,255,.5);line-height:1.7}.doc-meta strong{color:rgba(255,255,255,.8)}.header-title-block{border-top:1px solid rgba(99,102,241,.25);padding-top:14px}.doc-type-badge{display:inline-block;background:rgba(99,102,241,.15);color:#6366f1;font-size:.6rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;padding:3px 10px;border-radius:20px;border:1px solid rgba(99,102,241,.3);margin-bottom:6px}.recipe-title{font-size:1.8rem;font-weight:900;color:#fff;line-height:1.2}.recipe-subtitle{font-size:.75rem;color:rgba(255,255,255,.45);margin-top:4px}.kpi-bar{display:grid;grid-template-columns:repeat(5,1fr);background:#f8f9fb;border-bottom:1px solid #eaedf2}.kpi-item{padding:14px 10px;text-align:center;border-right:1px solid #eaedf2}.kpi-item:last-child{border-right:none}.kpi-value{font-size:1.3rem;font-weight:900;color:#0f1923}.kpi-value.green{color:#10b981}.kpi-value.gold{color:#6366f1}.kpi-value.blue{color:#3b82f6}.kpi-value.red{color:#ef4444}.kpi-label{font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#94a3b8;margin-top:4px}.body-grid{display:grid;grid-template-columns:1fr 195px}.main-col{padding:22px 26px}.side-col{background:#f8f9fb;border-left:1px solid #eaedf2;padding:18px 14px}.section-title{display:flex;align-items:center;gap:8px;font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.13em;color:#64748b;margin-bottom:10px}.section-title::after{content:'';flex:1;height:1px;background:#eaedf2}.ing-table{width:100%;border-collapse:collapse;font-size:.75rem;margin-bottom:18px}.ing-table thead tr{background:#0f1923;color:#fff}.ing-table thead th{padding:8px 9px;text-align:left;font-size:.58rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase}.ing-table thead th:last-child{text-align:right}.ing-table tbody tr:nth-child(even){background:#f8f9fb}.ing-table td{padding:6px 9px;border-bottom:1px solid #eaedf2;vertical-align:middle}.ing-table td:last-child{text-align:right}.ing-name{font-weight:600;color:#1a202c}.ing-note{font-size:.62rem;color:#94a3b8}.cost-pill{background:#f1f5f9;color:#334155;font-weight:700;font-size:.68rem;padding:2px 7px;border-radius:5px;white-space:nowrap}.steps{margin-bottom:18px}.step{display:flex;gap:12px;margin-bottom:10px;padding-bottom:10px;border-bottom:1px dashed #eaedf2}.step:last-child{border-bottom:none}.step-num{width:26px;height:26px;border-radius:50%;background:#0f1923;color:#6366f1;font-size:.68rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}.step-body{flex:1}.step-title{font-size:.78rem;font-weight:700;color:#0f1923;margin-bottom:3px}.step-desc{font-size:.7rem;color:#475569;line-height:1.5}.step-temp{font-size:.6rem;color:#ef4444;font-weight:600;margin-top:2px}.side-section{margin-bottom:16px}.side-section-title{font-size:.58rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#94a3b8;margin-bottom:8px;border-bottom:1px solid #eaedf2;padding-bottom:4px}.side-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;font-size:.68rem;border-bottom:1px dotted #eaedf2}.side-row:last-child{border-bottom:none}.side-key{color:#64748b}.side-val{font-weight:700;color:#0f1923}.gauge-label{display:flex;justify-content:space-between;font-size:.65rem;margin-bottom:4px}.gauge-track{background:#eaedf2;border-radius:20px;height:8px;overflow:hidden}.gauge-fill{height:100%;border-radius:20px;background:linear-gradient(90deg, #10b981, #34d399)}.cost-summary{background:#0f1923;border-radius:9px;padding:12px;color:#fff;margin-top:9px}.cost-row-s{display:flex;justify-content:space-between;font-size:.68rem;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.08)}.cost-row-s:last-child{border-bottom:none}.cost-key-s{color:rgba(255,255,255,.55)}.cost-val-s{font-weight:700}.cost-val-s.gold{color:#6366f1;font-size:.82rem}.allergen-badges{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px}.allergen-badge{background:#fee2e2;color:#991b1b;font-size:.56rem;font-weight:700;padding:2px 6px;border-radius:4px;text-transform:uppercase;letter-spacing:.06em}.footer{background:#f8f9fb;border-top:1px solid #eaedf2;padding:12px 38px;display:flex;justify-content:space-between;align-items:center;font-size:.62rem;color:#94a3b8}.footer-logo{color:#6366f1;font-weight:700;font-size:.68rem}.confidential{background:rgba(99,102,241,.1);color:#6366f1;font-size:.56rem;font-weight:700;padding:2px 8px;border-radius:4px;letter-spacing:.08em;text-transform:uppercase}</style></head><body>
 <div class="header"><div class="header-top"><div class="brand"><div style="font-size:1.6rem">🍰</div><div><div class="brand-name">GourmetRevient</div><div class="brand-sub">Solution Pâtisserie Pro</div></div></div><div class="doc-meta"><div><strong>Réf :</strong> ${refId}</div><div><strong>Date :</strong> ${today}</div><div><strong>Catégorie :</strong> ${esc(category)}</div><div><strong>Validée par :</strong> ${esc(user)}</div></div></div><div class="header-title-block"><div class="doc-type-badge">📋 Fiche Technique Premium</div><div class="recipe-title">${esc(recipeName)}</div><div class="recipe-subtitle">Production en laboratoire — ${esc(category)}</div></div></div>
 <div class="kpi-bar"><div class="kpi-item"><div class="kpi-value">${portions}</div><div class="kpi-label">Portions</div></div><div class="kpi-item"><div class="kpi-value green">${totalMat} €</div><div class="kpi-label">Coût Matière</div></div><div class="kpi-item"><div class="kpi-value gold">${margin} %</div><div class="kpi-label">Marge Brute</div></div><div class="kpi-item"><div class="kpi-value blue">${sellPrice} €</div><div class="kpi-label">Prix Vente HT</div></div><div class="kpi-item"><div class="kpi-value red">${prepTime}</div><div class="kpi-label">Préparation</div></div></div>
-<div class="body-grid"><div class="main-col"><div class="section-title">📋 Composition Harmonisée</div><table class="ing-table"><thead><tr><th>Ingrédient</th><th>Qté</th><th>Unité</th><th>Prix U.</th><th>Coût</th></tr></thead><tbody>${ingRows||'<tr><td colspan="5" style="text-align:center;color:#94a3b8;padding:10px">Aucun ingrédient enregistré</td></tr>'}<tr style="background:#f1f5f9;font-weight:700"><td colspan="4" style="text-align:right;color:#64748b;font-size:.65rem;padding:6px 7px">TOTAL MATIÈRE</td><td><span class="cost-pill" style="background:#0f1923;color:#6366f1">${totalMat} €</span></td></tr></tbody></table><div class="section-title">⚙️ Protocole de Production</div><div class="steps">${stepsHtml}</div></div><div class="side-col"><div class="side-section"><div class="side-section-title">📦 Infos Recette</div><div class="side-row"><span class="side-key">Catégorie</span><span class="side-val">${esc(category)}</span></div><div class="side-row"><span class="side-key">Portions</span><span class="side-val">${portions}</span></div><div class="side-row"><span class="side-key">Préparation</span><span class="side-val">${prepTime}</span></div><div class="side-row"><span class="side-key">Cuisson</span><span class="side-val">${cookTime}</span></div>${r.difficulty?`<div class="side-row"><span class="side-key">Niveau</span><span class="side-val">${esc(r.difficulty)}</span></div>`:''}</div><div class="side-section"><div class="side-section-title">📊 Rentabilité</div><div class="gauge-label"><span>Marge</span><span style="font-weight:700;color:${gaugeColor}">${margin} %</span></div><div class="gauge-track"><div class="gauge-fill" style="width:${Math.min(margin,100)}%"></div></div><div class="cost-summary"><div class="cost-row-s"><span class="cost-key-s">Coût matière</span><span class="cost-val-s">${totalMat} €</span></div><div class="cost-row-s"><span class="cost-key-s">Prix vente HT</span><span class="cost-val-s">${sellPrice} €</span></div><div class="cost-row-s"><span class="cost-key-s">TVA (5,5%)</span><span class="cost-val-s">${((costs.sellingPrice||0)*.055).toFixed(2)} €</span></div><div class="cost-row-s"><span class="cost-key-s">Prix TTC</span><span class="cost-val-s gold">${tvaTTC} €</span></div></div></div><div class="side-section"><div class="side-section-title">⚠️ Allergènes</div><div class="allergen-badges">${allergenList}</div></div><div class="side-section"><div class="side-section-title">🌡️ Hygiène & HACCP</div><div class="side-row"><span class="side-key">Stockage</span><span class="side-val" style="color:#3b82f6">0–4 °C</span></div><div class="side-row"><span class="side-key">DLC</span><span class="side-val" style="color:#ef4444">48 h max</span></div><div class="side-row"><span class="side-key">Service</span><span class="side-val" style="color:#3b82f6">2–4 °C</span></div></div></div></div>
+<div class="body-grid"><div class="main-col"><div class="section-title">📋 Composition Harmonisée</div><table class="ing-table"><thead><tr><th>Ingrédient</th><th>Qté</th><th>Unité</th><th>Prix U.</th><th>Coût</th></tr></thead><tbody>${ingRows||'<tr><td colspan="5" style="text-align:center;color:#94a3b8;padding:10px">Aucun ingrédient enregistré</td></tr>'}<tr style="background:#f1f5f9;font-weight:700"><td colspan="4" style="text-align:right;color:#64748b;font-size:.65rem;padding:6px 7px">TOTAL MATIÈRE</td><td><span class="cost-pill" style="background:#0f1923;color:#6366f1">${totalMat} €</span></td></tr></tbody></table><div class="section-title">⚙️ Protocole de Production</div><div class="steps">${stepsHtml}</div></div><div class="side-col"><div class="side-section"><div class="side-section-title">📦 Infos Recette</div><div class="side-row"><span class="side-key">Catégorie</span><span class="side-val">${esc(category)}</span></div><div class="side-row"><span class="side-key">Portions</span><span class="side-val">${portions}</span></div><div class="side-row"><span class="side-key">Préparation</span><span class="side-val">${prepTime}</span></div><div class="side-row"><span class="side-key">Cuisson</span><span class="side-val">${cookTime}</span></div>${r.difficulty?`<div class="side-row"><span class="side-key">Niveau</span><span class="side-val">${esc(r.difficulty)}</span></div>`:''}</div><div class="side-section"><div class="side-section-title">📊 Rentabilité</div><div class="gauge-label"><span>Marge</span><span style="font-weight:700;color:${gaugeColor}">${margin} %</span></div><div class="gauge-track"><div class="gauge-fill" style="width:${Math.min(margin,100)}%"></div></div><div class="cost-summary"><div class="cost-row-s"><span class="cost-key-s">Coût matière</span><span class="cost-val-s">${totalMat} €</span></div><div class="cost-row-s"><span class="cost-key-s">Prix vente HT</span><span class="cost-val-s">${sellPrice} €</span></div><div class="cost-row-s"><span class="cost-key-s">TVA (${tvaRate}%)</span><span class="cost-val-s">${tvaAmount} €</span></div><div class="cost-row-s"><span class="cost-key-s">Prix TTC</span><span class="cost-val-s gold">${tvaTTC} €</span></div></div></div><div class="side-section"><div class="side-section-title">⚠️ Allergènes</div><div class="allergen-badges">${allergenList}</div></div><div class="side-section"><div class="side-section-title">🌡️ Hygiène & HACCP</div><div class="side-row"><span class="side-key">Stockage</span><span class="side-val" style="color:#3b82f6">0–4 °C</span></div><div class="side-row"><span class="side-key">DLC</span><span class="side-val" style="color:#ef4444">48 h max</span></div><div class="side-row"><span class="side-key">Service</span><span class="side-val" style="color:#3b82f6">2–4 °C</span></div></div></div></div>
 <div class="footer"><span class="footer-logo">GourmetRevient</span><span>Fiche Technique Premium — &copy; ${new Date().getFullYear()}</span><span class="confidential">Strictement Confidentiel</span></div>
 </body></html>`;
 
@@ -2906,12 +2934,12 @@ function exportDevisPdf() {
           <span>${(costs.sellingPrice * APP.recipe.portions).toFixed(2)} €</span>
         </div>
         <div style="display:flex; justify-content:space-between; margin-bottom:12px; color:#4a5568;">
-          <span>TVA (5.5%)</span>
-          <span>${((costs.sellingPrice * APP.recipe.portions) * 0.055).toFixed(2)} €</span>
+          <span>TVA (${costs.tvaRate}%)</span>
+          <span>${(costs.tvaAmount * APP.recipe.portions).toFixed(2)} €</span>
         </div>
         <div style="display:flex; justify-content:space-between; font-size:1.5rem; font-weight:900; border-top:2px solid #1a202c; padding-top:12px; margin-top:5px;">
           <span>TOTAL TTC</span>
-          <span style="color:#10b981;">${((costs.sellingPrice * APP.recipe.portions) * 1.055).toFixed(2)} €</span>
+          <span style="color:#10b981;">${(costs.sellingPriceTTC * APP.recipe.portions).toFixed(2)} €</span>
         </div>
       </div>
     </div>
@@ -3322,7 +3350,7 @@ function newRecipe() {
   APP.baselineCosts = null;
 
   // Reset initialization state for advanced inputs
-  ['advLaborRate', 'advFixedCharges', 'advProductions', 'advEnergy', 'advAmortization'].forEach(id => {
+  ['advLaborRate', 'advFixedCharges', 'advProductions', 'advEnergy', 'advAmortization', 'recipeTvaRate'].forEach(id => {
     const el = document.getElementById(id);
     if (el) delete el.dataset.initialized;
   });
@@ -3486,6 +3514,8 @@ function bindEvents() {
     const el = $('#' + id);
     if (el) el.addEventListener('input', () => renderCostAnalysis());
   });
+  const tvaSelectorEl = $('#recipeTvaRate');
+  if (tvaSelectorEl) tvaSelectorEl.addEventListener('change', () => renderCostAnalysis());
 
   // Exports
   const btnExportPdf = $('#btnExportPdf');
@@ -5617,6 +5647,12 @@ function finishProduction() {
   document.getElementById('productionModal').style.display = 'none';
   if (prodState.timer) clearInterval(prodState.timer);
   showToast("Production terminée, stocks mis à jour !");
+  
+  setTimeout(() => {
+    if (typeof window.openProductionLogger === 'function') {
+      window.openProductionLogger(prodState.recipe.id, prodState.recipe.portions);
+    }
+  }, 400);
 }
 
 function scanInvoiceReal(file) {
@@ -7342,31 +7378,18 @@ function toggleCleaning(id) {
 }
 
 function renderTraceability() {
-  var container = document.getElementById('traceLogsBody');
+  const container = document.getElementById('traceLogsBody');
   if (!container) return;
   if (!APP.haccpLogs.trace || APP.haccpLogs.trace.length === 0) {
     const now = new Date();
     APP.haccpLogs.trace = [
-      { id: 'tr_demo1', lot: 'L260301', product: 'Éclair Chocolat', date: new Date(now - 1000 * 60 * 60 * 24).toISOString(), exp: '2026-03-06', qty: '50' },
-      { id: 'tr_demo2', lot: 'L260302', product: 'Tarte Citron Meringuée', date: new Date(now - 1000 * 60 * 60 * 12).toISOString(), exp: '2026-03-07', qty: '12' },
-      { id: 'tr_demo3', lot: 'L260303', product: 'Paris-Brest', date: new Date(now - 1000 * 60 * 60 * 48).toISOString(), exp: '2026-03-05', qty: '24' }
+      { id: 'tr_demo1', lot: 'L-260301-ECL-129', product: 'Éclair Chocolat', date: new Date(now - 1000 * 60 * 60 * 24).toISOString(), exp: '2026-03-06', qty: '50 portions', operator: 'Chef Julian' },
+      { id: 'tr_demo2', lot: 'L-260302-TAR-248', product: 'Tarte Citron Meringuée', date: new Date(now - 1000 * 60 * 60 * 12).toISOString(), exp: '2026-03-07', qty: '12 portions', operator: 'Chef' },
+      { id: 'tr_demo3', lot: 'L-260303-PAR-847', product: 'Paris-Brest', date: new Date(now - 1000 * 60 * 60 * 48).toISOString(), exp: '2026-03-05', qty: '24 portions', operator: 'Chef Julian' }
     ];
     try { saveHaccpLogs(); } catch(e){}
   }
-  if (!APP.haccpLogs.trace || APP.haccpLogs.trace.length === 0) {
-    container.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:2rem; color:var(--text-muted);">' + t('haccp.trace.empty') + '</td></tr>';
-    return;
-  }
-  container.innerHTML = APP.haccpLogs.trace.map(function (d) {
-    return '<tr>' +
-      '<td style="font-family:monospace; font-weight:800; color:var(--accent);">' + d.lot + '</td>' +
-      '<td style="font-weight:700;">' + d.product + '</td>' +
-      '<td>' + new Date(d.date).toLocaleDateString() + '</td>' +
-      '<td style="color:var(--danger); font-weight:700;">' + d.exp + '</td>' +
-      '<td>' + d.qty + ' ' + t('haccp.portions') + '</td>' +
-      '<td><button class="btn btn-sm btn-outline btn-round" onclick="window.print()">🖨️</button></td>' +
-      '</tr>';
-  }).join('');
+  filterTraceLogs();
 }
 
 // ============================================================================
@@ -8987,3 +9010,364 @@ function renderAllergenMatrix() {
   html += `</tbody>`;
   table.innerHTML = html;
 }
+
+// ============================================================================
+// SUPPLIER PRICE COMPARATOR MODULE
+// ============================================================================
+window.openPriceComparator = function() {
+  const modal = document.getElementById('priceComparatorModal');
+  if (modal) {
+    modal.style.display = 'flex';
+    // Populate select with unique ingredients from inventory
+    const select = document.getElementById('comparatorIngredientSelect');
+    if (select) {
+      select.innerHTML = '';
+      const ingredients = APP.inventory.map(i => i.name).sort();
+      if (ingredients.length === 0) {
+        select.innerHTML = '<option value="">Aucun ingrédient</option>';
+      } else {
+        ingredients.forEach(name => {
+          const opt = document.createElement('option');
+          opt.value = name;
+          opt.textContent = name;
+          select.appendChild(opt);
+        });
+      }
+      onComparatorIngredientChange();
+    }
+  }
+};
+
+window.onComparatorIngredientChange = function() {
+  const select = document.getElementById('comparatorIngredientSelect');
+  if (!select) return;
+  const ingName = select.value;
+  const body = document.getElementById('priceComparatorTableBody');
+  if (!body) return;
+  body.innerHTML = '';
+  
+  // Find base price in inventory
+  const invItem = APP.inventory.find(i => i.name.toLowerCase().trim() === ingName.toLowerCase().trim());
+  const basePrice = invItem ? invItem.price || 0 : 0;
+  const unit = invItem ? invItem.unit || 'kg' : 'kg';
+  
+  // Find all prices in APP.ingredientPrices
+  const prices = (APP.ingredientPrices || []).filter(ip => 
+    ip && ip.ingredient_name && ip.ingredient_name.toLowerCase().trim() === ingName.toLowerCase().trim()
+  );
+  
+  const allOffers = [];
+  if (invItem) {
+    allOffers.push({
+      name: 'Tarif de Référence (Inventaire)',
+      price: basePrice,
+      unit: unit,
+      isBase: true
+    });
+  }
+  
+  prices.forEach(ip => {
+    const supplier = (APP.suppliers || []).find(s => String(s.id) === String(ip.fournisseur_id));
+    allOffers.push({
+      name: supplier ? supplier.name : 'Fournisseur Inconnu',
+      price: ip.prix_unitaire,
+      unit: ip.unite || unit,
+      isBase: false,
+      supplierId: ip.fournisseur_id
+    });
+  });
+  
+  if (allOffers.length === 0) {
+    body.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:1.5rem; color:var(--text-muted);">Aucun tarif disponible pour cet ingrédient.</td></tr>`;
+    document.getElementById('priceComparatorAnalysis').style.display = 'none';
+    return;
+  }
+  
+  // Sort by price
+  allOffers.sort((a, b) => a.price - b.price);
+  
+  const cheapest = allOffers[0];
+  
+  body.innerHTML = allOffers.map(o => {
+    const isCheapest = o.price === cheapest.price;
+    const badge = o.isBase 
+      ? `<span style="background:var(--bg-alt); color:var(--text-muted); font-size:0.7rem; padding:4px 8px; border-radius:100px;">Référence</span>`
+      : (isCheapest 
+          ? `<span style="background:rgba(16,185,129,0.12); color:#10b981; font-weight:800; font-size:0.7rem; padding:4px 8px; border-radius:100px;">Meilleur Prix 🟢</span>`
+          : `<span style="background:var(--bg-alt); color:var(--text-muted); font-size:0.7rem; padding:4px 8px; border-radius:100px;">Option</span>`);
+    
+    const actionBtn = o.isBase 
+      ? '—'
+      : `<button class="btn btn-sm btn-primary" style="font-size:0.75rem; padding:4px 10px;" onclick="applySupplierPriceToIngredient('${ingName.replace(/'/g, "\\'")}', '${o.supplierId}', ${o.price})">Appliquer</button>`;
+    
+    return `
+      <tr>
+        <td style="font-weight:700; padding:0.8rem 0.5rem;">${escapeHtml(o.name)}</td>
+        <td style="font-family:monospace; font-weight:800; color:var(--primary); padding:0.8rem 0.5rem;">${o.price.toFixed(4)} € / ${o.unit}</td>
+        <td style="padding:0.8rem 0.5rem;">Par ${o.unit}</td>
+        <td style="padding:0.8rem 0.5rem;">${badge}</td>
+        <td style="text-align:right; padding:0.8rem 0.5rem;">${actionBtn}</td>
+      </tr>
+    `;
+  }).join('');
+  
+  // Savings analysis
+  const analysisDiv = document.getElementById('priceComparatorAnalysis');
+  const analysisText = document.getElementById('priceComparatorAnalysisText');
+  if (analysisDiv && analysisText) {
+    if (allOffers.length > 1) {
+      const mostExpensive = allOffers[allOffers.length - 1];
+      const diff = mostExpensive.price - cheapest.price;
+      if (diff > 0) {
+        analysisDiv.style.display = 'block';
+        analysisText.innerHTML = `Le meilleur tarif est proposé par <strong>${cheapest.name}</strong> à <strong>${cheapest.price.toFixed(2)} €/${cheapest.unit}</strong>.<br/>` +
+          `Vous économisez <strong>${diff.toFixed(2)} €/${cheapest.unit}</strong> par rapport à l'offre la plus chère (<strong>${mostExpensive.name}</strong> à ${mostExpensive.price.toFixed(2)} €).<br/>` +
+          `Sur une consommation estimée de 20 ${cheapest.unit}/mois, cela représente une économie de <strong>${(diff * 20).toFixed(2)} € / mois</strong>.`;
+      } else {
+        analysisDiv.style.display = 'none';
+      }
+    } else {
+      analysisDiv.style.display = 'none';
+    }
+  }
+};
+
+window.applySupplierPriceToIngredient = function(ingName, supplierId, price) {
+  const invItem = APP.inventory.find(i => i.name.toLowerCase().trim() === ingName.toLowerCase().trim());
+  if (invItem) {
+    invItem.price = parseFloat(price);
+    saveInventory();
+    renderInventory();
+    updateDashboard();
+    if (typeof renderCostAnalysis === 'function') renderCostAnalysis();
+    showToast(`Tarif appliqué ✓ ${ingName} mis à jour à ${price} €`, 'success');
+    onComparatorIngredientChange();
+  }
+};
+
+// ============================================================================
+// HACCP PRODUCTION LOTS & TRACEABILITY REGISTER
+// ============================================================================
+window.openProductionLogger = function(recipeIdOrName = null, portions = null, defaultName = '') {
+  const modal = document.getElementById('lotRegistreModal');
+  if (!modal) return;
+  
+  let productName = defaultName || '';
+  let qty = portions || 10;
+  let recipeId = '';
+  
+  if (recipeIdOrName) {
+    const allRecipes = [
+      ...(APP.savedRecipes || []),
+      ...(typeof RECIPES !== 'undefined' ? RECIPES : [])
+    ];
+    const found = allRecipes.find(r => r.id === recipeIdOrName || r.name === recipeIdOrName);
+    if (found) {
+      productName = found.name;
+      recipeId = found.id;
+      if (!portions) qty = found.portions || 10;
+    } else {
+      productName = recipeIdOrName;
+    }
+  }
+  
+  document.getElementById('lotRecipeId').value = recipeId;
+  document.getElementById('lotProductName').value = productName;
+  document.getElementById('lotQuantity').value = qty;
+  
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('lotDateFabrication').value = today;
+  
+  const dlcDate = new Date();
+  dlcDate.setDate(dlcDate.getDate() + 3);
+  document.getElementById('lotDLC').value = dlcDate.toISOString().split('T')[0];
+  
+  const user = localStorage.getItem('gourmet_current_user') || 'Chef';
+  document.getElementById('lotOperator').value = user;
+  
+  const generateLot = () => {
+    const d = new Date(document.getElementById('lotDateFabrication').value || new Date());
+    const yy = d.getFullYear().toString().slice(-2);
+    const mm = String(d.getMonth()+1).padStart(2,'0');
+    const dd = String(d.getDate()).padStart(2,'0');
+    const pName = document.getElementById('lotProductName').value || 'PROD';
+    const initials = pName.trim().toUpperCase().replace(/[^A-Z]/g,'').slice(0,3) || 'PRD';
+    const randomNum = Math.floor(Math.random() * 900) + 100;
+    document.getElementById('lotNumberField').value = `L-${yy}${mm}${dd}-${initials}-${randomNum}`;
+  };
+  
+  generateLot();
+  
+  document.getElementById('lotProductName').oninput = generateLot;
+  document.getElementById('lotDateFabrication').onchange = generateLot;
+  
+  modal.style.display = 'flex';
+};
+
+window.saveProductionLot = function(printLabel = false) {
+  const product = document.getElementById('lotProductName').value.trim();
+  const lot = document.getElementById('lotNumberField').value.trim();
+  const date = document.getElementById('lotDateFabrication').value;
+  const exp = document.getElementById('lotDLC').value;
+  const qty = document.getElementById('lotQuantity').value;
+  const operator = document.getElementById('lotOperator').value.trim();
+  
+  if (!product || !lot || !date || !exp || !qty) {
+    showToast('Veuillez remplir tous les champs', 'error');
+    return;
+  }
+  
+  const traceEntry = {
+    id: 'tr_' + Date.now(),
+    lot: lot,
+    product: product,
+    date: new Date(date).toISOString(),
+    exp: exp,
+    qty: qty + ' portions',
+    operator: operator
+  };
+  
+  if (!APP.haccpLogs.trace) APP.haccpLogs.trace = [];
+  APP.haccpLogs.trace.unshift(traceEntry);
+  saveHaccpLogs();
+  
+  // Render tables
+  if (typeof renderTraceability === 'function') renderTraceability();
+  else filterTraceLogs();
+  
+  if (window.GourmetHACCPAlerts && typeof window.GourmetHACCPAlerts.renderAlertBanner === 'function') {
+    window.GourmetHACCPAlerts.renderAlertBanner();
+  }
+  
+  document.getElementById('lotRegistreModal').style.display = 'none';
+  showToast('Lot de production enregistré ✓', 'success');
+  
+  // If there was a pending status change in the planning grid, apply it now
+  if (window.pendingProductionStatusChange) {
+    const { idx, status } = window.pendingProductionStatusChange;
+    window.pendingProductionStatusChange = null;
+    const plan = JSON.parse(localStorage.getItem('gourmet_production_plan') || '[]');
+    const item = plan[idx];
+    if (item) {
+      item.status = status;
+      localStorage.setItem('gourmet_production_plan', JSON.stringify(plan));
+      if (window.GourmetSync) GourmetSync.sauvegarderPlanning(item).catch(() => {});
+      if (typeof renderProductionPlan === 'function') renderProductionPlan();
+      if (window.syncInventoryWithProduction) window.syncInventoryWithProduction({ ...item, status: 'done' });
+    }
+  }
+  
+  if (printLabel) {
+    window.printDLCLabelCustom(product, lot, date, exp, operator);
+  }
+};
+
+window.printDLCLabelCustom = function(product, lot, date, exp, operator) {
+  const dateFabStr = new Date(date).toLocaleDateString('fr-FR');
+  const dateDlcStr = new Date(exp).toLocaleDateString('fr-FR');
+  
+  const content = `
+    <div style="width: 300px; padding: 15px; border: 2px solid #000; font-family: sans-serif; text-align: center; background: #fff; color: #000;">
+        <div style="font-weight: 800; font-size: 1.2rem; border-bottom: 1px solid #000; padding-bottom: 5px; margin-bottom: 10px;">
+            🧁 GourmetRevient
+        </div>
+        <div style="font-size: 1rem; font-weight: 700; margin-bottom: 5px;">${product}</div>
+        <div style="font-size: 0.8rem; margin-bottom: 10px; font-family:monospace; font-weight:bold;">LOT: ${lot}</div>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
+            <div style="text-align: left;">
+                <div style="font-size: 0.6rem; text-transform: uppercase;">Fabriqué le</div>
+                <div style="font-weight: 700;">${dateFabStr}</div>
+            </div>
+            <div style="text-align: right;">
+                <div style="font-size: 0.6rem; text-transform: uppercase; color: #ef4444;">À consommer jusqu'au</div>
+                <div style="font-weight: 700; color: #ef4444;">${dateDlcStr}</div>
+            </div>
+        </div>
+
+        <div style="font-size: 0.6rem; text-align: left; margin-bottom: 10px; padding: 5px; background: #f1f5f9;">
+            <strong>ALLERGÈNES:</strong> Gluten, Œufs, Lait, Fruits à coque.
+        </div>
+
+        <div style="font-size: 0.7rem; border-top: 1px dashed #000; padding-top: 5px; display:flex; justify-content:space-between;">
+            <span>Conserver entre 0°C et +4°C</span>
+            <span>Opérateur: ${operator || 'Chef'}</span>
+        </div>
+    </div>
+  `;
+
+  const opt = {
+    margin: 5,
+    filename: `label_${lot}.pdf`,
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 3 },
+    jsPDF: { unit: 'mm', format: [100, 60], orientation: 'landscape' }
+  };
+
+  if (typeof html2pdf !== 'undefined') {
+    html2pdf().from(content).set(opt).save();
+    showToast('🏷️ Étiquette DLC générée', 'success');
+  } else {
+    showToast('Erreur: html2pdf non disponible', 'error');
+  }
+};
+
+window.filterTraceLogs = function() {
+  const productQuery = document.getElementById('traceFilterProduct').value.toLowerCase().trim();
+  const dateQuery = document.getElementById('traceFilterDate').value;
+  
+  const container = document.getElementById('traceLogsBody');
+  if (!container) return;
+  
+  const trace = APP.haccpLogs.trace || [];
+  const filtered = trace.filter(d => {
+    const matchesProduct = d.product.toLowerCase().includes(productQuery);
+    const matchesDate = !dateQuery || d.date.split('T')[0] === dateQuery;
+    return matchesProduct && matchesDate;
+  });
+  
+  if (filtered.length === 0) {
+    container.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:2rem; color:var(--text-muted);">Aucun lot correspondant</td></tr>';
+    return;
+  }
+  
+  container.innerHTML = filtered.map(function (d) {
+    return '<tr>' +
+      '<td style="font-family:monospace; font-weight:800; color:var(--accent);">' + d.lot + '</td>' +
+      '<td style="font-weight:700;">' + d.product + '</td>' +
+      '<td>' + new Date(d.date).toLocaleDateString() + '</td>' +
+      '<td style="color:var(--danger); font-weight:700;">' + d.exp + '</td>' +
+      '<td>' + d.qty + '</td>' +
+      '<td><button class="btn btn-sm btn-outline btn-round" onclick="window.printDLCLabelCustom(\'' + d.product.replace(/'/g, "\\'") + '\', \'' + d.lot + '\', \'' + d.date + '\', \'' + d.exp + '\', \'' + (d.operator || 'Chef') + '\')">🖨️</button></td>' +
+      '</tr>';
+  }).join('');
+};
+
+window.resetTraceFilters = function() {
+  document.getElementById('traceFilterProduct').value = '';
+  document.getElementById('traceFilterDate').value = '';
+  filterTraceLogs();
+};
+
+window.exportTraceability = function() {
+  const trace = APP.haccpLogs.trace || [];
+  if (trace.length === 0) {
+    showToast('Aucune donnée à exporter', 'warning');
+    return;
+  }
+  let csv = 'Lot,Produit,Date Fabrication,DLC/DLUO,Quantité,Opérateur\n';
+  trace.forEach(t => {
+    const dStr = new Date(t.date).toLocaleDateString('fr-FR');
+    csv += `"${t.lot}","${t.product}","${dStr}","${t.exp}","${t.qty}","${t.operator || ''}"\n`;
+  });
+  
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.setAttribute('href', url);
+  link.setAttribute('download', `registre_tracabilite_${new Date().toISOString().split('T')[0]}.csv`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  showToast('Registre exporté en CSV ✓', 'success');
+};

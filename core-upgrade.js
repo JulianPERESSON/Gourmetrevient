@@ -86,16 +86,20 @@ window.syncInventoryWithProduction = async function(productionItem) {
   if (typeof updateDashboard === 'function') updateDashboard();
 };
 
-// Patch updateProductionStatus pour déclencher le pont automatiquement
+// Patch updateProductionStatus pour déclencher le pont et ouvrir le modal de lot
 const _origUpdateProductionStatus = window.updateProductionStatus;
 window.updateProductionStatus = function(idx, status) {
   const plan = JSON.parse(localStorage.getItem('gourmet_production_plan') || '[]');
   const item = plan[idx];
   if (item && status === 'done' && item.status !== 'done') {
-    // Déclencher la synchro inventaire avant la mise à jour du statut
-    window.syncInventoryWithProduction({ ...item, status: 'done' });
+    // Intercepter et ouvrir le modal de traçabilité
+    window.pendingProductionStatusChange = { idx, status };
+    if (typeof window.openProductionLogger === 'function') {
+      window.openProductionLogger(item.recipeId || item.name, item.qty, item.name);
+    }
+  } else {
+    if (_origUpdateProductionStatus) _origUpdateProductionStatus(idx, status);
   }
-  if (_origUpdateProductionStatus) _origUpdateProductionStatus(idx, status);
 };
 
 
