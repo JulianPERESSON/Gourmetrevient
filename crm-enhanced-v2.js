@@ -462,7 +462,7 @@ tbody td:last-child, tbody td:nth-child(n+2) { text-align: right; }
       <div style="font-size:0.72rem; font-weight:900; color:#6366f1; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:6px;">🎉 Commande Spéciale Événementielle</div>
       <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; font-size:0.85rem; line-height:1.4;">
         <div><strong>Événement :</strong> ${eventType}</div>
-        <div><strong>Livraison :</strong> ${deliveryDetails || 'À l\\'atelier'}</div>
+        <div><strong>Livraison :</strong> ${deliveryDetails || "À l'atelier"}</div>
         <div><strong>Thème / Couleurs :</strong> ${eventTheme || 'Aucun'}</div>
       </div>
     </div>

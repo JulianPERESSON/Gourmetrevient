@@ -538,7 +538,6 @@ function calcFullCost(margin, customRecipe = null, forcedInflation = null) {
 
   // TVA calculations
   let tvaRate = 5.5;
-  const isCurrent = (r === APP.recipe);
   const tvaEl = document.getElementById('recipeTvaRate');
   if (isCurrent && tvaEl) {
     tvaRate = parseFloat(tvaEl.value) || 5.5;

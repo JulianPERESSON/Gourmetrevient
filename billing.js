@@ -268,7 +268,7 @@ const GourmetBilling = {
                 </div>
             </div>
         `;
-    }
+    },
     /**
      * Affiche un prompt d'upgrade rapide (bannière non-bloquante).
      */
