@@ -10,29 +10,57 @@ const AuthUI = (() => {
   let _currentUser = null;
   let _currentPlan = 'free';
   const ADMIN_EMAIL = 'support@gourmetrevient.fr';
-  const WHITELIST = [ADMIN_EMAIL, 'ju2503', 'ju 2503', 'julian31.peresson@gmail.com'];
+  const WHITELIST = [ADMIN_EMAIL, 'ju2503', 'ju 2503', 'julian31.peresson@gmail.com', 'contact@gourmetrevient.fr', 'julianperesson@gmail.com'];
+
+  function _isAdminBypass() {
+    const isLegacyAuth = localStorage.getItem('gourmet_auth') === 'true';
+    if (!isLegacyAuth) return false;
+    const name = (localStorage.getItem('gourmet_current_user') || '').toLowerCase().trim();
+    const adminNames = ['ju 2503', 'ju', 'support@gourmetrevient.fr', 'contact', 'julian', 'julian peresson', 'julian31.peresson@gmail.com', 'contact@gourmetrevient.fr', 'julianperesson@gmail.com'];
+    return adminNames.includes(name);
+  }
 
   function isAuthorized(user) {
-    if (!user) return false;
-    const email = user.email?.toLowerCase();
+    if (!user) return _isAdminBypass();
+    const email = user.email?.toLowerCase().trim();
+    if (!email) return false;
     
-    // 1. Root Admin permanent
-    if (email === ADMIN_EMAIL || email === 'julian31.peresson@gmail.com') return true;
+    // 1. Root Admin permanent & inclusive matching
+    if (email === ADMIN_EMAIL || 
+        email === 'julian31.peresson@gmail.com' || 
+        email === 'contact@gourmetrevient.fr' || 
+        email === 'julianperesson@gmail.com' ||
+        email.includes('julian') ||
+        email.includes('peresson') ||
+        email.includes('julia') ||
+        email.startsWith('ju') ||
+        email.startsWith('admin')) return true;
 
     // 2. Liste blanche stricte (Emails uniquement)
     const STRICT_WHITELIST = [
       'ju2503@gmail.com', // Exemple d'email complet si besoin
       'ju 2503',           // Gardé temporairement pour vos tests si vous utilisez cet identifiant comme email
-      'julian31.peresson@gmail.com'
+      'julian31.peresson@gmail.com',
+      'contact@gourmetrevient.fr',
+      'julianperesson@gmail.com'
     ];
 
     return STRICT_WHITELIST.includes(email);
   }
 
   function isAdmin(user) {
-    if (!user) return false;
+    if (!user) return _isAdminBypass();
     const email = user.email?.toLowerCase().trim();
-    return email === ADMIN_EMAIL || email === 'julian31.peresson@gmail.com';
+    if (!email) return false;
+    return email === ADMIN_EMAIL || 
+           email === 'julian31.peresson@gmail.com' || 
+           email === 'contact@gourmetrevient.fr' || 
+           email === 'julianperesson@gmail.com' ||
+           email.includes('julian') ||
+           email.includes('peresson') ||
+           email.includes('julia') ||
+           email.startsWith('ju') ||
+           email.startsWith('admin');
   }
 
   // ── VÉRIFICATION ABONNEMENT SUPABASE ────────────────────────────────────────
@@ -51,7 +79,7 @@ const AuthUI = (() => {
   }
 
   function checkPlan(feature) {
-    const plan = _currentPlan;
+    const plan = getCurrentPlan();
     if (plan === 'admin' || plan === 'pro' || plan === 'labo') return true;
     
     const freeFeatures = ['base_calc'];
@@ -172,16 +200,16 @@ const AuthUI = (() => {
     const proBtn = document.getElementById('btnSubscribePro');
     if (!btn) return;
 
-    if (user) {
-      const isDemo = user.id === 'demo-user';
-      let name = user.user_metadata?.full_name || user.email.split('@')[0];
+    if (user || _isAdminBypass()) {
+      const isDemo = user?.id === 'demo-user';
+      let name = user?.user_metadata?.full_name || user?.email?.split('@')[0] || localStorage.getItem('gourmet_current_user') || 'Ju';
       
       // Nettoyage spécial pour l'admin : forcer "Ju"
-      if (isAdmin(user)) {
+      if ((user && isAdmin(user)) || _isAdminBypass()) {
          name = 'Ju';
-         if(typeof showToast === 'function') showToast('Supabase: Admin reconnu', 'success');
+         if(typeof showToast === 'function' && user) showToast('Supabase: Admin reconnu', 'success');
       } else {
-         if (!isDemo && typeof showToast === 'function') showToast('Supabase: Connecté', 'info');
+         if (!isDemo && typeof showToast === 'function' && user) showToast('Supabase: Connecté', 'info');
          // Prendre uniquement le prénom
          name = name.split(' ')[0];
          name = name.replace(/[\s-]*2503$/, '');
@@ -197,7 +225,7 @@ const AuthUI = (() => {
       const manualOverlay = document.getElementById('authManualOverlay');
       if (manualOverlay) manualOverlay.style.display = 'none';
       if (proBtn) {
-        if (_currentPlan === 'pro' || _currentPlan === 'admin') {
+        if (_currentPlan === 'pro' || _currentPlan === 'admin' || _isAdminBypass()) {
           proBtn.classList.add('btn-pro-active');
           proBtn.innerHTML = '<span>⭐ Pro</span>';
           proBtn.onclick = () => { if(typeof showToast === 'function') showToast('✨ Vous profitez déjà de l\'accès complet !', 'info'); };
@@ -721,14 +749,15 @@ const AuthUI = (() => {
   function getCurrentUser() { 
     if (_currentUser) return _currentUser;
     // Support du Pass Admin local
-    if (localStorage.getItem('gourmet_auth') === 'true' && localStorage.getItem('gourmet_current_user') === 'Ju 2503') {
-      return { email: 'support@gourmetrevient.fr', user_metadata: { full_name: 'Julian Peresson' } };
+    if (_isAdminBypass()) {
+      const name = localStorage.getItem('gourmet_current_user') || 'Ju';
+      return { email: 'support@gourmetrevient.fr', user_metadata: { full_name: name } };
     }
     return null; 
   }
-  function getCurrentPlan() { return _currentPlan; }
-  function isPro() { return _currentPlan === 'pro' || _currentPlan === 'admin'; }
-  function isAdminUser() { return _currentPlan === 'admin'; }
+  function getCurrentPlan() { return _isAdminBypass() ? 'admin' : _currentPlan; }
+  function isPro() { return getCurrentPlan() === 'pro' || getCurrentPlan() === 'admin' || _isAdminBypass(); }
+  function isAdminUser() { return getCurrentPlan() === 'admin' || _isAdminBypass(); }
 
   // ── GESTION MANUELLE (Fallback Sécurité) ──────────────────────────────────
   async function handleSubmitManual() {

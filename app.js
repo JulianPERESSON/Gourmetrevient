@@ -3775,7 +3775,7 @@ function checkAuth() {
     // Vérifier l'abonnement
     const isProOrAdmin = window.AuthUI && typeof window.AuthUI.isPro === 'function' ? window.AuthUI.isPro() : false;
     const name = localStorage.getItem('gourmet_current_user') || '';
-    const isAdminBypass = ['ju 2503', 'ju', 'support@gourmetrevient.fr', 'contact'].includes(name.toLowerCase());
+    const isAdminBypass = ['ju 2503', 'ju', 'support@gourmetrevient.fr', 'contact', 'julian', 'julian peresson', 'julian31.peresson@gmail.com', 'contact@gourmetrevient.fr', 'julianperesson@gmail.com'].includes(name.toLowerCase().trim());
 
     if (!isProOrAdmin && !isAdminBypass && user) {
       console.info('🔒 Abonnement requis. Accès bloqué.');
