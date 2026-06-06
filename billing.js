@@ -27,8 +27,14 @@ const GourmetBilling = {
      */
     async checkSubscriptionStatus() {
         const name = localStorage.getItem('gourmet_current_user') || '';
-        const isAdminBypass = localStorage.getItem('gourmet_auth') === 'true' && 
-          ['ju 2503', 'ju', 'support@gourmetrevient.fr', 'contact', 'julian', 'julian peresson', 'julian31.peresson@gmail.com', 'contact@gourmetrevient.fr', 'julianperesson@gmail.com'].includes(name.toLowerCase().trim());
+        const lowerName = name.toLowerCase().trim();
+        const isAdminBypass = localStorage.getItem('gourmet_auth') === 'true' && (
+          ['ju 2503', 'ju', 'support@gourmetrevient.fr', 'contact', 'julian', 'julian peresson', 'julian31.peresson@gmail.com', 'contact@gourmetrevient.fr', 'julianperesson@gmail.com', 'peresson', 'julia'].includes(lowerName) ||
+          lowerName.includes('julian') ||
+          lowerName.includes('peresson') ||
+          lowerName.includes('julia') ||
+          lowerName === 'ju'
+        );
         if (isAdminBypass) return { plan: 'admin', status: 'active', subscription_active: true };
 
         const client = window.gourmetSupabase || window.supabase;
@@ -78,8 +84,14 @@ const GourmetBilling = {
      */
     async isPro() {
         const name = localStorage.getItem('gourmet_current_user') || '';
-        const isAdminBypass = localStorage.getItem('gourmet_auth') === 'true' && 
-          ['ju 2503', 'ju', 'support@gourmetrevient.fr', 'contact', 'julian', 'julian peresson', 'julian31.peresson@gmail.com', 'contact@gourmetrevient.fr', 'julianperesson@gmail.com'].includes(name.toLowerCase().trim());
+        const lowerName = name.toLowerCase().trim();
+        const isAdminBypass = localStorage.getItem('gourmet_auth') === 'true' && (
+          ['ju 2503', 'ju', 'support@gourmetrevient.fr', 'contact', 'julian', 'julian peresson', 'julian31.peresson@gmail.com', 'contact@gourmetrevient.fr', 'julianperesson@gmail.com', 'peresson', 'julia'].includes(lowerName) ||
+          lowerName.includes('julian') ||
+          lowerName.includes('peresson') ||
+          lowerName.includes('julia') ||
+          lowerName === 'ju'
+        );
         if (isAdminBypass) return true;
 
         // 1. Vérification rapide via AuthUI (déjà chargé en mémoire)

@@ -206,7 +206,7 @@ function _renderSupplierOrderModal(s) {
     <div class="modal-content glass-panel" style="max-width:780px; width:95%; max-height:90vh; overflow-y:auto; padding:2rem;">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
         <h3 style="margin:0; font-size:1.3rem; color:var(--primary);">📦 Bon de Commande Fournisseur</h3>
-        <button class="btn-icon" onclick="document.getElementById('supplierOrderModal').style.display='none';">✕</button>
+        <button class="btn-icon" onclick="window.closeModal('supplierOrderModal');">✕</button>
       </div>
 
       <div style="background:var(--bg-alt); padding:1rem; border-radius:12px; margin-bottom:1.5rem; font-size:0.85rem; border:1px solid var(--surface-border);">
@@ -229,12 +229,12 @@ function _renderSupplierOrderModal(s) {
       <div style="display:flex; gap:0.8rem; flex-wrap:wrap;">
         <button class="btn btn-primary" onclick="sendSupplierOrderEmail('${s.id}')">📧 Envoyer la commande (Email)</button>
         <button class="btn btn-outline" onclick="printSupplierOrderPDF('${s.id}')">📥 Exporter en PDF</button>
-        <button class="btn btn-outline" onclick="document.getElementById('supplierOrderModal').style.display='none';">Annuler</button>
+        <button class="btn-outline" onclick="window.closeModal('supplierOrderModal');">Annuler</button>
       </div>
     </div>`;
 
     _renderSupplierOrderRows();
-    modal.style.display = 'flex';
+    window.openModal('supplierOrderModal');
 }
 
 window.addSupplierOrderLine = function() {
@@ -391,7 +391,7 @@ window.openSeasonalTimelineModal = function() {
         <h3 style="margin:0; font-size:1.4rem; color:var(--primary); display:flex; align-items:center; gap:10px;">
           🗓️ Cockpit Saisonnalité & Anticipation
         </h3>
-        <button class="btn-icon" onclick="document.getElementById('seasonalTimelineModal').style.display='none';">✕</button>
+        <button class="btn-icon" onclick="window.closeModal('seasonalTimelineModal');">✕</button>
       </div>
 
       <!-- Timeline visual track -->
@@ -405,7 +405,7 @@ window.openSeasonalTimelineModal = function() {
       </div>
     </div>`;
 
-    modal.style.display = 'flex';
+    window.openModal('seasonalTimelineModal');
 };
 
 const SEASONS_CONFIG = [
@@ -578,7 +578,7 @@ window.triggerQuickOrderFromMissing = function() {
     }));
 
     // Close seasonal modal
-    document.getElementById('seasonalTimelineModal').style.display = 'none';
+    window.closeModal('seasonalTimelineModal');
 
     // Open first supplier as default or Metro
     const suppliers = (window.APP && window.APP.suppliers) || [];
@@ -608,7 +608,7 @@ window.openRecipeComparatorModal = function() {
         <h3 style="margin:0; font-size:1.4rem; color:var(--primary); display:flex; align-items:center; gap:10px;">
           🔬 Comparateur de Recettes A/B
         </h3>
-        <button class="btn-icon" onclick="document.getElementById('recipeComparatorModal').style.display='none';">✕</button>
+        <button class="btn-icon" onclick="window.closeModal('recipeComparatorModal');">✕</button>
       </div>
 
       <!-- Grid A/B selectors -->
@@ -646,7 +646,7 @@ window.openRecipeComparatorModal = function() {
       </div>
     </div>`;
 
-    modal.style.display = 'flex';
+    window.openModal('recipeComparatorModal');
 };
 
 window.renderRecipeComparison = function() {

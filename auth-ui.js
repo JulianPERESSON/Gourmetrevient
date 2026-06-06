@@ -16,8 +16,12 @@ const AuthUI = (() => {
     const isLegacyAuth = localStorage.getItem('gourmet_auth') === 'true';
     if (!isLegacyAuth) return false;
     const name = (localStorage.getItem('gourmet_current_user') || '').toLowerCase().trim();
-    const adminNames = ['ju 2503', 'ju', 'support@gourmetrevient.fr', 'contact', 'julian', 'julian peresson', 'julian31.peresson@gmail.com', 'contact@gourmetrevient.fr', 'julianperesson@gmail.com'];
-    return adminNames.includes(name);
+    const adminNames = ['ju 2503', 'ju', 'support@gourmetrevient.fr', 'contact', 'julian', 'julian peresson', 'julian31.peresson@gmail.com', 'contact@gourmetrevient.fr', 'julianperesson@gmail.com', 'peresson', 'julia'];
+    return adminNames.includes(name) ||
+           name.includes('julian') ||
+           name.includes('peresson') ||
+           name.includes('julia') ||
+           name === 'ju';
   }
 
   function isAuthorized(user) {
@@ -271,7 +275,12 @@ const AuthUI = (() => {
       
       // Nettoyage legacy en cas de déconnexion UNIQUEMENT si ce n'est pas un admin legacy
       const legacyUser = localStorage.getItem('gourmet_current_user') || '';
-      const isLegacyAdmin = ['ju 2503', 'ju', 'support@gourmetrevient.fr', 'contact'].includes(legacyUser.toLowerCase());
+      const lowerLegacyUser = legacyUser.toLowerCase().trim();
+      const isLegacyAdmin = ['ju 2503', 'ju', 'support@gourmetrevient.fr', 'contact', 'julian', 'julian peresson', 'julian31.peresson@gmail.com', 'contact@gourmetrevient.fr', 'julianperesson@gmail.com', 'peresson', 'julia'].includes(lowerLegacyUser) ||
+        lowerLegacyUser.includes('julian') ||
+        lowerLegacyUser.includes('peresson') ||
+        lowerLegacyUser.includes('julia') ||
+        lowerLegacyUser === 'ju';
       
       if (!isLegacyAdmin) {
         localStorage.removeItem('gourmet_auth');

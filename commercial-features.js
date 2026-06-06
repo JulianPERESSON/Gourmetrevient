@@ -1029,7 +1029,7 @@ window.showCataloguePreview = function(html, items, shopName) {
       <div class="modal-content glass-panel" style="max-width:1200px; width:95%; max-height:95vh; display:flex; flex-direction:column;">
         <div class="modal-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
           <h3 style="margin:0;">🌐 E-Catalogue Client</h3>
-          <button class="btn-icon" onclick="document.getElementById('eCatalogueModal').style.display='none';">✕</button>
+          <button class="btn-icon" onclick="window.closeModal('eCatalogueModal');">✕</button>
         </div>
         <div id="eCataloguePreviewArea" style="flex:1; overflow:auto; border:1px solid var(--surface-border); border-radius:var(--radius); margin-bottom:1rem;"></div>
         <div id="eCatalogueActions" style="display:flex; gap:0.75rem; flex-wrap:wrap;"></div>
@@ -1070,7 +1070,7 @@ window.showCataloguePreview = function(html, items, shopName) {
   // Store generated HTML
   window._eCatalogueHTML = html;
   
-  modal.style.display = 'flex';
+  window.openModal('eCatalogueModal');
 }
 
 window.downloadECatalogue = function() {

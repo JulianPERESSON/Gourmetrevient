@@ -46,7 +46,7 @@ window.openInvoiceGenerator = function(orderId = null) {
     <div class="modal-content glass-panel" style="max-width:780px; width:95%; max-height:92vh; overflow-y:auto;">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
         <h3 style="margin:0; font-size:1.3rem;">📄 Générateur de Devis / Facture</h3>
-        <button class="btn-icon" onclick="document.getElementById('invoiceGeneratorModal').style.display='none';">✕</button>
+        <button class="btn-icon" onclick="window.closeModal('invoiceGeneratorModal');">✕</button>
       </div>
 
       <!-- Type Toggle -->
@@ -127,7 +127,7 @@ window.openInvoiceGenerator = function(orderId = null) {
       <div style="display:flex; gap:0.8rem; flex-wrap:wrap;">
         <button class="btn btn-primary" onclick="generateInvoicePDF()">📥 Générer le PDF</button>
         <button class="btn btn-outline" onclick="previewInvoice()">👁️ Aperçu HTML</button>
-        <button class="btn btn-outline" onclick="document.getElementById('invoiceGeneratorModal').style.display='none';">Annuler</button>
+        <button class="btn btn-outline" onclick="window.closeModal('invoiceGeneratorModal');">Annuler</button>
       </div>
     </div>`;
 
@@ -139,7 +139,7 @@ window.openInvoiceGenerator = function(orderId = null) {
         addInvoiceLine();
     }
 
-    modal.style.display = 'flex';
+    window.openModal('invoiceGeneratorModal');
     // Save address on blur
     setTimeout(() => {
         const addrInput = document.getElementById('invShopAddress');
@@ -696,7 +696,7 @@ window.openLotTraceability = function() {
     <div class="modal-content glass-panel" style="max-width:850px; width:95%; max-height:90vh; overflow-y:auto;">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
         <h3 style="margin:0;">🔬 Traçabilité des Lots (HACCP)</h3>
-        <button class="btn-icon" onclick="document.getElementById('lotTraceabilityModal').style.display='none';">✕</button>
+        <button class="btn-icon" onclick="window.closeModal('lotTraceabilityModal');">✕</button>
       </div>
       <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:1.5rem;">
         Enregistrez les numéros de lots de vos matières premières sensibles lors de chaque production. En cas de rappel produit, retrouvez instantanément quelles recettes et quels clients ont été impactés.
@@ -764,7 +764,7 @@ window.openLotTraceability = function() {
       </div>
     </div>`;
 
-    modal.style.display = 'flex';
+    window.openModal('lotTraceabilityModal');
 };
 
 window._renderLotIngRow = function(name = '', lot = '') {
@@ -859,7 +859,7 @@ window.openHACCPReminderSettings = function() {
     <div class="modal-content glass-panel" style="max-width:480px; width:95%;">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
         <h3 style="margin:0;">🔔 Alertes Relevés HACCP</h3>
-        <button class="btn-icon" onclick="document.getElementById('haccpReminderModal').style.display='none';">✕</button>
+        <button class="btn-icon" onclick="window.closeModal('haccpReminderModal');">✕</button>
       </div>
       <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:1.5rem;">
         Activez les rappels pour que votre brigade n'oublie jamais de relever les températures des frigos et chambres froides.
@@ -893,7 +893,7 @@ window.openHACCPReminderSettings = function() {
       <button class="btn btn-primary btn-full" onclick="saveHACCPReminderSettings()">💾 Enregistrer</button>
     </div>`;
 
-    modal.style.display = 'flex';
+    window.openModal('haccpReminderModal');
 };
 
 window._addHACCPTimeRow = function() {
@@ -931,7 +931,7 @@ window.saveHACCPReminderSettings = function() {
     }
 
     if (typeof showToast === 'function') showToast('Paramètres HACCP enregistrés ✓', 'success');
-    document.getElementById('haccpReminderModal').style.display = 'none';
+    window.closeModal('haccpReminderModal');
 };
 
 function _setupHACCPReminderTimer(config) {
@@ -1121,7 +1121,7 @@ window.openInflationComparator = function() {
           <h3 style="margin:0;">📈 Comparateur d'Inflation Multi-Périodes</h3>
           <p style="margin:6px 0 0; font-size:0.82rem; color:var(--text-secondary);">Simulez l'érosion de vos marges à différents niveaux d'inflation des matières premières.</p>
         </div>
-        <button class="btn-icon" onclick="document.getElementById('inflationComparatorModal').style.display='none';">✕</button>
+        <button class="btn-icon" onclick="window.closeModal('inflationComparatorModal');">✕</button>
       </div>
 
       <!-- Controls bar -->
@@ -1155,7 +1155,7 @@ window.openInflationComparator = function() {
       </div>
     </div>`;
 
-    modal.style.display = 'flex';
+    window.openModal('inflationComparatorModal');
     // Auto-run: show results immediately on open
     setTimeout(runInflationComparison, 200);
 };

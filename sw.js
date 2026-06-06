@@ -3,7 +3,7 @@
 // Stratégie : Cache-First assets statiques + SWR Google Fonts/CDN + IDB Queue
 // =============================================================================
 
-const CACHE_VERSION = '12.3.0'; // Zero-Bug & Conformité — Precache CRM Fix & Planning Sync Updates
+const CACHE_VERSION = '12.4.0'; // Modular app.js segmentations
 const CACHE_STATIC  = `gourmet-static-v${CACHE_VERSION}`;
 const CACHE_RUNTIME = `gourmet-runtime-v${CACHE_VERSION}`;
 const CACHE_FONTS   = `gourmet-fonts-v${CACHE_VERSION}`;
@@ -19,7 +19,17 @@ const PRECACHE_ASSETS = [
   './legal.html',
   './blog.html',
   './styles.css',
-  './app.js',
+  './app-state.js',
+  './app-core.js',
+  './app-recipes.js',
+  './app-inventory.js',
+  './app-auth.js',
+  './app-planning.js',
+  './app-analytics.js',
+  './app-production.js',
+  './app-haccp.js',
+  './app-omnisearch.js',
+  './app-main.js',
   './data.js',
   './blog-data.js',
   './i18n.js',

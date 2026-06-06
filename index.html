@@ -3929,7 +3929,7 @@
       <div class="modal-card" style="width: 500px; max-width:95%;">
         <div class="modal-header" style="display:flex; justify-content:space-between; align-items:center;">
           <h3 style="margin:0;">📦 Traçabilité — Nouveau Lot de Production</h3>
-          <button class="btn-icon" onclick="document.getElementById('lotRegistreModal').style.display='none'">✕</button>
+          <button class="btn-icon" onclick="window.closeModal('lotRegistreModal')">✕</button>
         </div>
         <div class="modal-body" style="padding:2rem;">
           <input type="hidden" id="lotRecipeId">
@@ -3974,7 +3974,7 @@
       <div class="modal-content glass-card" style="width: 650px; max-width: 95%; padding: 2rem; background: var(--surface); border-radius: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.15);">
         <div class="modal-header" style="justify-content:space-between; display:flex; margin-bottom:1.2rem; align-items:center;">
           <h3 style="margin:0; font-family:var(--font-heading); color:var(--primary); display:flex; align-items:center; gap:8px;">⚖️ Comparateur Prix Fournisseurs</h3>
-          <button class="close-btn-premium" onclick="document.getElementById('priceComparatorModal').style.display='none'">×</button>
+          <button class="close-btn-premium" onclick="window.closeModal('priceComparatorModal')">×</button>
         </div>
         <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1.5rem;">
           Sélectionnez un ingrédient pour comparer les tarifs de vos fournisseurs enregistrés et identifier la meilleure offre.
@@ -5371,7 +5371,17 @@
   <script src="./auth-ui.js?v=11.5.0" defer></script>
   <script src="./billing.js?v=11.5.0" defer></script>
   <script src="./cloud-sync.js?v=11.5.0" defer></script>
-  <script src="./app.js?v=11.6.0" defer></script>
+  <script src="./app-state.js?v=11.6.0" defer></script>
+  <script src="./app-core.js?v=11.6.0" defer></script>
+  <script src="./app-recipes.js?v=11.6.0" defer></script>
+  <script src="./app-inventory.js?v=11.6.0" defer></script>
+  <script src="./app-auth.js?v=11.6.0" defer></script>
+  <script src="./app-planning.js?v=11.6.0" defer></script>
+  <script src="./app-analytics.js?v=11.6.0" defer></script>
+  <script src="./app-production.js?v=11.6.0" defer></script>
+  <script src="./app-haccp.js?v=11.6.0" defer></script>
+  <script src="./app-omnisearch.js?v=11.6.0" defer></script>
+  <script src="./app-main.js?v=11.6.0" defer></script>
   <script src="./sous-recettes.js" defer></script>
   <script src="./core-upgrade.js?v=1.0.0" defer></script>
   <script src="./pro-features.js?v=1.0.8" defer></script>
@@ -5676,37 +5686,7 @@
 
   </script>
 
-  <!-- QR Code / Label Modal -->
-  <div id="qrModal" class="modal" style="display:none; position:fixed; z-index:9999; left:0; top:0; width:100%; height:100%; overflow:auto; background-color:rgba(0,0,0,0.5); align-items:center; justify-content:center;">
-    <div class="modal-content" style="background:var(--surface); margin:10% auto; padding:2rem; border-radius:12px; max-width:400px; text-align:center; position:relative; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);">
-      <span class="close-qr" onclick="document.getElementById('qrModal').style.display='none'" style="position:absolute; right:15px; top:10px; font-size:1.5rem; cursor:pointer; color:var(--text-muted);">&times;</span>
-      <h3 style="margin-bottom:1.5rem; color:var(--text); font-family:var(--font-heading);">Étiquette Point de Vente</h3>
-      
-      <div id="labelPreview" style="border:2px dashed var(--surface-border); padding:2rem; border-radius:8px; display:flex; flex-direction:column; align-items:center; background:var(--bg-alt);">
-        <h4 id="qrRecipeName" style="font-size:1.3rem; color:var(--text); margin-bottom:0.5rem; text-transform:uppercase; font-family:var(--font-heading); letter-spacing:1px;">Nom de la Recette</h4>
-        <div style="font-size:0.8rem; color:var(--text-muted); text-transform:uppercase; margin-bottom:0.2rem;">Prix de Vente Conseillé</div>
-        <p id="qrRecipePrice" style="font-size:2rem; font-weight:800; color:var(--accent); margin:0 0 1.5rem 0;">4.50 </p>
-        
-        <div id="qrcodeBox" style="margin: 0 0 1.5rem 0; padding:15px; background:white; border-radius:12px; box-shadow:0 4px 15px rgba(0,0,0,0.05); border:1px solid #eee;">
-          <div id="qrcode"></div>
-        </div>
-        
-        <div style="width:100%; text-align:left; border-top:1px solid var(--surface-border); padding-top:1rem;">
-          <strong style="font-size:0.8rem; color:var(--text); display:block; margin-bottom:0.3rem;">Allergènes Majeurs :</strong>
-          <p id="qrAllergens" style="font-size:0.8rem; color:var(--danger); font-weight:600; margin:0; line-height:1.4;">Aucun</p>
-        </div>
-      </div>
-      
-      <div style="margin-top:1.5rem; display:flex; gap:10px; justify-content:center;">
-         <button class="btn btn-primary" onclick="exportQRLabelPdf()" style="gap:8px; flex:1;">
-           📥 PDF
-         </button>
-         <button class="btn btn-outline" onclick="window.print()" style="gap:8px; flex:1;">
-            Imprimer
-         </button>
-      </div>
-    </div>
-  </div>
+
 
   <!-- ================================================ -->
   <!-- OCR SCANNER MODAL -->
@@ -5729,8 +5709,7 @@
 
   <script>
     function closeOCRScanner() {
-      const modal = document.getElementById('ocrScannerModal');
-      if (modal) modal.style.display = 'none';
+      window.closeModal('ocrScannerModal');
       // Clear the preview so next open starts fresh
       const preview = document.getElementById('ocrPreview');
       if (preview) preview.innerHTML = '';
@@ -6399,7 +6378,7 @@
   <!-- QR Code / Label Modal -->
   <div id="qrModal" class="modal-overlay" style="display:none; z-index: 10005;">
     <div class="modal-content glass-panel" style="max-width: 500px; text-align: center; padding: 2rem;">
-      <button class="auth-close" onclick="document.getElementById('qrModal').style.display='none'">✖</button>
+      <button class="auth-close" onclick="window.closeModal('qrModal')">✖</button>
       <div id="labelPreview" style="background: white; padding: 2rem; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); margin-bottom: 2rem; border: 1px solid #e2e8f0; text-align: left;">
         <div style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: #64748b; font-weight: 800; margin-bottom: 4px;" id="qrCategory">P&acirc;tisserie</div>
         <div style="font-size: 1.5rem; font-weight: 850; color: #1e293b; line-height: 1.2; margin-bottom: 1rem;" id="qrRecipeName">Nom de la recette</div>

@@ -349,6 +349,7 @@ window.GourmetRecipeHistory = {
     if (!modal) {
       modal = document.createElement('div');
       modal.id = 'recipeHistoryModal';
+      modal.className = 'modal-overlay';
       modal.style.cssText = 'position:fixed;inset:0;background:rgba(15,23,42,0.7);backdrop-filter:blur(8px);z-index:99999;display:flex;align-items:center;justify-content:center;';
       document.body.appendChild(modal);
     }
@@ -357,7 +358,7 @@ window.GourmetRecipeHistory = {
       <div style="background:var(--bg-surface,white);border-radius:24px;padding:2rem;width:600px;max-width:95vw;max-height:85vh;overflow-y:auto;box-shadow:0 30px 60px rgba(0,0,0,0.3);">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;">
           <h3 style="margin:0;font-family:var(--font-display);color:var(--primary);">📜 Historique — ${recipeName}</h3>
-          <button onclick="document.getElementById('recipeHistoryModal').style.display='none'"
+          <button onclick="window.closeModal('recipeHistoryModal')"
             style="background:none;border:none;font-size:1.5rem;cursor:pointer;color:var(--text-muted);">✕</button>
         </div>
         ${history.length === 0 ? `<p style="color:var(--text-muted);text-align:center;padding:2rem;">Aucun historique disponible.<br>Les versions sont sauvegardées à chaque modification.</p>` :
@@ -385,7 +386,7 @@ window.GourmetRecipeHistory = {
           }).join('')}
       </div>`;
 
-    modal.style.display = 'flex';
+    window.openModal('recipeHistoryModal');
   }
 };
 

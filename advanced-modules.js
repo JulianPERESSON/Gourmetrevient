@@ -26,7 +26,7 @@ window.openRecipeComparator = function() {
       <div class="modal-content glass-panel" style="max-width:1000px; width:95%; max-height:90vh; overflow-y:auto;">
         <div class="modal-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
           <h3 style="margin:0;">⚖️ Comparateur de Recettes</h3>
-          <button class="btn-icon" onclick="document.getElementById('recipeComparatorModal').style.display='none';">✕</button>
+          <button class="btn-icon" onclick="window.closeModal('recipeComparatorModal');">✕</button>
         </div>
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; margin-bottom:1.5rem;">
           <div class="form-group">
@@ -59,8 +59,8 @@ window.openRecipeComparator = function() {
       <p>Sélectionnez deux recettes pour comparer leurs coûts, leurs marges et leur composition.</p>
     </div>`;
   
-  modal.style.display = 'flex';
-};
+  window.openModal('recipeComparatorModal');
+}
 
 window.runRecipeComparison = function() {
   const idxA = document.getElementById('compareRecipeA').value;
@@ -289,7 +289,7 @@ window.analyzeWorkload = function() {
     <div class="modal-content glass-panel" style="max-width:700px; width:95%; max-height:90vh; overflow-y:auto;">
       <div class="modal-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
         <h3 style="margin:0;">📊 Analyse de Charge</h3>
-        <button class="btn-icon" onclick="document.getElementById('workloadModal').style.display='none';">✕</button>
+        <button class="btn-icon" onclick="window.closeModal('workloadModal');">✕</button>
       </div>
       
       <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:1rem; margin-bottom:1.5rem;">
@@ -340,7 +340,7 @@ window.analyzeWorkload = function() {
     </div>
   `;
   
-  modal.style.display = 'flex';
+  window.openModal('workloadModal');
 };
 
 
@@ -536,7 +536,7 @@ window.openVitrineLabels = function() {
     <div class="modal-content glass-panel" style="max-width:900px; width:95%; max-height:90vh; overflow-y:auto;">
       <div class="modal-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
         <h3 style="margin:0;">🏷️ Étiquettes de Vitrine</h3>
-        <button class="btn-icon" onclick="document.getElementById('vitrineLabelsModal').style.display='none';">✕</button>
+        <button class="btn-icon" onclick="window.closeModal('vitrineLabelsModal');">✕</button>
       </div>
       
       <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:1.5rem;">
@@ -576,7 +576,7 @@ window.openVitrineLabels = function() {
     </div>
   `;
   
-  modal.style.display = 'flex';
+  window.openModal('vitrineLabelsModal');
 };
 
 window.toggleAllVitrineCheckboxes = function(state) {

@@ -16,6 +16,7 @@ dist/
 
 # Backups & temp files
 backups/
+scratch/
 *_temp.js
 old_*.html
 *.resolved

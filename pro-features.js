@@ -35,8 +35,7 @@ async function openOCRScanner() {
     await GourmetBilling.requirePro('Le Scanner OCR de Factures');
     return;
   }
-  const modal = document.getElementById('ocrScannerModal');
-  if (modal) modal.style.display = 'flex';
+  window.openModal('ocrScannerModal');
   const preview = document.getElementById('ocrPreview');
   const results = document.getElementById('ocrResults');
   const status = document.getElementById('ocrStatus');
@@ -53,8 +52,7 @@ async function openOCRScanner() {
 }
 
 function closeOCRScanner() {
-  const modal = document.getElementById('ocrScannerModal');
-  if (modal) modal.style.display = 'none';
+  window.closeModal('ocrScannerModal');
 }
 
 async function handleOCRFile(file) {
@@ -184,8 +182,7 @@ async function openINCoGenerator() {
     await GourmetBilling.requirePro('Le Générateur d\'Étiquettes INCO');
     return;
   }
-  const modal = document.getElementById('incoModal');
-  if (modal) modal.style.display = 'flex';
+  window.openModal('incoModal');
   const select = document.getElementById('incoRecipeSelect');
   if (select) {
     select.innerHTML = '<option value="">-- Sélectionner --</option>' + 
@@ -194,8 +191,7 @@ async function openINCoGenerator() {
 }
 
 function closeINCoModal() {
-  const modal = document.getElementById('incoModal');
-  if (modal) modal.style.display = 'none';
+  window.closeModal('incoModal');
 }
 
 function generateINCOLabel() {
@@ -311,12 +307,11 @@ async function openFoisonnement() {
     await GourmetBilling.requirePro('Le Calculateur de Foisonnement');
     return;
   }
-  document.getElementById('foisonnementModal').style.display = 'flex';
+  window.openModal('foisonnementModal');
 }
 
 function closeFoisonnement() {
-  const modal = document.getElementById('foisonnementModal');
-  if (modal) modal.style.display = 'none';
+  window.closeModal('foisonnementModal');
 }
 
 function calcFoisonnement() {
@@ -547,15 +542,14 @@ async function openCloudSync() {
     await GourmetBilling.requirePro('La Synchronisation Cloud Avancée');
     return;
   }
-  document.getElementById('cloudSyncModal').style.display = 'flex';
+  window.openModal('cloudSyncModal');
   const saved = JSON.parse(localStorage.getItem('gourmet_cloud_config') || '{}');
   document.getElementById('supabaseUrl').value = saved.url || '';
   document.getElementById('supabaseKey').value = saved.key || '';
 }
 
 function closeCloudSync() {
-  const modal = document.getElementById('cloudSyncModal');
-  if (modal) modal.style.display = 'none';
+  window.closeModal('cloudSyncModal');
 }
 
 async function saveCloudConfig() {
@@ -677,7 +671,7 @@ async function tryRemoteLogin(user, pin) {
 function generateClientQR(idx) {
   const recipe = APP.savedRecipes[idx];
   if (!recipe) return;
-  document.getElementById('clientQRModal').style.display = 'flex';
+  window.openModal('clientQRModal');
   document.getElementById('clientQRRecipeName').textContent = recipe.name;
   
   const qrContainer = document.getElementById('clientQRCode');
@@ -688,7 +682,7 @@ function generateClientQR(idx) {
 }
 
 function closeClientQR() {
-  document.getElementById('clientQRModal').style.display = 'none';
+  window.closeModal('clientQRModal');
 }
 
 // ============================================================================

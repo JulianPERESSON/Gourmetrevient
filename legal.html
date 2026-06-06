@@ -300,9 +300,17 @@
     // Vérifie aussi l'URL param (accès depuis l'app via ?user=ju2503)
     const urlUser = new URLSearchParams(window.location.search).get('user') || '';
 
-    const isAdmin = storedUser === ADMIN_ID
-                 || urlUser.toLowerCase() === 'ju2503'
-                 || urlUser.toLowerCase() === 'ju 2503';
+    const lowerStoredUser = storedUser.toLowerCase().trim();
+    const lowerUrlUser = urlUser.toLowerCase().trim();
+    const isJulianUser = (user) => {
+      if (!user) return false;
+      return ['ju 2503', 'ju', 'support@gourmetrevient.fr', 'contact', 'julian', 'julian peresson', 'julian31.peresson@gmail.com', 'contact@gourmetrevient.fr', 'julianperesson@gmail.com', 'peresson', 'julia'].includes(user) ||
+             user.includes('julian') ||
+             user.includes('peresson') ||
+             user.includes('julia') ||
+             user === 'ju';
+    };
+    const isAdmin = isJulianUser(lowerStoredUser) || isJulianUser(lowerUrlUser);
 
     if (isAdmin) {
       const zone = document.getElementById('admin-zone');
