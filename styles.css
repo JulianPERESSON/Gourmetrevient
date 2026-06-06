@@ -11329,3 +11329,48 @@ input:checked + .slider:before {
   background: var(--accent-shimmer, linear-gradient(90deg, transparent, #f43f5e, transparent)) !important;
 }
 
+/* ============================================================================
+   SEGMENTED DOMAIN CONTROLS
+   ============================================================================ */
+.library-domain-selector {
+  display: flex;
+  gap: 0.5rem;
+  background: var(--surface-glass, rgba(255, 255, 255, 0.05));
+  backdrop-filter: blur(10px);
+  padding: 6px;
+  border-radius: 14px;
+  border: 1px solid var(--surface-border);
+  max-width: 480px;
+  margin: 0 auto 2.5rem auto;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+}
+
+.domain-btn {
+  flex: 1;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: transparent;
+  color: var(--text-muted);
+  transition: all 0.3s ease;
+  font-family: var(--font-heading);
+}
+
+.domain-btn:hover {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.domain-btn.active {
+  background: var(--accent, #6366f1) !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 15px var(--accent-glow, rgba(99, 102, 241, 0.3));
+}
+

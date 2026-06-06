@@ -3,7 +3,7 @@
 // Stratégie : Cache-First assets statiques + SWR Google Fonts/CDN + IDB Queue
 // =============================================================================
 
-const CACHE_VERSION = '12.4.0'; // Modular app.js segmentations
+const CACHE_VERSION = '12.5.0'; // Bakery recipes and library domains segmentation
 const CACHE_STATIC  = `gourmet-static-v${CACHE_VERSION}`;
 const CACHE_RUNTIME = `gourmet-runtime-v${CACHE_VERSION}`;
 const CACHE_FONTS   = `gourmet-fonts-v${CACHE_VERSION}`;

@@ -1170,6 +1170,20 @@ function exportRecipePdfDirect(idx) {
 // ============================================================================
 
 let currentLibraryFilter = 'all';
+let currentLibraryDomain = 'patisserie';
+
+// Domains classification
+const DOMAIN_BOULANGERIE = [
+  'Boulangerie',
+  'Viennoiserie', 
+  'Viennoiseries',
+  'Viennoiserie (PLF)',
+  'Viennoiseries (PLF)',
+  'Pâte levée',
+  'Pâte levée feuilletée',
+  'Pâtes levées feuilletées',
+  'Brioche'
+];
 
 // Define a professional sort order for pastry categories
 const LIBRARY_SORT_ORDER = [
@@ -1226,6 +1240,28 @@ function sortLibraryByOrder(a, b) {
   // If neither in list, sort alphabetically by category
   return catA.localeCompare(catB);
 }
+
+window.setLibraryDomain = function(domain) {
+  currentLibraryDomain = domain;
+  currentLibraryFilter = 'all'; // Reset category filter on domain switch
+  
+  // Update UI buttons
+  const btnPatisserie = document.getElementById('btnLibDomainPatisserie');
+  const btnBoulangerie = document.getElementById('btnLibDomainBoulangerie');
+  
+  if (btnPatisserie && btnBoulangerie) {
+    if (domain === 'patisserie') {
+      btnPatisserie.classList.add('active');
+      btnBoulangerie.classList.remove('active');
+    } else {
+      btnBoulangerie.classList.add('active');
+      btnPatisserie.classList.remove('active');
+    }
+  }
+  
+  renderLibraryRecipes();
+};
+
 function renderLibraryRecipes() {
   const container = $('#recipeLibraryGrid');
   const filtersContainer = $('#libraryFilters');
@@ -1237,9 +1273,15 @@ function renderLibraryRecipes() {
     return;
   }
 
+  // Filter recipes by active domain
+  const domainRecipes = allRecipes.filter(r => {
+    const isBoulangerie = DOMAIN_BOULANGERIE.includes(r.category);
+    return (currentLibraryDomain === 'boulangerie') ? isBoulangerie : !isBoulangerie;
+  });
+
   // Populate Filters
   if (filtersContainer) {
-    const rawCategories = Array.from(new Set(allRecipes.map(r => r.category)));
+    const rawCategories = Array.from(new Set(domainRecipes.map(r => r.category)));
     
     // Sort based on predefined order
     const sortedCategories = ['all', ...rawCategories.sort((a, b) => {
@@ -1279,6 +1321,9 @@ window.filterLibrary = function() {
 
   // 1. Filter
   let filtered = allRecipes.filter(r => {
+    const isBoulangerie = DOMAIN_BOULANGERIE.includes(r.category);
+    const matchesDomain = (currentLibraryDomain === 'boulangerie') ? isBoulangerie : !isBoulangerie;
+
     const tName = t(`data.recipe.${r.id}.name`).toLowerCase();
     const name = r.name.toLowerCase();
     const tCat = t(r.category).toLowerCase();
@@ -1287,7 +1332,7 @@ window.filterLibrary = function() {
     const matchesSearch = name.includes(query) || tName.includes(query) || cat.includes(query) || tCat.includes(query);
     const matchesFilter = currentLibraryFilter === 'all' || r.category === currentLibraryFilter;
     
-    return matchesSearch && matchesFilter;
+    return matchesDomain && matchesSearch && matchesFilter;
   });
 
   // 2. Sort by Order
@@ -1304,9 +1349,10 @@ window.filterLibrary = function() {
     let emoji = '🍰';
     const catLo = r.category.toLowerCase();
     if (catLo.includes('viennoiserie')) emoji = '🥐';
-    if (catLo.includes('chocolat')) emoji = '🍫';
-    if (catLo.includes('fruit') || catLo.includes('tarte')) emoji = '🍓';
-    if (catLo.includes('base')) emoji = '🥣';
+    else if (catLo.includes('boulangerie')) emoji = '🥖';
+    else if (catLo.includes('chocolat')) emoji = '🍫';
+    else if (catLo.includes('fruit') || catLo.includes('tarte')) emoji = '🍓';
+    else if (catLo.includes('base')) emoji = '🥣';
 
     const tCatRaw = t(r.category);
     const tCat = tCatRaw !== r.category ? tCatRaw : r.category;

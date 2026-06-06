@@ -2508,7 +2508,7 @@
       <!-- Hero / Onboarding (shown initially) -->
       <section class="hero" id="heroSection">
         <div class="hero-badge" data-i18n="hero.badge"> Coût de revient</div>
-        <h2 data-i18n="hero.title">Calculateur de <span class="accent">recettes</span><br>pour la pâtisserie</h2>
+        <h2 data-i18n="hero.title">Calculateur de <span class="accent">recettes</span><br>pour la boulangerie-pâtisserie</h2>
         <p data-i18n="hero.desc">Créez vos recettes, calculez vos coûts par portion, déterminez votre prix de vente et
           optimisez vos marges.
         </p>
@@ -2519,6 +2519,16 @@
         </div>
 
         <div class="library-hub-container">
+          <!-- Séparation distincte en 2 parties : Pâtisserie et Boulangerie -->
+          <div class="library-domain-selector">
+            <button id="btnLibDomainPatisserie" class="domain-btn active" onclick="setLibraryDomain('patisserie')">
+              🍰 Pâtisserie
+            </button>
+            <button id="btnLibDomainBoulangerie" class="domain-btn" onclick="setLibraryDomain('boulangerie')">
+              🥖 Boulangerie
+            </button>
+          </div>
+
           <div class="library-header">
             <h3 data-i18n="hero.library">📖 Bibliothèque des Chefs</h3>
             <div class="library-controls">

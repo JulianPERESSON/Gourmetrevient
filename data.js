@@ -1615,6 +1615,177 @@ function round2(n) {
   return Math.round(n * 100) / 100;
 }
 
+// =====================================================================
+// BOULANGERIE (Pains de tradition, levain, pains complets)
+// =====================================================================
+const BOULANGERIE_RECIPES = [
+  {
+    id: 'baguette-tradition',
+    name: 'Baguette de Tradition Française',
+    category: 'Boulangerie',
+    portions: 10,
+    prepTime: 180,
+    cookTime: 20,
+    image: './img/baguette.jpg',
+    description: 'La classique baguette de tradition à mie sauvage et alvéolée, croûte croustillante de couleur crème ambrée.',
+    ingredients: [
+      { name: 'Farine de Tradition T65', quantity: 1000, unit: 'g', pricePerKg: 0.95 },
+      { name: 'Eau pure', quantity: 700, unit: 'g', pricePerKg: 0.00 },
+      { name: 'Levure fraîche', quantity: 5, unit: 'g', pricePerKg: 4.50 },
+      { name: 'Sel fin de mer', quantity: 18, unit: 'g', pricePerKg: 0.80 }
+    ],
+    steps: [
+      'Autolyse : mélanger la farine T65 et l\'eau (température de base 54-58°C). Laisser reposer 45 min.',
+      'Pétrissage : ajouter la levure fraîche et le sel. Pétrir 8 min en vitesse 1, puis 2 min en vitesse 2.',
+      'Pointage : laisser reposer la pâte en cuve 2h à 24°C avec un rabat (fold) après 1h.',
+      'Division & Détente : diviser en pâtons de 350g, préformer en boules légères et laisser détendre 20 min.',
+      'Façonnage : voyager les pâtons régulièrement à 55cm avec des bouts légèrement pointus.',
+      'Apprêt : disposer les pâtons sur couche (tissu lin) farinée, repos de 1h15 à 24°C.',
+      'Lame & Cuisson : transférer sur tapis, scarifier (5 coups de lame réguliers), cuire à 240°C avec buée pendant 20 min.'
+    ]
+  },
+  {
+    id: 'pain-campagne',
+    name: 'Pain de Campagne',
+    category: 'Boulangerie',
+    portions: 5,
+    prepTime: 240,
+    cookTime: 30,
+    image: './img/campagne.jpg',
+    description: 'Pain rustique et aromatique composé d\'un mélange équilibré de farine de blé et de seigle sur levain.',
+    ingredients: [
+      { name: 'Farine T65', quantity: 800, unit: 'g', pricePerKg: 0.95 },
+      { name: 'Farine de Seigle T130', quantity: 200, unit: 'g', pricePerKg: 1.45 },
+      { name: 'Eau pure', quantity: 680, unit: 'g', pricePerKg: 0.00 },
+      { name: 'Levain liquide actif', quantity: 200, unit: 'g', pricePerKg: 1.20 },
+      { name: 'Levure fraîche', quantity: 3, unit: 'g', pricePerKg: 4.50 },
+      { name: 'Sel fin de mer', quantity: 18, unit: 'g', pricePerKg: 0.80 }
+    ],
+    steps: [
+      'Frasage : mélanger les farines, l\'eau, le levain liquide et la levure pendant 5 min en vitesse 1.',
+      'Pétrissage : ajouter le sel fin et pétrir pendant 5 min en vitesse 2.',
+      'Pointage : repos en bac de 2h30 à 24°C, réaliser deux rabats après 45 min et 90 min.',
+      'Division : diviser en pâtons de 500g, préformer en boules et reposer 15 min.',
+      'Façonnage : façonner en batards (allongés) ou boules rustiques.',
+      'Apprêt : placer dans des bannetons farinés pendant 1h30.',
+      'Cuisson : retourner sur pelle, inciser d\'une grigne en croix, cuire à 230°C avec forte buée pendant 30 min.'
+    ]
+  },
+  {
+    id: 'pain-levain-naturel',
+    name: 'Pain au Levain Naturel',
+    category: 'Boulangerie',
+    portions: 4,
+    prepTime: 300,
+    cookTime: 35,
+    image: './img/levain.jpg',
+    description: 'Pain de garde par excellence, croûte caramélisée, mie très alvéolée avec une acidité lactique subtile.',
+    ingredients: [
+      { name: 'Farine de Tradition T65', quantity: 900, unit: 'g', pricePerKg: 0.95 },
+      { name: 'Farine intégrale T150', quantity: 100, unit: 'g', pricePerKg: 1.60 },
+      { name: 'Eau pure', quantity: 750, unit: 'g', pricePerKg: 0.00 },
+      { name: 'Levain dur rafraîchi', quantity: 150, unit: 'g', pricePerKg: 1.50 },
+      { name: 'Sel fin de mer', quantity: 20, unit: 'g', pricePerKg: 0.80 }
+    ],
+    steps: [
+      'Autolyse : mélanger les farines T65, T150 et l\'eau. Laisser reposer 1h.',
+      'Ensemencement : incorporer le levain naturel dur et pétrir 5 min en vitesse 1.',
+      'Salage : ajouter le sel fin de mer, pétrir 3 min en vitesse 2.',
+      'Pointage & Rabat : repos de 4h à 26°C, réaliser des rabats (stretch & fold) toutes les 30 min les 2 premières heures.',
+      'Préfaçonnage & Repos : diviser en pâtons de 600g, préformer en boules et laisser reposer 20 min.',
+      'Façonnage : façonner en miches rondes serrées et déposer dans des bannetons farinés.',
+      'Apprêt à froid (Lente fermentation) : bloquer au réfrigérateur à 4°C pendant 12h à 18h.',
+      'Cuisson : retourner sur sole de four préchauffée à 240°C, faire une grigne longitudinale, cuire 35 min.'
+    ]
+  },
+  {
+    id: 'pain-complet',
+    name: 'Pain Complet (Riche en Fibres)',
+    category: 'Boulangerie',
+    portions: 6,
+    prepTime: 160,
+    cookTime: 25,
+    image: './img/complet.jpg',
+    description: 'Pain diététique à la mie dense et parfumée, idéal pour accompagner les repas légers.',
+    ingredients: [
+      { name: 'Farine complète T150', quantity: 1000, unit: 'g', pricePerKg: 1.60 },
+      { name: 'Eau pure', quantity: 720, unit: 'g', pricePerKg: 0.00 },
+      { name: 'Levain liquide', quantity: 150, unit: 'g', pricePerKg: 1.20 },
+      { name: 'Levure fraîche', quantity: 15, unit: 'g', pricePerKg: 4.50 },
+      { name: 'Sel fin de mer', quantity: 18, unit: 'g', pricePerKg: 0.80 },
+      { name: 'Beurre doux', quantity: 30, unit: 'g', pricePerKg: 6.80 }
+    ],
+    steps: [
+      'Pétrissage : mélanger la farine T150, l\'eau, le levain, la levure et le sel pendant 7 min en vitesse 1.',
+      'Lissage : incorporer le beurre ramolli coupé en dés et pétrir 3 min en vitesse 2.',
+      'Pointage : reposer la pâte sous bâche à 24°C pendant 1h15.',
+      'Division & Repos : diviser en pâtons de 450g et former des boules. Repos 15 min.',
+      'Façonnage : voyager les pâtons serrés et les placer dans des moules à cake préalablement graissés.',
+      'Apprêt : laisser lever pendant 1h à 25°C.',
+      'Cuisson : grigner en damier, enfourner à 210°C pendant 25 min.'
+    ]
+  },
+  {
+    id: 'pain-viennois',
+    name: 'Pain Viennois Moelleux',
+    category: 'Boulangerie',
+    portions: 8,
+    prepTime: 150,
+    cookTime: 15,
+    image: './img/viennois.jpg',
+    description: 'Le classique pain viennois à la mie filante extrêmement douce, parfait pour le goûter ou les toasts.',
+    ingredients: [
+      { name: 'Farine de force T55', quantity: 1000, unit: 'g', pricePerKg: 0.44 },
+      { name: 'Eau pure', quantity: 500, unit: 'g', pricePerKg: 0.00 },
+      { name: 'Poudre de lait entier', quantity: 40, unit: 'g', pricePerKg: 7.50 },
+      { name: 'Sucre semoule', quantity: 100, unit: 'g', pricePerKg: 0.68 },
+      { name: 'Beurre doux AOP', quantity: 120, unit: 'g', pricePerKg: 6.15 },
+      { name: 'Sel fin de mer', quantity: 18, unit: 'g', pricePerKg: 0.80 },
+      { name: 'Levure fraîche', quantity: 35, unit: 'g', pricePerKg: 4.50 },
+      { name: 'Œufs entiers (dorure)', quantity: 1, unit: 'pcs', pricePerPc: 0.11 }
+    ],
+    steps: [
+      'Pétrissage : mélanger farine, eau, poudre de lait, sucre, levure et sel. Pétrir 10 min en vitesse 1.',
+      'Lissage : ajouter le beurre ramolli coupé en morceaux. Pétrir 5 min en vitesse 2 jusqu\'à décollage complet.',
+      'Pointage : laisser reposer la pâte pendant 45 min à 24°C.',
+      'Division & Détente : diviser en pâtons de 220g, bouler légèrement et laisser détendre 15 min.',
+      'Façonnage : voyager de grands boudins réguliers de 25cm aux extrémités pointues.',
+      'Apprêt : disposer sur plaque de cuisson, reposer 1h15 à 25°C.',
+      'Dorure & Grignage : dorer à l\'œuf entier battu, couper horizontalement et finement à la lame (grignage serré).',
+      'Cuisson : enfourner à 220°C pendant 15 min sans buée.'
+    ]
+  },
+  {
+    id: 'brioche-parisienne',
+    name: 'Brioche Parisienne (à Tête)',
+    category: 'Boulangerie',
+    portions: 12,
+    prepTime: 200,
+    cookTime: 25,
+    image: './img/brioche_parisienne.jpg',
+    description: 'Brioche traditionnelle feuilletée à tête, très riche en beurre d\'Isigny et œufs frais, mie ultra-filante.',
+    ingredients: [
+      { name: 'Farine de force T45', quantity: 1000, unit: 'g', pricePerKg: 1.30 },
+      { name: 'Œufs entiers', quantity: 10, unit: 'pcs', pricePerPc: 0.11 },
+      { name: 'Sucre semoule', quantity: 120, unit: 'g', pricePerKg: 0.68 },
+      { name: 'Beurre AOP doux', quantity: 500, unit: 'g', pricePerKg: 6.15 },
+      { name: 'Levure fraîche', quantity: 40, unit: 'g', pricePerKg: 4.50 },
+      { name: 'Sel fin de mer', quantity: 20, unit: 'g', pricePerKg: 0.80 },
+      { name: 'Lait entier', quantity: 50, unit: 'ml', pricePerL: 0.72 }
+    ],
+    steps: [
+      'Frasage : pétrir la farine, le sel, le sucre, la levure émiettée et 8 œufs en vitesse 1 pendant 10 min.',
+      'Bassinage : ajouter les 2 œufs restants pour donner de la souplesse et pétrir jusqu\'au décollage.',
+      'Pétrissage du beurre : incorporer le beurre froid coupé en dés petit à petit en vitesse 2, pétrir jusqu\'à élasticité.',
+      'Pointage : repos de 1h à température ambiante, puis rompre le pâton pour dégazer.',
+      'Apprêt au froid : bloquer la pâte au congélateur 30 min, puis réserver à 4°C pendant 12h pour figer le beurre.',
+      'Façonnage : détailler des boules de 50g et des têtes de 10g. Placer les têtes sur les corps dans des moules côtelés.',
+      'Apprêt : reposer 2h à 24°C, dorer à l\'œuf et cuire à 180°C pendant 20 min.'
+    ]
+  }
+];
+
 // Combine toutes les recettes en une seule liste
 RECIPES.push(...VIENNOISERIES);
+RECIPES.push(...BOULANGERIE_RECIPES);
 

@@ -407,7 +407,7 @@ const TRANSLATIONS = {
 
         // Recipe Hero
         'hero.badge': '✨ Coût de revient',
-        'hero.title': 'Calculateur de <span class="accent">recettes</span><br>pour la pâtisserie',
+        'hero.title': 'Calculateur de <span class="accent">recettes</span><br>pour la boulangerie-pâtisserie',
         'hero.desc': 'Créez vos recettes, calculez vos coûts par portion, déterminez votre prix de vente et optimisez vos marges.',
         'hero.btn.create': '✚ Créer une recette',
         'hero.library': '📖 Bibliothèque des Chefs',
@@ -2055,7 +2055,7 @@ const TRANSLATIONS = {
         'dash.priority.btn_saisir': 'Enter',
 
         'hero.badge': '✨ Cost analysis',
-        'hero.title': '<span class="accent">Recipe</span> Calculator<br>for pastry making',
+        'hero.title': '<span class="accent">Recipe</span> Calculator<br>for bakery & pastry making',
         'hero.desc': 'Create your recipes, calculate your costs per portion, set your selling price and optimize your margins.',
         'hero.btn.create': '✚ Create a recipe',
         'hero.library': '📖 Chef Library',
@@ -3675,7 +3675,7 @@ const TRANSLATIONS = {
         'ui.btn.view_sheet': 'Ver ficha',
 
         'hero.badge': '✨ Análisis de costos',
-        'hero.title': 'Calculadora de <span class="accent">recetas</span><br>para pastelería',
+        'hero.title': 'Calculadora de <span class="accent">recetas</span><br>para panadería y pastelería',
         'hero.desc': 'Cree sus recetas, calcule sus costos por porción, determine su precio de venta y optimice sus márgenes.',
         'hero.btn.create': '✚ Crear una receta',
         'hero.library': '📖 Biblioteca de Chefs',
