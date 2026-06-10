@@ -87,9 +87,9 @@
   <link rel="stylesheet" href="./css/auth-premium.css" />
   <link rel="stylesheet" href="./css/rgpd-banner.css" />
   <!-- Libraries for new features -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+  <script src="./lib/chart.min.js" defer></script>
   <!-- Supabase SDK -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+  <script src="./lib/supabase.min.js" defer></script>
   <script src="./supabase-config.js" defer></script>
   <script src="./billing.js" defer></script>
   <script src="./auth-ui.js" defer></script>
@@ -132,13 +132,13 @@
   <script src="rgpd-banner.js?v=11.6.0" defer></script>
 
   <!-- °Chart.js Zoom Plugin (nécessite hammer.js) -->
-  <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js" defer></script>
-  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1/dist/chartjs-plugin-zoom.min.js" defer></script>
-  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js" defer></script>
-  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js" defer></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" defer></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" defer></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js" defer></script>
+  <script src="./lib/hammer.min.js" defer></script>
+  <script src="./lib/chartjs-plugin-zoom.min.js" defer></script>
+  <script src="./lib/chartjs-plugin-datalabels.min.js" defer></script>
+  <script src="./lib/tesseract.min.js" defer></script>
+  <script src="./lib/qrcode.min.js" defer></script>
+  <script src="./lib/html2pdf.bundle.min.js" defer></script>
+  <script src="./lib/gsap.min.js" defer></script>
 
   <style>
     /* ·······························································
@@ -1119,6 +1119,7 @@
 }
 
 </style>
+  <link rel="canonical" href="https://gourmetrevient.fr/" />
 </head>
 
 <body class="auth-pending">
@@ -4662,8 +4663,7 @@
     </div>
   </div>
 
-  <!-- Libraries -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.2/html2pdf.bundle.min.js" defer></script>
+  <!-- Localized libraries loaded in head -->
   <!-- °Change PIN Modal -->
   <div id="pinModal" class="modal-overlay" style="display:none;">
     <div class="modal-card">
@@ -5381,17 +5381,27 @@
   <script src="./auth-ui.js?v=11.5.0" defer></script>
   <script src="./billing.js?v=11.5.0" defer></script>
   <script src="./cloud-sync.js?v=11.5.0" defer></script>
-  <script src="./app-state.js?v=11.6.0" defer></script>
-  <script src="./app-core.js?v=11.6.0" defer></script>
-  <script src="./app-recipes.js?v=11.6.0" defer></script>
-  <script src="./app-inventory.js?v=11.6.0" defer></script>
-  <script src="./app-auth.js?v=11.6.0" defer></script>
-  <script src="./app-planning.js?v=11.6.0" defer></script>
-  <script src="./app-analytics.js?v=11.6.0" defer></script>
-  <script src="./app-production.js?v=11.6.0" defer></script>
-  <script src="./app-haccp.js?v=11.6.0" defer></script>
-  <script src="./app-omnisearch.js?v=11.6.0" defer></script>
-  <script src="./app-main.js?v=11.6.0" defer></script>
+  <script>
+    (function loadAppScripts() {
+      const isLocal = ['localhost', '127.0.0.1'].includes(window.location.hostname) || window.location.protocol === 'file:';
+      const isDevQuery = new URLSearchParams(window.location.search).get('dev') === 'true';
+      const isDev = isLocal || isDevQuery;
+      const version = '12.6.0';
+      
+      if (isDev) {
+        const devFiles = [
+          'app-state.js', 'app-core.js', 'app-recipes.js', 'app-inventory.js',
+          'app-auth.js', 'app-planning.js', 'app-analytics.js', 'app-production.js',
+          'app-haccp.js', 'app-omnisearch.js', 'app-main.js'
+        ];
+        devFiles.forEach(file => {
+          document.write('<script src="./' + file + '?v=' + version + '" defer><\/script>');
+        });
+      } else {
+        document.write('<script src="./app.bundle.js?v=' + version + '" defer><\/script>');
+      }
+    })();
+  </script>
   <script src="./sous-recettes.js" defer></script>
   <script src="./core-upgrade.js?v=1.0.0" defer></script>
   <script src="./pro-features.js?v=1.0.8" defer></script>

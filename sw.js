@@ -3,7 +3,7 @@
 // Stratégie : Cache-First assets statiques + SWR Google Fonts/CDN + IDB Queue
 // =============================================================================
 
-const CACHE_VERSION = '12.5.2'; // Active prep times updates and price corrections
+const CACHE_VERSION = '12.6.0'; // Localized CDNs for 100% offline support
 const CACHE_STATIC  = `gourmet-static-v${CACHE_VERSION}`;
 const CACHE_RUNTIME = `gourmet-runtime-v${CACHE_VERSION}`;
 const CACHE_FONTS   = `gourmet-fonts-v${CACHE_VERSION}`;
@@ -19,17 +19,7 @@ const PRECACHE_ASSETS = [
   './legal.html',
   './blog.html',
   './styles.css',
-  './app-state.js',
-  './app-core.js',
-  './app-recipes.js',
-  './app-inventory.js',
-  './app-auth.js',
-  './app-planning.js',
-  './app-analytics.js',
-  './app-production.js',
-  './app-haccp.js',
-  './app-omnisearch.js',
-  './app-main.js',
+  './app.bundle.js',
   './data.js',
   './blog-data.js',
   './i18n.js',
@@ -61,6 +51,15 @@ const PRECACHE_ASSETS = [
   './css/commercial-features.css',
   './img/macaron.jpg',
   './favicon.png',
+  './lib/chart.min.js',
+  './lib/supabase.min.js',
+  './lib/hammer.min.js',
+  './lib/chartjs-plugin-zoom.min.js',
+  './lib/chartjs-plugin-datalabels.min.js',
+  './lib/tesseract.min.js',
+  './lib/qrcode.min.js',
+  './lib/html2pdf.bundle.min.js',
+  './lib/gsap.min.js',
 ];
 
 // ── Google Fonts à précacher (améliore le FCP hors-ligne) ─────────────────────
