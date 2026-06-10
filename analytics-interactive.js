@@ -83,7 +83,7 @@ window.AnalyticsInteractive = (function() {
       isLibrary: true
     }));
     
-    let recipes = [...saved, ...library].filter(r => r.id !== 'crabe-art-boulanger');
+    let recipes = [...saved, ...library];
 
     // Ensure all recipes have computed costs for the stats
     recipes = recipes.map(r => {

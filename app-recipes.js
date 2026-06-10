@@ -669,13 +669,13 @@ function renderAdvancedCostKPI(costs) {
     </div>
     <div class="kpi-card accent">
       <div class="kpi-label">${t('s4.adv.kpi.full_cost')}</div>
-      <div class="kpi-value" style="font-size:1.3rem">${APP.recipe && APP.recipe.id === 'crabe-art-boulanger' ? '🦀🎀' : costs.totalFullCost.toFixed(2) + ' €'}</div>
-      <div class="kpi-sub">${t('ui.kpi.total_material')}: ${APP.recipe && APP.recipe.id === 'crabe-art-boulanger' ? '🦀🎀' : costs.totalMaterial.toFixed(2) + ' €'} + ${APP.recipe && APP.recipe.id === 'crabe-art-boulanger' ? '🦀🎀' : additionalSum.toFixed(2) + ' €'}</div>
+      <div class="kpi-value" style="font-size:1.3rem">${costs.totalFullCost.toFixed(2)} €</div>
+      <div class="kpi-sub">${t('ui.kpi.total_material')}: ${costs.totalMaterial.toFixed(2)} € + ${additionalSum.toFixed(2)} €</div>
     </div>
     <div class="kpi-card success">
       <div class="kpi-label">${t('s4.adv.kpi.full_portion')}</div>
-      <div class="kpi-value" style="font-size:1.3rem">${APP.recipe && APP.recipe.id === 'crabe-art-boulanger' ? '🦀🎀' : costs.costPerPortion.toFixed(2) + ' €'}</div>
-      <div class="kpi-sub">${APP.recipe && APP.recipe.id === 'crabe-art-boulanger' ? '🦀🎀' : costs.totalFullCost.toFixed(2) + ' €'} / ${costs.portions} ${costs.portions > 1 ? t('unit.portions') : t('unit.portion')}</div>
+      <div class="kpi-value" style="font-size:1.3rem">${costs.costPerPortion.toFixed(2)} €</div>
+      <div class="kpi-sub">${costs.totalFullCost.toFixed(2)} € / ${costs.portions} ${costs.portions > 1 ? t('unit.portions') : t('unit.portion')}</div>
     </div>
   `;
 }
@@ -1160,9 +1160,8 @@ function exportRecipePdfDirect(idx) {
   if (allRecipes.length === 0 || idx >= allRecipes.length) return;
 
   const example = allRecipes[idx];
-  // Redirect to the static pre-generated PDF
-  window.open(`./fiches/FT_${example.id}.pdf`, '_blank');
-  showToast(`Ouverture de la fiche technique ${example.name}...`, 'info');
+  // Dynamically generate the premium PDF using the same logic
+  exportPdf(example, example.margin || 70);
 }
 
 // ============================================================================
@@ -1393,7 +1392,6 @@ function renderPortfolio() {
 
   // Filter to show only specific portfolio items requested by user
   const portfolioFilter = [
-    'crabe-art-boulanger',
     'saint-honore',
     'negresco',
     'frangipane',
@@ -1426,13 +1424,12 @@ function renderPortfolio() {
 
     // Specific styling for certain images (dezoom, zoom or position)
     const dezoomIds = [];
-    const zoomIds = ['crabe-art-boulanger'];
+    const zoomIds = [];
     let extraClass = dezoomIds.includes(r.id) ? ' dezoom' : '';
     if (zoomIds.includes(r.id)) extraClass += ' zoom-in';
     
     let extraStyle = '';
     if (r.id === 'saint-honore') extraStyle = ' style="object-position: top;"';
-    if (r.id === 'crabe-art-boulanger') extraStyle = ' style="object-position: center 35%;"';
 
     // Translation logic
     const tCatRaw = t(r.category);
@@ -1498,18 +1495,19 @@ function getHaccp(text) {
    return '';
 }
 
-function exportPdf() {
-  const r = APP.recipe;
+function exportPdf(recipeToExport = null, marginToExport = null) {
+  const r = recipeToExport || APP.recipe;
   if (!r || !r.name) { showToast('Erreur: Aucune recette chargée.', 'error'); return; }
 
-  const costs = calcFullCost(APP.margin);
+  const targetMargin = marginToExport !== null ? marginToExport : APP.margin;
+  const costs = calcFullCost(targetMargin, r);
   const recipeName = r.name || 'Recette';
   showToast(`Génération de la fiche technique de ${recipeName}...`, 'info');
 
   const safeFilename = recipeName.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]/gi, '_').toLowerCase();
   const today = new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
-  const refId = 'FT-' + new Date().getFullYear() + '-' + String(new Date().getMonth()+1).padStart(2,'0') + String(new Date().getDate()).padStart(2,'0');
-  const margin = Math.round(costs.marginPct || APP.margin || 70);
+  const refId = r.ref || 'FT-' + (recipeName.replace(/[^a-zA-Z0-9]/g, '').substring(0, 6).toUpperCase() || 'REC');
+  const margin = Math.round(costs.marginPct || targetMargin || 70);
   const totalMat = (costs.totalMaterial || 0).toFixed(2);
   const sellPrice = (costs.sellingPrice || 0).toFixed(2);
   const tvaRate = costs.tvaRate !== undefined ? costs.tvaRate : 5.5;
@@ -1520,48 +1518,397 @@ function exportPdf() {
   const cookTime = r.cookTime ? `${r.cookTime} min` : '—';
   const category = r.category || r.style || 'Pâtisserie';
   const user = localStorage.getItem('gourmet_current_user') || 'Chef Julian';
-  const gaugeColor = margin >= 70 ? '#10b981' : (margin >= 50 ? '#f59e0b' : '#ef4444');
+  const totalTime = (r.prepTime || 0) + (r.cookTime || 0);
+
+  // DESIGN 1 — Palette de couleurs cohérente
+  const PALETTE = {
+    noir:        '#0f0f0f',
+    indigo:      '#3730a3',
+    indigoClair: '#eef2ff',
+    indigoMoyen: '#4f46e5',
+    or:          '#b8960c',
+    orClair:     '#fefce8',
+    gris1:       '#f8fafc',
+    gris2:       '#e2e8f0',
+    gris3:       '#94a3b8',
+    gris4:       '#475569',
+    blanc:       '#ffffff',
+    rouge:       '#dc2626',
+    vert:        '#166534',
+    vertClair:   '#f0fdf4',
+  };
 
   function esc(str) { return typeof str !== 'string' ? String(str || '') : str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
-  const allergenList = r.allergens && r.allergens.length > 0
-    ? r.allergens.map(a => `<span class="allergen-badge">${esc(a)}</span>`).join('')
-    : '<span class="allergen-badge">Gluten</span><span class="allergen-badge">Oeufs</span><span class="allergen-badge">Lait</span>';
+  // DESIGN 9 — Indicateur visuel de niveau de difficulté
+  function renderNiveau(niveau) {
+    const niveaux = ['●', '●', '●', '●', '●'];
+    return niveaux.map((dot, i) => 
+      `<span style="color:${i < niveau ? '#3730a3' : '#e2e8f0'}; font-size:10px; margin-right:2px;">●</span>`
+    ).join('');
+  }
+
+  // DESIGN 10 — Filigrane discret
+  const filigraneHTML = `
+    <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%) rotate(-45deg); font-size:72px; font-weight:900; color:rgba(55,48,163,0.03); letter-spacing:0.1em; pointer-events:none; white-space:nowrap; z-index:0; font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+      GOURMETREVIENT
+    </div>`;
+
+  // DESIGN 2 — Header repensé
+  const headerHTML = `
+    <div style="display:flex; min-height:100px; border-bottom: 3px solid #3730a3; font-family:'Helvetica Neue',Helvetica,Arial,sans-serif; background:#fff;">
+      <div style="flex:0.6; padding:24px 28px; background:#fff; text-align:left;">
+        <div style="font-size:9px; color:#4f46e5; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; margin-bottom:16px;">
+          GourmetRevient · Solution Pâtisserie Pro
+        </div>
+        <div style="display:inline-block; background:#eef2ff; color:#3730a3; font-size:8px; font-weight:600; padding:3px 8px; border-radius:4px; letter-spacing:0.05em; text-transform:uppercase; margin-bottom:10px;">
+          Fiche Technique Intégrale
+        </div>
+        <div style="font-size:26px; font-weight:700; color:#0f0f0f; letter-spacing:-0.02em; line-height:1.1;">${esc(recipeName)}</div>
+        <div style="font-size:11px; color:#94a3b8; margin-top:6px;">${esc(category)} — ${esc(r.description || 'Production en laboratoire')}</div>
+      </div>
+      <div style="flex:0.4; padding:24px 24px; background:#3730a3; color:#fff; text-align:right;">
+        <div style="font-size:10px; color:#c7d2fe; margin-bottom:8px; padding-bottom:8px; border-bottom:1px solid rgba(255,255,255,0.15);">
+          <span style="color:rgba(255,255,255,0.6)">Réf · </span>${esc(refId)}
+        </div>
+        <div style="font-size:10px; color:#c7d2fe; margin-bottom:8px; padding-bottom:8px; border-bottom:1px solid rgba(255,255,255,0.15);">
+          <span style="color:rgba(255,255,255,0.6)">Date · </span>${today}
+        </div>
+        <div style="font-size:10px; color:#c7d2fe;">
+          <span style="color:rgba(255,255,255,0.6)">Validée par · </span>${esc(user)}
+        </div>
+      </div>
+    </div>`;
+
+  // DESIGN 3 — Bande KPI redessinée
+  const kpiHTML = `
+    <div style="display:grid; grid-template-columns:repeat(5,1fr); gap:0; border-bottom:2px solid #e2e8f0; background:#f8fafc; font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+      ${[
+        { label:'PORTIONS', value: portions, unit:'', color:'#0f0f0f' },
+        { label:'COÛT MATIÈRE', value: parseFloat(totalMat).toFixed(2), unit:'€', color:'#4f46e5' },
+        { label:'MARGE BRUTE', value: margin + '%', unit:'', color: margin >= 60 ? '#166534' : '#dc2626' },
+        { label:'PRIX VENTE HT', value: parseFloat(sellPrice).toFixed(2), unit:'€', color:'#b8960c' },
+        { label:'TEMPS TOTAL', value: totalTime || '-', unit:'min', color:'#64748b' },
+      ].map((kpi, i) => `
+        <div style="padding:16px 12px; text-align:center; ${i < 4 ? 'border-right:1px solid #e2e8f0;' : ''}">
+          <div style="font-size:22px; font-weight:700; color:${kpi.color}; letter-spacing:-0.02em; line-height:1;">${kpi.value}${kpi.unit}</div>
+          <div style="font-size:8px; color:#94a3b8; letter-spacing:0.1em; text-transform:uppercase; margin-top:6px; font-weight:500;">${kpi.label}</div>
+        </div>`).join('')}
+    </div>`;
+
+  // DESIGN 4 — Table des ingrédients redessinée
+  // Couleurs catégories — sobre et professionnel
+  const CATEGORIE_STYLES = {
+    'BASE & PÂTE':        { bg: '#eef2ff', color: '#3730a3', label: 'BASE & PÂTE' },
+    'CRÈMES & LAITAGES':  { bg: '#f0fdf4', color: '#166534', label: 'CRÈMES & LAITAGES' },
+    'STRUCTURE & SUCRES': { bg: '#fefce8', color: '#854d0e', label: 'STRUCTURE & SUCRES' },
+    'DIVERS':             { bg: '#faf5ff', color: '#6b21a8', label: 'DIVERS' },
+    'CHOCOLAT & NOISETTES': { bg: '#ffedd5', color: '#7c2d12', label: 'CHOCOLAT & NOISETTES' },
+    'FRUITS & ACIDITÉ':   { bg: '#ecfeff', color: '#0891b2', label: 'FRUITS & ACIDITÉ' }
+  };
+
+  function getPdfCategoryStyle(badge) {
+    const cleanBadge = badge.replace(/[^a-zA-Z0-9\s&]/g, '').trim().toUpperCase();
+    if (cleanBadge.includes('BASE')) {
+      return CATEGORIE_STYLES['BASE & PÂTE'];
+    } else if (cleanBadge.includes('CRME') || cleanBadge.includes('LAIT') || cleanBadge.includes('CREME')) {
+      return CATEGORIE_STYLES['CRÈMES & LAITAGES'];
+    } else if (cleanBadge.includes('STRUCTURE') || cleanBadge.includes('SUCRE')) {
+      return CATEGORIE_STYLES['STRUCTURE & SUCRES'];
+    } else if (cleanBadge.includes('CHOCOLAT') || cleanBadge.includes('NOISETTE')) {
+      return CATEGORIE_STYLES['CHOCOLAT & NOISETTES'];
+    } else if (cleanBadge.includes('FRUIT') || cleanBadge.includes('ACIDIT')) {
+      return CATEGORIE_STYLES['FRUITS & ACIDITÉ'];
+    } else {
+      return CATEGORIE_STYLES['DIVERS'];
+    }
+  }
 
   const groups = {};
   (r.ingredients || []).forEach(ing => {
     const cat = getIngCategory(ing.name||'');
     if(!groups[cat.badge]) groups[cat.badge] = { meta: cat, items: [] };
-    const qty = ing.quantity || ing.qty || 0;
-    const unit = ing.unit || 'g';
-    const ingCost = calcIngredientCost(ing).toFixed(2);
-    const priceU = ing.pricePerUnit ? `${parseFloat(ing.pricePerUnit).toFixed(2)} &euro;/${esc(ing.priceRef||'kg')}` : '—';
-    const note = ing.note || ing.description || '';
-    groups[cat.badge].items.push(`<tr><td><span class="ing-name">${esc(ing.name||'—')}</span>${note?`<div class="ing-note">${esc(note)}</div>`:''}</td><td>${qty}</td><td>${esc(unit)}</td><td>${priceU}</td><td><span class="cost-pill">${ingCost} &euro;</span></td></tr>`);
+    groups[cat.badge].items.push(ing);
   });
-  
+
   let ingRows = '';
-  for(let key in groups){
-     ingRows += `<tr><td colspan="5" style="padding:6px 10px; background:${groups[key].meta.bg};"><span style="font-size:.58rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; padding:2px 7px; border-radius:10px; margin-bottom:2px; display:inline-block; color:${groups[key].meta.color};">${key}</span></td></tr>`;
-     ingRows += groups[key].items.join('');
+  let rowCounter = 0;
+  for (let key in groups) {
+    const style = getPdfCategoryStyle(key);
+    ingRows += `<tr><td colspan="5" style="padding:6px 12px; background:${style.bg}; color:${style.color}; font-size:9px; font-weight:600; text-transform:uppercase; letter-spacing:0.06em; border-bottom:1px solid #e2e8f0; font-family:'Helvetica Neue',Helvetica,Arial,sans-serif; text-align:left;">${style.label}</td></tr>`;
+    
+    groups[key].items.forEach(ing => {
+      const isEven = (rowCounter % 2 === 0);
+      const rowBg = isEven ? '#f8fafc' : '#ffffff';
+      rowCounter++;
+
+      const qty = ing.quantity || ing.qty || 0;
+      const unit = ing.unit || 'g';
+      const ingCost = calcIngredientCost(ing).toFixed(2);
+      const priceU = ing.pricePerUnit ? `${parseFloat(ing.pricePerUnit).toFixed(2)} &euro;/${esc(ing.priceRef||'kg')}` : '—';
+      const note = ing.note || ing.description || '';
+
+      ingRows += `
+        <tr style="background:${rowBg}; font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+          <td style="padding:6px 12px; border-bottom:1px solid #e2e8f0; vertical-align:middle; text-align:left;">
+            <span style="font-weight:600; color:#0f0f0f; font-size:10px;">${esc(ing.name||'—')}</span>
+            ${note ? `<div style="font-size:8px; color:#94a3b8; margin-top:2px;">${esc(note)}</div>` : ''}
+          </td>
+          <td style="padding:6px 12px; border-bottom:1px solid #e2e8f0; vertical-align:middle; text-align:left; font-size:10px; color:#475569;">${qty}</td>
+          <td style="padding:6px 12px; border-bottom:1px solid #e2e8f0; vertical-align:middle; text-align:left; font-size:10px; color:#475569;">${esc(unit)}</td>
+          <td style="padding:6px 12px; border-bottom:1px solid #e2e8f0; vertical-align:middle; text-align:left; font-size:10px; color:#475569;">${priceU}</td>
+          <td style="padding:6px 12px; border-bottom:1px solid #e2e8f0; vertical-align:middle; text-align:right; font-weight:700; color:#0f0f0f; font-size:10px;">${ingCost} &euro;</td>
+        </tr>
+      `;
+    });
   }
 
-  const steps = r.steps || r.instructions || [];
-  let stepsHtml = steps.length > 0
-    ? steps.slice(0,8).map((step,i) => {
-        const title = typeof step === 'string' ? `Étape ${i+1}` : (step.title||step.name||`Étape ${i+1}`);
-        const desc  = typeof step === 'string' ? step : (step.description||step.text||'');
-        const temp  = step && step.temperature ? `<div class="step-temp">🌡️ ${esc(step.temperature)}</div>` : '';
-        return `<div class="step"><div class="step-num">${i+1}</div><div class="step-body"><div class="step-title" style="display:flex; justify-content:space-between; align-items:center;"><span>${esc(title)}</span> ${getHaccp(desc)}</div><div class="step-desc">${esc(typeof desc==='string'?desc:JSON.stringify(desc))}</div>${temp}</div></div>`;
-      }).join('')
-    : `<div class="step"><div class="step-num">1</div><div class="step-body"><div class="step-title">Procédé de fabrication</div><div class="step-desc">${esc(r.description||'Suivre le protocole de production défini pour cette recette.')}</div></div></div>`;
+  // DESIGN 5 — Side Column and Allergens Monochrome
+  const allergens = r.allergens && r.allergens.length > 0
+    ? r.allergens
+    : ['Gluten', 'Œufs', 'Lait'];
 
-  const html = `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><title>Fiche Technique</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:Arial,Helvetica,sans-serif;background:#fff;color:#1a202c;-webkit-print-color-adjust:exact;print-color-adjust:exact}.header{background:linear-gradient(135deg,#0f1923 0%,#1a3040 60%,#12232e 100%);color:#fff;padding:28px 38px 22px}.header-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px}.brand{display:flex;align-items:center;gap:10px}.brand-name{font-size:1.15rem;font-weight:800;color:#6366f1;letter-spacing:.04em}.brand-sub{font-size:.6rem;color:rgba(255,255,255,.45);letter-spacing:.12em;text-transform:uppercase}.doc-meta{text-align:right;font-size:.7rem;color:rgba(255,255,255,.5);line-height:1.7}.doc-meta strong{color:rgba(255,255,255,.8)}.header-title-block{border-top:1px solid rgba(99,102,241,.25);padding-top:14px}.doc-type-badge{display:inline-block;background:rgba(99,102,241,.15);color:#6366f1;font-size:.6rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;padding:3px 10px;border-radius:20px;border:1px solid rgba(99,102,241,.3);margin-bottom:6px}.recipe-title{font-size:1.8rem;font-weight:900;color:#fff;line-height:1.2}.recipe-subtitle{font-size:.75rem;color:rgba(255,255,255,.45);margin-top:4px}.kpi-bar{display:grid;grid-template-columns:repeat(5,1fr);background:#f8f9fb;border-bottom:1px solid #eaedf2}.kpi-item{padding:14px 10px;text-align:center;border-right:1px solid #eaedf2}.kpi-item:last-child{border-right:none}.kpi-value{font-size:1.3rem;font-weight:900;color:#0f1923}.kpi-value.green{color:#10b981}.kpi-value.gold{color:#6366f1}.kpi-value.blue{color:#3b82f6}.kpi-value.red{color:#ef4444}.kpi-label{font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#94a3b8;margin-top:4px}.body-grid{display:grid;grid-template-columns:1fr 195px}.main-col{padding:22px 26px}.side-col{background:#f8f9fb;border-left:1px solid #eaedf2;padding:18px 14px}.section-title{display:flex;align-items:center;gap:8px;font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.13em;color:#64748b;margin-bottom:10px}.section-title::after{content:'';flex:1;height:1px;background:#eaedf2}.ing-table{width:100%;border-collapse:collapse;font-size:.75rem;margin-bottom:18px}.ing-table thead tr{background:#0f1923;color:#fff}.ing-table thead th{padding:8px 9px;text-align:left;font-size:.58rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase}.ing-table thead th:last-child{text-align:right}.ing-table tbody tr:nth-child(even){background:#f8f9fb}.ing-table td{padding:6px 9px;border-bottom:1px solid #eaedf2;vertical-align:middle}.ing-table td:last-child{text-align:right}.ing-name{font-weight:600;color:#1a202c}.ing-note{font-size:.62rem;color:#94a3b8}.cost-pill{background:#f1f5f9;color:#334155;font-weight:700;font-size:.68rem;padding:2px 7px;border-radius:5px;white-space:nowrap}.steps{margin-bottom:18px}.step{display:flex;gap:12px;margin-bottom:10px;padding-bottom:10px;border-bottom:1px dashed #eaedf2}.step:last-child{border-bottom:none}.step-num{width:26px;height:26px;border-radius:50%;background:#0f1923;color:#6366f1;font-size:.68rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}.step-body{flex:1}.step-title{font-size:.78rem;font-weight:700;color:#0f1923;margin-bottom:3px}.step-desc{font-size:.7rem;color:#475569;line-height:1.5}.step-temp{font-size:.6rem;color:#ef4444;font-weight:600;margin-top:2px}.side-section{margin-bottom:16px}.side-section-title{font-size:.58rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#94a3b8;margin-bottom:8px;border-bottom:1px solid #eaedf2;padding-bottom:4px}.side-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;font-size:.68rem;border-bottom:1px dotted #eaedf2}.side-row:last-child{border-bottom:none}.side-key{color:#64748b}.side-val{font-weight:700;color:#0f1923}.gauge-label{display:flex;justify-content:space-between;font-size:.65rem;margin-bottom:4px}.gauge-track{background:#eaedf2;border-radius:20px;height:8px;overflow:hidden}.gauge-fill{height:100%;border-radius:20px;background:linear-gradient(90deg, #10b981, #34d399)}.cost-summary{background:#0f1923;border-radius:9px;padding:12px;color:#fff;margin-top:9px}.cost-row-s{display:flex;justify-content:space-between;font-size:.68rem;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.08)}.cost-row-s:last-child{border-bottom:none}.cost-key-s{color:rgba(255,255,255,.55)}.cost-val-s{font-weight:700}.cost-val-s.gold{color:#6366f1;font-size:.82rem}.allergen-badges{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px}.allergen-badge{background:#fee2e2;color:#991b1b;font-size:.56rem;font-weight:700;padding:2px 6px;border-radius:4px;text-transform:uppercase;letter-spacing:.06em}.footer{background:#f8f9fb;border-top:1px solid #eaedf2;padding:12px 38px;display:flex;justify-content:space-between;align-items:center;font-size:.62rem;color:#94a3b8}.footer-logo{color:#6366f1;font-weight:700;font-size:.68rem}.confidential{background:rgba(99,102,241,.1);color:#6366f1;font-size:.56rem;font-weight:700;padding:2px 8px;border-radius:4px;letter-spacing:.08em;text-transform:uppercase}</style></head><body>
-<div class="header"><div class="header-top"><div class="brand"><div style="font-size:1.6rem">🍰</div><div><div class="brand-name">GourmetRevient</div><div class="brand-sub">Solution Pâtisserie Pro</div></div></div><div class="doc-meta"><div><strong>Réf :</strong> ${refId}</div><div><strong>Date :</strong> ${today}</div><div><strong>Catégorie :</strong> ${esc(category)}</div><div><strong>Validée par :</strong> ${esc(user)}</div></div></div><div class="header-title-block"><div class="doc-type-badge">📋 Fiche Technique Premium</div><div class="recipe-title">${esc(recipeName)}</div><div class="recipe-subtitle">Production en laboratoire — ${esc(category)}</div></div></div>
-<div class="kpi-bar"><div class="kpi-item"><div class="kpi-value">${portions}</div><div class="kpi-label">Portions</div></div><div class="kpi-item"><div class="kpi-value green">${totalMat} €</div><div class="kpi-label">Coût Matière</div></div><div class="kpi-item"><div class="kpi-value gold">${margin} %</div><div class="kpi-label">Marge Brute</div></div><div class="kpi-item"><div class="kpi-value blue">${sellPrice} €</div><div class="kpi-label">Prix Vente HT</div></div><div class="kpi-item"><div class="kpi-value red">${prepTime}</div><div class="kpi-label">Préparation</div></div></div>
-<div class="body-grid"><div class="main-col"><div class="section-title">📋 Composition Harmonisée</div><table class="ing-table"><thead><tr><th>Ingrédient</th><th>Qté</th><th>Unité</th><th>Prix U.</th><th>Coût</th></tr></thead><tbody>${ingRows||'<tr><td colspan="5" style="text-align:center;color:#94a3b8;padding:10px">Aucun ingrédient enregistré</td></tr>'}<tr style="background:#f1f5f9;font-weight:700"><td colspan="4" style="text-align:right;color:#64748b;font-size:.65rem;padding:6px 7px">TOTAL MATIÈRE</td><td><span class="cost-pill" style="background:#0f1923;color:#6366f1">${totalMat} €</span></td></tr></tbody></table><div class="section-title">⚙️ Protocole de Production</div><div class="steps">${stepsHtml}</div></div><div class="side-col"><div class="side-section"><div class="side-section-title">📦 Infos Recette</div><div class="side-row"><span class="side-key">Catégorie</span><span class="side-val">${esc(category)}</span></div><div class="side-row"><span class="side-key">Portions</span><span class="side-val">${portions}</span></div><div class="side-row"><span class="side-key">Préparation</span><span class="side-val">${prepTime}</span></div><div class="side-row"><span class="side-key">Cuisson</span><span class="side-val">${cookTime}</span></div>${r.difficulty?`<div class="side-row"><span class="side-key">Niveau</span><span class="side-val">${esc(r.difficulty)}</span></div>`:''}</div><div class="side-section"><div class="side-section-title">📊 Rentabilité</div><div class="gauge-label"><span>Marge</span><span style="font-weight:700;color:${gaugeColor}">${margin} %</span></div><div class="gauge-track"><div class="gauge-fill" style="width:${Math.min(margin,100)}%"></div></div><div class="cost-summary"><div class="cost-row-s"><span class="cost-key-s">Coût matière</span><span class="cost-val-s">${totalMat} €</span></div><div class="cost-row-s"><span class="cost-key-s">Prix vente HT</span><span class="cost-val-s">${sellPrice} €</span></div><div class="cost-row-s"><span class="cost-key-s">TVA (${tvaRate}%)</span><span class="cost-val-s">${tvaAmount} €</span></div><div class="cost-row-s"><span class="cost-key-s">Prix TTC</span><span class="cost-val-s gold">${tvaTTC} €</span></div></div></div><div class="side-section"><div class="side-section-title">⚠️ Allergènes</div><div class="allergen-badges">${allergenList}</div></div><div class="side-section"><div class="side-section-title">🌡️ Hygiène & HACCP</div><div class="side-row"><span class="side-key">Stockage</span><span class="side-val" style="color:#3b82f6">0–4 °C</span></div><div class="side-row"><span class="side-key">DLC</span><span class="side-val" style="color:#ef4444">48 h max</span></div><div class="side-row"><span class="side-key">Service</span><span class="side-val" style="color:#3b82f6">2–4 °C</span></div></div></div></div>
-<div class="footer"><span class="footer-logo">GourmetRevient</span><span>Fiche Technique Premium — &copy; ${new Date().getFullYear()}</span><span class="confidential">Strictement Confidentiel</span></div>
-</body></html>`;
+  const allergenListHTML = allergens.map(a => {
+    const cleanAllergen = a.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    const isMajor = cleanAllergen.includes('gluten') || cleanAllergen.includes('lait') || cleanAllergen.includes('oeuf') || cleanAllergen.includes('œuf') || cleanAllergen.includes('arachide') || cleanAllergen.includes('noix') || cleanAllergen.includes('fruit a coque');
+    
+    if (isMajor) {
+      return `<span style="background:#fef2f2; color:#991b1b; border:1px solid #fecaca; border-radius:4px; padding:3px 8px; font-size:9px; font-weight:600; text-transform:uppercase; font-family:'Helvetica Neue',Helvetica,Arial,sans-serif; display:inline-block; margin-right:4px; margin-bottom:4px;">${esc(a)}</span>`;
+    } else {
+      return `<span style="background:#f1f5f9; color:#1e293b; border:1px solid #cbd5e1; border-radius:4px; padding:3px 8px; font-size:9px; font-weight:600; text-transform:uppercase; font-family:'Helvetica Neue',Helvetica,Arial,sans-serif; display:inline-block; margin-right:4px; margin-bottom:4px;">${esc(a)}</span>`;
+    }
+  }).join('');
+
+  // DESIGN 6 — Protocole de production redessiné
+  const steps = r.steps || r.instructions || [];
+  let stepsHtml = '';
+  if (steps.length > 0) {
+    stepsHtml = steps.slice(0, 8).map((step, i) => {
+      const title = typeof step === 'string' ? `Étape ${i + 1}` : (step.title || step.name || `Étape ${i + 1}`);
+      const desc = typeof step === 'string' ? step : (step.description || step.text || '');
+      const temp = step && step.temperature ? `🌡️ ${step.temperature}` : '';
+      
+      const lowerDesc = desc.toLowerCase();
+      let type = 'base';
+      if (lowerDesc.match(/cuir|cuisson|four|bouill|chauff|1[0-9]{2}°/)) {
+        type = 'cuisson';
+      } else if (lowerDesc.match(/froid|réfrigé|congéla|refroid|glace/)) {
+        type = 'froid';
+      }
+      
+      let haccpTag = '';
+      if (type === 'cuisson') haccpTag = 'CC1 — Cuisson';
+      else if (type === 'froid') haccpTag = 'CC2 — Froid';
+      else if (lowerDesc.match(/montage|poche/)) haccpTag = 'Hygiène';
+      
+      return `
+      <div style="display:flex; gap:14px; padding:14px 0; border-bottom:1px solid #f1f5f9; align-items:flex-start; font-family:'Helvetica Neue',Helvetica,Arial,sans-serif; text-align:left;">
+        <div style="width:28px; height:28px; border-radius:50%; background:${type === 'cuisson' ? '#fef3c7' : type === 'froid' ? '#eff6ff' : '#eef2ff'}; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+          <span style="font-size:11px; font-weight:700; color:${type === 'cuisson' ? '#92400e' : type === 'froid' ? '#1e40af' : '#3730a3'};">${i + 1}</span>
+        </div>
+        <div style="flex:1;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+            <span style="font-size:11px; font-weight:600; color:#0f0f0f;">${esc(title)}</span>
+            ${haccpTag ? `<span style="font-size:8px; font-weight:600; padding:2px 8px; border-radius:20px; background:${type === 'cuisson' ? '#fef3c7' : '#eff6ff'}; color:${type === 'cuisson' ? '#92400e' : '#1e40af'}; letter-spacing:0.05em;">${haccpTag}</span>` : ''}
+          </div>
+          <div style="font-size:11px; color:#475569; line-height:1.6;">${esc(desc)}</div>
+          ${temp ? `<div style="font-size:10px; color:#dc2626; font-weight:600; margin-top:4px;">🌡️ ${esc(temp)}</div>` : ''}
+        </div>
+      </div>`;
+    }).join('');
+  } else {
+    stepsHtml = `
+    <div style="display:flex; gap:14px; padding:14px 0; border-bottom:1px solid #f1f5f9; align-items:flex-start; font-family:'Helvetica Neue',Helvetica,Arial,sans-serif; text-align:left;">
+      <div style="width:28px; height:28px; border-radius:50%; background:#eef2ff; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+        <span style="font-size:11px; font-weight:700; color:#3730a3;">1</span>
+      </div>
+      <div style="flex:1;">
+        <div style="font-size:11px; font-weight:600; color:#0f0f0f; margin-bottom:4px;">Procédé de fabrication</div>
+        <div style="font-size:11px; color:#475569; line-height:1.6;">${esc(r.description || 'Suivre le protocole de production défini pour cette recette.')}</div>
+      </div>
+    </div>`;
+  }
+
+  // DESIGN 7 — Footer premium
+  const footerHTML = `
+    <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 28px; border-top:2px solid #3730a3; margin-top:24px; font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+      <div style="font-size:8px; color:#94a3b8; text-align:left;">
+        <span style="color:#3730a3; font-weight:600;">GourmetRevient</span> · Fiche Technique Premium · gourmetrevient.fr
+      </div>
+      <div style="font-size:8px; color:#94a3b8; text-align:center;">
+        ${esc(recipeName)} · Réf. ${esc(refId)} · © ${new Date().getFullYear()}
+      </div>
+      <div style="font-size:8px; color:#94a3b8; text-align:right;">
+        Document confidentiel · Usage interne uniquement
+      </div>
+    </div>`;
+
+  // DESIGN 8 — Main body and side column layout
+  const html = `<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Fiche Technique - ${esc(recipeName)}</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      background: #ffffff;
+      color: #0f0f0f;
+      line-height: 1.6;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+      position: relative;
+    }
+  </style>
+</head>
+<body style="padding: 24px 28px; background: #ffffff;">
+  ${filigraneHTML}
+  <div style="position: relative; z-index: 1;">
+    ${headerHTML}
+    ${kpiHTML}
+    
+    <div style="display:grid; grid-template-columns: 1fr 220px; gap: 24px; margin-top: 20px; background: #ffffff;">
+      <!-- Main Column -->
+      <div class="main-col" style="display:flex; flex-direction:column; gap:20px;">
+        <div>
+          <div style="border-left: 2px solid #3730a3; padding-left: 8px; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #3730a3; margin-bottom: 12px; font-family:'Helvetica Neue',Helvetica,Arial,sans-serif; text-align:left;">
+            COMPOSITION HARMONISÉE
+          </div>
+          <table style="width:100%; border-collapse:collapse; font-size:11px; border-radius:8px; overflow:hidden; box-shadow:0 1px 3px rgba(0,0,0,0.08); border: 1px solid #e2e8f0; font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+            <thead>
+              <tr style="background:#0f0f0f; color:#ffffff; text-transform:uppercase; font-size:8px; letter-spacing:0.1em; text-align:left;">
+                <th style="padding:10px 12px; font-weight:700;">Ingrédient</th>
+                <th style="padding:10px 12px; font-weight:700;">Qté</th>
+                <th style="padding:10px 12px; font-weight:700;">Unité</th>
+                <th style="padding:10px 12px; font-weight:700;">Prix U.</th>
+                <th style="padding:10px 12px; text-align:right; font-weight:700;">Coût</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${ingRows || '<tr><td colspan="5" style="text-align:center;color:#94a3b8;padding:20px">Aucun ingrédient enregistré</td></tr>'}
+              <tr style="background:#0f0f0f; color:#ffffff; font-weight:700;">
+                <td colspan="4" style="text-align:right; font-size:9px; letter-spacing:0.08em; padding:10px 12px;">TOTAL MATIÈRE</td>
+                <td style="text-align:right; padding:10px 12px; font-size:10px;">${totalMat} €</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        
+        <div>
+          <div style="border-left: 2px solid #3730a3; padding-left: 8px; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #3730a3; margin-bottom: 12px; font-family:'Helvetica Neue',Helvetica,Arial,sans-serif; text-align:left;">
+            PROTOCOLE DE PRODUCTION
+          </div>
+          <div>
+            ${stepsHtml}
+          </div>
+        </div>
+      </div>
+      
+      <!-- Side Column -->
+      <div class="side-col" style="display:flex; flex-direction:column; gap:16px; font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+        <!-- Infos Recette -->
+        <div>
+          <div style="border-left: 2px solid #3730a3; padding-left: 8px; font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #3730a3; margin-bottom: 8px; text-align:left;">
+            INFO RECETTE
+          </div>
+          <div style="background:#f8fafc; padding:10px 12px; border-radius:6px; border:1px solid #e2e8f0;">
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:4px 0; font-size:10px; border-bottom:1px dotted #e2e8f0;">
+              <span style="color:#64748b;">Catégorie</span>
+              <span style="font-weight:700; color:#0f0f0f;">${esc(category)}</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:4px 0; font-size:10px; border-bottom:1px dotted #e2e8f0;">
+              <span style="color:#64748b;">Portions</span>
+              <span style="font-weight:700; color:#0f0f0f;">${portions}</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:4px 0; font-size:10px; border-bottom:1px dotted #e2e8f0;">
+              <span style="color:#64748b;">Préparation</span>
+              <span style="font-weight:700; color:#0f0f0f;">${prepTime}</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:4px 0; font-size:10px; ${r.difficulty ? 'border-bottom:1px dotted #e2e8f0;' : ''}">
+              <span style="color:#64748b;">Cuisson</span>
+              <span style="font-weight:700; color:#0f0f0f;">${cookTime}</span>
+            </div>
+            ${r.difficulty ? `
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:4px 0; font-size:10px;">
+              <span style="color:#64748b;">Niveau</span>
+              <span style="font-weight:700; color:#0f0f0f;">${renderNiveau(parseInt(r.difficulty) || 3)}</span>
+            </div>` : ''}
+          </div>
+        </div>
+
+        <!-- Rentabilité -->
+        <div>
+          <div style="border-left: 2px solid #3730a3; padding-left: 8px; font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #3730a3; margin-bottom: 8px; text-align:left;">
+            SYNTHÈSE RENTABILITÉ
+          </div>
+          <div style="background:#f8fafc; padding:12px; border-radius:6px; border:1px solid #e2e8f0;">
+            <div style="display:flex; justify-content:space-between; font-size:10px; margin-bottom:6px;">
+              <span style="color:#64748b;">Marge brute</span>
+              <span style="font-weight:700; color:#3730a3;">${margin} %</span>
+            </div>
+            <div style="background:#e2e8f0; border-radius:20px; height:6px; overflow:hidden; margin-bottom:12px; width:100%;">
+              <div style="height:100%; border-radius:20px; background:linear-gradient(90deg, #4f46e5, #06b6d4); width:${Math.min(margin, 100)}%;"></div>
+            </div>
+            
+            <div style="font-size:10px;">
+              <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #e2e8f0;">
+                <span style="color:#64748b;">Coût matière</span>
+                <span style="font-weight:700; color:#0f0f0f;">${totalMat} €</span>
+              </div>
+              <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #e2e8f0;">
+                <span style="color:#64748b;">Prix vente HT</span>
+                <span style="font-weight:700; color:#0f0f0f;">${sellPrice} €</span>
+              </div>
+              <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #e2e8f0;">
+                <span style="color:#64748b;">TVA (${tvaRate}%)</span>
+                <span style="font-weight:700; color:#0f0f0f;">${tvaAmount} €</span>
+              </div>
+              <div style="display:flex; justify-content:space-between; padding:6px 0 0 0; align-items:center;">
+                <span style="color:#3730a3; font-weight:700;">Prix TTC</span>
+                <span style="font-size:14px; font-weight:700; color:#3730a3;">${tvaTTC} €</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Allergènes -->
+        <div>
+          <div style="border-left: 2px solid #3730a3; padding-left: 8px; font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #3730a3; margin-bottom: 8px; text-align:left;">
+            ALLERGÈNES
+          </div>
+          <div style="background:#f8fafc; padding:10px 12px; border-radius:6px; border:1px solid #e2e8f0; display:flex; flex-wrap:wrap; gap:4px; text-align:left;">
+            ${allergenListHTML || '<span style="font-size:10px; color:#94a3b8;">Aucun</span>'}
+          </div>
+        </div>
+
+        <!-- HACCP -->
+        <div>
+          <div style="border-left: 2px solid #3730a3; padding-left: 8px; font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #3730a3; margin-bottom: 8px; text-align:left;">
+            HYGIÈNE & HACCP
+          </div>
+          <div style="background:#f8fafc; padding:10px 12px; border-radius:6px; border:1px solid #e2e8f0;">
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:4px 0; font-size:10px; border-bottom:1px dotted #e2e8f0;">
+              <span style="color:#64748b;">Stockage</span>
+              <span style="font-weight:700; color:#3730a3;">0–4 °C</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:4px 0; font-size:10px; border-bottom:1px dotted #e2e8f0;">
+              <span style="color:#64748b;">DLC</span>
+              <span style="font-weight:700; color:#dc2626;">48 h max</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:4px 0; font-size:10px;">
+              <span style="color:#64748b;">Service</span>
+              <span style="font-weight:700; color:#3730a3;">2–4 °C</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    ${footerHTML}
+  </div>
+</body>
+</html>`;
 
   if (typeof html2pdf === 'undefined') { showToast('Bibliothèque html2pdf non chargée', 'error'); return; }
   html2pdf().set({ margin:0, filename:`${safeFilename}_fiche.pdf`, image:{type:'jpeg',quality:.98}, html2canvas:{scale:2,useCORS:true,logging:false}, jsPDF:{unit:'mm',format:'a4',orientation:'portrait'} }).from(html).save().then(() => showToast('Fiche technique exportée ✓','success')).catch(err => { console.error(err); showToast('Erreur PDF','error'); });
