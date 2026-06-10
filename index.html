@@ -2366,7 +2366,7 @@
 
             <div class="inflation-workspace" style="display:grid; grid-template-columns: 340px 1fr; gap:2rem;">
                <div class="inflation-sidebar">
-                  <div class="inflation-slider-container">
+                  <div class="inflation-slider-container" style="margin-bottom: 1.5rem;">
                      <div style="display:flex; justify-content:space-between; align-items:center;">
                         <span style="font-weight:800; font-size:0.9rem; color:var(--primary);">Hausse Globale</span>
                         <span id="inflationValue" style="font-weight:900; font-size:1.4rem; color:var(--accent);">0%</span>
@@ -2377,6 +2377,26 @@
                         <span>Moyen (+50%)</span>
                         <span>Crise (+100%)</span>
                      </div>
+                  </div>
+
+                  <!-- Supplier Price Cockpit Overrides -->
+                  <div class="mgmt-glass-card" style="padding:1.2rem; margin-bottom:1.5rem;">
+                     <h4 style="margin:0 0 10px 0; font-size:0.95rem; color:var(--primary);">🏭 Cockpit Fournisseur</h4>
+                     
+                     <div class="form-group" style="margin-bottom:12px;">
+                        <label style="font-size:0.75rem; font-weight:700; color:var(--text-secondary); display:block; margin-bottom:4px;">Seuil de Marge Cible (%)</label>
+                        <input type="number" id="cockpitTargetMargin" class="form-input" value="70" min="0" max="100" style="padding:6px 10px; font-size:0.85rem;" oninput="renderInflationSimulation()">
+                     </div>
+                     
+                     <div class="form-group" style="margin-bottom:10px;">
+                        <input type="text" id="cockpitSearch" class="form-input" placeholder="🔍 Filtrer les ingrédients..." style="padding:6px 10px; font-size:0.8rem;" oninput="filterCockpitIngredients()">
+                     </div>
+                     
+                     <div id="cockpitIngredientsList" style="max-height: 240px; overflow-y: auto; border: 1px solid var(--surface-border); border-radius: 8px; padding: 6px; display:flex; flex-direction:column; gap:6px; background: rgba(0,0,0,0.15); margin-bottom:10px;">
+                        <!-- JS populated -->
+                     </div>
+                     
+                     <button class="btn btn-outline btn-full btn-sm" onclick="resetCockpitOverrides()" style="padding:6px; font-size:0.75rem; width: 100%;">🔄 Réinitialiser les hausses</button>
                   </div>
 
                   <div class="mgmt-glass-card" style="padding:1.5rem; background:rgba(220, 38, 38, 0.05); border:1px solid rgba(220, 38, 38, 0.2) !important;">
@@ -4552,6 +4572,11 @@
           <div class="dot"></div>
           <span>Clients</span>
         </div>
+        <div class="step-line"></div>
+        <div class="step-dot" id="dotCrmQuotes" onclick="switchCrmTab('quotes')">
+          <div class="dot"></div>
+          <span>Devis Catering</span>
+        </div>
       </div>
 
       <!-- °Commandes Tab -->
@@ -4589,6 +4614,18 @@
         </div>
         
         <div class="order-grid" id="crmClientsBody">
+            <!-- Rendered via JS -->
+        </div>
+      </div>
+
+      <!-- °Quotes Tab -->
+      <div id="crmViewQuotes" class="crm-view" style="display:none;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 2rem;">
+          <h3 class="apropos-title" style="margin:0;">Devis Catering & Événementiel</h3>
+          <button class="btn btn-primary" onclick="openInvoiceGenerator()"> Nouveau Devis / Facture</button>
+        </div>
+        
+        <div class="order-grid" id="crmQuotesBody" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem;">
             <!-- Rendered via JS -->
         </div>
       </div>
@@ -6406,6 +6443,11 @@
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
           <div style="font-size: 2.2rem; font-weight: 900; color: #6366f1;" id="qrRecipePrice">0,00 €</div>
           <div id="qrcode" style="width: 100px; height: 100px; background: #f8fafc; border-radius: 8px; display: flex; align-items: center; justify-content: center;"></div>
+        </div>
+        
+        <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: #475569; margin-bottom: 1rem; padding: 0.5rem 0; border-bottom: 1px dashed #e2e8f0; border-top: 1px dashed #e2e8f0;">
+          <div>Poids net : <strong id="qrRecipeWeight">0g</strong></div>
+          <div>Prix/kg (TTC) : <strong id="qrRecipePricePerKg">0,00 €/kg</strong></div>
         </div>
         
         <div style="padding: 10px; background: #fef2f2; border: 1px solid #fee2e2; border-radius: 8px; font-size: 0.8rem; color: #dc2626; font-weight: 700;">

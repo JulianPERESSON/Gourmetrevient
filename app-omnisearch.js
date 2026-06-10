@@ -370,10 +370,43 @@ function generateQRLable() {
   }
   
   const costData = calcFullCost(APP.margin);
-  const suggestedPrice = costData.suggestedPrice.toFixed(2);
+  const suggestedPrice = costData.sellingPriceTTC.toFixed(2);
+  
+  // Calcule de la masse totale de la recette
+  let totalWeightG = 0;
+  if (APP.recipe.ingredients) {
+    APP.recipe.ingredients.forEach(ing => {
+      let qty = parseFloat(ing.quantity) || 0;
+      const unit = ing.unit || 'g';
+      if (unit === 'kg' || unit === 'L') {
+        totalWeightG += qty * 1000;
+      } else if (unit === 'cl') {
+        totalWeightG += qty * 10;
+      } else if (unit === 'g' || unit === 'ml') {
+        totalWeightG += qty;
+      } else {
+        totalWeightG += qty * 50; // pièce approx 50g
+      }
+    });
+  }
+  if (window.SousRecettes && APP.recipe.sousRecettes) {
+    APP.recipe.sousRecettes.forEach(sr => {
+      totalWeightG += parseFloat(sr.quantiteUtilisee) || 0;
+    });
+  }
+  
+  const portions = costData.portions || APP.recipe.portions || 10;
+  const netWeightPortionG = portions > 0 ? totalWeightG / portions : 0;
+  const netWeightPortionKg = netWeightPortionG / 1000;
+  const pricePerKgTTC = netWeightPortionKg > 0 ? costData.sellingPriceTTC / netWeightPortionKg : 0;
   
   $('#qrRecipeName').textContent = APP.recipe.name;
-  $('#qrRecipePrice').textContent = suggestedPrice + ' €';
+  $('#qrRecipePrice').textContent = suggestedPrice + ' € TTC';
+  
+  const qrWeightEl = document.getElementById('qrRecipeWeight');
+  const qrPriceKgEl = document.getElementById('qrRecipePricePerKg');
+  if (qrWeightEl) qrWeightEl.textContent = netWeightPortionG.toFixed(0) + ' g';
+  if (qrPriceKgEl) qrPriceKgEl.textContent = pricePerKgTTC.toFixed(2) + ' €/kg';
   
   const al = document.getElementById('allergensList');
   $('#qrAllergens').textContent = al ? al.textContent : 'Non spécifié';

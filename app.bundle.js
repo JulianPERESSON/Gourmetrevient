@@ -1,7 +1,7 @@
 /* 
   =============================================================================
   GourmetRevient Application Bundle (Production)
-  Généré automatiquement le : 2026-06-10T17:14:53.805Z
+  Généré automatiquement le : 2026-06-10T17:25:55.031Z
   =============================================================================
 */
 
@@ -62,124 +62,124 @@ haccpLogs: 'gourmet_haccp_logs',
 wasteLogs: 'gourmet_waste_logs'
 };
 const DEFAULT_INGREDIENT_DB = [
-{ name: 'Farine T45', unit: 'g', pricePerUnit: 0.48, priceRef: 'kg', allergens: ['Gluten'] },
-{ name: 'Farine T55', unit: 'g', pricePerUnit: 0.44, priceRef: 'kg', allergens: ['Gluten'] },
-{ name: 'Farine de Gruau T45', unit: 'g', pricePerUnit: 1.10, priceRef: 'kg', allergens: ['Gluten'] },
-{ name: 'Farine T55 Label Rouge', unit: 'g', pricePerUnit: 0.95, priceRef: 'kg', allergens: ['Gluten'] },
-{ name: 'Farine de Seigle T130', unit: 'g', pricePerUnit: 1.50, priceRef: 'kg', allergens: ['Gluten'] },
-{ name: 'Farine de Sarrasin', unit: 'g', pricePerUnit: 2.50, priceRef: 'kg', allergens: [] },
-{ name: 'Farine de Riz (S.G)', unit: 'g', pricePerUnit: 3.20, priceRef: 'kg', allergens: [] },
-{ name: 'Farine de Châtaigne', unit: 'g', pricePerUnit: 9.50, priceRef: 'kg', allergens: [] },
-{ name: 'Fécule de Pomme de Terre', unit: 'g', pricePerUnit: 2.20, priceRef: 'kg', allergens: [] },
-{ name: 'Maïzena', unit: 'g', pricePerUnit: 1.80, priceRef: 'kg', allergens: [] },
-{ name: 'Beurre AOP', unit: 'g', pricePerUnit: 6.15, priceRef: 'kg', allergens: ['Lait'] },
-{ name: 'Beurre doux', unit: 'g', pricePerUnit: 5.50, priceRef: 'kg', allergens: ['Lait'] },
-{ name: 'Beurre Tourage AOP 82%', unit: 'g', pricePerUnit: 10.50, priceRef: 'kg', allergens: ['Lait'] },
-{ name: 'Beurre de Cacao', unit: 'g', pricePerUnit: 12.50, priceRef: 'kg', allergens: [] },
-{ name: 'Beurre de Cacao Mycryo', unit: 'g', pricePerUnit: 28.00, priceRef: 'kg', allergens: [] },
-{ name: 'Huile de Coco Vierge', unit: 'ml', pricePerUnit: 12.00, priceRef: 'L', allergens: [] },
-{ name: 'Sucre semoule', unit: 'g', pricePerUnit: 0.68, priceRef: 'kg', allergens: [] },
-{ name: 'Sucre glace', unit: 'g', pricePerUnit: 1.60, priceRef: 'kg', allergens: [] },
-{ name: 'Sucre Muscovado', unit: 'g', pricePerUnit: 3.50, priceRef: 'kg', allergens: [] },
-{ name: 'Vergeoise Brune', unit: 'g', pricePerUnit: 2.80, priceRef: 'kg', allergens: [] },
-{ name: 'Sucre de Fleur de Coco', unit: 'g', pricePerUnit: 11.00, priceRef: 'kg', allergens: [] },
-{ name: 'Glucose', unit: 'g', pricePerUnit: 3.50, priceRef: 'kg', allergens: [] },
-{ name: 'Sirop de Glucose', unit: 'g', pricePerUnit: 2.80, priceRef: 'kg', allergens: [] },
-{ name: 'Trimoline (Sucre Inverti)', unit: 'g', pricePerUnit: 3.80, priceRef: 'kg', allergens: [] },
-{ name: 'Miel de Fleurs', unit: 'g', pricePerUnit: 6.50, priceRef: 'kg', allergens: [] },
-{ name: 'Sirop d\'Erable Grade A', unit: 'ml', pricePerUnit: 28.00, priceRef: 'L', allergens: [] },
-{ name: 'Isomalt', unit: 'g', pricePerUnit: 6.50, priceRef: 'kg', allergens: [] },
-{ name: 'Sorbitol Poudre', unit: 'g', pricePerUnit: 18.00, priceRef: 'kg', allergens: [] },
-{ name: 'Lait entier', unit: 'ml', pricePerUnit: 0.72, priceRef: 'L', allergens: ['Lait'] },
-{ name: 'Lait d\'Amande Pro', unit: 'ml', pricePerUnit: 2.80, priceRef: 'L', allergens: ['Fruits à coque'] },
-{ name: 'Crème 35% MG Excellence', unit: 'ml', pricePerUnit: 4.50, priceRef: 'L', allergens: ['Lait'] },
-{ name: 'Crème 35% MG', unit: 'ml', pricePerUnit: 3.25, priceRef: 'L', allergens: ['Lait'] },
-{ name: 'Mascarpone', unit: 'g', pricePerUnit: 6.80, priceRef: 'kg', allergens: ['Lait'] },
-{ name: 'Œufs Frais (L)', unit: 'pièce', pricePerUnit: 0.18, priceRef: 'pièce', allergens: ['Œufs'] },
-{ name: 'Œufs entiers', unit: 'pièce', pricePerUnit: 0.11, priceRef: 'pièce', allergens: ['Œufs'] },
-{ name: 'Jaunes d\'œufs', unit: 'pièce', pricePerUnit: 0.11, priceRef: 'pièce', allergens: ['Œufs'] },
-{ name: 'Blancs d\'œufs', unit: 'pièce', pricePerUnit: 0.08, priceRef: 'pièce', allergens: ['Œufs'] },
-{ name: 'Blanc d\'œuf Pasteurisé', unit: 'g', pricePerUnit: 4.50, priceRef: 'kg', allergens: ['Œufs'] },
-{ name: 'Jaune d\'œuf Pasteurisé', unit: 'g', pricePerUnit: 9.00, priceRef: 'kg', allergens: ['Œufs'] },
-{ name: 'Poudre de Blanc d\'Œuf', unit: 'g', pricePerUnit: 35.00, priceRef: 'kg', allergens: ['Œufs'] },
-{ name: 'Chocolat noir 64%', unit: 'g', pricePerUnit: 11.50, priceRef: 'kg', allergens: ['Lait', 'Soja'] },
-{ name: 'Chocolat Guanaja 70%', unit: 'g', pricePerUnit: 18.50, priceRef: 'kg', allergens: ['Lait', 'Soja'] },
-{ name: 'Chocolat au Lait 35%', unit: 'g', pricePerUnit: 10.20, priceRef: 'kg', allergens: ['Lait', 'Soja'] },
-{ name: 'Chocolat Jivara 40%', unit: 'g', pricePerUnit: 17.20, priceRef: 'kg', allergens: ['Lait', 'Soja'] },
-{ name: 'Chocolat Blanc 33%', unit: 'g', pricePerUnit: 9.80, priceRef: 'kg', allergens: ['Lait', 'Soja'] },
-{ name: 'Chocolat Opalys 33%', unit: 'g', pricePerUnit: 18.90, priceRef: 'kg', allergens: ['Lait', 'Soja'] },
-{ name: 'Chocolat Dulcey 35%', unit: 'g', pricePerUnit: 19.80, priceRef: 'kg', allergens: ['Lait', 'Soja'] },
-{ name: 'Cacao poudre', unit: 'g', pricePerUnit: 12.00, priceRef: 'kg', allergens: [] },
-{ name: 'Poudre Cacao Barry', unit: 'g', pricePerUnit: 18.00, priceRef: 'kg', allergens: [] },
-{ name: 'Pâte à glacer Brune', unit: 'g', pricePerUnit: 8.50, priceRef: 'kg', allergens: ['Soja'] },
-{ name: 'Fraises fraîches', unit: 'g', pricePerUnit: 4.50, priceRef: 'kg', allergens: [] },
-{ name: 'Pomme Golden', unit: 'kg', pricePerUnit: 2.20, priceRef: 'kg', allergens: [] },
-{ name: 'Poire Williams', unit: 'kg', pricePerUnit: 3.50, priceRef: 'kg', allergens: [] },
-{ name: 'Menthe Fraîche', unit: 'g', pricePerUnit: 25.00, priceRef: 'kg', allergens: [] },
-{ name: 'Citron Vert', unit: 'pièce', pricePerUnit: 0.45, priceRef: 'pièce', allergens: [] },
-{ name: 'Orange', unit: 'pièce', pricePerUnit: 0.35, priceRef: 'pièce', allergens: [] },
-{ name: 'Griottes au Sirop', unit: 'g', pricePerUnit: 12.50, priceRef: 'kg', allergens: [] },
-{ name: 'Purée de Fraise', unit: 'ml', pricePerUnit: 11.50, priceRef: 'L', allergens: [] },
-{ name: 'Purée de Framboise', unit: 'ml', pricePerUnit: 13.20, priceRef: 'L', allergens: [] },
-{ name: 'Purée de Mangue', unit: 'ml', pricePerUnit: 12.80, priceRef: 'L', allergens: [] },
-{ name: 'Purée de Passion', unit: 'ml', pricePerUnit: 14.80, priceRef: 'L', allergens: [] },
-{ name: 'Purée de Cassis', unit: 'ml', pricePerUnit: 11.20, priceRef: 'L', allergens: [] },
-{ name: 'Purée de Yuzu', unit: 'ml', pricePerUnit: 55.00, priceRef: 'L', allergens: [] },
-{ name: 'Purée de Litchi', unit: 'ml', pricePerUnit: 16.50, priceRef: 'L', allergens: [] },
-{ name: 'Purée de Noix de Coco', unit: 'ml', pricePerUnit: 14.20, priceRef: 'L', allergens: [] },
-{ name: 'Purée de Goyave Rose', unit: 'ml', pricePerUnit: 15.80, priceRef: 'L', allergens: [] },
-{ name: 'Purée de Bergamote', unit: 'ml', pricePerUnit: 24.00, priceRef: 'L', allergens: [] },
-{ name: 'Poudre de Fraise Lyophilisée', unit: 'g', pricePerUnit: 120.00, priceRef: 'kg', allergens: [] },
-{ name: 'Poudre d\'amandes', unit: 'g', pricePerUnit: 9.50, priceRef: 'kg', allergens: ['Fruits à coque'] },
-{ name: 'Amandes effilées', unit: 'g', pricePerUnit: 9.50, priceRef: 'kg', allergens: ['Fruits à coque'] },
-{ name: 'Amandes blanchies', unit: 'g', pricePerUnit: 11.20, priceRef: 'kg', allergens: ['Fruits à coque'] },
-{ name: 'Noisettes torréfiées', unit: 'g', pricePerUnit: 12.50, priceRef: 'kg', allergens: ['Fruits à coque'] },
-{ name: 'Poudre de Noisette', unit: 'g', pricePerUnit: 14.50, priceRef: 'kg', allergens: ['Fruits à coque'] },
-{ name: 'Pâte de Noisette 100%', unit: 'g', pricePerUnit: 24.00, priceRef: 'kg', allergens: ['Fruits à coque'] },
-{ name: 'Pâte Noisette Piémont I.G.P', unit: 'g', pricePerUnit: 42.00, priceRef: 'kg', allergens: ['Fruits à coque'] },
-{ name: 'Praliné noisette', unit: 'g', pricePerUnit: 14.50, priceRef: 'kg', allergens: ['Fruits à coque'] },
-{ name: 'Pistaches Entières', unit: 'g', pricePerUnit: 28.50, priceRef: 'kg', allergens: ['Fruits à coque'] },
-{ name: 'Pâte de pistache', unit: 'g', pricePerUnit: 38.00, priceRef: 'kg', allergens: ['Fruits à coque'] },
-{ name: 'Pistache de Bronte D.O.P', unit: 'g', pricePerUnit: 85.00, priceRef: 'kg', allergens: ['Fruits à coque'] },
-{ name: 'Noix de Coco Râpée', unit: 'g', pricePerUnit: 7.20, priceRef: 'kg', allergens: [] },
-{ name: 'Vanille (gousse)', unit: 'pièce', pricePerUnit: 1.80, priceRef: 'pièce', allergens: [] },
-{ name: 'Gousse Vanille Bourbon', unit: 'pièce', pricePerUnit: 2.50, priceRef: 'pièce', allergens: [] },
-{ name: 'Gousses de Vanille Tahiti', unit: 'pièce', pricePerUnit: 4.50, priceRef: 'pièce', allergens: [] },
-{ name: 'Arôme Naturel Vanille', unit: 'ml', pricePerUnit: 45.00, priceRef: 'L', allergens: [] },
-{ name: 'Arôme Amande Amère', unit: 'ml', pricePerUnit: 35.00, priceRef: 'L', allergens: [] },
-{ name: 'Extrait Café Trablit', unit: 'ml', pricePerUnit: 52.00, priceRef: 'L', allergens: [] },
-{ name: 'Café soluble', unit: 'g', pricePerUnit: 18.00, priceRef: 'kg', allergens: [] },
-{ name: 'Matcha Cérémonial', unit: 'g', pricePerUnit: 250.00, priceRef: 'kg', allergens: [] },
-{ name: 'Thé Matcha', unit: 'g', pricePerUnit: 85.00, priceRef: 'kg', allergens: [] },
-{ name: 'Tonka (fèves entières)', unit: 'g', pricePerUnit: 110.00, priceRef: 'kg', allergens: [] },
-{ name: 'Poivre de Timut', unit: 'g', pricePerUnit: 95.00, priceRef: 'kg', allergens: [] },
-{ name: 'Eau de Fleur d\'Oranger', unit: 'ml', pricePerUnit: 18.00, priceRef: 'L', allergens: [] },
-{ name: 'Sel', unit: 'g', pricePerUnit: 0.50, priceRef: 'kg', allergens: [] },
-{ name: 'Fleur de sel', unit: 'g', pricePerUnit: 18.00, priceRef: 'kg', allergens: [] },
-{ name: 'Fleur de Sel de Guérande', unit: 'g', pricePerUnit: 12.00, priceRef: 'kg', allergens: [] },
-{ name: 'Sel de Guérande Moulu', unit: 'g', pricePerUnit: 0.85, priceRef: 'kg', allergens: [] },
-{ name: 'Rhum Ambré 54%', unit: 'ml', pricePerUnit: 42.00, priceRef: 'L', allergens: [] },
-{ name: 'Grand Marnier 54%', unit: 'ml', pricePerUnit: 48.00, priceRef: 'L', allergens: [] },
-{ name: 'Amaretto Disaronno', unit: 'ml', pricePerUnit: 32.00, priceRef: 'L', allergens: [] },
-{ name: 'Kirsh Pâtissier', unit: 'ml', pricePerUnit: 35.00, priceRef: 'L', allergens: [] },
-{ name: 'Levure fraîche', unit: 'g', pricePerUnit: 6.50, priceRef: 'kg', allergens: [] },
-{ name: 'Levure chimique', unit: 'g', pricePerUnit: 8.50, priceRef: 'kg', allergens: [] },
-{ name: 'Poudre à lever', unit: 'g', pricePerUnit: 4.20, priceRef: 'kg', allergens: [] },
-{ name: 'Bicarbonate de soude', unit: 'g', pricePerUnit: 2.50, priceRef: 'kg', allergens: [] },
-{ name: 'Gélatine en feuilles (Or)', unit: 'g', pricePerUnit: 28.00, priceRef: 'kg', allergens: [] },
-{ name: 'Gélatine poudre 200 Bloom', unit: 'g', pricePerUnit: 22.00, priceRef: 'kg', allergens: [] },
-{ name: 'Agar-agar', unit: 'g', pricePerUnit: 65.00, priceRef: 'kg', allergens: [] },
-{ name: 'Pectine NH', unit: 'g', pricePerUnit: 45.00, priceRef: 'kg', allergens: [] },
-{ name: 'Pectine X58', unit: 'g', pricePerUnit: 75.00, priceRef: 'kg', allergens: [] },
-{ name: 'Pectine Jaune', unit: 'g', pricePerUnit: 68.00, priceRef: 'kg', allergens: [] },
-{ name: 'Pectine Rapide (Nappage)', unit: 'g', pricePerUnit: 52.00, priceRef: 'kg', allergens: [] },
-{ name: 'Acide Citrique', unit: 'g', pricePerUnit: 12.00, priceRef: 'kg', allergens: [] },
-{ name: 'Crème de Tartre', unit: 'g', pricePerUnit: 28.00, priceRef: 'kg', allergens: [] },
-{ name: 'Feuillantine', unit: 'g', pricePerUnit: 18.50, priceRef: 'kg', allergens: ['Gluten'] },
-{ name: 'Speculoos', unit: 'g', pricePerUnit: 6.20, priceRef: 'kg', allergens: ['Gluten'] },
-{ name: 'Colorant Jaune Hydrosoluble', unit: 'g', pricePerUnit: 95.00, priceRef: 'kg', allergens: [] },
-{ name: 'Colorant Noir Carbone', unit: 'g', pricePerUnit: 150.00, priceRef: 'kg', allergens: [] },
-{ name: 'Feuille d\'Or 24 carats', unit: 'pièce', pricePerUnit: 2.50, priceRef: 'pièce', allergens: [] },
+{ name: 'Farine T45', unit: 'g', pricePerUnit: 0.48, priceRef: 'kg', allergens: ['Gluten'] , origin: 'france' },
+{ name: 'Farine T55', unit: 'g', pricePerUnit: 0.44, priceRef: 'kg', allergens: ['Gluten'] , origin: 'france' },
+{ name: 'Farine de Gruau T45', unit: 'g', pricePerUnit: 1.10, priceRef: 'kg', allergens: ['Gluten'] , origin: 'france' },
+{ name: 'Farine T55 Label Rouge', unit: 'g', pricePerUnit: 0.95, priceRef: 'kg', allergens: ['Gluten'] , origin: 'local' },
+{ name: 'Farine de Seigle T130', unit: 'g', pricePerUnit: 1.50, priceRef: 'kg', allergens: ['Gluten'] , origin: 'france' },
+{ name: 'Farine de Sarrasin', unit: 'g', pricePerUnit: 2.50, priceRef: 'kg', allergens: [] , origin: 'france' },
+{ name: 'Farine de Riz (S.G)', unit: 'g', pricePerUnit: 3.20, priceRef: 'kg', allergens: [] , origin: 'france' },
+{ name: 'Farine de Châtaigne', unit: 'g', pricePerUnit: 9.50, priceRef: 'kg', allergens: [] , origin: 'france' },
+{ name: 'Fécule de Pomme de Terre', unit: 'g', pricePerUnit: 2.20, priceRef: 'kg', allergens: [] , origin: 'france' },
+{ name: 'Maïzena', unit: 'g', pricePerUnit: 1.80, priceRef: 'kg', allergens: [] , origin: 'france' },
+{ name: 'Beurre AOP', unit: 'g', pricePerUnit: 6.15, priceRef: 'kg', allergens: ['Lait'] , origin: 'local' },
+{ name: 'Beurre doux', unit: 'g', pricePerUnit: 5.50, priceRef: 'kg', allergens: ['Lait'] , origin: 'france' },
+{ name: 'Beurre Tourage AOP 82%', unit: 'g', pricePerUnit: 10.50, priceRef: 'kg', allergens: ['Lait'] , origin: 'local' },
+{ name: 'Beurre de Cacao', unit: 'g', pricePerUnit: 12.50, priceRef: 'kg', allergens: [] , origin: 'import' },
+{ name: 'Beurre de Cacao Mycryo', unit: 'g', pricePerUnit: 28.00, priceRef: 'kg', allergens: [] , origin: 'import' },
+{ name: 'Huile de Coco Vierge', unit: 'ml', pricePerUnit: 12.00, priceRef: 'L', allergens: [] , origin: 'import' },
+{ name: 'Sucre semoule', unit: 'g', pricePerUnit: 0.68, priceRef: 'kg', allergens: [] , origin: 'france' },
+{ name: 'Sucre glace', unit: 'g', pricePerUnit: 1.60, priceRef: 'kg', allergens: [] , origin: 'france' },
+{ name: 'Sucre Muscovado', unit: 'g', pricePerUnit: 3.50, priceRef: 'kg', allergens: [] , origin: 'france' },
+{ name: 'Vergeoise Brune', unit: 'g', pricePerUnit: 2.80, priceRef: 'kg', allergens: [] , origin: 'france' },
+{ name: 'Sucre de Fleur de Coco', unit: 'g', pricePerUnit: 11.00, priceRef: 'kg', allergens: [] , origin: 'import' },
+{ name: 'Glucose', unit: 'g', pricePerUnit: 3.50, priceRef: 'kg', allergens: [] , origin: 'import' },
+{ name: 'Sirop de Glucose', unit: 'g', pricePerUnit: 2.80, priceRef: 'kg', allergens: [] , origin: 'import' },
+{ name: 'Trimoline (Sucre Inverti)', unit: 'g', pricePerUnit: 3.80, priceRef: 'kg', allergens: [] , origin: 'france' },
+{ name: 'Miel de Fleurs', unit: 'g', pricePerUnit: 6.50, priceRef: 'kg', allergens: [] , origin: 'france' },
+{ name: 'Sirop d\'Erable Grade A', unit: 'ml', pricePerUnit: 28.00, priceRef: 'L', allergens: [] , origin: 'france' },
+{ name: 'Isomalt', unit: 'g', pricePerUnit: 6.50, priceRef: 'kg', allergens: [] , origin: 'import' },
+{ name: 'Sorbitol Poudre', unit: 'g', pricePerUnit: 18.00, priceRef: 'kg', allergens: [] , origin: 'import' },
+{ name: 'Lait entier', unit: 'ml', pricePerUnit: 0.72, priceRef: 'L', allergens: ['Lait'] , origin: 'france' },
+{ name: 'Lait d\'Amande Pro', unit: 'ml', pricePerUnit: 2.80, priceRef: 'L', allergens: ['Fruits à coque'] , origin: 'france' },
+{ name: 'Crème 35% MG Excellence', unit: 'ml', pricePerUnit: 4.50, priceRef: 'L', allergens: ['Lait'] , origin: 'france' },
+{ name: 'Crème 35% MG', unit: 'ml', pricePerUnit: 3.25, priceRef: 'L', allergens: ['Lait'] , origin: 'france' },
+{ name: 'Mascarpone', unit: 'g', pricePerUnit: 6.80, priceRef: 'kg', allergens: ['Lait'] , origin: 'france' },
+{ name: 'Œufs Frais (L)', unit: 'pièce', pricePerUnit: 0.18, priceRef: 'pièce', allergens: ['Œufs'] , origin: 'local' },
+{ name: 'Œufs entiers', unit: 'pièce', pricePerUnit: 0.11, priceRef: 'pièce', allergens: ['Œufs'] , origin: 'france' },
+{ name: 'Jaunes d\'œufs', unit: 'pièce', pricePerUnit: 0.11, priceRef: 'pièce', allergens: ['Œufs'] , origin: 'france' },
+{ name: 'Blancs d\'œufs', unit: 'pièce', pricePerUnit: 0.08, priceRef: 'pièce', allergens: ['Œufs'] , origin: 'france' },
+{ name: 'Blanc d\'œuf Pasteurisé', unit: 'g', pricePerUnit: 4.50, priceRef: 'kg', allergens: ['Œufs'] , origin: 'france' },
+{ name: 'Jaune d\'œuf Pasteurisé', unit: 'g', pricePerUnit: 9.00, priceRef: 'kg', allergens: ['Œufs'] , origin: 'france' },
+{ name: 'Poudre de Blanc d\'Œuf', unit: 'g', pricePerUnit: 35.00, priceRef: 'kg', allergens: ['Œufs'] , origin: 'france' },
+{ name: 'Chocolat noir 64%', unit: 'g', pricePerUnit: 11.50, priceRef: 'kg', allergens: ['Lait', 'Soja'] , origin: 'import' },
+{ name: 'Chocolat Guanaja 70%', unit: 'g', pricePerUnit: 18.50, priceRef: 'kg', allergens: ['Lait', 'Soja'] , origin: 'import' },
+{ name: 'Chocolat au Lait 35%', unit: 'g', pricePerUnit: 10.20, priceRef: 'kg', allergens: ['Lait', 'Soja'] , origin: 'import' },
+{ name: 'Chocolat Jivara 40%', unit: 'g', pricePerUnit: 17.20, priceRef: 'kg', allergens: ['Lait', 'Soja'] , origin: 'import' },
+{ name: 'Chocolat Blanc 33%', unit: 'g', pricePerUnit: 9.80, priceRef: 'kg', allergens: ['Lait', 'Soja'] , origin: 'import' },
+{ name: 'Chocolat Opalys 33%', unit: 'g', pricePerUnit: 18.90, priceRef: 'kg', allergens: ['Lait', 'Soja'] , origin: 'import' },
+{ name: 'Chocolat Dulcey 35%', unit: 'g', pricePerUnit: 19.80, priceRef: 'kg', allergens: ['Lait', 'Soja'] , origin: 'import' },
+{ name: 'Cacao poudre', unit: 'g', pricePerUnit: 12.00, priceRef: 'kg', allergens: [] , origin: 'import' },
+{ name: 'Poudre Cacao Barry', unit: 'g', pricePerUnit: 18.00, priceRef: 'kg', allergens: [] , origin: 'import' },
+{ name: 'Pâte à glacer Brune', unit: 'g', pricePerUnit: 8.50, priceRef: 'kg', allergens: ['Soja'] , origin: 'france' },
+{ name: 'Fraises fraîches', unit: 'g', pricePerUnit: 4.50, priceRef: 'kg', allergens: [] , origin: 'local' },
+{ name: 'Pomme Golden', unit: 'kg', pricePerUnit: 2.20, priceRef: 'kg', allergens: [] , origin: 'france' },
+{ name: 'Poire Williams', unit: 'kg', pricePerUnit: 3.50, priceRef: 'kg', allergens: [] , origin: 'france' },
+{ name: 'Menthe Fraîche', unit: 'g', pricePerUnit: 25.00, priceRef: 'kg', allergens: [] , origin: 'local' },
+{ name: 'Citron Vert', unit: 'pièce', pricePerUnit: 0.45, priceRef: 'pièce', allergens: [] , origin: 'france' },
+{ name: 'Orange', unit: 'pièce', pricePerUnit: 0.35, priceRef: 'pièce', allergens: [] , origin: 'france' },
+{ name: 'Griottes au Sirop', unit: 'g', pricePerUnit: 12.50, priceRef: 'kg', allergens: [] , origin: 'france' },
+{ name: 'Purée de Fraise', unit: 'ml', pricePerUnit: 11.50, priceRef: 'L', allergens: [] , origin: 'local' },
+{ name: 'Purée de Framboise', unit: 'ml', pricePerUnit: 13.20, priceRef: 'L', allergens: [] , origin: 'france' },
+{ name: 'Purée de Mangue', unit: 'ml', pricePerUnit: 12.80, priceRef: 'L', allergens: [] , origin: 'import' },
+{ name: 'Purée de Passion', unit: 'ml', pricePerUnit: 14.80, priceRef: 'L', allergens: [] , origin: 'import' },
+{ name: 'Purée de Cassis', unit: 'ml', pricePerUnit: 11.20, priceRef: 'L', allergens: [] , origin: 'france' },
+{ name: 'Purée de Yuzu', unit: 'ml', pricePerUnit: 55.00, priceRef: 'L', allergens: [] , origin: 'import' },
+{ name: 'Purée de Litchi', unit: 'ml', pricePerUnit: 16.50, priceRef: 'L', allergens: [] , origin: 'import' },
+{ name: 'Purée de Noix de Coco', unit: 'ml', pricePerUnit: 14.20, priceRef: 'L', allergens: [] , origin: 'import' },
+{ name: 'Purée de Goyave Rose', unit: 'ml', pricePerUnit: 15.80, priceRef: 'L', allergens: [] , origin: 'france' },
+{ name: 'Purée de Bergamote', unit: 'ml', pricePerUnit: 24.00, priceRef: 'L', allergens: [] , origin: 'import' },
+{ name: 'Poudre de Fraise Lyophilisée', unit: 'g', pricePerUnit: 120.00, priceRef: 'kg', allergens: [] , origin: 'local' },
+{ name: 'Poudre d\'amandes', unit: 'g', pricePerUnit: 9.50, priceRef: 'kg', allergens: ['Fruits à coque'] , origin: 'france' },
+{ name: 'Amandes effilées', unit: 'g', pricePerUnit: 9.50, priceRef: 'kg', allergens: ['Fruits à coque'] , origin: 'import' },
+{ name: 'Amandes blanchies', unit: 'g', pricePerUnit: 11.20, priceRef: 'kg', allergens: ['Fruits à coque'] , origin: 'import' },
+{ name: 'Noisettes torréfiées', unit: 'g', pricePerUnit: 12.50, priceRef: 'kg', allergens: ['Fruits à coque'] , origin: 'import' },
+{ name: 'Poudre de Noisette', unit: 'g', pricePerUnit: 14.50, priceRef: 'kg', allergens: ['Fruits à coque'] , origin: 'import' },
+{ name: 'Pâte de Noisette 100%', unit: 'g', pricePerUnit: 24.00, priceRef: 'kg', allergens: ['Fruits à coque'] , origin: 'import' },
+{ name: 'Pâte Noisette Piémont I.G.P', unit: 'g', pricePerUnit: 42.00, priceRef: 'kg', allergens: ['Fruits à coque'] , origin: 'import' },
+{ name: 'Praliné noisette', unit: 'g', pricePerUnit: 14.50, priceRef: 'kg', allergens: ['Fruits à coque'] , origin: 'import' },
+{ name: 'Pistaches Entières', unit: 'g', pricePerUnit: 28.50, priceRef: 'kg', allergens: ['Fruits à coque'] , origin: 'import' },
+{ name: 'Pâte de pistache', unit: 'g', pricePerUnit: 38.00, priceRef: 'kg', allergens: ['Fruits à coque'] , origin: 'import' },
+{ name: 'Pistache de Bronte D.O.P', unit: 'g', pricePerUnit: 85.00, priceRef: 'kg', allergens: ['Fruits à coque'] , origin: 'import' },
+{ name: 'Noix de Coco Râpée', unit: 'g', pricePerUnit: 7.20, priceRef: 'kg', allergens: [] , origin: 'import' },
+{ name: 'Vanille (gousse)', unit: 'pièce', pricePerUnit: 1.80, priceRef: 'pièce', allergens: [] , origin: 'import' },
+{ name: 'Gousse Vanille Bourbon', unit: 'pièce', pricePerUnit: 2.50, priceRef: 'pièce', allergens: [] , origin: 'import' },
+{ name: 'Gousses de Vanille Tahiti', unit: 'pièce', pricePerUnit: 4.50, priceRef: 'pièce', allergens: [] , origin: 'import' },
+{ name: 'Arôme Naturel Vanille', unit: 'ml', pricePerUnit: 45.00, priceRef: 'L', allergens: [] , origin: 'import' },
+{ name: 'Arôme Amande Amère', unit: 'ml', pricePerUnit: 35.00, priceRef: 'L', allergens: [] , origin: 'import' },
+{ name: 'Extrait Café Trablit', unit: 'ml', pricePerUnit: 52.00, priceRef: 'L', allergens: [] , origin: 'france' },
+{ name: 'Café soluble', unit: 'g', pricePerUnit: 18.00, priceRef: 'kg', allergens: [] , origin: 'france' },
+{ name: 'Matcha Cérémonial', unit: 'g', pricePerUnit: 250.00, priceRef: 'kg', allergens: [] , origin: 'france' },
+{ name: 'Thé Matcha', unit: 'g', pricePerUnit: 85.00, priceRef: 'kg', allergens: [] , origin: 'france' },
+{ name: 'Tonka (fèves entières)', unit: 'g', pricePerUnit: 110.00, priceRef: 'kg', allergens: [] , origin: 'import' },
+{ name: 'Poivre de Timut', unit: 'g', pricePerUnit: 95.00, priceRef: 'kg', allergens: [] , origin: 'import' },
+{ name: 'Eau de Fleur d\'Oranger', unit: 'ml', pricePerUnit: 18.00, priceRef: 'L', allergens: [] , origin: 'france' },
+{ name: 'Sel', unit: 'g', pricePerUnit: 0.50, priceRef: 'kg', allergens: [] , origin: 'france' },
+{ name: 'Fleur de sel', unit: 'g', pricePerUnit: 18.00, priceRef: 'kg', allergens: [] , origin: 'france' },
+{ name: 'Fleur de Sel de Guérande', unit: 'g', pricePerUnit: 12.00, priceRef: 'kg', allergens: [] , origin: 'local' },
+{ name: 'Sel de Guérande Moulu', unit: 'g', pricePerUnit: 0.85, priceRef: 'kg', allergens: [] , origin: 'local' },
+{ name: 'Rhum Ambré 54%', unit: 'ml', pricePerUnit: 42.00, priceRef: 'L', allergens: [] , origin: 'import' },
+{ name: 'Grand Marnier 54%', unit: 'ml', pricePerUnit: 48.00, priceRef: 'L', allergens: [] , origin: 'import' },
+{ name: 'Amaretto Disaronno', unit: 'ml', pricePerUnit: 32.00, priceRef: 'L', allergens: [] , origin: 'import' },
+{ name: 'Kirsh Pâtissier', unit: 'ml', pricePerUnit: 35.00, priceRef: 'L', allergens: [] , origin: 'import' },
+{ name: 'Levure fraîche', unit: 'g', pricePerUnit: 6.50, priceRef: 'kg', allergens: [] , origin: 'local' },
+{ name: 'Levure chimique', unit: 'g', pricePerUnit: 8.50, priceRef: 'kg', allergens: [] , origin: 'france' },
+{ name: 'Poudre à lever', unit: 'g', pricePerUnit: 4.20, priceRef: 'kg', allergens: [] , origin: 'france' },
+{ name: 'Bicarbonate de soude', unit: 'g', pricePerUnit: 2.50, priceRef: 'kg', allergens: [] , origin: 'france' },
+{ name: 'Gélatine en feuilles (Or)', unit: 'g', pricePerUnit: 28.00, priceRef: 'kg', allergens: [] , origin: 'france' },
+{ name: 'Gélatine poudre 200 Bloom', unit: 'g', pricePerUnit: 22.00, priceRef: 'kg', allergens: [] , origin: 'france' },
+{ name: 'Agar-agar', unit: 'g', pricePerUnit: 65.00, priceRef: 'kg', allergens: [] , origin: 'france' },
+{ name: 'Pectine NH', unit: 'g', pricePerUnit: 45.00, priceRef: 'kg', allergens: [] , origin: 'france' },
+{ name: 'Pectine X58', unit: 'g', pricePerUnit: 75.00, priceRef: 'kg', allergens: [] , origin: 'france' },
+{ name: 'Pectine Jaune', unit: 'g', pricePerUnit: 68.00, priceRef: 'kg', allergens: [] , origin: 'france' },
+{ name: 'Pectine Rapide (Nappage)', unit: 'g', pricePerUnit: 52.00, priceRef: 'kg', allergens: [] , origin: 'france' },
+{ name: 'Acide Citrique', unit: 'g', pricePerUnit: 12.00, priceRef: 'kg', allergens: [] , origin: 'france' },
+{ name: 'Crème de Tartre', unit: 'g', pricePerUnit: 28.00, priceRef: 'kg', allergens: [] , origin: 'france' },
+{ name: 'Feuillantine', unit: 'g', pricePerUnit: 18.50, priceRef: 'kg', allergens: ['Gluten'] , origin: 'france' },
+{ name: 'Speculoos', unit: 'g', pricePerUnit: 6.20, priceRef: 'kg', allergens: ['Gluten'] , origin: 'france' },
+{ name: 'Colorant Jaune Hydrosoluble', unit: 'g', pricePerUnit: 95.00, priceRef: 'kg', allergens: [] , origin: 'france' },
+{ name: 'Colorant Noir Carbone', unit: 'g', pricePerUnit: 150.00, priceRef: 'kg', allergens: [] , origin: 'france' },
+{ name: 'Feuille d\'Or 24 carats', unit: 'pièce', pricePerUnit: 2.50, priceRef: 'pièce', allergens: [] , origin: 'france' },
 ];
 const HOLIDAYS_A_2026 = [
 { start: "2025-12-20", end: "2026-01-05", label: "Vacances de Noël" },
@@ -382,6 +382,12 @@ if (isNaN(price)) price = parseFloat(ing.pricePerKg);
 if (isNaN(price)) price = parseFloat(ing.pricePerL);
 if (isNaN(price)) price = parseFloat(ing.pricePerPc);
 if (isNaN(price)) price = 0;
+if (window.ingredientPriceOverrides && ing.name) {
+const overridePercent = window.ingredientPriceOverrides[ing.name.trim().toLowerCase()];
+if (overridePercent !== undefined) {
+price = price * (1 + overridePercent / 100);
+}
+}
 if (unit === 'g' || unit === 'ml') return (qty / 1000) * price;
 return qty * price;
 }
@@ -2288,9 +2294,72 @@ if (lower.match(/froid|réfrigé|congéla|refroid|glace/)) return `<span style="
 if (lower.match(/montage|poche/)) return `<span style="background:#d1fae5; color:#065f46; padding:2px 6px; font-size:0.55rem; font-weight:700; border-radius:4px; text-transform:uppercase; letter-spacing:0.05em;">🛡️ Hygiène</span>`;
 return '';
 }
+function calcRecipeEcoScore(recipe) {
+if (!recipe) return { score: 75, grade: 'B', color: '#84cc16' };
+let totalWeight = 0;
+let totalScore = 0;
+const getIngredientOrigin = (ingName) => {
+if (window.APP && APP.ingredientDb) {
+const match = APP.ingredientDb.find(i => i.name.toLowerCase() === ingName.toLowerCase());
+if (match && match.origin) return match.origin;
+}
+if (typeof DEFAULT_INGREDIENT_DB !== 'undefined') {
+const match = DEFAULT_INGREDIENT_DB.find(i => i.name.toLowerCase() === ingName.toLowerCase());
+if (match && match.origin) return match.origin;
+}
+return 'france';
+};
+const originScores = { 'local': 100, 'france': 80, 'import': 30 };
+if (recipe.ingredients) {
+recipe.ingredients.forEach(ing => {
+let qty = parseFloat(ing.quantity || ing.qty) || 0;
+const unit = ing.unit || 'g';
+if (unit === 'kg' || unit === 'L') qty *= 1000;
+else if (unit === 'cl') qty *= 10;
+else if (unit === 'pcs' || unit === 'pièce') qty *= 50;
+const origin = ing.origin || getIngredientOrigin(ing.name || '');
+const score = originScores[origin] || 80;
+totalWeight += qty;
+totalScore += qty * score;
+});
+}
+if (recipe.sousRecettes && recipe.sousRecettes.length > 0) {
+const fromApp = window.APP ? (APP.savedRecipes || []) : [];
+let local = [];
+try {
+const key = window.getUserRecipesKey ? getUserRecipesKey() : 'gourmetrevient_recipes_';
+local = JSON.parse(localStorage.getItem(key) || '[]');
+} catch(e) {}
+const allRecipes = [...fromApp, ...local];
+recipe.sousRecettes.forEach(sr => {
+const child = allRecipes.find(r => r.id === sr.recetteEnfantId);
+const qte = parseFloat(sr.quantiteUtilisee) || 0;
+totalWeight += qte;
+if (child) {
+const childRes = calcRecipeEcoScore(child);
+totalScore += qte * childRes.score;
+} else {
+totalScore += qte * 80;
+}
+});
+}
+if (totalWeight === 0) {
+return { score: 80, grade: 'B', color: '#84cc16' };
+}
+const finalScore = totalScore / totalWeight;
+let grade = 'C';
+let color = '#eab308';
+if (finalScore >= 85) { grade = 'A'; color = '#22c55e'; }
+else if (finalScore >= 70) { grade = 'B'; color = '#84cc16'; }
+else if (finalScore >= 50) { grade = 'C'; color = '#eab308'; }
+else if (finalScore >= 35) { grade = 'D'; color = '#f97316'; }
+else { grade = 'E'; color = '#ef4444'; }
+return { score: Math.round(finalScore), grade, color };
+}
 function exportPdf(recipeToExport = null, marginToExport = null) {
 const r = recipeToExport || APP.recipe;
 if (!r || !r.name) { showToast('Erreur: Aucune recette chargée.', 'error'); return; }
+const ecoRes = calcRecipeEcoScore(r);
 const targetMargin = marginToExport !== null ? marginToExport : APP.margin;
 const costs = calcFullCost(targetMargin, r);
 const recipeName = r.name || 'Recette';
@@ -2631,6 +2700,21 @@ ALLERGÈNES
 </div>
 <div style="background:#f8fafc; padding:10px 12px; border-radius:6px; border:1px solid #e2e8f0; display:flex; flex-wrap:wrap; gap:4px; text-align:left;">
 ${allergenListHTML || '<span style="font-size:10px; color:#94a3b8;">Aucun</span>'}
+</div>
+</div>
+<!-- Eco-Score -->
+<div>
+<div style="border-left: 2px solid #3730a3; padding-left: 8px; font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #3730a3; margin-bottom: 8px; text-align:left;">
+ÉCO-SCORE SOURCING
+</div>
+<div style="background:#f8fafc; padding:10px 12px; border-radius:6px; border:1px solid #e2e8f0; text-align:left;">
+<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+<span style="font-size:10px; color:#64748b;">Eco-Score</span>
+<span style="font-size:11px; font-weight:900; color:${ecoRes.color}; background:${ecoRes.color}15; padding:2px 8px; border-radius:4px; border:1px solid ${ecoRes.color}33;">🎯 Classe ${ecoRes.grade}</span>
+</div>
+<div style="font-size:8px; color:#94a3b8; line-height:1.3;">
+Score : <strong>${ecoRes.score}/100</strong>. Calculé selon la provenance des matières premières.
+</div>
 </div>
 </div>
 <!-- HACCP -->
@@ -6238,9 +6322,38 @@ showToast("Veuillez d'abord nommer la recette.", "error");
 return;
 }
 const costData = calcFullCost(APP.margin);
-const suggestedPrice = costData.suggestedPrice.toFixed(2);
+const suggestedPrice = costData.sellingPriceTTC.toFixed(2);
+let totalWeightG = 0;
+if (APP.recipe.ingredients) {
+APP.recipe.ingredients.forEach(ing => {
+let qty = parseFloat(ing.quantity) || 0;
+const unit = ing.unit || 'g';
+if (unit === 'kg' || unit === 'L') {
+totalWeightG += qty * 1000;
+} else if (unit === 'cl') {
+totalWeightG += qty * 10;
+} else if (unit === 'g' || unit === 'ml') {
+totalWeightG += qty;
+} else {
+totalWeightG += qty * 50;
+}
+});
+}
+if (window.SousRecettes && APP.recipe.sousRecettes) {
+APP.recipe.sousRecettes.forEach(sr => {
+totalWeightG += parseFloat(sr.quantiteUtilisee) || 0;
+});
+}
+const portions = costData.portions || APP.recipe.portions || 10;
+const netWeightPortionG = portions > 0 ? totalWeightG / portions : 0;
+const netWeightPortionKg = netWeightPortionG / 1000;
+const pricePerKgTTC = netWeightPortionKg > 0 ? costData.sellingPriceTTC / netWeightPortionKg : 0;
 $('#qrRecipeName').textContent = APP.recipe.name;
-$('#qrRecipePrice').textContent = suggestedPrice + ' €';
+$('#qrRecipePrice').textContent = suggestedPrice + ' € TTC';
+const qrWeightEl = document.getElementById('qrRecipeWeight');
+const qrPriceKgEl = document.getElementById('qrRecipePricePerKg');
+if (qrWeightEl) qrWeightEl.textContent = netWeightPortionG.toFixed(0) + ' g';
+if (qrPriceKgEl) qrPriceKgEl.textContent = pricePerKgTTC.toFixed(2) + ' €/kg';
 const al = document.getElementById('allergensList');
 $('#qrAllergens').textContent = al ? al.textContent : 'Non spécifié';
 const qrbox = document.getElementById('qrcode');

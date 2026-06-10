@@ -368,8 +368,7 @@ function _buildInflationBaselines() {
       
       const oldMargin = currentCosts.marginPct || 0;
       const oldCost = currentCosts.costPerPortion || 0;
-      const sellPrice = currentCosts.sellPriceHT || (oldMargin < 100 ? (oldCost / (1 - (oldMargin/100))) : oldCost * 4);
-      
+      const sellPrice = currentCosts.sellingPrice || (oldMargin < 100 ? (oldCost / (1 - (oldMargin/100))) : oldCost * 4);
       return { name: r.name, oldMargin, oldCost, sellPrice };
     } catch(e) { return null; }
   }).filter(Boolean);
@@ -377,6 +376,93 @@ function _buildInflationBaselines() {
   _inflationCache = { recipes, baselines, version: (_inflationCache.version || 0) + 1 };
   return baselines;
 }
+
+window.ingredientPriceOverrides = window.ingredientPriceOverrides || {};
+
+function getUniqueIngredients() {
+  const savedRecs = (window.APP && window.APP.savedRecipes) || [];
+  const libraryRecs = typeof RECIPES !== 'undefined' ? RECIPES : [];
+  const recipes = [...savedRecs, ...libraryRecs];
+  
+  const ings = new Set();
+  recipes.forEach(r => {
+    if (r.ingredients) {
+      r.ingredients.forEach(i => {
+        if (i.name && i.name.trim()) ings.add(i.name.trim());
+      });
+    }
+  });
+  return [...ings].sort();
+}
+
+window.renderCockpitIngredientsList = function() {
+  const container = document.getElementById('cockpitIngredientsList');
+  if (!container) return;
+  
+  const ings = getUniqueIngredients();
+  container.innerHTML = ings.map(ing => {
+    const key = ing.toLowerCase();
+    const val = window.ingredientPriceOverrides[key] || 0;
+    return `
+      <div class="cockpit-ing-row" style="display:flex; justify-content:space-between; align-items:center; font-size:0.8rem; padding: 4px 0; border-bottom: 1px dotted rgba(255,255,255,0.05);">
+        <span style="color:var(--text-secondary); max-width: 170px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${ing}">${ing}</span>
+        <div style="display:flex; align-items:center; gap:4px;">
+          <input type="number" class="form-input cockpit-override-input" data-ing="${key}" value="${val}" style="width:60px; padding:3px 5px; font-size:0.75rem; text-align:center; height:auto; border: 1px solid var(--surface-border)!important; background:rgba(0,0,0,0.3); color:#fff;" oninput="window.onCockpitOverrideChange(this)">
+          <span style="color:var(--text-muted); font-size:0.7rem;">%</span>
+        </div>
+      </div>
+    `;
+  }).join('');
+};
+
+window.filterCockpitIngredients = function() {
+  const query = (document.getElementById('cockpitSearch').value || '').toLowerCase().trim();
+  const rows = document.querySelectorAll('.cockpit-ing-row');
+  rows.forEach(row => {
+    const label = row.querySelector('span').textContent.toLowerCase();
+    if (label.includes(query)) {
+      row.style.display = 'flex';
+    } else {
+      row.style.display = 'none';
+    }
+  });
+};
+
+window.onCockpitOverrideChange = function(input) {
+  const ingName = input.dataset.ing;
+  const val = parseFloat(input.value) || 0;
+  
+  if (val === 0) {
+    delete window.ingredientPriceOverrides[ingName];
+  } else {
+    window.ingredientPriceOverrides[ingName] = val;
+  }
+  
+  // Refresh simulation
+  const slider = document.getElementById('inflationSlider');
+  const pct = slider ? parseFloat(slider.value) : 0;
+  _updateInflationValues(pct);
+};
+
+window.resetCockpitOverrides = function() {
+  window.ingredientPriceOverrides = {};
+  const inputs = document.querySelectorAll('.cockpit-override-input');
+  inputs.forEach(input => input.value = 0);
+  
+  const search = document.getElementById('cockpitSearch');
+  if (search) search.value = '';
+  window.filterCockpitIngredients();
+  
+  const slider = document.getElementById('inflationSlider');
+  if (slider) {
+    slider.value = 0;
+    const valDisp = document.getElementById('inflationValue');
+    if (valDisp) valDisp.textContent = '0%';
+    window.inflationFactor = 0;
+  }
+  
+  _updateInflationValues(0);
+};
 
 function _buildInflationDOM(baselines) {
   const container = document.getElementById('inflationResults');
@@ -419,6 +505,9 @@ function _buildInflationDOM(baselines) {
 
   container.innerHTML = summaryHTML + `<div class="inflation-grid">${cardsHTML}</div>`;
   _inflationDomBuilt = true;
+  
+  // Render cockpit unique ingredients list
+  window.renderCockpitIngredientsList();
 }
 
 function _updateInflationValues(pct) {
@@ -428,15 +517,31 @@ function _updateInflationValues(pct) {
   let inDanger = 0;
   let totalMarginLoss = 0;
   
+  const targetMarginInput = document.getElementById('cockpitTargetMargin');
+  const targetMargin = targetMarginInput ? (parseFloat(targetMarginInput.value) || 70) : 70;
+  
   for (let i = 0; i < baselines.length; i++) {
     const b = baselines[i];
-    const newCost = b.oldCost * (1 + pct / 100);
+    const recipeObj = _inflationCache.recipes[i];
+    
+    let newCost = b.oldCost;
+    if (recipeObj && typeof window.calcFullCost === 'function') {
+      try {
+        const costData = window.calcFullCost(recipeObj.margin || 70, recipeObj, pct);
+        newCost = costData.costPerPortion || 0;
+      } catch (e) {
+        console.error(e);
+        newCost = b.oldCost * (1 + pct / 100);
+      }
+    } else {
+      newCost = b.oldCost * (1 + pct / 100);
+    }
+    
     const newMargin = b.sellPrice > 0 ? (((b.sellPrice - newCost) / b.sellPrice) * 100) : 0;
     const marginImpact = b.oldMargin - newMargin;
     totalMarginLoss += marginImpact;
-    if (newMargin < 50) inDanger++;
+    if (newMargin < targetMargin) inDanger++;
     
-    // Update card class + icon (direct DOM manipulation — no innerHTML rebuild)
     const card = document.getElementById('inflCard_' + i);
     const icon = document.getElementById('inflIcon_' + i);
     const newMarginEl = document.getElementById('inflNewMargin_' + i);
@@ -445,37 +550,40 @@ function _updateInflationValues(pct) {
     
     if (!card) continue;
     
-    // Status class
     let cls = 'status-ok', ico = '✅';
-    if (newMargin < 50) { cls = 'status-danger'; ico = '💀'; }
-    else if (newMargin < 65) { cls = 'status-warning'; ico = '⚠️'; }
+    if (newMargin < targetMargin) { cls = 'status-danger'; ico = '❌'; }
+    else if (newMargin < targetMargin + 5) { cls = 'status-warning'; ico = '⚠️'; }
     
     card.className = 'inflation-card ' + cls;
     if (icon) icon.textContent = ico;
     if (newMarginEl) newMarginEl.textContent = newMargin.toFixed(1) + '%';
     if (bar) {
       bar.style.width = Math.max(0, Math.min(100, newMargin)) + '%';
-      bar.style.background = newMargin < 50 ? 'var(--cockpit-danger)' : (newMargin < 65 ? 'var(--cockpit-accent)' : 'var(--cockpit-success)');
+      bar.style.background = newMargin < targetMargin ? '#ef4444' : (newMargin < targetMargin + 5 ? '#f59e0b' : '#10b981');
     }
     if (diff) {
-      diff.textContent = Math.abs(marginImpact) < 0.1 
-        ? i18n.t('inflation.status.ok') 
+      const lossText = Math.abs(marginImpact) < 0.1 
+        ? 'Marge stable' 
         : `-${marginImpact.toFixed(1)} pts de marge`;
+      const recommendedPrice = targetMargin < 100 ? (newCost / (1 - targetMargin / 100)) : newCost * 3.33;
+      diff.innerHTML = `
+        <div style="font-size:0.75rem; color:var(--text-muted);">${lossText}</div>
+        <div style="font-size:0.75rem; font-weight:700; color:var(--primary); margin-top:2px;">PV cible : ${recommendedPrice.toFixed(2)} €</div>
+      `;
     }
   }
   
-  // Update summary pills
   const pillStatus = document.getElementById('inflationPillStatus');
   const pillLoss = document.getElementById('inflationPillLoss');
   const avgLoss = baselines.length > 0 ? (totalMarginLoss / baselines.length) : 0;
-
+  
   if (pillStatus) {
     if (inDanger > 0) {
       pillStatus.className = 'summary-pill danger';
-      pillStatus.textContent = `❗ ${inDanger} ${i18n.t('inflation.critical') || 'Recettes en danger'}`;
+      pillStatus.textContent = `❗ ${inDanger} sous la cible (${targetMargin}%)`;
     } else {
       pillStatus.className = 'summary-pill safe';
-      pillStatus.textContent = `🛡️ ${i18n.t('inflation.safe') || 'Catalogue résilient'}`;
+      pillStatus.textContent = `🛡️ Catalogue résilient (>${targetMargin}%)`;
     }
   }
   if (pillLoss) {
@@ -489,30 +597,25 @@ function renderInflationSimulation() {
   if (!slider) return;
   const pct = parseFloat(slider.value) || 0;
   
-  // Instant: update the value label (no lag)
   const valDisp = document.getElementById('inflationValue');
   if (valDisp) valDisp.textContent = pct + '%';
   window.inflationFactor = pct;
   
-  // Debounce localStorage write (100ms) — this was causing jank
   if (_inflationStorageTimeout) clearTimeout(_inflationStorageTimeout);
   _inflationStorageTimeout = setTimeout(() => {
     localStorage.setItem('gourmet_inflation_factor', pct);
   }, 100);
 
-  // Build baselines + DOM skeleton once, then only update values
   if (!_inflationCache.baselines || !_inflationDomBuilt) {
     _buildInflationBaselines();
     _buildInflationDOM(_inflationCache.baselines);
   }
   
-  // Use rAF for smooth 60fps slider updates
   if (_inflationRAF) cancelAnimationFrame(_inflationRAF);
   _inflationRAF = requestAnimationFrame(() => {
     _updateInflationValues(pct);
   });
 
-  // Heavy cross-app updates: debounce to 300ms after last move
   if (_inflationCascadeTimeout) clearTimeout(_inflationCascadeTimeout);
   _inflationCascadeTimeout = setTimeout(() => {
     const hub = document.getElementById('hubSection');
@@ -520,6 +623,9 @@ function renderInflationSimulation() {
       hydratePremiumDashboard();
     }
     if (typeof calculateBreakingPoint === 'function') calculateBreakingPoint();
+    if (typeof renderBCGMatrix === 'function') renderBCGMatrix(true);
+  }, 300);
+}reakingPoint === 'function') calculateBreakingPoint();
     if (typeof renderBCGMatrix === 'function') renderBCGMatrix(true);
   }, 300);
 }

@@ -1495,9 +1495,85 @@ function getHaccp(text) {
    return '';
 }
 
+function calcRecipeEcoScore(recipe) {
+  if (!recipe) return { score: 75, grade: 'B', color: '#84cc16' };
+  
+  let totalWeight = 0;
+  let totalScore = 0;
+  
+  const getIngredientOrigin = (ingName) => {
+    if (window.APP && APP.ingredientDb) {
+      const match = APP.ingredientDb.find(i => i.name.toLowerCase() === ingName.toLowerCase());
+      if (match && match.origin) return match.origin;
+    }
+    if (typeof DEFAULT_INGREDIENT_DB !== 'undefined') {
+      const match = DEFAULT_INGREDIENT_DB.find(i => i.name.toLowerCase() === ingName.toLowerCase());
+      if (match && match.origin) return match.origin;
+    }
+    return 'france';
+  };
+  
+  const originScores = { 'local': 100, 'france': 80, 'import': 30 };
+  
+  if (recipe.ingredients) {
+    recipe.ingredients.forEach(ing => {
+      let qty = parseFloat(ing.quantity || ing.qty) || 0;
+      const unit = ing.unit || 'g';
+      if (unit === 'kg' || unit === 'L') qty *= 1000;
+      else if (unit === 'cl') qty *= 10;
+      else if (unit === 'pcs' || unit === 'pièce') qty *= 50; 
+      
+      const origin = ing.origin || getIngredientOrigin(ing.name || '');
+      const score = originScores[origin] || 80;
+      
+      totalWeight += qty;
+      totalScore += qty * score;
+    });
+  }
+  
+  if (recipe.sousRecettes && recipe.sousRecettes.length > 0) {
+    const fromApp = window.APP ? (APP.savedRecipes || []) : [];
+    let local = [];
+    try {
+      const key = window.getUserRecipesKey ? getUserRecipesKey() : 'gourmetrevient_recipes_';
+      local = JSON.parse(localStorage.getItem(key) || '[]');
+    } catch(e) {}
+    const allRecipes = [...fromApp, ...local];
+    
+    recipe.sousRecettes.forEach(sr => {
+      const child = allRecipes.find(r => r.id === sr.recetteEnfantId);
+      const qte = parseFloat(sr.quantiteUtilisee) || 0;
+      totalWeight += qte;
+      if (child) {
+        const childRes = calcRecipeEcoScore(child);
+        totalScore += qte * childRes.score;
+      } else {
+        totalScore += qte * 80;
+      }
+    });
+  }
+  
+  if (totalWeight === 0) {
+    return { score: 80, grade: 'B', color: '#84cc16' };
+  }
+  
+  const finalScore = totalScore / totalWeight;
+  let grade = 'C';
+  let color = '#eab308';
+  if (finalScore >= 85) { grade = 'A'; color = '#22c55e'; }
+  else if (finalScore >= 70) { grade = 'B'; color = '#84cc16'; }
+  else if (finalScore >= 50) { grade = 'C'; color = '#eab308'; }
+  else if (finalScore >= 35) { grade = 'D'; color = '#f97316'; }
+  else { grade = 'E'; color = '#ef4444'; }
+  
+  return { score: Math.round(finalScore), grade, color };
+}
+
 function exportPdf(recipeToExport = null, marginToExport = null) {
   const r = recipeToExport || APP.recipe;
   if (!r || !r.name) { showToast('Erreur: Aucune recette chargée.', 'error'); return; }
+
+  const ecoRes = calcRecipeEcoScore(r);
 
   const targetMargin = marginToExport !== null ? marginToExport : APP.margin;
   const costs = calcFullCost(targetMargin, r);
@@ -1879,6 +1955,22 @@ function exportPdf(recipeToExport = null, marginToExport = null) {
           </div>
           <div style="background:#f8fafc; padding:10px 12px; border-radius:6px; border:1px solid #e2e8f0; display:flex; flex-wrap:wrap; gap:4px; text-align:left;">
             ${allergenListHTML || '<span style="font-size:10px; color:#94a3b8;">Aucun</span>'}
+          </div>
+        </div>
+
+        <!-- Eco-Score -->
+        <div>
+          <div style="border-left: 2px solid #3730a3; padding-left: 8px; font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #3730a3; margin-bottom: 8px; text-align:left;">
+            ÉCO-SCORE SOURCING
+          </div>
+          <div style="background:#f8fafc; padding:10px 12px; border-radius:6px; border:1px solid #e2e8f0; text-align:left;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+              <span style="font-size:10px; color:#64748b;">Eco-Score</span>
+              <span style="font-size:11px; font-weight:900; color:${ecoRes.color}; background:${ecoRes.color}15; padding:2px 8px; border-radius:4px; border:1px solid ${ecoRes.color}33;">🎯 Classe ${ecoRes.grade}</span>
+            </div>
+            <div style="font-size:8px; color:#94a3b8; line-height:1.3;">
+              Score : <strong>${ecoRes.score}/100</strong>. Calculé selon la provenance des matières premières.
+            </div>
           </div>
         </div>
 

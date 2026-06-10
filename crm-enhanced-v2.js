@@ -45,8 +45,10 @@ function openInvoiceGenerator(orderId = null) {
     const orders  = (window.APP && window.APP.crm && window.APP.crm.orders)  || [];
     const shopName = localStorage.getItem('gourmet_current_user') || 'Mon Atelier';
 
-    // Pre-select order if ID provided
-    const selectedOrder = orderId ? orders.find(o => o.id === orderId) : null;
+    // Pre-select order or saved quote if ID provided
+    const savedQuotes = JSON.parse(localStorage.getItem('gourmet_quotes') || '[]');
+    const quote = orderId ? savedQuotes.find(q => q.id === orderId) : null;
+    const selectedOrder = (orderId && !quote) ? orders.find(o => o.id === orderId) : null;
 
     modal.innerHTML = `
     <div class="modal-content glass-panel" style="max-width:780px; width:95%; max-height:92vh; overflow-y:auto;">
@@ -206,7 +208,22 @@ function openInvoiceGenerator(orderId = null) {
 
     // Init with one line
     _invoiceLines = [];
-    if (selectedOrder) {
+    if (quote) {
+        _invoiceLines = JSON.parse(JSON.stringify(quote.lines || []));
+        setTimeout(() => {
+            document.getElementById('invClientSel').value = quote.clientId || '';
+            document.getElementById('invNumber').value = quote.id;
+            document.getElementById('invDate').value = quote.date;
+            document.getElementById('invValidity').value = quote.validity || 30;
+            document.getElementById('invNotes').value = quote.notes || '';
+            document.getElementById('invShopAddress').value = quote.shopAddr || '';
+            if (document.getElementById('invEventType')) document.getElementById('invEventType').value = quote.eventType || '';
+            if (document.getElementById('invDeliveryDetails')) document.getElementById('invDeliveryDetails').value = quote.deliveryDetails || '';
+            if (document.getElementById('invEventTheme')) document.getElementById('invEventTheme').value = quote.eventTheme || '';
+            setInvoiceType(quote.type || 'devis');
+            _renderInvoiceLines();
+        }, 150);
+    } else if (selectedOrder) {
         _initInvoiceFromOrder(selectedOrder);
     } else {
         addInvoiceLine();
@@ -521,21 +538,212 @@ window.previewInvoice = function() {
     if (win) { win.document.write(html); win.document.close(); }
 };
 
+window.saveInvoiceQuote = function() {
+    const clients = (window.APP && window.APP.crm && window.APP.crm.clients) || [];
+    const clientId = document.getElementById('invClientSel').value;
+    const client   = clients.find(c => c.id === clientId);
+    const docNum   = document.getElementById('invNumber').value;
+    const docDate  = document.getElementById('invDate').value;
+    const validity = document.getElementById('invValidity').value;
+    const notes    = document.getElementById('invNotes').value;
+    const shopAddr = document.getElementById('invShopAddress').value;
+    const docType  = document.getElementById('invDocType').value || 'devis';
+    
+    const subtotal = _invoiceLines.reduce((s, l) => s + (l.qty * l.unitPrice), 0);
+    const tva = subtotal * 0.10;
+    const total = subtotal + tva;
+    
+    const eventType = document.getElementById('invEventType') ? document.getElementById('invEventType').value : '';
+    const deliveryDetails = document.getElementById('invDeliveryDetails') ? document.getElementById('invDeliveryDetails').value : '';
+    const eventTheme = document.getElementById('invEventTheme') ? document.getElementById('invEventTheme').value : '';
+    
+    const savedQuotes = JSON.parse(localStorage.getItem('gourmet_quotes') || '[]');
+    
+    const quote = {
+        id: docNum || ('Q-' + Date.now()),
+        clientId: clientId,
+        clientName: client ? client.name : 'Client inconnu',
+        date: docDate,
+        validity: validity,
+        notes: notes,
+        shopAddr: shopAddr,
+        type: docType,
+        lines: _invoiceLines,
+        eventType: eventType,
+        deliveryDetails: deliveryDetails,
+        eventTheme: eventTheme,
+        totalTTC: total
+    };
+    
+    const index = savedQuotes.findIndex(q => q.id === quote.id);
+    if (index > -1) {
+        savedQuotes[index] = quote;
+    } else {
+        savedQuotes.push(quote);
+    }
+    
+    localStorage.setItem('gourmet_quotes', JSON.stringify(savedQuotes));
+    
+    if (typeof showToast === 'function') showToast(`${docType === 'devis' ? 'Devis' : 'Facture'} enregistré(e) avec succès.`, 'success');
+    
+    if (typeof renderCrmQuotes === 'function') {
+        renderCrmQuotes();
+    }
+};
+
 window.generateInvoicePDF = function() {
     const docType = document.getElementById('invDocType').value || 'devis';
     const html = _buildInvoiceHTML(docType);
     const docNum = document.getElementById('invNumber').value;
+    
+    window.saveInvoiceQuote(); // Automatically save the document
+    
     if (typeof html2pdf !== 'undefined') {
         html2pdf()
             .set({ margin: 0, filename: `${docType}_${docNum}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } })
             .from(html)
             .save();
     } else {
-        // Fallback: open as printable window
         previewInvoice();
         if (typeof showToast === 'function') showToast('Utilisez Ctrl+P du navigateur pour imprimer/sauvegarder en PDF.', 'info');
     }
 };
+
+window.addFastRecipeToInvoice = function() {
+    const select = document.getElementById('invFastRecipeSel');
+    const qtyInput = document.getElementById('invFastRecipeQty');
+    if (!select || !qtyInput) return;
+    
+    const recipeId = select.value;
+    const qty = parseFloat(qtyInput.value) || 10;
+    
+    if (!recipeId) {
+        if (typeof showToast === 'function') showToast('Veuillez choisir une recette.', 'error');
+        return;
+    }
+    
+    const savedRecs = (window.APP && window.APP.savedRecipes) || [];
+    const libraryRecs = typeof RECIPES !== 'undefined' ? RECIPES : [];
+    const recipes = [...savedRecs, ...libraryRecs];
+    
+    const recipe = recipes.find(r => r.id === recipeId);
+    if (!recipe) return;
+    
+    let unitPrice = 0;
+    if (typeof calcFullCost === 'function') {
+        try {
+            const costs = calcFullCost(recipe.margin || 70, recipe);
+            unitPrice = costs.sellingPrice || 0; // selling price HT per portion
+        } catch (e) {
+            console.error(e);
+        }
+    }
+    
+    _appendInvoiceLine({
+        desc: recipe.name,
+        qty: qty,
+        unitPrice: unitPrice
+    });
+    
+    if (typeof showToast === 'function') showToast(`Recette "${recipe.name}" insérée`, 'success');
+};
+
+window.renderCrmQuotes = function() {
+  const container = document.getElementById('crmQuotesBody');
+  if (!container) return;
+  
+  const savedQuotes = JSON.parse(localStorage.getItem('gourmet_quotes') || '[]');
+  if (savedQuotes.length === 0) {
+    container.innerHTML = '<p style="grid-column:1/-1; text-align:center; padding:2rem; color:var(--text-muted); width:100%;">Aucun devis enregistré.</p>';
+    return;
+  }
+  
+  container.innerHTML = savedQuotes.map(q => {
+    const eventBadge = q.eventType ? `<span class="badge" style="background:var(--accent); color:white; font-size:0.75rem;">🎉 ${q.eventType}</span>` : '';
+    const dateStr = new Date(q.date).toLocaleDateString('fr-FR', { dateStyle: 'medium' });
+    const clientName = q.clientName || 'Client inconnu';
+    const totalTTC = parseFloat(q.totalTTC || 0).toFixed(2);
+    
+    return `
+      <div class="order-card" style="display:flex; flex-direction:column; justify-content:space-between; min-height:220px; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--surface-border); border-radius: 12px; padding: 1.2rem;">
+        <div class="order-header" style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
+          <div>
+            <div class="order-client" style="font-weight:800; font-size:1.05rem; color:var(--primary);">${_escHtml(clientName)}</div>
+            <div class="order-id" style="font-size:0.75rem; color:var(--text-muted); margin-top:2px;">Doc N° ${q.id}</div>
+          </div>
+          ${eventBadge}
+        </div>
+        <div style="font-size:0.8rem; color:var(--text-secondary); margin: 6px 0;">
+          🗓️ Émis le : <strong>${dateStr}</strong>
+          ${q.eventTheme ? `<br>🎨 Thème : <em>${_escHtml(q.eventTheme)}</em>` : ''}
+          ${q.deliveryDetails ? `<br>📍 Livré à : <em>${_escHtml(q.deliveryDetails)}</em>` : ''}
+        </div>
+        <div class="order-products" style="margin-top:8px; font-size:0.8rem; color:var(--text-secondary); border-top: 1px solid var(--surface-border); padding-top:8px; flex-grow:1;">
+          ${(q.lines || []).map(l => `• ${l.qty}x ${l.desc} (${parseFloat(l.unitPrice).toFixed(2)} €)`).join('<br>')}
+        </div>
+        <div class="order-footer" style="display:flex; justify-content:space-between; align-items:center; margin-top:16px; border-top:1px solid var(--surface-border); padding-top:10px;">
+          <div class="order-price" style="font-size:1.1rem; font-weight:900; color:var(--accent);">${totalTTC} € TTC</div>
+          <div style="display:flex; gap:6px;">
+            <button class="btn btn-sm btn-primary" onclick="openInvoiceGenerator('${q.id}')" style="padding: 4px 10px; font-size:0.8rem;">✏️ Ouvrir</button>
+            <button class="btn btn-sm btn-outline" style="border-color:var(--danger); color:var(--danger); padding:4px 8px; font-size:0.8rem;" onclick="deleteCrmQuote('${q.id}')">🗑️</button>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+};
+
+window.deleteCrmQuote = function(id) {
+  if (confirm("Supprimer définitivement ce devis ?")) {
+    let savedQuotes = JSON.parse(localStorage.getItem('gourmet_quotes') || '[]');
+    savedQuotes = savedQuotes.filter(q => q.id !== id);
+    localStorage.setItem('gourmet_quotes', JSON.stringify(savedQuotes));
+    if (typeof showToast === 'function') showToast('Devis supprimé', 'info');
+    window.renderCrmQuotes();
+  }
+};
+
+// Patch switchCrmTab to support quotes tab
+(function() {
+  const origSwitchCrmTab = window.switchCrmTab;
+  window.switchCrmTab = function(tab) {
+    // Hide all crm views
+    ['crmViewOrders', 'crmViewClients', 'crmViewQuotes'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.style.display = 'none';
+    });
+    
+    // Deactivate all crm tabs
+    ['dotCrmOrders', 'dotCrmClients', 'dotCrmQuotes'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.classList.remove('active');
+    });
+
+    if (tab === 'quotes') {
+      const view = document.getElementById('crmViewQuotes');
+      const dot = document.getElementById('dotCrmQuotes');
+      if (view) view.style.display = 'block';
+      if (dot) dot.classList.add('active');
+      window.renderCrmQuotes();
+    } else if (tab === 'orders') {
+      const view = document.getElementById('crmViewOrders');
+      const dot = document.getElementById('dotCrmOrders');
+      if (view) view.style.display = 'block';
+      if (dot) dot.classList.add('active');
+      if (typeof renderCrmOrders === 'function') renderCrmOrders();
+    } else if (tab === 'clients') {
+      const view = document.getElementById('crmViewClients');
+      const dot = document.getElementById('dotCrmClients');
+      if (view) view.style.display = 'block';
+      if (dot) dot.classList.add('active');
+      if (typeof renderCrmClients === 'function') renderCrmClients();
+    } else {
+      if (typeof origSwitchCrmTab === 'function') {
+        origSwitchCrmTab(tab);
+      }
+    }
+  };
+})();
 
 // ============================================================================
 // 2. 👑 LIFETIME VALUE (LTV) & BADGE CLIENTS VIP

@@ -146,6 +146,14 @@ function calcIngredientCost(ing, depth = 0) {
   if (isNaN(price)) price = parseFloat(ing.pricePerPc);
   if (isNaN(price)) price = 0;
 
+  // Appliquer la hausse spécifique d'ingrédient si présente
+  if (window.ingredientPriceOverrides && ing.name) {
+    const overridePercent = window.ingredientPriceOverrides[ing.name.trim().toLowerCase()];
+    if (overridePercent !== undefined) {
+      price = price * (1 + overridePercent / 100);
+    }
+  }
+
   // price is per kg, per L, or per pièce
   if (unit === 'g' || unit === 'ml') return (qty / 1000) * price;
   return qty * price;
