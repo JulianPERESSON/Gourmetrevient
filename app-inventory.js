@@ -156,36 +156,42 @@ function selectOffProduct(index) {
   showToast(`Ingrédient associé avec Open Food Facts (${nutriData.kcal} kcal/100g)`, 'success');
 }
 
-function renderNutritionAnalysis() {
+window.calculateFullNutrition = function(recipe) {
+  if (!recipe || !recipe.ingredients) return null;
+
   let totalKcal = 0;
+  let totalKj = 0;
   let totalPro = 0;
   let totalGlu = 0;
+  let totalSugar = 0;
   let totalLip = 0;
+  let totalSatFat = 0;
+  let totalSalt = 0;
   let weightInGrams = 0;
-  const foundAllergens = new Set();
 
-  // Fonction locale pour simuler la nutrition des ingrédients par défaut
   const getMockNutrition = (name) => {
     const n = name.toLowerCase();
     const matches = (keywords) => keywords.some(k => n.includes(k));
 
-    if (matches(['beurre', 'huile', 'graisse', 'gras'])) return { kcal: 717, proteins: 1, carbs: 1, fats: 81 };
-    if (matches(['sucre', 'sirop', 'miel', 'glucose', 'semoule', 'glace'])) return { kcal: 387, proteins: 0, carbs: 100, fats: 0 };
-    if (matches(['farine', 'fécule', 'fecule', 'amidon', 'maïzena'])) return { kcal: 364, proteins: 10, carbs: 76, fats: 1 };
-    if (matches(['crème', 'creme', 'mascarpone', 'chantilly'])) return { kcal: 345, proteins: 2, carbs: 3, fats: 35 };
-    if (matches(['lait'])) return { kcal: 42, proteins: 3.4, carbs: 4.8, fats: 1 };
-    if (matches(['chocolat', 'cacao', 'couverture', 'ganache', 'pralin', 'gianduja'])) return { kcal: 546, proteins: 5, carbs: 31, fats: 36 };
-    if (matches(['œuf', 'oeuf', 'jaune', 'blanc', 'oufs'])) return { kcal: 143, proteins: 13, carbs: 1, fats: 10 };
-    if (matches(['fraise', 'framboise', 'pomme', 'citron', 'fruit', 'purée', 'coulis', 'griotte'])) return { kcal: 50, proteins: 1, carbs: 12, fats: 0 };
-    if (matches(['amande', 'noisette', 'noix', 'pistache', 'pignon'])) return { kcal: 600, proteins: 20, carbs: 10, fats: 50 };
-    if (matches(['sel'])) return { kcal: 0, proteins: 0, carbs: 0, fats: 0 };
-    return { kcal: 250, proteins: 5, carbs: 30, fats: 10 }; // Default
+    if (matches(['beurre', 'huile', 'graisse', 'gras'])) return { kcal: 717, kj: 3000, proteins: 1, carbs: 1, sugar: 0.1, fats: 81, saturatedFat: 51, salt: 0.1 };
+    if (matches(['sucre', 'sirop', 'miel', 'glucose', 'semoule', 'glace'])) return { kcal: 387, kj: 1619, proteins: 0, carbs: 100, sugar: 100, fats: 0, saturatedFat: 0, salt: 0 };
+    if (matches(['farine', 'fécule', 'fecule', 'amidon', 'maïzena'])) return { kcal: 364, kj: 1523, proteins: 10, carbs: 76, sugar: 1.5, fats: 1, saturatedFat: 0.2, salt: 0.01 };
+    if (matches(['crème', 'creme', 'mascarpone', 'chantilly'])) return { kcal: 345, kj: 1443, proteins: 2, carbs: 3, sugar: 3, fats: 35, saturatedFat: 23, salt: 0.1 };
+    if (matches(['lait'])) return { kcal: 42, kj: 176, proteins: 3.4, carbs: 4.8, sugar: 4.8, fats: 1, saturatedFat: 0.6, salt: 0.1 };
+    if (matches(['chocolat', 'cacao', 'couverture', 'ganache', 'pralin', 'gianduja'])) return { kcal: 546, kj: 2284, proteins: 5, carbs: 31, sugar: 28, fats: 36, saturatedFat: 22, salt: 0.05 };
+    if (matches(['œuf', 'oeuf', 'jaune', 'blanc', 'oufs'])) return { kcal: 143, kj: 598, proteins: 13, carbs: 1, sugar: 0.6, fats: 10, saturatedFat: 3, salt: 0.3 };
+    if (matches(['fraise', 'framboise', 'pomme', 'citron', 'fruit', 'purée', 'coulis', 'griotte'])) return { kcal: 50, kj: 209, proteins: 1, carbs: 12, sugar: 9, fats: 0.2, saturatedFat: 0.05, salt: 0.01 };
+    if (matches(['amande', 'noisette', 'noix', 'pistache', 'pignon'])) return { kcal: 600, kj: 2510, proteins: 20, carbs: 10, sugar: 4, fats: 50, saturatedFat: 4, salt: 0.01 };
+    if (matches(['eau', 'water', 'glace hydrique'])) return { kcal: 0, kj: 0, proteins: 0, carbs: 0, sugar: 0, fats: 0, saturatedFat: 0, salt: 0 };
+    if (matches(['gelatine', 'gélatine', 'agar'])) return { kcal: 335, kj: 1400, proteins: 86, carbs: 0, sugar: 0, fats: 0, saturatedFat: 0, salt: 0.1 };
+    if (matches(['levure'])) return { kcal: 105, kj: 439, proteins: 14, carbs: 19, sugar: 0, fats: 2, saturatedFat: 0.3, salt: 0.1 };
+    if (matches(['sel'])) return { kcal: 0, kj: 0, proteins: 0, carbs: 0, sugar: 0, fats: 0, saturatedFat: 0, salt: 100 };
+    return { kcal: 250, kj: 1046, proteins: 5, carbs: 30, sugar: 10, fats: 10, saturatedFat: 3, salt: 0.1 }; // Default
   };
 
-  APP.recipe.ingredients.forEach(ing => {
+  recipe.ingredients.forEach(ing => {
     if (!ing.name || ing.quantity <= 0) return;
 
-    // Convert to grams
     let qtyGrams = 0;
     const unit = (ing.unit || '').toLowerCase();
 
@@ -194,30 +200,79 @@ function renderNutritionAnalysis() {
     } else if (unit === 'kg' || unit === 'l') {
       qtyGrams = parseFloat(ing.quantity) * 1000;
     } else if (unit === 'pièce' || unit === 'piece' || unit === 'pcs' || unit === 'unité' || unit === 'u') {
-      // Conversion arbitraire mais nécessaire (50g par pièce/oeuf)
       qtyGrams = parseFloat(ing.quantity) * 50;
     }
 
     weightInGrams += qtyGrams;
 
     const dbItem = APP.ingredientDb.find(db => db.name.toLowerCase() === ing.name.toLowerCase());
-
-    // Fallback nutrition if exact API data is not present
-    const nutrition = (dbItem && dbItem.nutrition) ? dbItem.nutrition : getMockNutrition(ing.name);
-
-    if (qtyGrams > 0) {
-      const ratio = qtyGrams / 100; // Database nutrition is for 100g
-      totalKcal += nutrition.kcal * ratio;
-      totalPro += nutrition.proteins * ratio;
-      totalGlu += nutrition.carbs * ratio;
-      totalLip += nutrition.fats * ratio;
+    let nut = null;
+    if (dbItem && dbItem.nutrition) {
+      nut = dbItem.nutrition;
+    } else {
+      nut = getMockNutrition(ing.name);
     }
 
-    // Allergens from DB if available
+    if (qtyGrams > 0 && nut) {
+      const ratio = qtyGrams / 100;
+      totalKcal += (nut.kcal || 0) * ratio;
+      totalKj += (nut.kj || nut.kcal * 4.184 || 0) * ratio;
+      totalPro += (nut.proteins || nut.prot || 0) * ratio;
+      totalGlu += (nut.carbs || nut.carb || 0) * ratio;
+      totalSugar += (nut.sugar !== undefined ? nut.sugar : (nut.carbs || nut.carb || 0) * 0.3) * ratio;
+      totalLip += (nut.fats || nut.fat || 0) * ratio;
+      totalSatFat += (nut.saturatedFat !== undefined ? nut.saturatedFat : (nut.fats || nut.fat || 0) * 0.6) * ratio;
+      totalSalt += (nut.salt !== undefined ? nut.salt : 0.01) * ratio;
+    }
+  });
+
+  if (weightInGrams === 0) return null;
+
+  const portions = recipe.portions || 10;
+  const portionWeight = weightInGrams / portions;
+
+  const factor100 = 100 / weightInGrams;
+  const per100g = {
+    kcal: Math.round(totalKcal * factor100),
+    kj: Math.round(totalKj * factor100),
+    proteins: +(totalPro * factor100).toFixed(1),
+    carbs: +(totalGlu * factor100).toFixed(1),
+    sugar: +(totalSugar * factor100).toFixed(1),
+    fats: +(totalLip * factor100).toFixed(1),
+    saturatedFat: +(totalSatFat * factor100).toFixed(1),
+    salt: +(totalSalt * factor100).toFixed(2)
+  };
+
+  const factorPortion = portionWeight / 100;
+  const perPortion = {
+    kcal: Math.round(per100g.kcal * factorPortion),
+    kj: Math.round(per100g.kj * factorPortion),
+    proteins: +(per100g.proteins * factorPortion).toFixed(1),
+    carbs: +(per100g.carbs * factorPortion).toFixed(1),
+    sugar: +(per100g.sugar * factorPortion).toFixed(1),
+    fats: +(per100g.fats * factorPortion).toFixed(1),
+    saturatedFat: +(per100g.saturatedFat * factorPortion).toFixed(1),
+    salt: +(per100g.salt * factorPortion).toFixed(2)
+  };
+
+  return {
+    weightInGrams: Math.round(weightInGrams),
+    portionWeight: Math.round(portionWeight),
+    per100g,
+    perPortion
+  };
+};
+
+function renderNutritionAnalysis() {
+  const nutData = window.calculateFullNutrition(APP.recipe);
+  const foundAllergens = new Set();
+
+  APP.recipe.ingredients.forEach(ing => {
+    if (!ing.name || ing.quantity <= 0) return;
+    const dbItem = APP.ingredientDb.find(db => db.name.toLowerCase() === ing.name.toLowerCase());
     if (dbItem && dbItem.allergens) {
       dbItem.allergens.forEach(a => foundAllergens.add(a));
     }
-    // Simple name-based allergen fallback if DB missing (safety)
     const n = ing.name.toLowerCase();
     if (n.includes('lait') || n.includes('crème') || n.includes('creme') || n.includes('beurre')) foundAllergens.add('Lait');
     if (n.includes('farine') || n.includes('gluten')) foundAllergens.add('Gluten');
@@ -225,19 +280,9 @@ function renderNutritionAnalysis() {
     if (n.includes('noisette') || n.includes('amande') || n.includes('noix') || n.includes('pistache')) foundAllergens.add('Fruits à coque');
   });
 
-  // Get all allergens (including sub-recipes recursively)
   if (window.SousRecettes) {
     const cascadeAllergens = SousRecettes.getAllergenesFromRecipe(APP.recipe);
     cascadeAllergens.forEach(a => foundAllergens.add(a));
-  }
-
-  // Calculate per 100g
-  if (weightInGrams > 0) {
-    const factor = 100 / weightInGrams;
-    totalKcal *= factor;
-    totalPro *= factor;
-    totalGlu *= factor;
-    totalLip *= factor;
   }
 
   const k = document.getElementById('nutriKcal');
@@ -245,11 +290,73 @@ function renderNutritionAnalysis() {
   const g = document.getElementById('nutriGlu');
   const l = document.getElementById('nutriLip');
   const al = document.getElementById('allergensList');
+  const tableContainer = document.getElementById('incoNutritionTable');
 
-  if (k) k.textContent = Math.round(totalKcal);
-  if (p) p.textContent = totalPro.toFixed(1) + 'g';
-  if (g) g.textContent = totalGlu.toFixed(1) + 'g';
-  if (l) l.textContent = totalLip.toFixed(1) + 'g';
+  if (nutData) {
+    if (k) k.textContent = Math.round(nutData.per100g.kcal);
+    if (p) p.textContent = nutData.per100g.proteins.toFixed(1) + 'g';
+    if (g) g.textContent = nutData.per100g.carbs.toFixed(1) + 'g';
+    if (l) l.textContent = nutData.per100g.fats.toFixed(1) + 'g';
+
+    if (tableContainer) {
+      tableContainer.innerHTML = `
+        <div style="margin-top: 1rem; border: 1px solid var(--surface-border); border-radius: 8px; overflow: hidden; background: var(--surface);">
+          <table style="width: 100%; border-collapse: collapse; font-size: 0.82rem; color: var(--text);">
+            <thead>
+              <tr style="background: var(--surface-hover); font-weight: 700; border-bottom: 1px solid var(--surface-border);">
+                <th style="padding: 8px 12px; text-align: left;">Valeurs moyennes</th>
+                <th style="padding: 8px 12px; text-align: right;">Pour 100g</th>
+                <th style="padding: 8px 12px; text-align: right;">Par portion (${Math.round(nutData.portionWeight)}g)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="border-bottom: 1px solid var(--surface-border);">
+                <td style="padding: 8px 12px; text-align: left; font-weight: 600;">Énergie</td>
+                <td style="padding: 8px 12px; text-align: right; font-weight: 600;">${nutData.per100g.kj} kJ / ${nutData.per100g.kcal} kcal</td>
+                <td style="padding: 8px 12px; text-align: right; font-weight: 600;">${nutData.perPortion.kj} kJ / ${nutData.perPortion.kcal} kcal</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--surface-border);">
+                <td style="padding: 8px 12px; text-align: left;">Matières grasses</td>
+                <td style="padding: 8px 12px; text-align: right;">${nutData.per100g.fats.toFixed(1)}g</td>
+                <td style="padding: 8px 12px; text-align: right;">${nutData.perPortion.fats.toFixed(1)}g</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--surface-border);">
+                <td style="padding: 8px 12px; text-align: left; padding-left: 20px; color: var(--text-muted);">dont acides gras saturés</td>
+                <td style="padding: 8px 12px; text-align: right; color: var(--text-muted);">${nutData.per100g.saturatedFat.toFixed(1)}g</td>
+                <td style="padding: 8px 12px; text-align: right; color: var(--text-muted);">${nutData.perPortion.saturatedFat.toFixed(1)}g</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--surface-border);">
+                <td style="padding: 8px 12px; text-align: left;">Glucides</td>
+                <td style="padding: 8px 12px; text-align: right;">${nutData.per100g.carbs.toFixed(1)}g</td>
+                <td style="padding: 8px 12px; text-align: right;">${nutData.perPortion.carbs.toFixed(1)}g</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--surface-border);">
+                <td style="padding: 8px 12px; text-align: left; padding-left: 20px; color: var(--text-muted);">dont sucres</td>
+                <td style="padding: 8px 12px; text-align: right; color: var(--text-muted);">${nutData.per100g.sugar.toFixed(1)}g</td>
+                <td style="padding: 8px 12px; text-align: right; color: var(--text-muted);">${nutData.perPortion.sugar.toFixed(1)}g</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--surface-border);">
+                <td style="padding: 8px 12px; text-align: left;">Protéines</td>
+                <td style="padding: 8px 12px; text-align: right;">${nutData.per100g.proteins.toFixed(1)}g</td>
+                <td style="padding: 8px 12px; text-align: right;">${nutData.perPortion.proteins.toFixed(1)}g</td>
+              </tr>
+              <tr style="border-bottom: none;">
+                <td style="padding: 8px 12px; text-align: left;">Sel</td>
+                <td style="padding: 8px 12px; text-align: right;">${nutData.per100g.salt.toFixed(2)}g</td>
+                <td style="padding: 8px 12px; text-align: right;">${nutData.perPortion.salt.toFixed(2)}g</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+  } else {
+    if (k) k.textContent = '0';
+    if (p) p.textContent = '0g';
+    if (g) g.textContent = '0g';
+    if (l) l.textContent = '0g';
+    if (tableContainer) tableContainer.innerHTML = '';
+  }
 
   if (al) {
     if (foundAllergens.size > 0) {

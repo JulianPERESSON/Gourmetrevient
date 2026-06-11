@@ -149,7 +149,7 @@ function bindEvents() {
   }
 
   // Advanced cost inputs
-  ['advLaborRate', 'advFixedCharges', 'advProductions', 'advEnergy', 'advAmortization'].forEach(id => {
+  ['advLaborRate', 'advFixedCharges', 'advProductions', 'advEnergy', 'advAmortization', 'advPackagingCost', 'advApprenticeTime', 'advCommisTime', 'advChefTime'].forEach(id => {
     const el = $('#' + id);
     if (el) el.addEventListener('input', () => renderCostAnalysis());
   });

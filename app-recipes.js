@@ -61,7 +61,11 @@ function collectCurrentStepData() {
         fixedCharges: parseFloat($('#advFixedCharges').value) || 0,
         productions: parseInt($('#advProductions').value) || 1,
         energyRate: parseFloat($('#advEnergy').value) || 0,
-        amortization: parseFloat($('#advAmortization').value) || 0
+        amortization: parseFloat($('#advAmortization').value) || 0,
+        packagingCost: parseFloat($('#advPackagingCost').value) || 0,
+        apprenticeTime: parseFloat($('#advApprenticeTime').value) || 0,
+        commisTime: parseFloat($('#advCommisTime').value) || 0,
+        chefTime: parseFloat($('#advChefTime').value) || 0
       };
     }
     if ($('#recipeTvaRate')) {
@@ -465,6 +469,10 @@ function renderCostAnalysis() {
       setVal('advProductions', adv.productions);
       setVal('advEnergy', adv.energyRate);
       setVal('advAmortization', adv.amortization);
+      setVal('advPackagingCost', adv.packagingCost || 0);
+      setVal('advApprenticeTime', adv.apprenticeTime || 0);
+      setVal('advCommisTime', adv.commisTime || 0);
+      setVal('advChefTime', adv.chefTime || 0);
     }
 
     if (APP.recipe.tvaRate !== undefined) {
@@ -644,36 +652,54 @@ function renderAdvancedCostKPI(costs) {
   if (!grid) return;
 
   const totalTimeH = (costs.prepTime + costs.cookTime) / 60;
+  
+  // Show detailed profile labor details if set
+  const profileTotalTime = (costs.apprenticeTime || 0) + (costs.commisTime || 0) + (costs.chefTime || 0);
+  let laborSubText = `${costs.laborRate.toFixed(2)} €/h × ${totalTimeH.toFixed(1)}h`;
+  if (profileTotalTime > 0) {
+    const details = [];
+    if (costs.apprenticeTime > 0) details.push(`Appr. ${costs.apprenticeTime}m`);
+    if (costs.commisTime > 0) details.push(`Comm. ${costs.commisTime}m`);
+    if (costs.chefTime > 0) details.push(`Chef ${costs.chefTime}m`);
+    laborSubText = details.join(' | ');
+  }
+
   const additionalSum = costs.laborCost + costs.energyCost + costs.fixedShare + costs.amortShare;
+  const totalMaterialWithPkg = costs.totalMaterial + (costs.packagingCost * costs.portions);
 
   grid.innerHTML = `
     <div class="kpi-card">
-      <div class="kpi-label">${t('s4.adv.kpi.labor')}</div>
+      <div class="kpi-label">${t('s4.adv.kpi.labor') || 'Main d\'œuvre'}</div>
       <div class="kpi-value">${costs.laborCost.toFixed(2)} €</div>
-      <div class="kpi-sub">${costs.laborRate.toFixed(2)} €/h × ${totalTimeH.toFixed(1)}h</div>
+      <div class="kpi-sub">${laborSubText}</div>
     </div>
     <div class="kpi-card">
-      <div class="kpi-label">${t('s4.adv.kpi.energy')}</div>
+      <div class="kpi-label">${t('s4.adv.kpi.energy') || 'Énergie'}</div>
       <div class="kpi-value">${costs.energyCost.toFixed(2)} €</div>
       <div class="kpi-sub">${costs.energyRate.toFixed(2)} €/h × ${(costs.cookTime / 60).toFixed(1)}h</div>
     </div>
     <div class="kpi-card">
-      <div class="kpi-label">${t('s4.adv.kpi.fixed')}</div>
+      <div class="kpi-label">📦 Emballages</div>
+      <div class="kpi-value">${(costs.packagingCost * costs.portions).toFixed(2)} €</div>
+      <div class="kpi-sub">${costs.packagingCost.toFixed(2)} €/port. × ${costs.portions}</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">${t('s4.adv.kpi.fixed') || 'Charges fixes'}</div>
       <div class="kpi-value">${costs.fixedShare.toFixed(2)} €</div>
       <div class="kpi-sub">${costs.fixedCharges.toFixed(0)} € / ${costs.productions}</div>
     </div>
     <div class="kpi-card">
-      <div class="kpi-label">${t('s4.adv.kpi.amort')}</div>
+      <div class="kpi-label">${t('s4.adv.kpi.amort') || 'Amortissement'}</div>
       <div class="kpi-value">${costs.amortShare.toFixed(2)} €</div>
       <div class="kpi-sub">${costs.amortization.toFixed(0)} € / ${costs.productions}</div>
     </div>
     <div class="kpi-card accent">
-      <div class="kpi-label">${t('s4.adv.kpi.full_cost')}</div>
+      <div class="kpi-label">${t('s4.adv.kpi.full_cost') || 'Coût complet'}</div>
       <div class="kpi-value" style="font-size:1.3rem">${costs.totalFullCost.toFixed(2)} €</div>
-      <div class="kpi-sub">${t('ui.kpi.total_material')}: ${costs.totalMaterial.toFixed(2)} € + ${additionalSum.toFixed(2)} €</div>
+      <div class="kpi-sub">Mat.+Pkg: ${totalMaterialWithPkg.toFixed(2)} € + Frais: ${additionalSum.toFixed(2)} €</div>
     </div>
     <div class="kpi-card success">
-      <div class="kpi-label">${t('s4.adv.kpi.full_portion')}</div>
+      <div class="kpi-label">${t('s4.adv.kpi.full_portion') || 'Coût portion'}</div>
       <div class="kpi-value" style="font-size:1.3rem">${costs.costPerPortion.toFixed(2)} €</div>
       <div class="kpi-sub">${costs.totalFullCost.toFixed(2)} € / ${costs.portions} ${costs.portions > 1 ? t('unit.portions') : t('unit.portion')}</div>
     </div>
@@ -1017,7 +1043,7 @@ async function loadRecipe(id) {
   populateStep1();
 
   // Reset initialization for advanced inputs
-  ['advLaborRate', 'advFixedCharges', 'advProductions', 'advEnergy', 'advAmortization', 'recipeTvaRate'].forEach(id => {
+  ['advLaborRate', 'advFixedCharges', 'advProductions', 'advEnergy', 'advAmortization', 'recipeTvaRate', 'advPackagingCost', 'advApprenticeTime', 'advCommisTime', 'advChefTime'].forEach(id => {
     const el = document.getElementById(id);
     if (el) delete el.dataset.initialized;
   });
@@ -1145,7 +1171,7 @@ function loadExampleRecipe(idOrIdx) {
   populateStep1();
 
   // Reset initialization for advanced inputs
-  ['advLaborRate', 'advFixedCharges', 'advProductions', 'advEnergy', 'advAmortization', 'recipeTvaRate'].forEach(id => {
+  ['advLaborRate', 'advFixedCharges', 'advProductions', 'advEnergy', 'advAmortization', 'recipeTvaRate', 'advPackagingCost', 'advApprenticeTime', 'advCommisTime', 'advChefTime'].forEach(id => {
     const el = document.getElementById(id);
     if (el) delete el.dataset.initialized;
   });
@@ -1577,6 +1603,63 @@ function exportPdf(recipeToExport = null, marginToExport = null) {
 
   const targetMargin = marginToExport !== null ? marginToExport : APP.margin;
   const costs = calcFullCost(targetMargin, r);
+  const nutData = typeof calculateFullNutrition === 'function' ? calculateFullNutrition(r) : null;
+  let nutriHtml = '';
+  if (nutData) {
+    nutriHtml = `
+      <div style="margin-top: 20px;">
+        <div style="border-left: 2px solid #3730a3; padding-left: 8px; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #3730a3; margin-bottom: 12px; font-family:'Helvetica Neue',Helvetica,Arial,sans-serif; text-align:left;">
+          DÉCLARATION NUTRITIONNELLE (LOI INCO)
+        </div>
+        <table style="width:100%; border-collapse:collapse; font-size:8px; border:1px solid #e2e8f0; font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+          <thead>
+            <tr style="background:#f8fafc; font-weight:700; border-bottom:1px solid #e2e8f0; text-align:left;">
+              <th style="padding:6px 10px; text-align:left; font-size:8px;">Valeurs moyennes</th>
+              <th style="padding:6px 10px; text-align:right; font-size:8px;">Pour 100g</th>
+              <th style="padding:6px 10px; text-align:right; font-size:8px;">Par portion (${nutData.portionWeight}g)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom:1px solid #e2e8f0;">
+              <td style="padding:5px 10px; text-align:left; font-weight:600; font-size:8px;">Énergie</td>
+              <td style="padding:5px 10px; text-align:right; font-weight:600; font-size:8px;">${nutData.per100g.kj} kJ / ${nutData.per100g.kcal} kcal</td>
+              <td style="padding:5px 10px; text-align:right; font-weight:600; font-size:8px;">${nutData.perPortion.kj} kJ / ${nutData.perPortion.kcal} kcal</td>
+            </tr>
+            <tr style="border-bottom:1px solid #e2e8f0;">
+              <td style="padding:5px 10px; text-align:left; font-size:8px;">Matières grasses</td>
+              <td style="padding:5px 10px; text-align:right; font-size:8px;">${nutData.per100g.fats.toFixed(1)}g</td>
+              <td style="padding:5px 10px; text-align:right; font-size:8px;">${nutData.perPortion.fats.toFixed(1)}g</td>
+            </tr>
+            <tr style="border-bottom:1px solid #e2e8f0;">
+              <td style="padding:5px 10px; text-align:left; padding-left:20px; color:#475569; font-size:8px;">dont acides gras saturés</td>
+              <td style="padding:5px 10px; text-align:right; color:#475569; font-size:8px;">${nutData.per100g.saturatedFat.toFixed(1)}g</td>
+              <td style="padding:5px 10px; text-align:right; color:#475569; font-size:8px;">${nutData.perPortion.saturatedFat.toFixed(1)}g</td>
+            </tr>
+            <tr style="border-bottom:1px solid #e2e8f0;">
+              <td style="padding:5px 10px; text-align:left; font-size:8px;">Glucides</td>
+              <td style="padding:5px 10px; text-align:right; font-size:8px;">${nutData.per100g.carbs.toFixed(1)}g</td>
+              <td style="padding:5px 10px; text-align:right; font-size:8px;">${nutData.perPortion.carbs.toFixed(1)}g</td>
+            </tr>
+            <tr style="border-bottom:1px solid #e2e8f0;">
+              <td style="padding:5px 10px; text-align:left; padding-left:20px; color:#475569; font-size:8px;">dont sucres</td>
+              <td style="padding:5px 10px; text-align:right; color:#475569; font-size:8px;">${nutData.per100g.sugar.toFixed(1)}g</td>
+              <td style="padding:5px 10px; text-align:right; color:#475569; font-size:8px;">${nutData.perPortion.sugar.toFixed(1)}g</td>
+            </tr>
+            <tr style="border-bottom:1px solid #e2e8f0;">
+              <td style="padding:5px 10px; text-align:left; font-size:8px;">Protéines</td>
+              <td style="padding:5px 10px; text-align:right; font-size:8px;">${nutData.per100g.proteins.toFixed(1)}g</td>
+              <td style="padding:5px 10px; text-align:right; font-size:8px;">${nutData.perPortion.proteins.toFixed(1)}g</td>
+            </tr>
+            <tr style="border-bottom:none;">
+              <td style="padding:5px 10px; text-align:left; font-size:8px;">Sel</td>
+              <td style="padding:5px 10px; text-align:right; font-size:8px;">${nutData.per100g.salt.toFixed(2)}g</td>
+              <td style="padding:5px 10px; text-align:right; font-size:8px;">${nutData.perPortion.salt.toFixed(2)}g</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    `;
+  }
   const recipeName = r.name || 'Recette';
   showToast(`Génération de la fiche technique de ${recipeName}...`, 'info');
 
@@ -1879,6 +1962,7 @@ function exportPdf(recipeToExport = null, marginToExport = null) {
             ${stepsHtml}
           </div>
         </div>
+        ${nutriHtml}
       </div>
       
       <!-- Side Column -->
@@ -1932,6 +2016,12 @@ function exportPdf(recipeToExport = null, marginToExport = null) {
                 <span style="color:#64748b;">Coût matière</span>
                 <span style="font-weight:700; color:#0f0f0f;">${totalMat} €</span>
               </div>
+              ${costs.packagingCost > 0 ? `
+              <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #e2e8f0;">
+                <span style="color:#64748b;">Emballages</span>
+                <span style="font-weight:700; color:#0f0f0f;">${(costs.packagingCost * portions).toFixed(2)} €</span>
+              </div>
+              ` : ''}
               <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #e2e8f0;">
                 <span style="color:#64748b;">Prix vente HT</span>
                 <span style="font-weight:700; color:#0f0f0f;">${sellPrice} €</span>

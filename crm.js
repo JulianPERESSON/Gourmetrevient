@@ -29,8 +29,12 @@ async function loadCrm() {
     try {
       const { data: { session } } = await gourmetSupabase.auth.getSession();
       if (session?.user?.id) {
-        const cloudClients = await GourmetSync.chargerClients();
-        const cloudOrders = await GourmetSync.chargerCommandes();
+        // Load clients, orders, and quotes in parallel
+        const [cloudClients, cloudOrders, cloudQuotes] = await Promise.all([
+          GourmetSync.chargerClients(),
+          GourmetSync.chargerCommandes(),
+          GourmetSync.chargerDevis()
+        ]);
 
         if (cloudClients !== null) {
           APP.crm.clients = cloudClients;
@@ -39,6 +43,15 @@ async function loadCrm() {
         if (cloudOrders !== null) {
           APP.crm.orders = cloudOrders;
           APP.crm.orders.sort((a,b) => new Date(a.date) - new Date(b.date));
+        }
+
+        // Sync catering quotes into localStorage (used by crm-enhanced-v2.js)
+        if (cloudQuotes !== null) {
+          // Merge: cloud is authoritative; keep any local-only quotes that haven't been synced yet
+          const localQuotes = JSON.parse(localStorage.getItem('gourmet_quotes') || '[]')
+            .filter(q => q && typeof q === 'object' && !q._syncId); // unsaved local quotes
+          const merged = [...cloudQuotes, ...localQuotes];
+          localStorage.setItem('gourmet_quotes', JSON.stringify(merged));
         }
 
         saveCrm();
@@ -55,25 +68,41 @@ function saveCrm() {
 }
 
 function switchCrmTab(tab) {
-  document.getElementById('crmViewOrders').style.display = 'none';
-  document.getElementById('crmViewClients').style.display = 'none';
-  document.getElementById('dotCrmOrders').classList.remove('active');
-  document.getElementById('dotCrmClients').classList.remove('active');
+  // Hide all views and deactivate all tabs
+  ['crmViewOrders', 'crmViewClients', 'crmViewQuotes'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
+  ['dotCrmOrders', 'dotCrmClients', 'dotCrmQuotes'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('active');
+  });
 
-  if (tab === 'orders') {
-    document.getElementById('crmViewOrders').style.display = 'block';
-    document.getElementById('dotCrmOrders').classList.add('active');
-    renderCrmOrders();
-  } else {
-    document.getElementById('crmViewClients').style.display = 'block';
-    document.getElementById('dotCrmClients').classList.add('active');
+  if (tab === 'quotes') {
+    const view = document.getElementById('crmViewQuotes');
+    const dot  = document.getElementById('dotCrmQuotes');
+    if (view) view.style.display = 'block';
+    if (dot)  dot.classList.add('active');
+    if (typeof window.renderCrmQuotes === 'function') window.renderCrmQuotes();
+  } else if (tab === 'clients') {
+    const view = document.getElementById('crmViewClients');
+    const dot  = document.getElementById('dotCrmClients');
+    if (view) view.style.display = 'block';
+    if (dot)  dot.classList.add('active');
     renderCrmClients();
+  } else {
+    // Default: orders
+    const view = document.getElementById('crmViewOrders');
+    const dot  = document.getElementById('dotCrmOrders');
+    if (view) view.style.display = 'block';
+    if (dot)  dot.classList.add('active');
+    renderCrmOrders();
   }
 }
 
-function renderCRM() {
+function renderCRM(defaultTab) {
   loadCrm().then(() => {
-    switchCrmTab('orders');
+    switchCrmTab(defaultTab || 'orders');
   });
 }
 

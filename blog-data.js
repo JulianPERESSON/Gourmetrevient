@@ -161,6 +161,66 @@ const blogArticles = [
     author: "Julian Peresson",
     url: "article-digitaliser-laboratoire-budget.html",
     tags: ["digitalisation", "gratuit", "gestion", "laboratoire", "GourmetRevient"]
+  },
+  {
+    id: "cout-revient-buche-noel",
+    title: "Coût de revient d'une bûche de Noël : calcul complet et prix de vente",
+    category: "Rentabilité",
+    excerpt: "Le calcul complet du coût de revient d'une bûche de Noël chocolat-framboise pour 8 personnes. Analyse de la saisonnalité des ingrédients et marge de fêtes.",
+    image: generateCover('🎄', '#e0e7ff', '#a5b4fc'),
+    date: "10 Juin 2026",
+    readTime: "7 min",
+    author: "Julian Peresson",
+    url: "article-cout-revient-buche-noel.html",
+    tags: ["bûche de Noël", "coût de revient", "fêtes", "saisonnalité", "calcul"]
+  },
+  {
+    id: "logiciel-gestion-boulangerie",
+    title: "Meilleur logiciel de gestion pour boulangerie artisanale en 2026",
+    category: "Gestion",
+    excerpt: "Un comparatif complet des logiciels de gestion boulangerie artisanale en 2026 (Excel vs outils SaaS dédiés) et les critères de choix essentiels.",
+    image: generateCover('🍞', '#fef3c7', '#fcd34d'),
+    date: "10 Juin 2026",
+    readTime: "8 min",
+    author: "Julian Peresson",
+    url: "article-logiciel-gestion-boulangerie.html",
+    tags: ["logiciel gestion", "boulangerie", "fournées", "farine", "HACCP"]
+  },
+  {
+    id: "tva-patisserie-boulangerie",
+    title: "TVA en pâtisserie-boulangerie : quel taux appliquer sur quels produits ?",
+    category: "Gestion",
+    excerpt: "5.5%, 10% ou 20% ? Ce guide complet détaille les taux de TVA en vigueur en boulangerie-pâtisserie en France pour éviter les redressements fiscaux.",
+    image: generateCover('💶', '#fef3c7', '#fcd34d'),
+    date: "10 Juin 2026",
+    readTime: "6 min",
+    author: "Julian Peresson",
+    url: "article-tva-patisserie-boulangerie.html",
+    tags: ["TVA", "fiscalité", "boulangerie", "pâtisserie", "taux de TVA"]
+  },
+  {
+    id: "marge-boulangerie-pain",
+    title: "Quelle marge sur une baguette tradition ? Calcul et comparatif",
+    category: "Rentabilité",
+    excerpt: "Découvrez le coût de revient réel (farine, levure, sel, énergie, main-d'œuvre) et la marge nette dégagée par une baguette tradition.",
+    image: generateCover('🥖', '#e0e7ff', '#a5b4fc'),
+    date: "10 Juin 2026",
+    readTime: "7 min",
+    author: "Julian Peresson",
+    url: "article-marge-boulangerie-pain.html",
+    tags: ["marge", "baguette tradition", "boulangerie", "matière première", "coût"]
+  },
+  {
+    id: "haccp-boulangerie-guide",
+    title: "HACCP en boulangerie : guide pratique et obligations légales 2026",
+    category: "Hygiène & HACCP",
+    excerpt: "Le Plan de Maîtrise Sanitaire (PMS) obligatoire en boulangerie. Points critiques, traçabilité des farines et gestion numérique des relevés.",
+    image: generateCover('🧼', '#d1fae5', '#6ee7b7'),
+    date: "10 Juin 2026",
+    readTime: "8 min",
+    author: "Julian Peresson",
+    url: "article-haccp-boulangerie-guide.html",
+    tags: ["HACCP", "PMS", "boulangerie", "hygiène", "traçabilité"]
   }
 ];
 

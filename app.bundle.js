@@ -1,7 +1,7 @@
 /* 
   =============================================================================
   GourmetRevient Application Bundle (Production)
-  Généré automatiquement le : 2026-06-10T17:25:55.031Z
+  Généré automatiquement le : 2026-06-11T12:57:26.076Z
   =============================================================================
 */
 
@@ -410,6 +410,7 @@ const srCost = (window.SousRecettes && r.sousRecettes)
 : 0;
 const totalMaterial = (ingCost + srCost) * costMultiplier;
 let laborRate = 0, fixedCharges = 0, productions = 1, energyRate = 0, amortization = 0;
+let packagingCost = 0, apprenticeTime = 0, commisTime = 0, chefTime = 0;
 const isCurrent = (r === APP.recipe);
 const advEl = $('#advLaborRate');
 if (isCurrent && advEl && APP.currentStep === 4) {
@@ -418,22 +419,36 @@ fixedCharges = parseFloat($('#advFixedCharges').value) || 0;
 productions = Math.max(1, parseInt($('#advProductions').value) || 1);
 energyRate = parseFloat($('#advEnergy').value) || 0;
 amortization = parseFloat($('#advAmortization').value) || 0;
+packagingCost = parseFloat($('#advPackagingCost').value) || 0;
+apprenticeTime = parseFloat($('#advApprenticeTime').value) || 0;
+commisTime = parseFloat($('#advCommisTime').value) || 0;
+chefTime = parseFloat($('#advChefTime').value) || 0;
 } else if (r.advanced) {
 laborRate = r.advanced.laborRate || 0;
 fixedCharges = r.advanced.fixedCharges || 0;
 productions = r.advanced.productions || 1;
 energyRate = r.advanced.energyRate || 0;
 amortization = r.advanced.amortization || 0;
+packagingCost = r.advanced.packagingCost || 0;
+apprenticeTime = r.advanced.apprenticeTime || 0;
+commisTime = r.advanced.commisTime || 0;
+chefTime = r.advanced.chefTime || 0;
 }
 const prepTime = parseFloat(r.prepTime) || 0;
 const cookTime = parseFloat(r.cookTime) || 0;
 const totalTimeH = (prepTime + cookTime) / 60;
-const laborCost = laborRate * totalTimeH;
+let laborCost = 0;
+const profileTotalTime = apprenticeTime + commisTime + chefTime;
+if (profileTotalTime > 0) {
+laborCost = (apprenticeTime * 8 + commisTime * 14 + chefTime * 24) / 60;
+} else {
+laborCost = laborRate * totalTimeH;
+}
 const energyCost = (energyRate * (cookTime / 60)) * costMultiplier;
 const fixedShare = fixedCharges / productions;
 const amortShare = amortization / productions;
 const additionalCosts = laborCost + energyCost + fixedShare + amortShare;
-const totalFullCost = totalMaterial + additionalCosts;
+const totalFullCost = totalMaterial + additionalCosts + (packagingCost * portions);
 const costPerPortion = totalFullCost / portions;
 const marginRate = (margin || APP.margin) / 100;
 const sellingPrice = marginRate < 1 ? costPerPortion / (1 - marginRate) : costPerPortion * 10;
@@ -470,7 +485,11 @@ laborRate,
 energyRate,
 fixedCharges,
 amortization,
-productions
+productions,
+packagingCost: round2(packagingCost),
+apprenticeTime,
+commisTime,
+chefTime
 };
 }
 function getViewOwner() {
@@ -1179,7 +1198,11 @@ laborRate: parseFloat($('#advLaborRate').value) || 0,
 fixedCharges: parseFloat($('#advFixedCharges').value) || 0,
 productions: parseInt($('#advProductions').value) || 1,
 energyRate: parseFloat($('#advEnergy').value) || 0,
-amortization: parseFloat($('#advAmortization').value) || 0
+amortization: parseFloat($('#advAmortization').value) || 0,
+packagingCost: parseFloat($('#advPackagingCost').value) || 0,
+apprenticeTime: parseFloat($('#advApprenticeTime').value) || 0,
+commisTime: parseFloat($('#advCommisTime').value) || 0,
+chefTime: parseFloat($('#advChefTime').value) || 0
 };
 }
 if ($('#recipeTvaRate')) {
@@ -1484,6 +1507,10 @@ setVal('advFixedCharges', adv.fixedCharges);
 setVal('advProductions', adv.productions);
 setVal('advEnergy', adv.energyRate);
 setVal('advAmortization', adv.amortization);
+setVal('advPackagingCost', adv.packagingCost || 0);
+setVal('advApprenticeTime', adv.apprenticeTime || 0);
+setVal('advCommisTime', adv.commisTime || 0);
+setVal('advChefTime', adv.chefTime || 0);
 }
 if (APP.recipe.tvaRate !== undefined) {
 const el = document.getElementById('recipeTvaRate');
@@ -1626,35 +1653,50 @@ function renderAdvancedCostKPI(costs) {
 const grid = $('#advancedKpiGrid');
 if (!grid) return;
 const totalTimeH = (costs.prepTime + costs.cookTime) / 60;
+const profileTotalTime = (costs.apprenticeTime || 0) + (costs.commisTime || 0) + (costs.chefTime || 0);
+let laborSubText = `${costs.laborRate.toFixed(2)} €/h × ${totalTimeH.toFixed(1)}h`;
+if (profileTotalTime > 0) {
+const details = [];
+if (costs.apprenticeTime > 0) details.push(`Appr. ${costs.apprenticeTime}m`);
+if (costs.commisTime > 0) details.push(`Comm. ${costs.commisTime}m`);
+if (costs.chefTime > 0) details.push(`Chef ${costs.chefTime}m`);
+laborSubText = details.join(' | ');
+}
 const additionalSum = costs.laborCost + costs.energyCost + costs.fixedShare + costs.amortShare;
+const totalMaterialWithPkg = costs.totalMaterial + (costs.packagingCost * costs.portions);
 grid.innerHTML = `
 <div class="kpi-card">
-<div class="kpi-label">${t('s4.adv.kpi.labor')}</div>
+<div class="kpi-label">${t('s4.adv.kpi.labor') || 'Main d\'œuvre'}</div>
 <div class="kpi-value">${costs.laborCost.toFixed(2)} €</div>
-<div class="kpi-sub">${costs.laborRate.toFixed(2)} €/h × ${totalTimeH.toFixed(1)}h</div>
+<div class="kpi-sub">${laborSubText}</div>
 </div>
 <div class="kpi-card">
-<div class="kpi-label">${t('s4.adv.kpi.energy')}</div>
+<div class="kpi-label">${t('s4.adv.kpi.energy') || 'Énergie'}</div>
 <div class="kpi-value">${costs.energyCost.toFixed(2)} €</div>
 <div class="kpi-sub">${costs.energyRate.toFixed(2)} €/h × ${(costs.cookTime / 60).toFixed(1)}h</div>
 </div>
 <div class="kpi-card">
-<div class="kpi-label">${t('s4.adv.kpi.fixed')}</div>
+<div class="kpi-label">📦 Emballages</div>
+<div class="kpi-value">${(costs.packagingCost * costs.portions).toFixed(2)} €</div>
+<div class="kpi-sub">${costs.packagingCost.toFixed(2)} €/port. × ${costs.portions}</div>
+</div>
+<div class="kpi-card">
+<div class="kpi-label">${t('s4.adv.kpi.fixed') || 'Charges fixes'}</div>
 <div class="kpi-value">${costs.fixedShare.toFixed(2)} €</div>
 <div class="kpi-sub">${costs.fixedCharges.toFixed(0)} € / ${costs.productions}</div>
 </div>
 <div class="kpi-card">
-<div class="kpi-label">${t('s4.adv.kpi.amort')}</div>
+<div class="kpi-label">${t('s4.adv.kpi.amort') || 'Amortissement'}</div>
 <div class="kpi-value">${costs.amortShare.toFixed(2)} €</div>
 <div class="kpi-sub">${costs.amortization.toFixed(0)} € / ${costs.productions}</div>
 </div>
 <div class="kpi-card accent">
-<div class="kpi-label">${t('s4.adv.kpi.full_cost')}</div>
+<div class="kpi-label">${t('s4.adv.kpi.full_cost') || 'Coût complet'}</div>
 <div class="kpi-value" style="font-size:1.3rem">${costs.totalFullCost.toFixed(2)} €</div>
-<div class="kpi-sub">${t('ui.kpi.total_material')}: ${costs.totalMaterial.toFixed(2)} € + ${additionalSum.toFixed(2)} €</div>
+<div class="kpi-sub">Mat.+Pkg: ${totalMaterialWithPkg.toFixed(2)} € + Frais: ${additionalSum.toFixed(2)} €</div>
 </div>
 <div class="kpi-card success">
-<div class="kpi-label">${t('s4.adv.kpi.full_portion')}</div>
+<div class="kpi-label">${t('s4.adv.kpi.full_portion') || 'Coût portion'}</div>
 <div class="kpi-value" style="font-size:1.3rem">${costs.costPerPortion.toFixed(2)} €</div>
 <div class="kpi-sub">${costs.totalFullCost.toFixed(2)} € / ${costs.portions} ${costs.portions > 1 ? t('unit.portions') : t('unit.portion')}</div>
 </div>
@@ -1935,7 +1977,7 @@ APP.recipe = JSON.parse(JSON.stringify(recipe));
 APP.margin = recipe.margin || 70;
 APP.baselineCosts = null;
 populateStep1();
-['advLaborRate', 'advFixedCharges', 'advProductions', 'advEnergy', 'advAmortization', 'recipeTvaRate'].forEach(id => {
+['advLaborRate', 'advFixedCharges', 'advProductions', 'advEnergy', 'advAmortization', 'recipeTvaRate', 'advPackagingCost', 'advApprenticeTime', 'advCommisTime', 'advChefTime'].forEach(id => {
 const el = document.getElementById(id);
 if (el) delete el.dataset.initialized;
 });
@@ -2035,7 +2077,7 @@ return tStep !== stepKey ? tStep : step;
 })
 };
 populateStep1();
-['advLaborRate', 'advFixedCharges', 'advProductions', 'advEnergy', 'advAmortization', 'recipeTvaRate'].forEach(id => {
+['advLaborRate', 'advFixedCharges', 'advProductions', 'advEnergy', 'advAmortization', 'recipeTvaRate', 'advPackagingCost', 'advApprenticeTime', 'advCommisTime', 'advChefTime'].forEach(id => {
 const el = document.getElementById(id);
 if (el) delete el.dataset.initialized;
 });
@@ -2362,6 +2404,63 @@ if (!r || !r.name) { showToast('Erreur: Aucune recette chargée.', 'error'); ret
 const ecoRes = calcRecipeEcoScore(r);
 const targetMargin = marginToExport !== null ? marginToExport : APP.margin;
 const costs = calcFullCost(targetMargin, r);
+const nutData = typeof calculateFullNutrition === 'function' ? calculateFullNutrition(r) : null;
+let nutriHtml = '';
+if (nutData) {
+nutriHtml = `
+<div style="margin-top: 20px;">
+<div style="border-left: 2px solid #3730a3; padding-left: 8px; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #3730a3; margin-bottom: 12px; font-family:'Helvetica Neue',Helvetica,Arial,sans-serif; text-align:left;">
+DÉCLARATION NUTRITIONNELLE (LOI INCO)
+</div>
+<table style="width:100%; border-collapse:collapse; font-size:8px; border:1px solid #e2e8f0; font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+<thead>
+<tr style="background:#f8fafc; font-weight:700; border-bottom:1px solid #e2e8f0; text-align:left;">
+<th style="padding:6px 10px; text-align:left; font-size:8px;">Valeurs moyennes</th>
+<th style="padding:6px 10px; text-align:right; font-size:8px;">Pour 100g</th>
+<th style="padding:6px 10px; text-align:right; font-size:8px;">Par portion (${nutData.portionWeight}g)</th>
+</tr>
+</thead>
+<tbody>
+<tr style="border-bottom:1px solid #e2e8f0;">
+<td style="padding:5px 10px; text-align:left; font-weight:600; font-size:8px;">Énergie</td>
+<td style="padding:5px 10px; text-align:right; font-weight:600; font-size:8px;">${nutData.per100g.kj} kJ / ${nutData.per100g.kcal} kcal</td>
+<td style="padding:5px 10px; text-align:right; font-weight:600; font-size:8px;">${nutData.perPortion.kj} kJ / ${nutData.perPortion.kcal} kcal</td>
+</tr>
+<tr style="border-bottom:1px solid #e2e8f0;">
+<td style="padding:5px 10px; text-align:left; font-size:8px;">Matières grasses</td>
+<td style="padding:5px 10px; text-align:right; font-size:8px;">${nutData.per100g.fats.toFixed(1)}g</td>
+<td style="padding:5px 10px; text-align:right; font-size:8px;">${nutData.perPortion.fats.toFixed(1)}g</td>
+</tr>
+<tr style="border-bottom:1px solid #e2e8f0;">
+<td style="padding:5px 10px; text-align:left; padding-left:20px; color:#475569; font-size:8px;">dont acides gras saturés</td>
+<td style="padding:5px 10px; text-align:right; color:#475569; font-size:8px;">${nutData.per100g.saturatedFat.toFixed(1)}g</td>
+<td style="padding:5px 10px; text-align:right; color:#475569; font-size:8px;">${nutData.perPortion.saturatedFat.toFixed(1)}g</td>
+</tr>
+<tr style="border-bottom:1px solid #e2e8f0;">
+<td style="padding:5px 10px; text-align:left; font-size:8px;">Glucides</td>
+<td style="padding:5px 10px; text-align:right; font-size:8px;">${nutData.per100g.carbs.toFixed(1)}g</td>
+<td style="padding:5px 10px; text-align:right; font-size:8px;">${nutData.perPortion.carbs.toFixed(1)}g</td>
+</tr>
+<tr style="border-bottom:1px solid #e2e8f0;">
+<td style="padding:5px 10px; text-align:left; padding-left:20px; color:#475569; font-size:8px;">dont sucres</td>
+<td style="padding:5px 10px; text-align:right; color:#475569; font-size:8px;">${nutData.per100g.sugar.toFixed(1)}g</td>
+<td style="padding:5px 10px; text-align:right; color:#475569; font-size:8px;">${nutData.perPortion.sugar.toFixed(1)}g</td>
+</tr>
+<tr style="border-bottom:1px solid #e2e8f0;">
+<td style="padding:5px 10px; text-align:left; font-size:8px;">Protéines</td>
+<td style="padding:5px 10px; text-align:right; font-size:8px;">${nutData.per100g.proteins.toFixed(1)}g</td>
+<td style="padding:5px 10px; text-align:right; font-size:8px;">${nutData.perPortion.proteins.toFixed(1)}g</td>
+</tr>
+<tr style="border-bottom:none;">
+<td style="padding:5px 10px; text-align:left; font-size:8px;">Sel</td>
+<td style="padding:5px 10px; text-align:right; font-size:8px;">${nutData.per100g.salt.toFixed(2)}g</td>
+<td style="padding:5px 10px; text-align:right; font-size:8px;">${nutData.perPortion.salt.toFixed(2)}g</td>
+</tr>
+</tbody>
+</table>
+</div>
+`;
+}
 const recipeName = r.name || 'Recette';
 showToast(`Génération de la fiche technique de ${recipeName}...`, 'info');
 const safeFilename = recipeName.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]/gi, '_').toLowerCase();
@@ -2628,6 +2727,7 @@ PROTOCOLE DE PRODUCTION
 ${stepsHtml}
 </div>
 </div>
+${nutriHtml}
 </div>
 <!-- Side Column -->
 <div class="side-col" style="display:flex; flex-direction:column; gap:16px; font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
@@ -2678,6 +2778,12 @@ SYNTHÈSE RENTABILITÉ
 <span style="color:#64748b;">Coût matière</span>
 <span style="font-weight:700; color:#0f0f0f;">${totalMat} €</span>
 </div>
+${costs.packagingCost > 0 ? `
+<div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #e2e8f0;">
+<span style="color:#64748b;">Emballages</span>
+<span style="font-weight:700; color:#0f0f0f;">${(costs.packagingCost * portions).toFixed(2)} €</span>
+</div>
+` : ''}
 <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #e2e8f0;">
 <span style="color:#64748b;">Prix vente HT</span>
 <span style="font-weight:700; color:#0f0f0f;">${sellPrice} €</span>
@@ -2975,29 +3081,36 @@ nutrition: nutriData, allergens: allergensData
 hideOffModal();
 showToast(`Ingrédient associé avec Open Food Facts (${nutriData.kcal} kcal/100g)`, 'success');
 }
-function renderNutritionAnalysis() {
+window.calculateFullNutrition = function(recipe) {
+if (!recipe || !recipe.ingredients) return null;
 let totalKcal = 0;
+let totalKj = 0;
 let totalPro = 0;
 let totalGlu = 0;
+let totalSugar = 0;
 let totalLip = 0;
+let totalSatFat = 0;
+let totalSalt = 0;
 let weightInGrams = 0;
-const foundAllergens = new Set();
 const getMockNutrition = (name) => {
 const n = name.toLowerCase();
 const matches = (keywords) => keywords.some(k => n.includes(k));
-if (matches(['beurre', 'huile', 'graisse', 'gras'])) return { kcal: 717, proteins: 1, carbs: 1, fats: 81 };
-if (matches(['sucre', 'sirop', 'miel', 'glucose', 'semoule', 'glace'])) return { kcal: 387, proteins: 0, carbs: 100, fats: 0 };
-if (matches(['farine', 'fécule', 'fecule', 'amidon', 'maïzena'])) return { kcal: 364, proteins: 10, carbs: 76, fats: 1 };
-if (matches(['crème', 'creme', 'mascarpone', 'chantilly'])) return { kcal: 345, proteins: 2, carbs: 3, fats: 35 };
-if (matches(['lait'])) return { kcal: 42, proteins: 3.4, carbs: 4.8, fats: 1 };
-if (matches(['chocolat', 'cacao', 'couverture', 'ganache', 'pralin', 'gianduja'])) return { kcal: 546, proteins: 5, carbs: 31, fats: 36 };
-if (matches(['œuf', 'oeuf', 'jaune', 'blanc', 'oufs'])) return { kcal: 143, proteins: 13, carbs: 1, fats: 10 };
-if (matches(['fraise', 'framboise', 'pomme', 'citron', 'fruit', 'purée', 'coulis', 'griotte'])) return { kcal: 50, proteins: 1, carbs: 12, fats: 0 };
-if (matches(['amande', 'noisette', 'noix', 'pistache', 'pignon'])) return { kcal: 600, proteins: 20, carbs: 10, fats: 50 };
-if (matches(['sel'])) return { kcal: 0, proteins: 0, carbs: 0, fats: 0 };
-return { kcal: 250, proteins: 5, carbs: 30, fats: 10 };
+if (matches(['beurre', 'huile', 'graisse', 'gras'])) return { kcal: 717, kj: 3000, proteins: 1, carbs: 1, sugar: 0.1, fats: 81, saturatedFat: 51, salt: 0.1 };
+if (matches(['sucre', 'sirop', 'miel', 'glucose', 'semoule', 'glace'])) return { kcal: 387, kj: 1619, proteins: 0, carbs: 100, sugar: 100, fats: 0, saturatedFat: 0, salt: 0 };
+if (matches(['farine', 'fécule', 'fecule', 'amidon', 'maïzena'])) return { kcal: 364, kj: 1523, proteins: 10, carbs: 76, sugar: 1.5, fats: 1, saturatedFat: 0.2, salt: 0.01 };
+if (matches(['crème', 'creme', 'mascarpone', 'chantilly'])) return { kcal: 345, kj: 1443, proteins: 2, carbs: 3, sugar: 3, fats: 35, saturatedFat: 23, salt: 0.1 };
+if (matches(['lait'])) return { kcal: 42, kj: 176, proteins: 3.4, carbs: 4.8, sugar: 4.8, fats: 1, saturatedFat: 0.6, salt: 0.1 };
+if (matches(['chocolat', 'cacao', 'couverture', 'ganache', 'pralin', 'gianduja'])) return { kcal: 546, kj: 2284, proteins: 5, carbs: 31, sugar: 28, fats: 36, saturatedFat: 22, salt: 0.05 };
+if (matches(['œuf', 'oeuf', 'jaune', 'blanc', 'oufs'])) return { kcal: 143, kj: 598, proteins: 13, carbs: 1, sugar: 0.6, fats: 10, saturatedFat: 3, salt: 0.3 };
+if (matches(['fraise', 'framboise', 'pomme', 'citron', 'fruit', 'purée', 'coulis', 'griotte'])) return { kcal: 50, kj: 209, proteins: 1, carbs: 12, sugar: 9, fats: 0.2, saturatedFat: 0.05, salt: 0.01 };
+if (matches(['amande', 'noisette', 'noix', 'pistache', 'pignon'])) return { kcal: 600, kj: 2510, proteins: 20, carbs: 10, sugar: 4, fats: 50, saturatedFat: 4, salt: 0.01 };
+if (matches(['eau', 'water', 'glace hydrique'])) return { kcal: 0, kj: 0, proteins: 0, carbs: 0, sugar: 0, fats: 0, saturatedFat: 0, salt: 0 };
+if (matches(['gelatine', 'gélatine', 'agar'])) return { kcal: 335, kj: 1400, proteins: 86, carbs: 0, sugar: 0, fats: 0, saturatedFat: 0, salt: 0.1 };
+if (matches(['levure'])) return { kcal: 105, kj: 439, proteins: 14, carbs: 19, sugar: 0, fats: 2, saturatedFat: 0.3, salt: 0.1 };
+if (matches(['sel'])) return { kcal: 0, kj: 0, proteins: 0, carbs: 0, sugar: 0, fats: 0, saturatedFat: 0, salt: 100 };
+return { kcal: 250, kj: 1046, proteins: 5, carbs: 30, sugar: 10, fats: 10, saturatedFat: 3, salt: 0.1 };
 };
-APP.recipe.ingredients.forEach(ing => {
+recipe.ingredients.forEach(ing => {
 if (!ing.name || ing.quantity <= 0) return;
 let qtyGrams = 0;
 const unit = (ing.unit || '').toLowerCase();
@@ -3010,14 +3123,62 @@ qtyGrams = parseFloat(ing.quantity) * 50;
 }
 weightInGrams += qtyGrams;
 const dbItem = APP.ingredientDb.find(db => db.name.toLowerCase() === ing.name.toLowerCase());
-const nutrition = (dbItem && dbItem.nutrition) ? dbItem.nutrition : getMockNutrition(ing.name);
-if (qtyGrams > 0) {
-const ratio = qtyGrams / 100;
-totalKcal += nutrition.kcal * ratio;
-totalPro += nutrition.proteins * ratio;
-totalGlu += nutrition.carbs * ratio;
-totalLip += nutrition.fats * ratio;
+let nut = null;
+if (dbItem && dbItem.nutrition) {
+nut = dbItem.nutrition;
+} else {
+nut = getMockNutrition(ing.name);
 }
+if (qtyGrams > 0 && nut) {
+const ratio = qtyGrams / 100;
+totalKcal += (nut.kcal || 0) * ratio;
+totalKj += (nut.kj || nut.kcal * 4.184 || 0) * ratio;
+totalPro += (nut.proteins || nut.prot || 0) * ratio;
+totalGlu += (nut.carbs || nut.carb || 0) * ratio;
+totalSugar += (nut.sugar !== undefined ? nut.sugar : (nut.carbs || nut.carb || 0) * 0.3) * ratio;
+totalLip += (nut.fats || nut.fat || 0) * ratio;
+totalSatFat += (nut.saturatedFat !== undefined ? nut.saturatedFat : (nut.fats || nut.fat || 0) * 0.6) * ratio;
+totalSalt += (nut.salt !== undefined ? nut.salt : 0.01) * ratio;
+}
+});
+if (weightInGrams === 0) return null;
+const portions = recipe.portions || 10;
+const portionWeight = weightInGrams / portions;
+const factor100 = 100 / weightInGrams;
+const per100g = {
+kcal: Math.round(totalKcal * factor100),
+kj: Math.round(totalKj * factor100),
+proteins: +(totalPro * factor100).toFixed(1),
+carbs: +(totalGlu * factor100).toFixed(1),
+sugar: +(totalSugar * factor100).toFixed(1),
+fats: +(totalLip * factor100).toFixed(1),
+saturatedFat: +(totalSatFat * factor100).toFixed(1),
+salt: +(totalSalt * factor100).toFixed(2)
+};
+const factorPortion = portionWeight / 100;
+const perPortion = {
+kcal: Math.round(per100g.kcal * factorPortion),
+kj: Math.round(per100g.kj * factorPortion),
+proteins: +(per100g.proteins * factorPortion).toFixed(1),
+carbs: +(per100g.carbs * factorPortion).toFixed(1),
+sugar: +(per100g.sugar * factorPortion).toFixed(1),
+fats: +(per100g.fats * factorPortion).toFixed(1),
+saturatedFat: +(per100g.saturatedFat * factorPortion).toFixed(1),
+salt: +(per100g.salt * factorPortion).toFixed(2)
+};
+return {
+weightInGrams: Math.round(weightInGrams),
+portionWeight: Math.round(portionWeight),
+per100g,
+perPortion
+};
+};
+function renderNutritionAnalysis() {
+const nutData = window.calculateFullNutrition(APP.recipe);
+const foundAllergens = new Set();
+APP.recipe.ingredients.forEach(ing => {
+if (!ing.name || ing.quantity <= 0) return;
+const dbItem = APP.ingredientDb.find(db => db.name.toLowerCase() === ing.name.toLowerCase());
 if (dbItem && dbItem.allergens) {
 dbItem.allergens.forEach(a => foundAllergens.add(a));
 }
@@ -3031,22 +3192,76 @@ if (window.SousRecettes) {
 const cascadeAllergens = SousRecettes.getAllergenesFromRecipe(APP.recipe);
 cascadeAllergens.forEach(a => foundAllergens.add(a));
 }
-if (weightInGrams > 0) {
-const factor = 100 / weightInGrams;
-totalKcal *= factor;
-totalPro *= factor;
-totalGlu *= factor;
-totalLip *= factor;
-}
 const k = document.getElementById('nutriKcal');
 const p = document.getElementById('nutriPro');
 const g = document.getElementById('nutriGlu');
 const l = document.getElementById('nutriLip');
 const al = document.getElementById('allergensList');
-if (k) k.textContent = Math.round(totalKcal);
-if (p) p.textContent = totalPro.toFixed(1) + 'g';
-if (g) g.textContent = totalGlu.toFixed(1) + 'g';
-if (l) l.textContent = totalLip.toFixed(1) + 'g';
+const tableContainer = document.getElementById('incoNutritionTable');
+if (nutData) {
+if (k) k.textContent = Math.round(nutData.per100g.kcal);
+if (p) p.textContent = nutData.per100g.proteins.toFixed(1) + 'g';
+if (g) g.textContent = nutData.per100g.carbs.toFixed(1) + 'g';
+if (l) l.textContent = nutData.per100g.fats.toFixed(1) + 'g';
+if (tableContainer) {
+tableContainer.innerHTML = `
+<div style="margin-top: 1rem; border: 1px solid var(--surface-border); border-radius: 8px; overflow: hidden; background: var(--surface);">
+<table style="width: 100%; border-collapse: collapse; font-size: 0.82rem; color: var(--text);">
+<thead>
+<tr style="background: var(--surface-hover); font-weight: 700; border-bottom: 1px solid var(--surface-border);">
+<th style="padding: 8px 12px; text-align: left;">Valeurs moyennes</th>
+<th style="padding: 8px 12px; text-align: right;">Pour 100g</th>
+<th style="padding: 8px 12px; text-align: right;">Par portion (${Math.round(nutData.portionWeight)}g)</th>
+</tr>
+</thead>
+<tbody>
+<tr style="border-bottom: 1px solid var(--surface-border);">
+<td style="padding: 8px 12px; text-align: left; font-weight: 600;">Énergie</td>
+<td style="padding: 8px 12px; text-align: right; font-weight: 600;">${nutData.per100g.kj} kJ / ${nutData.per100g.kcal} kcal</td>
+<td style="padding: 8px 12px; text-align: right; font-weight: 600;">${nutData.perPortion.kj} kJ / ${nutData.perPortion.kcal} kcal</td>
+</tr>
+<tr style="border-bottom: 1px solid var(--surface-border);">
+<td style="padding: 8px 12px; text-align: left;">Matières grasses</td>
+<td style="padding: 8px 12px; text-align: right;">${nutData.per100g.fats.toFixed(1)}g</td>
+<td style="padding: 8px 12px; text-align: right;">${nutData.perPortion.fats.toFixed(1)}g</td>
+</tr>
+<tr style="border-bottom: 1px solid var(--surface-border);">
+<td style="padding: 8px 12px; text-align: left; padding-left: 20px; color: var(--text-muted);">dont acides gras saturés</td>
+<td style="padding: 8px 12px; text-align: right; color: var(--text-muted);">${nutData.per100g.saturatedFat.toFixed(1)}g</td>
+<td style="padding: 8px 12px; text-align: right; color: var(--text-muted);">${nutData.perPortion.saturatedFat.toFixed(1)}g</td>
+</tr>
+<tr style="border-bottom: 1px solid var(--surface-border);">
+<td style="padding: 8px 12px; text-align: left;">Glucides</td>
+<td style="padding: 8px 12px; text-align: right;">${nutData.per100g.carbs.toFixed(1)}g</td>
+<td style="padding: 8px 12px; text-align: right;">${nutData.perPortion.carbs.toFixed(1)}g</td>
+</tr>
+<tr style="border-bottom: 1px solid var(--surface-border);">
+<td style="padding: 8px 12px; text-align: left; padding-left: 20px; color: var(--text-muted);">dont sucres</td>
+<td style="padding: 8px 12px; text-align: right; color: var(--text-muted);">${nutData.per100g.sugar.toFixed(1)}g</td>
+<td style="padding: 8px 12px; text-align: right; color: var(--text-muted);">${nutData.perPortion.sugar.toFixed(1)}g</td>
+</tr>
+<tr style="border-bottom: 1px solid var(--surface-border);">
+<td style="padding: 8px 12px; text-align: left;">Protéines</td>
+<td style="padding: 8px 12px; text-align: right;">${nutData.per100g.proteins.toFixed(1)}g</td>
+<td style="padding: 8px 12px; text-align: right;">${nutData.perPortion.proteins.toFixed(1)}g</td>
+</tr>
+<tr style="border-bottom: none;">
+<td style="padding: 8px 12px; text-align: left;">Sel</td>
+<td style="padding: 8px 12px; text-align: right;">${nutData.per100g.salt.toFixed(2)}g</td>
+<td style="padding: 8px 12px; text-align: right;">${nutData.perPortion.salt.toFixed(2)}g</td>
+</tr>
+</tbody>
+</table>
+</div>
+`;
+}
+} else {
+if (k) k.textContent = '0';
+if (p) p.textContent = '0g';
+if (g) g.textContent = '0g';
+if (l) l.textContent = '0g';
+if (tableContainer) tableContainer.innerHTML = '';
+}
 if (al) {
 if (foundAllergens.size > 0) {
 al.textContent = Array.from(foundAllergens).map(a => t(a) || a).join(', ').toUpperCase();
@@ -7540,7 +7755,7 @@ APP.margin = parseInt(e.target.value);
 renderCostAnalysis();
 });
 }
-['advLaborRate', 'advFixedCharges', 'advProductions', 'advEnergy', 'advAmortization'].forEach(id => {
+['advLaborRate', 'advFixedCharges', 'advProductions', 'advEnergy', 'advAmortization', 'advPackagingCost', 'advApprenticeTime', 'advCommisTime', 'advChefTime'].forEach(id => {
 const el = $('#' + id);
 if (el) el.addEventListener('input', () => renderCostAnalysis());
 });

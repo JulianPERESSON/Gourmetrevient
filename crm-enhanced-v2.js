@@ -46,8 +46,8 @@ function openInvoiceGenerator(orderId = null) {
     const shopName = localStorage.getItem('gourmet_current_user') || 'Mon Atelier';
 
     // Pre-select order or saved quote if ID provided
-    const savedQuotes = JSON.parse(localStorage.getItem('gourmet_quotes') || '[]');
-    const quote = orderId ? savedQuotes.find(q => q.id === orderId) : null;
+    const savedQuotes = JSON.parse(localStorage.getItem('gourmet_quotes') || '[]').filter(q => q && typeof q === 'object');
+    const quote = (orderId && savedQuotes.length > 0) ? savedQuotes.find(q => q && q.id === orderId) : null;
     const selectedOrder = (orderId && !quote) ? orders.find(o => o.id === orderId) : null;
 
     modal.innerHTML = `
@@ -148,6 +148,51 @@ function openInvoiceGenerator(orderId = null) {
             <label class="form-label" style="font-size:0.75rem;">Thème / Couleurs</label>
             <input type="text" id="invEventTheme" class="form-input" placeholder="ex: Rose et Blanc, Bohème">
           </div>
+      </div>
+
+      <!-- 📊 Seuil de Rentabilité & Frais Fixes de l'Événement -->
+      <div style="background:var(--bg-alt); padding:1rem; border-radius:14px; border:1px solid var(--surface-border); margin-bottom:1rem;">
+        <h4 style="margin:0 0 0.8rem; font-size:0.9rem; color:var(--primary);">📊 Seuil de Rentabilité & Frais Fixes de l'Événement</h4>
+        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:0.8rem; margin-bottom:1rem;">
+          <div class="form-group" style="margin:0;">
+            <label class="form-label" style="font-size:0.75rem;">Coût Livraison / Transport (€ HT)</label>
+            <input type="number" id="invDeliveryCost" class="form-input" placeholder="0.00" value="0" min="0" step="5">
+          </div>
+          <div class="form-group" style="margin:0;">
+            <label class="form-label" style="font-size:0.75rem;">Frais Personnel / Service (€ HT)</label>
+            <input type="number" id="invStaffingCost" class="form-input" placeholder="0.00" value="0" min="0" step="10">
+          </div>
+          <div class="form-group" style="margin:0;">
+            <label class="form-label" style="font-size:0.75rem;">Frais Divers / Logistique (€ HT)</label>
+            <input type="number" id="invEventOverheads" class="form-input" placeholder="0.00" value="0" min="0" step="5">
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 0.8rem; padding: 0.8rem; background: var(--surface); border-radius: 10px; border: 1px solid var(--surface-border); text-align: center;">
+          <div>
+            <div style="font-size: 0.68rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">CA de l'événement</div>
+            <div id="simEventRevenue" style="font-size: 1.05rem; font-weight: 800; color: var(--text-primary); margin-top: 2px;">0,00 €</div>
+          </div>
+          <div>
+            <div style="font-size: 0.68rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Coût variable total</div>
+            <div id="simVariableCost" style="font-size: 1.05rem; font-weight: 800; color: var(--text-primary); margin-top: 2px;">0,00 €</div>
+          </div>
+          <div>
+            <div style="font-size: 0.68rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Total Frais Fixes</div>
+            <div id="simFixedCost" style="font-size: 1.05rem; font-weight: 800; color: var(--text-primary); margin-top: 2px;">0,00 €</div>
+          </div>
+          <div>
+            <div style="font-size: 0.68rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Seuil Rentabilité HT</div>
+            <div id="simBreakEven" style="font-size: 1.05rem; font-weight: 800; color: var(--accent); margin-top: 2px;">0,00 €</div>
+          </div>
+          <div>
+            <div style="font-size: 0.68rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Bénéfice Net HT</div>
+            <div id="simNetMargin" style="font-size: 1.05rem; font-weight: 800; color: var(--success); margin-top: 2px;">0,00 €</div>
+          </div>
+        </div>
+
+        <div id="simStatus" style="margin-top: 0.8rem; text-align: center;">
+          <span class="badge" style="background:var(--surface-border); color:var(--text-muted);">En attente de chiffrage</span>
         </div>
       </div>
 
@@ -220,22 +265,39 @@ function openInvoiceGenerator(orderId = null) {
             if (document.getElementById('invEventType')) document.getElementById('invEventType').value = quote.eventType || '';
             if (document.getElementById('invDeliveryDetails')) document.getElementById('invDeliveryDetails').value = quote.deliveryDetails || '';
             if (document.getElementById('invEventTheme')) document.getElementById('invEventTheme').value = quote.eventTheme || '';
+            if (document.getElementById('invDeliveryCost')) document.getElementById('invDeliveryCost').value = quote.deliveryCost || 0;
+            if (document.getElementById('invStaffingCost')) document.getElementById('invStaffingCost').value = quote.staffingCost || 0;
+            if (document.getElementById('invEventOverheads')) document.getElementById('invEventOverheads').value = quote.eventOverheads || 0;
             setInvoiceType(quote.type || 'devis');
             _renderInvoiceLines();
         }, 150);
     } else if (selectedOrder) {
+        if (document.getElementById('invDeliveryCost')) document.getElementById('invDeliveryCost').value = 0;
+        if (document.getElementById('invStaffingCost')) document.getElementById('invStaffingCost').value = 0;
+        if (document.getElementById('invEventOverheads')) document.getElementById('invEventOverheads').value = 0;
         _initInvoiceFromOrder(selectedOrder);
     } else {
+        if (document.getElementById('invEventType')) document.getElementById('invEventType').value = '';
+        if (document.getElementById('invDeliveryDetails')) document.getElementById('invDeliveryDetails').value = '';
+        if (document.getElementById('invEventTheme')) document.getElementById('invEventTheme').value = '';
+        if (document.getElementById('invDeliveryCost')) document.getElementById('invDeliveryCost').value = 0;
+        if (document.getElementById('invStaffingCost')) document.getElementById('invStaffingCost').value = 0;
+        if (document.getElementById('invEventOverheads')) document.getElementById('invEventOverheads').value = 0;
         addInvoiceLine();
     }
 
     window.openModal('invoiceGeneratorModal');
     
-    // Init tactile signature
+    // Init tactile signature and event break-even inputs
     setTimeout(() => {
         if (typeof window._initSignatureCanvas === 'function') {
             window._initSignatureCanvas();
         }
+        ['invDeliveryCost', 'invStaffingCost', 'invEventOverheads'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.addEventListener('input', _updateEventBreakEven);
+        });
+        _updateEventBreakEven();
     }, 200);
 
     // Save address on blur
@@ -309,7 +371,13 @@ window.prefillInvoiceFromClient = function() { /* keep focus on client */ };
 
 function _appendInvoiceLine(data = {}) {
     const id = Date.now() + Math.random();
-    _invoiceLines.push({ id, desc: data.desc || '', qty: data.qty || 1, unitPrice: data.unitPrice || 0 });
+    _invoiceLines.push({
+        id,
+        desc: data.desc || '',
+        qty: data.qty || 1,
+        unitPrice: data.unitPrice || 0,
+        materialUnitCost: data.materialUnitCost !== undefined ? data.materialUnitCost : (data.unitPrice ? data.unitPrice * 0.3 : 0)
+    });
     _renderInvoiceLines();
 }
 
@@ -325,7 +393,11 @@ window.removeInvoiceLine = function(id) {
 window.updateInvoiceLine = function(id, field, value) {
     const line = _invoiceLines.find(l => l.id === id);
     if (line) {
+        const oldPrice = line.unitPrice;
         line[field] = field === 'qty' || field === 'unitPrice' ? parseFloat(value) || 0 : value;
+        if (field === 'unitPrice' && (!line.materialUnitCost || line.materialUnitCost === oldPrice * 0.3)) {
+            line.materialUnitCost = line.unitPrice * 0.3;
+        }
         _updateInvoiceTotals();
     }
 };
@@ -363,6 +435,67 @@ function _updateInvoiceTotals() {
     if (el('invSubtotal')) el('invSubtotal').textContent = fmt(subtotal);
     if (el('invTVA'))      el('invTVA').textContent      = fmt(tva);
     if (el('invTotal'))    el('invTotal').textContent   = fmt(total);
+    _updateEventBreakEven();
+}
+
+function _updateEventBreakEven() {
+    const el = id => document.getElementById(id);
+    if (!el('invDeliveryCost')) return; // Simulator not present in the DOM yet
+
+    const deliveryCost = parseFloat(el('invDeliveryCost').value) || 0;
+    const staffingCost = parseFloat(el('invStaffingCost').value) || 0;
+    const eventOverheads = parseFloat(el('invEventOverheads').value) || 0;
+
+    const fixedCosts = deliveryCost + staffingCost + eventOverheads;
+
+    // Calculate revenue (HT)
+    const revenue = _invoiceLines.reduce((s, l) => s + (l.qty * l.unitPrice), 0);
+
+    // Calculate variable cost
+    // If a line doesn't have a materialUnitCost, we estimate it at 30% of unitPrice as a standard food cost percentage fallback
+    const variableCost = _invoiceLines.reduce((s, l) => s + (l.qty * (l.materialUnitCost !== undefined ? l.materialUnitCost : (l.unitPrice * 0.3))), 0);
+
+    const marginOnVariable = revenue - variableCost;
+    const marginOnVariablePct = revenue > 0 ? (marginOnVariable / revenue) * 100 : 0;
+    const tMc = revenue > 0 ? (marginOnVariable / revenue) : 0;
+
+    // Break-even point in HT revenue (SR = CF / TMCV)
+    const breakEvenPoint = tMc > 0 ? fixedCosts / tMc : 0;
+
+    const netProfit = marginOnVariable - fixedCosts;
+
+    // Render results
+    const fmt = v => v.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+
+    if (el('simEventRevenue')) el('simEventRevenue').textContent = fmt(revenue);
+    if (el('simVariableCost')) el('simVariableCost').textContent = fmt(variableCost);
+    if (el('simFixedCost')) el('simFixedCost').textContent = fmt(fixedCosts);
+    
+    if (el('simNetMargin')) {
+        el('simNetMargin').textContent = fmt(netProfit);
+        if (netProfit >= 0) {
+            el('simNetMargin').style.color = '#10b981'; // success green
+        } else {
+            el('simNetMargin').style.color = '#ef4444'; // danger red
+        }
+    }
+    
+    if (el('simBreakEven')) {
+        el('simBreakEven').textContent = tMc > 0 ? fmt(breakEvenPoint) : 'Non atteignable';
+    }
+
+    // Render status badge
+    if (el('simStatus')) {
+        if (revenue === 0) {
+            el('simStatus').innerHTML = '<span class="badge" style="background:var(--surface-border); color:var(--text-muted); padding:4px 8px; border-radius:4px;">En attente de chiffrage</span>';
+        } else if (netProfit > 0) {
+            el('simStatus').innerHTML = `<span class="badge success" style="background:rgba(16,185,129,0.1); color:#10b981; padding:6px 10px; border-radius:6px; font-weight:700;">✅ Événement rentable (+${Math.round(marginOnVariablePct)}% de marge variable)</span>`;
+        } else if (netProfit === 0 && fixedCosts > 0) {
+            el('simStatus').innerHTML = '<span class="badge warning" style="background:rgba(245,158,11,0.1); color:#f59e0b; padding:6px 10px; border-radius:6px; font-weight:700;">⚖️ Équilibre parfait</span>';
+        } else {
+            el('simStatus').innerHTML = `<span class="badge danger" style="background:rgba(239,68,68,0.1); color:#ef4444; padding:6px 10px; border-radius:6px; font-weight:700;">⚠️ Déficitaire (CA requis : ${fmt(breakEvenPoint)})</span>`;
+        }
+    }
 }
 
 function _buildInvoiceHTML(docType) {
@@ -556,8 +689,11 @@ window.saveInvoiceQuote = function() {
     const eventType = document.getElementById('invEventType') ? document.getElementById('invEventType').value : '';
     const deliveryDetails = document.getElementById('invDeliveryDetails') ? document.getElementById('invDeliveryDetails').value : '';
     const eventTheme = document.getElementById('invEventTheme') ? document.getElementById('invEventTheme').value : '';
+    const deliveryCost = document.getElementById('invDeliveryCost') ? parseFloat(document.getElementById('invDeliveryCost').value) || 0 : 0;
+    const staffingCost = document.getElementById('invStaffingCost') ? parseFloat(document.getElementById('invStaffingCost').value) || 0 : 0;
+    const eventOverheads = document.getElementById('invEventOverheads') ? parseFloat(document.getElementById('invEventOverheads').value) || 0 : 0;
     
-    const savedQuotes = JSON.parse(localStorage.getItem('gourmet_quotes') || '[]');
+    const savedQuotes = JSON.parse(localStorage.getItem('gourmet_quotes') || '[]').filter(q => q && typeof q === 'object');
     
     const quote = {
         id: docNum || ('Q-' + Date.now()),
@@ -572,6 +708,9 @@ window.saveInvoiceQuote = function() {
         eventType: eventType,
         deliveryDetails: deliveryDetails,
         eventTheme: eventTheme,
+        deliveryCost: deliveryCost,
+        staffingCost: staffingCost,
+        eventOverheads: eventOverheads,
         totalTTC: total
     };
     
@@ -585,6 +724,20 @@ window.saveInvoiceQuote = function() {
     localStorage.setItem('gourmet_quotes', JSON.stringify(savedQuotes));
     
     if (typeof showToast === 'function') showToast(`${docType === 'devis' ? 'Devis' : 'Facture'} enregistré(e) avec succès.`, 'success');
+    
+    // Cloud sync
+    if (typeof GourmetSync !== 'undefined' && typeof GourmetSync.sauvegarderDevis === 'function') {
+        // Find the quote we just saved (it's the one we just upserted into savedQuotes)
+        const savedIdx = savedQuotes.findIndex(q => q.id === quote.id);
+        const quoteToSync = savedIdx > -1 ? savedQuotes[savedIdx] : quote;
+        GourmetSync.sauvegarderDevis(quoteToSync).then(() => {
+            // Persist _syncId back to localStorage after cloud sync
+            const latestQuotes = JSON.parse(localStorage.getItem('gourmet_quotes') || '[]');
+            const idx = latestQuotes.findIndex(q => q.id === quoteToSync.id);
+            if (idx > -1) latestQuotes[idx]._syncId = quoteToSync._syncId;
+            localStorage.setItem('gourmet_quotes', JSON.stringify(latestQuotes));
+        }).catch(e => console.warn('[CRM] Sync devis échoué:', e));
+    }
     
     if (typeof renderCrmQuotes === 'function') {
         renderCrmQuotes();
@@ -630,10 +783,12 @@ window.addFastRecipeToInvoice = function() {
     if (!recipe) return;
     
     let unitPrice = 0;
+    let materialUnitCost = 0;
     if (typeof calcFullCost === 'function') {
         try {
             const costs = calcFullCost(recipe.margin || 70, recipe);
             unitPrice = costs.sellingPrice || 0; // selling price HT per portion
+            materialUnitCost = costs.costPerPortion || 0; // full portion cost (COGS)
         } catch (e) {
             console.error(e);
         }
@@ -642,7 +797,8 @@ window.addFastRecipeToInvoice = function() {
     _appendInvoiceLine({
         desc: recipe.name,
         qty: qty,
-        unitPrice: unitPrice
+        unitPrice: unitPrice,
+        materialUnitCost: materialUnitCost
     });
     
     if (typeof showToast === 'function') showToast(`Recette "${recipe.name}" insérée`, 'success');
@@ -652,40 +808,59 @@ window.renderCrmQuotes = function() {
   const container = document.getElementById('crmQuotesBody');
   if (!container) return;
   
-  const savedQuotes = JSON.parse(localStorage.getItem('gourmet_quotes') || '[]');
+  const savedQuotes = JSON.parse(localStorage.getItem('gourmet_quotes') || '[]')
+    .filter(q => q && typeof q === 'object');
+    
   if (savedQuotes.length === 0) {
     container.innerHTML = '<p style="grid-column:1/-1; text-align:center; padding:2rem; color:var(--text-muted); width:100%;">Aucun devis enregistré.</p>';
     return;
   }
   
   container.innerHTML = savedQuotes.map(q => {
-    const eventBadge = q.eventType ? `<span class="badge" style="background:var(--accent); color:white; font-size:0.75rem;">🎉 ${q.eventType}</span>` : '';
-    const dateStr = new Date(q.date).toLocaleDateString('fr-FR', { dateStyle: 'medium' });
+    const eventBadge = q.eventType ? `<span class="badge" style="background:var(--accent); color:white; font-size:0.75rem;">🎉 ${_escHtml(q.eventType)}</span>` : '';
+    
+    let dateStr = 'Date inconnue';
+    if (q.date) {
+      const d = new Date(q.date);
+      if (!isNaN(d.getTime())) {
+        try {
+          dateStr = d.toLocaleDateString('fr-FR', { dateStyle: 'medium' });
+        } catch (err) {
+          console.warn('[GourmetRevient] Erreur formatage date devis:', err);
+        }
+      }
+    }
+    
     const clientName = q.clientName || 'Client inconnu';
     const totalTTC = parseFloat(q.totalTTC || 0).toFixed(2);
+    
+    const linesHtml = (q.lines || [])
+      .filter(l => l && typeof l === 'object')
+      .map(l => `• ${l.qty || 0}x ${_escHtml(l.desc || '')} (${parseFloat(l.unitPrice || 0).toFixed(2)} €)`)
+      .join('<br>');
     
     return `
       <div class="order-card" style="display:flex; flex-direction:column; justify-content:space-between; min-height:220px; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--surface-border); border-radius: 12px; padding: 1.2rem;">
         <div class="order-header" style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
           <div>
             <div class="order-client" style="font-weight:800; font-size:1.05rem; color:var(--primary);">${_escHtml(clientName)}</div>
-            <div class="order-id" style="font-size:0.75rem; color:var(--text-muted); margin-top:2px;">Doc N° ${q.id}</div>
+            <div class="order-id" style="font-size:0.75rem; color:var(--text-muted); margin-top:2px;">Doc N° ${_escHtml(q.id || '')}</div>
           </div>
           ${eventBadge}
         </div>
         <div style="font-size:0.8rem; color:var(--text-secondary); margin: 6px 0;">
-          🗓️ Émis le : <strong>${dateStr}</strong>
+          🗓️ Émis le : <strong>${_escHtml(dateStr)}</strong>
           ${q.eventTheme ? `<br>🎨 Thème : <em>${_escHtml(q.eventTheme)}</em>` : ''}
           ${q.deliveryDetails ? `<br>📍 Livré à : <em>${_escHtml(q.deliveryDetails)}</em>` : ''}
         </div>
         <div class="order-products" style="margin-top:8px; font-size:0.8rem; color:var(--text-secondary); border-top: 1px solid var(--surface-border); padding-top:8px; flex-grow:1;">
-          ${(q.lines || []).map(l => `• ${l.qty}x ${l.desc} (${parseFloat(l.unitPrice).toFixed(2)} €)`).join('<br>')}
+          ${linesHtml}
         </div>
         <div class="order-footer" style="display:flex; justify-content:space-between; align-items:center; margin-top:16px; border-top:1px solid var(--surface-border); padding-top:10px;">
           <div class="order-price" style="font-size:1.1rem; font-weight:900; color:var(--accent);">${totalTTC} € TTC</div>
           <div style="display:flex; gap:6px;">
-            <button class="btn btn-sm btn-primary" onclick="openInvoiceGenerator('${q.id}')" style="padding: 4px 10px; font-size:0.8rem;">✏️ Ouvrir</button>
-            <button class="btn btn-sm btn-outline" style="border-color:var(--danger); color:var(--danger); padding:4px 8px; font-size:0.8rem;" onclick="deleteCrmQuote('${q.id}')">🗑️</button>
+            <button class="btn btn-sm btn-primary" onclick="openInvoiceGenerator('${_escHtml(q.id || '')}')" style="padding: 4px 10px; font-size:0.8rem;">✏️ Ouvrir</button>
+            <button class="btn btn-sm btn-outline" style="border-color:var(--danger); color:var(--danger); padding:4px 8px; font-size:0.8rem;" onclick="deleteCrmQuote('${_escHtml(q.id || '')}')">🗑️</button>
           </div>
         </div>
       </div>
@@ -695,55 +870,28 @@ window.renderCrmQuotes = function() {
 
 window.deleteCrmQuote = function(id) {
   if (confirm("Supprimer définitivement ce devis ?")) {
-    let savedQuotes = JSON.parse(localStorage.getItem('gourmet_quotes') || '[]');
-    savedQuotes = savedQuotes.filter(q => q.id !== id);
+    const allQuotes = JSON.parse(localStorage.getItem('gourmet_quotes') || '[]')
+      .filter(q => q && typeof q === 'object');
+    // Find the quote to get its _syncId before removing it
+    const quoteToDelete = allQuotes.find(q => q.id === id);
+    const savedQuotes = allQuotes.filter(q => q.id !== id);
     localStorage.setItem('gourmet_quotes', JSON.stringify(savedQuotes));
+    
+    // Cloud sync — delete the corresponding Supabase row
+    if (typeof GourmetSync !== 'undefined' && typeof GourmetSync.supprimerDevis === 'function') {
+        if (quoteToDelete) {
+            GourmetSync.supprimerDevis(quoteToDelete).catch(e => console.warn('[CRM] Suppression devis échouée:', e));
+        } else {
+            GourmetSync.supprimerDevis(id).catch(e => console.warn('[CRM] Suppression devis échouée:', e));
+        }
+    }
+    
     if (typeof showToast === 'function') showToast('Devis supprimé', 'info');
     window.renderCrmQuotes();
   }
 };
 
-// Patch switchCrmTab to support quotes tab
-(function() {
-  const origSwitchCrmTab = window.switchCrmTab;
-  window.switchCrmTab = function(tab) {
-    // Hide all crm views
-    ['crmViewOrders', 'crmViewClients', 'crmViewQuotes'].forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.style.display = 'none';
-    });
-    
-    // Deactivate all crm tabs
-    ['dotCrmOrders', 'dotCrmClients', 'dotCrmQuotes'].forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.classList.remove('active');
-    });
-
-    if (tab === 'quotes') {
-      const view = document.getElementById('crmViewQuotes');
-      const dot = document.getElementById('dotCrmQuotes');
-      if (view) view.style.display = 'block';
-      if (dot) dot.classList.add('active');
-      window.renderCrmQuotes();
-    } else if (tab === 'orders') {
-      const view = document.getElementById('crmViewOrders');
-      const dot = document.getElementById('dotCrmOrders');
-      if (view) view.style.display = 'block';
-      if (dot) dot.classList.add('active');
-      if (typeof renderCrmOrders === 'function') renderCrmOrders();
-    } else if (tab === 'clients') {
-      const view = document.getElementById('crmViewClients');
-      const dot = document.getElementById('dotCrmClients');
-      if (view) view.style.display = 'block';
-      if (dot) dot.classList.add('active');
-      if (typeof renderCrmClients === 'function') renderCrmClients();
-    } else {
-      if (typeof origSwitchCrmTab === 'function') {
-        origSwitchCrmTab(tab);
-      }
-    }
-  };
-})();
+// Note: switchCrmTab is defined in crm.js and natively supports 'quotes', 'orders', 'clients' tabs.
 
 // ============================================================================
 // 2. 👑 LIFETIME VALUE (LTV) & BADGE CLIENTS VIP

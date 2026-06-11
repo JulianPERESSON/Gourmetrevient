@@ -183,6 +183,7 @@ function calcFullCost(margin, customRecipe = null, forcedInflation = null) {
 
   // Use either live UI values or saved values
   let laborRate = 0, fixedCharges = 0, productions = 1, energyRate = 0, amortization = 0;
+  let packagingCost = 0, apprenticeTime = 0, commisTime = 0, chefTime = 0;
 
   // Only use DOM values if we are processing the CURRENT active recipe
   const isCurrent = (r === APP.recipe);
@@ -194,25 +195,41 @@ function calcFullCost(margin, customRecipe = null, forcedInflation = null) {
     productions = Math.max(1, parseInt($('#advProductions').value) || 1);
     energyRate = parseFloat($('#advEnergy').value) || 0;
     amortization = parseFloat($('#advAmortization').value) || 0;
+    packagingCost = parseFloat($('#advPackagingCost').value) || 0;
+    apprenticeTime = parseFloat($('#advApprenticeTime').value) || 0;
+    commisTime = parseFloat($('#advCommisTime').value) || 0;
+    chefTime = parseFloat($('#advChefTime').value) || 0;
   } else if (r.advanced) {
     laborRate = r.advanced.laborRate || 0;
     fixedCharges = r.advanced.fixedCharges || 0;
     productions = r.advanced.productions || 1;
     energyRate = r.advanced.energyRate || 0;
     amortization = r.advanced.amortization || 0;
+    packagingCost = r.advanced.packagingCost || 0;
+    apprenticeTime = r.advanced.apprenticeTime || 0;
+    commisTime = r.advanced.commisTime || 0;
+    chefTime = r.advanced.chefTime || 0;
   }
 
   const prepTime = parseFloat(r.prepTime) || 0;
   const cookTime = parseFloat(r.cookTime) || 0;
   const totalTimeH = (prepTime + cookTime) / 60;
 
-  const laborCost = laborRate * totalTimeH;
+  let laborCost = 0;
+  const profileTotalTime = apprenticeTime + commisTime + chefTime;
+  if (profileTotalTime > 0) {
+    laborCost = (apprenticeTime * 8 + commisTime * 14 + chefTime * 24) / 60;
+  } else {
+    laborCost = laborRate * totalTimeH;
+  }
+
   const energyCost = (energyRate * (cookTime / 60)) * costMultiplier; // Energy also affected by inflation
   const fixedShare = fixedCharges / productions;
   const amortShare = amortization / productions;
 
   const additionalCosts = laborCost + energyCost + fixedShare + amortShare;
-  const totalFullCost = totalMaterial + additionalCosts;
+  // Packaging is a direct material cost per portion, total full cost includes packaging * portions
+  const totalFullCost = totalMaterial + additionalCosts + (packagingCost * portions);
 
   const costPerPortion = totalFullCost / portions;
   const marginRate = (margin || APP.margin) / 100;
@@ -255,7 +272,11 @@ function calcFullCost(margin, customRecipe = null, forcedInflation = null) {
     energyRate,
     fixedCharges,
     amortization,
-    productions
+    productions,
+    packagingCost: round2(packagingCost),
+    apprenticeTime,
+    commisTime,
+    chefTime
   };
 }
 

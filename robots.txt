@@ -3,4 +3,5 @@ Allow: /
 Disallow: /admin/
 Disallow: /config/
 
-Sitemap: https://gourmetrevient.com/sitemap.xml
+Sitemap: https://gourmetrevient.fr/sitemap.xml
+Sitemap: https://gourmetrevient.fr/sitemap-news.xml

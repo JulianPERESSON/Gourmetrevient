@@ -184,6 +184,77 @@ const GourmetSync = {
         };
     },
 
+    /**
+     * Maps a catering quote (from crm-enhanced-v2.js) to a commandes row.
+     * Uses statut='en_attente' and stores isQuote:true in the notes JSON.
+     */
+    _quoteToRow(quote, userId) {
+        const isValidUUID = (str) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str);
+        // Ensure the quote has a stable UUID — the quote.id might be a doc number like "DEV-001"
+        const stableId = (quote._syncId && isValidUUID(quote._syncId)) ? quote._syncId : this.uuid();
+        const clientId = (quote.clientId && isValidUUID(quote.clientId)) ? quote.clientId : null;
+        return {
+            id: stableId,
+            user_id: userId,
+            client_id: clientId,
+            produits: [quote.clientName || 'Devis catering'],
+            prix_total: parseFloat(quote.totalTTC) || 0,
+            statut: 'en_attente',
+            date_livraison: quote.date ? quote.date.substring(0, 10) : new Date().toISOString().substring(0, 10),
+            notes: JSON.stringify({
+                isQuote: true,
+                quoteId: quote.id,
+                clientName: quote.clientName || '',
+                clientId: quote.clientId || '',
+                date: quote.date || '',
+                validity: quote.validity || 30,
+                notes: quote.notes || '',
+                shopAddr: quote.shopAddr || '',
+                type: quote.type || 'devis',
+                lines: quote.lines || [],
+                eventType: quote.eventType || '',
+                deliveryDetails: quote.deliveryDetails || '',
+                eventTheme: quote.eventTheme || '',
+                deliveryCost: quote.deliveryCost || 0,
+                staffingCost: quote.staffingCost || 0,
+                eventOverheads: quote.eventOverheads || 0,
+                totalTTC: quote.totalTTC || 0
+            }),
+            updated_at: new Date().toISOString()
+        };
+    },
+
+    /**
+     * Maps a commandes row (with isQuote=true in notes) back to a quote object.
+     */
+    _rowToQuote(row) {
+        let quoteData = {};
+        try {
+            if (row.notes && row.notes.startsWith('{')) {
+                quoteData = JSON.parse(row.notes);
+            }
+        } catch (e) {}
+        return {
+            _syncId: row.id,           // The stable Supabase UUID
+            id: quoteData.quoteId || row.id,  // The user-facing doc number
+            clientId: quoteData.clientId || row.client_id || '',
+            clientName: quoteData.clientName || '',
+            date: quoteData.date || row.date_livraison || '',
+            validity: quoteData.validity || 30,
+            notes: quoteData.notes || '',
+            shopAddr: quoteData.shopAddr || '',
+            type: quoteData.type || 'devis',
+            lines: quoteData.lines || [],
+            eventType: quoteData.eventType || '',
+            deliveryDetails: quoteData.deliveryDetails || '',
+            eventTheme: quoteData.eventTheme || '',
+            deliveryCost: quoteData.deliveryCost || 0,
+            staffingCost: quoteData.staffingCost || 0,
+            eventOverheads: quoteData.eventOverheads || 0,
+            totalTTC: quoteData.totalTTC || row.prix_total || 0
+        };
+    },
+
     _supplierToRow(supplier, userId) {
         let rating = Math.round(supplier.rating || supplier.note || 5);
         if (rating < 1) rating = 1;
@@ -490,7 +561,55 @@ const GourmetSync = {
     },
 
     async chargerCommandes() {
-        return this.chargerTable('commandes', row => this._rowToOrder(row));
+        // Exclude rows that are catering quotes (isQuote flag in notes JSON)
+        if (!navigator.onLine || !window.gourmetSupabase) return null;
+        try {
+            const { data: { session } } = await gourmetSupabase.auth.getSession();
+            if (!session?.user?.id) return null;
+            const { data, error } = await gourmetSupabase
+                .from('commandes')
+                .select('*')
+                .eq('user_id', session.user.id);
+            if (error) throw error;
+            return (data || [])
+                .filter(row => {
+                    try {
+                        if (!row.notes || !row.notes.startsWith('{')) return true;
+                        const parsed = JSON.parse(row.notes);
+                        return !parsed.isQuote;
+                    } catch (e) { return true; }
+                })
+                .map(row => this._rowToOrder(row));
+        } catch (err) {
+            console.error('[GourmetSync] Erreur chargement commandes:', err.message);
+            return null;
+        }
+    },
+
+    async chargerDevis() {
+        // Load only rows that are catering quotes (isQuote=true in notes)
+        if (!navigator.onLine || !window.gourmetSupabase) return null;
+        try {
+            const { data: { session } } = await gourmetSupabase.auth.getSession();
+            if (!session?.user?.id) return null;
+            const { data, error } = await gourmetSupabase
+                .from('commandes')
+                .select('*')
+                .eq('user_id', session.user.id);
+            if (error) throw error;
+            return (data || [])
+                .filter(row => {
+                    try {
+                        if (!row.notes || !row.notes.startsWith('{')) return false;
+                        const parsed = JSON.parse(row.notes);
+                        return parsed.isQuote === true;
+                    } catch (e) { return false; }
+                })
+                .map(row => this._rowToQuote(row));
+        } catch (err) {
+            console.error('[GourmetSync] Erreur chargement devis:', err.message);
+            return null;
+        }
     },
 
     async chargerFournisseurs() {
@@ -575,6 +694,48 @@ const GourmetSync = {
 
     async supprimerCommande(id) {
         await this.supprimerRow('commandes', id);
+    },
+
+    async sauvegarderDevis(quote) {
+        try {
+            const { data: { session } } = await gourmetSupabase.auth.getSession();
+            if (!session?.user?.id) return;
+            const row = this._quoteToRow(quote, session.user.id);
+            // Persist the stable UUID back to the quote object so future saves reuse the same row
+            quote._syncId = row.id;
+            await this.sauvegarderRow('commandes', row);
+        } catch (e) {
+            console.warn('[GourmetSync] sauvegarderDevis échoué, mise en queue:', e.message);
+            const rowForQueue = this._quoteToRow(quote, 'offline');
+            this.addToQueue('commandes', 'upsert', rowForQueue);
+        }
+    },
+
+    async supprimerDevis(quote) {
+        // quote may be the full object (with _syncId) or just an id string
+        const syncId = (quote && quote._syncId) ? quote._syncId : null;
+        const docId  = (quote && quote.id)      ? quote.id      : (typeof quote === 'string' ? quote : null);
+        // If we have the stable Supabase UUID, delete by that
+        if (syncId) {
+            await this.supprimerRow('commandes', syncId);
+        } else if (docId) {
+            // Fallback: try to find the row by scanning notes
+            try {
+                const { data: { session } } = await gourmetSupabase.auth.getSession();
+                if (!session?.user?.id) return;
+                const { data } = await gourmetSupabase
+                    .from('commandes')
+                    .select('id, notes')
+                    .eq('user_id', session.user.id);
+                const match = (data || []).find(row => {
+                    try {
+                        const parsed = JSON.parse(row.notes || '{}');
+                        return parsed.isQuote && parsed.quoteId === docId;
+                    } catch (e) { return false; }
+                });
+                if (match) await this.supprimerRow('commandes', match.id);
+            } catch (e) {}
+        }
     },
 
     async sauvegarderFournisseur(supplier) {

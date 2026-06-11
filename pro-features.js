@@ -625,9 +625,6 @@ function renderInflationSimulation() {
     if (typeof calculateBreakingPoint === 'function') calculateBreakingPoint();
     if (typeof renderBCGMatrix === 'function') renderBCGMatrix(true);
   }, 300);
-}reakingPoint === 'function') calculateBreakingPoint();
-    if (typeof renderBCGMatrix === 'function') renderBCGMatrix(true);
-  }, 300);
 }
 
 // Force a full rebuild (call when recipes list changes)
