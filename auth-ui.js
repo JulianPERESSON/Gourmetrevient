@@ -348,6 +348,10 @@ const AuthUI = (() => {
               </div>
             </div>
             <div class="auth-field">
+              <label for="authPhone">📱 Téléphone (unique pour validation d'essai)</label>
+              <input type="tel" id="authPhone" placeholder="06 12 34 56 78" class="auth-input">
+            </div>
+            <div class="auth-field">
               <label for="authPasswordConfirm">🔑 Confirmer le mot de passe</label>
               <input type="password" id="authPasswordConfirm" placeholder="••••••••" class="auth-input">
             </div>
@@ -447,15 +451,47 @@ const AuthUI = (() => {
   async function _handleSignUp(email, password) {
     const firstName = document.getElementById('authFirstName')?.value.trim();
     const lastName = document.getElementById('authLastName')?.value.trim();
+    const phone = document.getElementById('authPhone')?.value.trim() || '';
     const confirm  = document.getElementById('authPasswordConfirm')?.value;
 
     if (!firstName || !lastName) { _showError('Veuillez renseigner votre prénom et votre nom.'); return; }
+    if (!phone) { _showError('Veuillez renseigner votre numéro de téléphone.'); return; }
     
     // Validation email stricte pour éviter les "Bounces" Supabase
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) { _showError('Veuillez entrer une adresse email valide.'); return; }
+    
+    // Nettoyer le numéro pour vérification
+    const phoneClean = phone.replace(/[^\d]/g, '');
+    if (phoneClean.length < 9) {
+      _showError('Veuillez entrer un numéro de téléphone valide (9 chiffres minimum).');
+      return;
+    }
+    
     if (password !== confirm) { _showError('Les mots de passe ne correspondent pas.'); return; }
     if (password.length < 8)  { _showError('Le mot de passe doit faire au moins 8 caractères.'); return; }
+
+    const btn = document.getElementById('authSubmitBtn');
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = 'Vérification...';
+    }
+
+    // Vérification de l'unicité du numéro via le RPC Supabase
+    try {
+      const { data: phoneExists, error: phoneErr } = await gourmetSupabase.rpc('check_phone_exists', { p_phone: phoneClean });
+      if (phoneErr) throw phoneErr;
+      if (phoneExists) {
+        _showError('Ce numéro de téléphone a déjà été utilisé pour une période d\'essai.');
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = 'Créer mon compte 🚀';
+        }
+        return;
+      }
+    } catch (err) {
+      console.error('Erreur lors de la vérification du téléphone :', err);
+    }
 
     const { data, error } = await gourmetSupabase.auth.signUp({
       email,
@@ -464,13 +500,18 @@ const AuthUI = (() => {
         data: { 
           first_name: firstName,
           last_name: lastName,
-          full_name: `${firstName} ${lastName}`
+          full_name: `${firstName} ${lastName}`,
+          phone: phone
         } 
       }
     });
 
     if (error) {
       _showError(error.message);
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = 'Créer mon compte 🚀';
+      }
     } else {
       if (typeof showToast === 'function') showToast('Compte créé ! Redirection vers le paiement... 💳', 'success');
       

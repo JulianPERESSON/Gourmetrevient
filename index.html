@@ -1205,6 +1205,10 @@
               <input type="text" id="authLastNameManual" placeholder="Dupont" class="auth-input">
             </div>
           </div>
+          <div class="auth-field">
+            <label>Téléphone (unique pour validation d'essai)</label>
+            <input type="tel" id="authPhoneManual" placeholder="06 12 34 56 78" class="auth-input">
+          </div>
         </div>
 
         <div class="auth-field">
@@ -1281,13 +1285,14 @@
     async function signupDirect() {
       const btn = document.getElementById('authBtnManual');
       const errorDiv = document.getElementById('authErrorManual');
-      const email = document.getElementById('authEmailManual').value;
+      const email = document.getElementById('authEmailManual').value.trim();
       const pass = document.getElementById('authPasswordManual').value;
       const passConf = document.getElementById('authPasswordConfirmManual').value;
-      const firstName = document.getElementById('authFirstNameManual').value;
-      const lastName = document.getElementById('authLastNameManual').value;
+      const firstName = document.getElementById('authFirstNameManual').value.trim();
+      const lastName = document.getElementById('authLastNameManual').value.trim();
+      const phone = document.getElementById('authPhoneManual').value.trim();
 
-      if (!email || !pass || !firstName || !lastName) {
+      if (!email || !pass || !firstName || !lastName || !phone) {
         errorDiv.innerText = "Veuillez remplir tous les champs.";
         errorDiv.style.display = 'block';
         return;
@@ -1301,6 +1306,14 @@
         return;
       }
 
+      // Nettoyer le numéro pour vérification
+      const phoneClean = phone.replace(/[^\d]/g, '');
+      if (phoneClean.length < 9) {
+        errorDiv.innerText = "Veuillez entrer un numéro de téléphone valide (9 chiffres minimum).";
+        errorDiv.style.display = 'block';
+        return;
+      }
+
       if (pass !== passConf) {
         errorDiv.innerText = "Les mots de passe ne correspondent pas.";
         errorDiv.style.display = 'block';
@@ -1308,15 +1321,28 @@
       }
 
       btn.disabled = true;
-      btn.innerText = "Création en cours...";
+      btn.innerText = "Vérification...";
 
       try {
+        // Vérification de l'unicité du téléphone via RPC
+        const { data: phoneExists, error: phoneErr } = await supabase.rpc('check_phone_exists', { p_phone: phoneClean });
+        if (phoneErr) throw phoneErr;
+        if (phoneExists) {
+          errorDiv.innerText = "Ce numéro de téléphone a déjà été utilisé pour une période d'essai.";
+          errorDiv.style.display = 'block';
+          btn.disabled = false;
+          btn.innerText = "Créer mon compte";
+          return;
+        }
+
+        btn.innerText = "Création en cours...";
+
         // On utilise la même logique que AuthUI pour la redirection Stripe
         const { data, error } = await supabase.auth.signUp({
           email,
           password: pass,
           options: {
-            data: { first_name: firstName, last_name: lastName }
+            data: { first_name: firstName, last_name: lastName, phone: phone }
           }
         });
 
