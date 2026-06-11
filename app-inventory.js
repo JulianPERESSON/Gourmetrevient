@@ -395,7 +395,13 @@ function renderInventory() {
     container.innerHTML = `
       <tr>
         <td colspan="6" style="text-align:center; padding:3rem; color:var(--text-muted);">
-          ${t('inv.table.empty') || 'Le module d\'inventaire est en cours d\'initialisation.'} <button class="btn btn-sm btn-outline" onclick="syncInventoryWithCloud()">✨ ${t('inv.btn.sync') || 'Synchronisation Ingrédients'}</button>
+          <div style="display:flex; flex-direction:column; align-items:center; gap:12px; justify-content:center;">
+            <p>${t('inv.table.empty') || 'Votre inventaire est vide.'}</p>
+            <div style="display:flex; gap:10px; justify-content:center;">
+              <button class="btn btn-sm btn-primary" onclick="window.importStarterPack()" style="background:linear-gradient(135deg, #6366f1, #4f46e5); color:#fff; border:none; padding:8px 16px; border-radius:8px; font-weight:600; cursor:pointer; box-shadow:0 4px 12px rgba(99,102,241,0.2);">⚡ Importer 20 ingrédients de base</button>
+              <button class="btn btn-sm btn-outline" onclick="syncInventoryWithCloud()">✨ ${t('inv.btn.sync') || 'Synchronisation'}</button>
+            </div>
+          </div>
         </td>
       </tr>
     `;

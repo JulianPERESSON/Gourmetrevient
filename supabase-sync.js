@@ -650,13 +650,15 @@ const GourmetSync = {
 
     async sauvegarderRecette(recipe) {
         if (!window.gourmetSupabase) return;
+        let row = null;
         try {
             const { data: { session } } = await gourmetSupabase.auth.getSession();
-            if (!session?.user?.id) return;
-            const row = this._recipeToRow(recipe, session.user.id);
+            const userId = session?.user?.id || 'offline';
+            row = this._recipeToRow(recipe, userId);
             await this.sauvegarderRow('recipes', row);
         } catch (err) {
-            this.addToQueue('recipes', 'upsert', recipe);
+            if (!row) row = this._recipeToRow(recipe, 'offline');
+            this.addToQueue('recipes', 'upsert', row);
         }
     },
 
@@ -665,14 +667,16 @@ const GourmetSync = {
     },
 
     async sauvegarderClient(client) {
+        let row = null;
         try {
             const { data: { session } } = await gourmetSupabase.auth.getSession();
-            if (!session?.user?.id) return;
-            const row = this._clientToRow(client, session.user.id);
+            const userId = session?.user?.id || 'offline';
+            row = this._clientToRow(client, userId);
             client.id = row.id; // Garder la même id locale
             await this.sauvegarderRow('clients', row);
         } catch (e) {
-            this.addToQueue('clients', 'upsert', client);
+            if (!row) row = this._clientToRow(client, 'offline');
+            this.addToQueue('clients', 'upsert', row);
         }
     },
 
@@ -681,14 +685,16 @@ const GourmetSync = {
     },
 
     async sauvegarderCommande(order) {
+        let row = null;
         try {
             const { data: { session } } = await gourmetSupabase.auth.getSession();
-            if (!session?.user?.id) return;
-            const row = this._orderToRow(order, session.user.id);
+            const userId = session?.user?.id || 'offline';
+            row = this._orderToRow(order, userId);
             order.id = row.id;
             await this.sauvegarderRow('commandes', row);
         } catch (e) {
-            this.addToQueue('commandes', 'upsert', order);
+            if (!row) row = this._orderToRow(order, 'offline');
+            this.addToQueue('commandes', 'upsert', row);
         }
     },
 
@@ -697,17 +703,17 @@ const GourmetSync = {
     },
 
     async sauvegarderDevis(quote) {
+        let row = null;
         try {
             const { data: { session } } = await gourmetSupabase.auth.getSession();
-            if (!session?.user?.id) return;
-            const row = this._quoteToRow(quote, session.user.id);
-            // Persist the stable UUID back to the quote object so future saves reuse the same row
+            const userId = session?.user?.id || 'offline';
+            row = this._quoteToRow(quote, userId);
             quote._syncId = row.id;
             await this.sauvegarderRow('commandes', row);
         } catch (e) {
             console.warn('[GourmetSync] sauvegarderDevis échoué, mise en queue:', e.message);
-            const rowForQueue = this._quoteToRow(quote, 'offline');
-            this.addToQueue('commandes', 'upsert', rowForQueue);
+            if (!row) row = this._quoteToRow(quote, 'offline');
+            this.addToQueue('commandes', 'upsert', row);
         }
     },
 
@@ -739,14 +745,16 @@ const GourmetSync = {
     },
 
     async sauvegarderFournisseur(supplier) {
+        let row = null;
         try {
             const { data: { session } } = await gourmetSupabase.auth.getSession();
-            if (!session?.user?.id) return;
-            const row = this._supplierToRow(supplier, session.user.id);
+            const userId = session?.user?.id || 'offline';
+            row = this._supplierToRow(supplier, userId);
             supplier.id = row.id;
             await this.sauvegarderRow('fournisseurs', row);
         } catch (e) {
-            this.addToQueue('fournisseurs', 'upsert', supplier);
+            if (!row) row = this._supplierToRow(supplier, 'offline');
+            this.addToQueue('fournisseurs', 'upsert', row);
         }
     },
 
@@ -755,14 +763,16 @@ const GourmetSync = {
     },
 
     async sauvegarderPlanning(item) {
+        let row = null;
         try {
             const { data: { session } } = await gourmetSupabase.auth.getSession();
-            if (!session?.user?.id) return;
-            const row = this._planningToRow(item, session.user.id);
+            const userId = session?.user?.id || 'offline';
+            row = this._planningToRow(item, userId);
             item.id = row.id;
             await this.sauvegarderRow('planning_production', row);
         } catch (e) {
-            this.addToQueue('planning_production', 'upsert', item);
+            if (!row) row = this._planningToRow(item, 'offline');
+            this.addToQueue('planning_production', 'upsert', row);
         }
     },
 
@@ -771,14 +781,16 @@ const GourmetSync = {
     },
 
     async sauvegarderTemp(log) {
+        let row = null;
         try {
             const { data: { session } } = await gourmetSupabase.auth.getSession();
-            if (!session?.user?.id) return;
-            const row = this._tempToRow(log, session.user.id);
+            const userId = session?.user?.id || 'offline';
+            row = this._tempToRow(log, userId);
             log.id = row.id;
             await this.sauvegarderRow('haccp_temperatures', row);
         } catch (e) {
-            this.addToQueue('haccp_temperatures', 'upsert', log);
+            if (!row) row = this._tempToRow(log, 'offline');
+            this.addToQueue('haccp_temperatures', 'upsert', row);
         }
     },
 
@@ -787,14 +799,16 @@ const GourmetSync = {
     },
 
     async sauvegarderNettoyage(task) {
+        let row = null;
         try {
             const { data: { session } } = await gourmetSupabase.auth.getSession();
-            if (!session?.user?.id) return;
-            const row = this._cleanToRow(task, session.user.id);
+            const userId = session?.user?.id || 'offline';
+            row = this._cleanToRow(task, userId);
             task.id = row.id;
             await this.sauvegarderRow('haccp_nettoyage', row);
         } catch (e) {
-            this.addToQueue('haccp_nettoyage', 'upsert', task);
+            if (!row) row = this._cleanToRow(task, 'offline');
+            this.addToQueue('haccp_nettoyage', 'upsert', row);
         }
     },
 
@@ -803,14 +817,16 @@ const GourmetSync = {
     },
 
     async sauvegarderPerte(log) {
+        let row = null;
         try {
             const { data: { session } } = await gourmetSupabase.auth.getSession();
-            if (!session?.user?.id) return;
-            const row = this._wasteToRow(log, session.user.id);
+            const userId = session?.user?.id || 'offline';
+            row = this._wasteToRow(log, userId);
             log.id = row.id;
             await this.sauvegarderRow('pertes', row);
         } catch (e) {
-            this.addToQueue('pertes', 'upsert', log);
+            if (!row) row = this._wasteToRow(log, 'offline');
+            this.addToQueue('pertes', 'upsert', row);
         }
     },
 
@@ -819,14 +835,16 @@ const GourmetSync = {
     },
 
     async sauvegarderMember(member) {
+        let row = null;
         try {
             const { data: { session } } = await gourmetSupabase.auth.getSession();
-            if (!session?.user?.id) return;
-            const row = this._memberToRow(member, session.user.id);
+            const userId = session?.user?.id || 'offline';
+            row = this._memberToRow(member, userId);
             member.id = row.id;
             await this.sauvegarderRow('team_members', row);
         } catch (e) {
-            this.addToQueue('team_members', 'upsert', member);
+            if (!row) row = this._memberToRow(member, 'offline');
+            this.addToQueue('team_members', 'upsert', row);
         }
     },
 
@@ -835,14 +853,16 @@ const GourmetSync = {
     },
 
     async sauvegarderLeave(leave) {
+        let row = null;
         try {
             const { data: { session } } = await gourmetSupabase.auth.getSession();
-            if (!session?.user?.id) return;
-            const row = this._leaveToRow(leave, session.user.id);
+            const userId = session?.user?.id || 'offline';
+            row = this._leaveToRow(leave, userId);
             leave.id = row.id;
             await this.sauvegarderRow('staff_leaves', row);
         } catch (e) {
-            this.addToQueue('staff_leaves', 'upsert', leave);
+            if (!row) row = this._leaveToRow(leave, 'offline');
+            this.addToQueue('staff_leaves', 'upsert', row);
         }
     },
 
@@ -851,19 +871,52 @@ const GourmetSync = {
     },
 
     async sauvegarderDelivery(d) {
+        let row = null;
         try {
             const { data: { session } } = await gourmetSupabase.auth.getSession();
-            if (!session?.user?.id) return;
-            const row = this._deliveryToRow(d, session.user.id);
+            const userId = session?.user?.id || 'offline';
+            row = this._deliveryToRow(d, userId);
             d.id = row.id;
             await this.sauvegarderRow('deliveries', row);
         } catch (e) {
-            this.addToQueue('deliveries', 'upsert', d);
+            if (!row) row = this._deliveryToRow(d, 'offline');
+            this.addToQueue('deliveries', 'upsert', row);
         }
     },
 
     async supprimerDelivery(id) {
         await this.supprimerRow('deliveries', id);
+    },
+
+    // ── GESTION DE SYNCHRONISATION DES INGRÉDIENTS (STOCKS) ────────
+    _ingredientToRow(item, userId) {
+        return {
+            id: item.id,
+            user_id: userId,
+            nom: item.name,
+            stock_actuel: parseFloat(item.stock) || 0,
+            unite: item.unit,
+            prix_unitaire: parseFloat(item.price) || 0,
+            seuil_alerte: parseFloat(item.alertThreshold) || 0,
+            updated_at: new Date().toISOString()
+        };
+    },
+
+    async sauvegarderIngredient(item) {
+        let row = null;
+        try {
+            const { data: { session } } = await gourmetSupabase.auth.getSession();
+            const userId = session?.user?.id || 'offline';
+            row = this._ingredientToRow(item, userId);
+            await this.sauvegarderRow('ingredients', row);
+        } catch (e) {
+            if (!row) row = this._ingredientToRow(item, 'offline');
+            this.addToQueue('ingredients', 'upsert', row);
+        }
+    },
+
+    async supprimerIngredient(id) {
+        await this.supprimerRow('ingredients', id);
     },
 
     // ══════════════════════════════════════════════════════════════
@@ -947,6 +1000,17 @@ const GourmetSync = {
     async processQueue() {
         if (this.queue.length === 0) { this.updateOfflineBanner(); return; }
         console.log(`🔄 GourmetSync : ${this.queue.length} opération(s) en attente...`);
+
+        let currentUserId = null;
+        try {
+            if (window.gourmetSupabase) {
+                const { data: { session } } = await gourmetSupabase.auth.getSession();
+                currentUserId = session?.user?.id || null;
+            }
+        } catch (e) {
+            console.warn('[GourmetSync] processQueue could not fetch session:', e.message);
+        }
+
         const MAX = 5;
         const remaining = [];
 
@@ -956,6 +1020,11 @@ const GourmetSync = {
                 remaining.push(op); continue;
             }
             try {
+                // Dynamic mapping of 'offline' user_id to actual authenticated user_id
+                if (op.data && op.data.user_id === 'offline' && currentUserId) {
+                    op.data.user_id = currentUserId;
+                }
+
                 if (op.action === 'upsert') {
                     const { error } = await gourmetSupabase.from(op.table).upsert(op.data, { onConflict: 'id' });
                     if (error) throw error;

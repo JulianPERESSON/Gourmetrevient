@@ -5,7 +5,7 @@
 // AUTHENTICATION — Bridged to AuthUI.js (Supabase)
 // ============================================================================
 
-function showSubscriptionRequiredOverlay(email) {
+async function showSubscriptionRequiredOverlay(email) {
   let overlay = document.getElementById('stripeSubscriptionRequiredOverlay');
   if (overlay) return;
 
@@ -14,22 +14,66 @@ function showSubscriptionRequiredOverlay(email) {
   overlay.className = 'glass-modal-overlay';
   overlay.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15,23,42,0.85); backdrop-filter:blur(16px); z-index:99999; display:flex; justify-content:center; align-items:center; color:#fff; font-family:Inter, sans-serif;';
   
+  // State: Loading initially
+  overlay.innerHTML = `
+    <div style="background:var(--surface, #1e293b); border:1px solid var(--border, #334155); border-radius:24px; padding:3rem; max-width:480px; width:90%; text-align:center; box-shadow:0 25px 50px -12px rgba(0,0,0,0.5); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1.5rem;">
+      <div class="spinner-premium" style="width:40px; height:40px; border:3px solid rgba(99,102,241,0.2); border-top-color:#6366f1; border-radius:50%; animation:spin 1s linear infinite;"></div>
+      <p style="color:#94a3b8; font-size:0.95rem;">Vérification du statut de l'abonnement...</p>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+
+  // Masquer les conteneurs de l'app
+  ['mainNav', 'mobileNavBar', 'appMain', 'hubSection'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
+
+  // Fetch true status
+  let subStatus = { plan: 'free', status: 'inactive', subscription_active: false, has_subscription: false };
+  try {
+    if (window.GourmetBilling && typeof window.GourmetBilling.checkSubscriptionStatus === 'function') {
+      subStatus = await window.GourmetBilling.checkSubscriptionStatus();
+    }
+  } catch (err) {
+    console.error('Error fetching subscription status in overlay:', err);
+  }
+
+  const hasSub = subStatus.has_subscription;
+  const isTrialExpired = hasSub && !subStatus.subscription_active;
+
+  let title = "Abonnement requis";
+  let description = "Bienvenue ! GourmetRevient est un outil professionnel. Pour accéder à votre laboratoire et commencer vos calculs, veuillez activer votre abonnement Pro Chef.";
+  let priceBadgeTitle = "👨‍🍳 Offre Pro Chef";
+  let priceBadgeText = "29,99 € <span style=\"font-size:0.9rem; font-weight:400; color:#94a3b8;\">/ mois HT</span>";
+  let buttonText = "Commencer l'essai gratuit (14 jours)";
+  let buttonAction = `GourmetBilling.checkout('pro_monthly', '${email}')`;
+
+  if (isTrialExpired) {
+    title = "Votre essai a expiré";
+    description = "Votre période d'essai gratuit de 14 jours ou votre abonnement a expiré. Pour retrouver l'accès à vos fiches techniques, vos stocks et votre outil HACCP, veuillez activer votre abonnement Pro Chef en ajoutant un moyen de paiement.";
+    priceBadgeTitle = "👨‍🍳 Statut de l'abonnement";
+    priceBadgeText = "Essai / Abonnement Expiré";
+    buttonText = "Activer mon abonnement Pro Chef";
+    buttonAction = `GourmetBilling.openCustomerPortal()`;
+  }
+
   overlay.innerHTML = `
     <div style="background:var(--surface, #1e293b); border:1px solid var(--border, #334155); border-radius:24px; padding:3rem; max-width:480px; width:90%; text-align:center; box-shadow:0 25px 50px -12px rgba(0,0,0,0.5);">
       <div style="font-size:3rem; margin-bottom:1.5rem;">🧁</div>
-      <h2 style="font-size:1.8rem; font-weight:800; margin-bottom:1rem; color:#fff;">Abonnement requis</h2>
+      <h2 style="font-size:1.8rem; font-weight:800; margin-bottom:1rem; color:#fff;">${title}</h2>
       <p style="color:#94a3b8; font-size:0.95rem; margin-bottom:2rem; line-height:1.5;">
-        Bienvenue ! GourmetRevient est un outil professionnel. Pour accéder à votre laboratoire et commencer vos calculs, veuillez activer votre abonnement Pro Chef.
+        ${description}
       </p>
       
       <div style="background:rgba(99,102,241,0.1); border:1px solid rgba(99,102,241,0.3); border-radius:16px; padding:1.25rem; margin-bottom:2rem;">
-        <div style="font-weight:700; font-size:1.1rem; color:#818cf8; margin-bottom:4px;">👨‍🍳 Offre Pro Chef</div>
-        <div style="font-size:1.5rem; font-weight:900; color:#fff;">29,99 € <span style="font-size:0.9rem; font-weight:400; color:#94a3b8;">/ mois HT</span></div>
-        <div style="font-size:0.8rem; color:#a5b4fc; margin-top:6px; font-weight:600;">14 jours d'essai gratuits · Sans engagement</div>
+        <div style="font-weight:700; font-size:1.1rem; color:#818cf8; margin-bottom:4px;">${priceBadgeTitle}</div>
+        <div style="font-size:1.5rem; font-weight:900; color:#fff;">${priceBadgeText}</div>
+        ${!isTrialExpired ? `<div style="font-size:0.8rem; color:#a5b4fc; margin-top:6px; font-weight:600;">14 jours d'essai gratuits · Sans engagement</div>` : `<div style="font-size:0.8rem; color:#f87171; margin-top:6px; font-weight:600;">Accès restreint aux fonctionnalités</div>`}
       </div>
       
-      <button class="btn btn-primary" onclick="GourmetBilling.checkout('pro_monthly', '${email}')" style="width:100%; padding:1rem; font-size:1.1rem; font-weight:700; border-radius:12px; background:linear-gradient(135deg, #6366f1, #4f46e5); color:#fff; border:none; cursor:pointer; margin-bottom:1rem; box-shadow:0 10px 20px -5px rgba(99,102,241,0.4);">
-        Commencer l'essai gratuit (14 jours)
+      <button class="btn btn-primary" onclick="${buttonAction}" style="width:100%; padding:1rem; font-size:1.1rem; font-weight:700; border-radius:12px; background:linear-gradient(135deg, #6366f1, #4f46e5); color:#fff; border:none; cursor:pointer; margin-bottom:1rem; box-shadow:0 10px 20px -5px rgba(99,102,241,0.4);">
+        ${buttonText}
       </button>
       
       <button id="authOverlayLogoutBtn" style="background:none; border:none; color:#94a3b8; cursor:pointer; font-size:0.9rem; text-decoration:underline;">
@@ -37,7 +81,6 @@ function showSubscriptionRequiredOverlay(email) {
       </button>
     </div>
   `;
-  document.body.appendChild(overlay);
 
   const logoutBtn = document.getElementById('authOverlayLogoutBtn');
   if (logoutBtn) {
@@ -50,17 +93,67 @@ function showSubscriptionRequiredOverlay(email) {
       }
     });
   }
-
-  // Masquer les conteneurs de l'app
-  ['mainNav', 'mobileNavBar', 'appMain', 'hubSection'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.style.display = 'none';
-  });
 }
 
 function removeSubscriptionRequiredOverlay() {
   const overlay = document.getElementById('stripeSubscriptionRequiredOverlay');
   if (overlay) overlay.remove();
+}
+
+function showTrialCountdownBanner(daysLeft) {
+  let banner = document.getElementById('trialCountdownBanner');
+  if (!banner) {
+    banner = document.createElement('div');
+    banner.id = 'trialCountdownBanner';
+    banner.style.cssText = `
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 9999;
+      background: rgba(30, 41, 59, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      border-radius: 9999px;
+      padding: 10px 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(99, 102, 241, 0.1);
+      font-family: Inter, sans-serif;
+      font-size: 0.9rem;
+      color: #fff;
+      transition: all 0.3s ease;
+    `;
+    document.body.appendChild(banner);
+  }
+
+  banner.innerHTML = `
+    <span style="display: flex; align-items: center; gap: 8px;">
+      <span style="font-size: 1.1rem;">⏳</span>
+      <span>Il vous reste <strong style="color: #a5b4fc;">${daysLeft} jour${daysLeft > 1 ? 's' : ''}</strong> d'essai gratuit</span>
+    </span>
+    <button onclick="GourmetBilling.openCustomerPortal()" style="
+      background: linear-gradient(135deg, #6366f1, #4f46e5);
+      color: #fff;
+      border: none;
+      border-radius: 9999px;
+      padding: 6px 16px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+      transition: all 0.2s ease;
+    " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+      S'abonner
+    </button>
+  `;
+}
+
+function removeTrialCountdownBanner() {
+  const banner = document.getElementById('trialCountdownBanner');
+  if (banner) banner.remove();
 }
 
 function checkAuth() {
@@ -86,6 +179,30 @@ function checkAuth() {
 
     removeSubscriptionRequiredOverlay();
     console.info('🔓 Authentification confirmée, déverrouillage de l\'interface...');
+
+    // Asynchronously handle trial countdown banner
+    (async () => {
+      try {
+        if (window.GourmetBilling && typeof window.GourmetBilling.checkSubscriptionStatus === 'function') {
+          const subStatus = await window.GourmetBilling.checkSubscriptionStatus();
+          if (subStatus.status === 'trialing' && subStatus.trial_end) {
+            const trialEndMs = new Date(subStatus.trial_end).getTime();
+            const nowMs = Date.now();
+            const diffMs = trialEndMs - nowMs;
+            if (diffMs > 0) {
+              const daysLeft = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+              showTrialCountdownBanner(daysLeft);
+            } else {
+              removeTrialCountdownBanner();
+            }
+          } else {
+            removeTrialCountdownBanner();
+          }
+        }
+      } catch (err) {
+        console.error('Error handling trial countdown banner:', err);
+      }
+    })();
     const wasPending = document.body.classList.contains('auth-pending');
     document.body.classList.remove('auth-pending');
 

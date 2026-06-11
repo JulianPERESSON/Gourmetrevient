@@ -35,14 +35,14 @@ const GourmetBilling = {
           lowerName.includes('julia') ||
           lowerName === 'ju'
         );
-        if (isAdminBypass) return { plan: 'admin', status: 'active', subscription_active: true };
+        if (isAdminBypass) return { plan: 'admin', status: 'active', subscription_active: true, has_subscription: true, trial_expired: false };
 
         const client = window.gourmetSupabase || window.supabase;
-        if (!client) return { plan: 'free', status: 'inactive', subscription_active: false };
+        if (!client) return { plan: 'free', status: 'inactive', subscription_active: false, has_subscription: false, trial_expired: false };
 
         try {
             const { data: { user }, error: authErr } = await client.auth.getUser();
-            if (authErr || !user) return { plan: 'free', status: 'inactive', subscription_active: false };
+            if (authErr || !user) return { plan: 'free', status: 'inactive', subscription_active: false, has_subscription: false, trial_expired: false };
 
             const { data, error } = await client
                 .from('subscriptions')
@@ -51,7 +51,7 @@ const GourmetBilling = {
                 .maybeSingle();
 
             if (error) throw error;
-            if (!data) return { plan: 'free', status: 'inactive', subscription_active: false };
+            if (!data) return { plan: 'free', status: 'inactive', subscription_active: false, has_subscription: false, trial_expired: false };
 
             // Vérification stricte : actif ET pas plan gratuit ET période non expirée
             const now = Date.now();
@@ -65,16 +65,21 @@ const GourmetBilling = {
                 data.plan_type !== 'free' &&
                 (inPeriod || inTrial);
 
+            const trial_expired = trialEnd > 0 && trialEnd <= now && !subscription_active;
+
             return {
                 plan: data.plan_type,
                 status: data.status,
                 current_period_end: data.current_period_end,
-                subscription_active
+                trial_end: data.trial_end,
+                subscription_active,
+                has_subscription: true,
+                trial_expired
             };
         } catch (e) {
             console.error('GourmetBilling — Erreur vérification abonnement:', e);
             // Fail-closed : en cas d'erreur, pas d'accès Pro
-            return { plan: 'free', status: 'error', subscription_active: false };
+            return { plan: 'free', status: 'error', subscription_active: false, has_subscription: false, trial_expired: false };
         }
     },
 

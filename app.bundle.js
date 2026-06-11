@@ -1,7 +1,7 @@
 /* 
   =============================================================================
   GourmetRevient Application Bundle (Production)
-  Généré automatiquement le : 2026-06-11T13:36:28.059Z
+  Généré automatiquement le : 2026-06-11T16:27:17.587Z
   =============================================================================
 */
 
@@ -1021,26 +1021,9 @@ window.syncInventoryWithCloud = syncInventoryWithCloud;
 async function saveInventory() {
 const userKey = getUserInventoryKey();
 localStorage.setItem(userKey, JSON.stringify(APP.inventory));
-if (navigator.onLine && window.gourmetSupabase) {
-try {
-const { data: { session } } = await gourmetSupabase.auth.getSession();
-const userId = session?.user?.id;
-if (userId) {
+if (window.GourmetSync) {
 for (const item of APP.inventory) {
-await gourmetSupabase.from('ingredients').upsert({
-id: item.id,
-user_id: userId,
-nom: item.name,            // colonne réelle : 'nom'
-stock_actuel: item.stock,
-unite: item.unit,
-prix_unitaire: item.price,
-seuil_alerte: item.alertThreshold,
-updated_at: new Date().toISOString()
-});
-}
-}
-} catch (e) {
-console.warn('[saveInventory] Cloud save failed:', e.message);
+await GourmetSync.sauvegarderIngredient(item);
 }
 }
 }
@@ -1151,6 +1134,64 @@ if (el) delete el.dataset.initialized;
 });
 goToStep(0);
 }
+window.importStarterPack = async function() {
+const toastFn = typeof showToast === 'function' ? showToast : console.log;
+toastFn("Importation des données de base... ⏳", "info");
+const basicNames = [
+'Farine T45', 'Farine T55', 'Beurre doux', 'Beurre AOP', 'Sucre semoule',
+'Sucre glace', 'Lait entier', 'Œufs entiers', 'Jaunes d\'œufs', 'Blancs d\'œufs',
+'Crème 35% MG', 'Chocolat noir 64%', 'Maïzena', 'Poudre d\'amandes', 'Vanille (gousse)',
+'Sel', 'Levure fraîche', 'Levure chimique', 'Gélatine en feuilles (Or)', 'Mascarpone'
+];
+let addedIngCount = 0;
+if (typeof DEFAULT_INGREDIENT_DB !== 'undefined') {
+basicNames.forEach(name => {
+const exists = APP.inventory.some(item => item.name.toLowerCase() === name.toLowerCase());
+if (!exists) {
+const ing = DEFAULT_INGREDIENT_DB.find(db => db.name.toLowerCase() === name.toLowerCase());
+if (ing) {
+APP.inventory.push({
+id: 'inv_' + Math.random().toString(36).substr(2, 9),
+name: ing.name,
+stock: 0,
+unit: ing.unit,
+price: ing.pricePerUnit,
+alertThreshold: ing.unit === 'g' || ing.unit === 'ml' ? 1000 : 5,
+lastUpdate: new Date().toISOString()
+});
+addedIngCount++;
+}
+}
+});
+}
+let addedRecipe = false;
+if (typeof RECIPES !== 'undefined') {
+const eclair = RECIPES.find(r => r.id === 'eclair');
+if (eclair) {
+const exists = APP.savedRecipes.some(saved => saved.name.toLowerCase() === eclair.name.toLowerCase());
+if (!exists) {
+const copy = JSON.parse(JSON.stringify(eclair));
+copy.savedAt = new Date().toISOString();
+copy.margin = 70;
+if (typeof calcFullCost === 'function') {
+copy.costs = calcFullCost(copy.margin, copy);
+}
+APP.savedRecipes.push(copy);
+addedRecipe = true;
+}
+}
+}
+if (addedIngCount > 0) {
+await saveInventory();
+}
+if (addedRecipe) {
+await saveSavedRecipes();
+}
+if (typeof renderInventory === 'function') renderInventory();
+if (typeof renderSavedRecipes === 'function') renderSavedRecipes();
+if (typeof updateDashboard === 'function') updateDashboard();
+toastFn(`🎉 Pack importé : ${addedIngCount} ingrédients de base et 1 recette modèle ajoutée !`, 'success');
+};
 
 // --- MODULE: app-recipes.js ---
 function goToStep(step) {
@@ -3292,7 +3333,13 @@ if (APP.inventory.length === 0) {
 container.innerHTML = `
 <tr>
 <td colspan="6" style="text-align:center; padding:3rem; color:var(--text-muted);">
-${t('inv.table.empty') || 'Le module d\'inventaire est en cours d\'initialisation.'} <button class="btn btn-sm btn-outline" onclick="syncInventoryWithCloud()">✨ ${t('inv.btn.sync') || 'Synchronisation Ingrédients'}</button>
+<div style="display:flex; flex-direction:column; align-items:center; gap:12px; justify-content:center;">
+<p>${t('inv.table.empty') || 'Votre inventaire est vide.'}</p>
+<div style="display:flex; gap:10px; justify-content:center;">
+<button class="btn btn-sm btn-primary" onclick="window.importStarterPack()" style="background:linear-gradient(135deg, #6366f1, #4f46e5); color:#fff; border:none; padding:8px 16px; border-radius:8px; font-weight:600; cursor:pointer; box-shadow:0 4px 12px rgba(99,102,241,0.2);">⚡ Importer 20 ingrédients de base</button>
+<button class="btn btn-sm btn-outline" onclick="syncInventoryWithCloud()">✨ ${t('inv.btn.sync') || 'Synchronisation'}</button>
+</div>
+</div>
 </td>
 </tr>
 `;
@@ -3710,7 +3757,7 @@ showToast(i18n.t('orders.export_success'));
 }
 
 // --- MODULE: app-auth.js ---
-function showSubscriptionRequiredOverlay(email) {
+async function showSubscriptionRequiredOverlay(email) {
 let overlay = document.getElementById('stripeSubscriptionRequiredOverlay');
 if (overlay) return;
 overlay = document.createElement('div');
@@ -3718,26 +3765,60 @@ overlay.id = 'stripeSubscriptionRequiredOverlay';
 overlay.className = 'glass-modal-overlay';
 overlay.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15,23,42,0.85); backdrop-filter:blur(16px); z-index:99999; display:flex; justify-content:center; align-items:center; color:#fff; font-family:Inter, sans-serif;';
 overlay.innerHTML = `
+<div style="background:var(--surface, #1e293b); border:1px solid var(--border, #334155); border-radius:24px; padding:3rem; max-width:480px; width:90%; text-align:center; box-shadow:0 25px 50px -12px rgba(0,0,0,0.5); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1.5rem;">
+<div class="spinner-premium" style="width:40px; height:40px; border:3px solid rgba(99,102,241,0.2); border-top-color:#6366f1; border-radius:50%; animation:spin 1s linear infinite;"></div>
+<p style="color:#94a3b8; font-size:0.95rem;">Vérification du statut de l'abonnement...</p>
+</div>
+`;
+document.body.appendChild(overlay);
+['mainNav', 'mobileNavBar', 'appMain', 'hubSection'].forEach(id => {
+const el = document.getElementById(id);
+if (el) el.style.display = 'none';
+});
+let subStatus = { plan: 'free', status: 'inactive', subscription_active: false, has_subscription: false };
+try {
+if (window.GourmetBilling && typeof window.GourmetBilling.checkSubscriptionStatus === 'function') {
+subStatus = await window.GourmetBilling.checkSubscriptionStatus();
+}
+} catch (err) {
+console.error('Error fetching subscription status in overlay:', err);
+}
+const hasSub = subStatus.has_subscription;
+const isTrialExpired = hasSub && !subStatus.subscription_active;
+let title = "Abonnement requis";
+let description = "Bienvenue ! GourmetRevient est un outil professionnel. Pour accéder à votre laboratoire et commencer vos calculs, veuillez activer votre abonnement Pro Chef.";
+let priceBadgeTitle = "👨‍🍳 Offre Pro Chef";
+let priceBadgeText = "29,99 € <span style=\"font-size:0.9rem; font-weight:400; color:#94a3b8;\">/ mois HT</span>";
+let buttonText = "Commencer l'essai gratuit (14 jours)";
+let buttonAction = `GourmetBilling.checkout('pro_monthly', '${email}')`;
+if (isTrialExpired) {
+title = "Votre essai a expiré";
+description = "Votre période d'essai gratuit de 14 jours ou votre abonnement a expiré. Pour retrouver l'accès à vos fiches techniques, vos stocks et votre outil HACCP, veuillez activer votre abonnement Pro Chef en ajoutant un moyen de paiement.";
+priceBadgeTitle = "👨‍🍳 Statut de l'abonnement";
+priceBadgeText = "Essai / Abonnement Expiré";
+buttonText = "Activer mon abonnement Pro Chef";
+buttonAction = `GourmetBilling.openCustomerPortal()`;
+}
+overlay.innerHTML = `
 <div style="background:var(--surface, #1e293b); border:1px solid var(--border, #334155); border-radius:24px; padding:3rem; max-width:480px; width:90%; text-align:center; box-shadow:0 25px 50px -12px rgba(0,0,0,0.5);">
 <div style="font-size:3rem; margin-bottom:1.5rem;">🧁</div>
-<h2 style="font-size:1.8rem; font-weight:800; margin-bottom:1rem; color:#fff;">Abonnement requis</h2>
+<h2 style="font-size:1.8rem; font-weight:800; margin-bottom:1rem; color:#fff;">${title}</h2>
 <p style="color:#94a3b8; font-size:0.95rem; margin-bottom:2rem; line-height:1.5;">
-Bienvenue ! GourmetRevient est un outil professionnel. Pour accéder à votre laboratoire et commencer vos calculs, veuillez activer votre abonnement Pro Chef.
+${description}
 </p>
 <div style="background:rgba(99,102,241,0.1); border:1px solid rgba(99,102,241,0.3); border-radius:16px; padding:1.25rem; margin-bottom:2rem;">
-<div style="font-weight:700; font-size:1.1rem; color:#818cf8; margin-bottom:4px;">👨‍🍳 Offre Pro Chef</div>
-<div style="font-size:1.5rem; font-weight:900; color:#fff;">29,99 € <span style="font-size:0.9rem; font-weight:400; color:#94a3b8;">/ mois HT</span></div>
-<div style="font-size:0.8rem; color:#a5b4fc; margin-top:6px; font-weight:600;">14 jours d'essai gratuits · Sans engagement</div>
+<div style="font-weight:700; font-size:1.1rem; color:#818cf8; margin-bottom:4px;">${priceBadgeTitle}</div>
+<div style="font-size:1.5rem; font-weight:900; color:#fff;">${priceBadgeText}</div>
+${!isTrialExpired ? `<div style="font-size:0.8rem; color:#a5b4fc; margin-top:6px; font-weight:600;">14 jours d'essai gratuits · Sans engagement</div>` : `<div style="font-size:0.8rem; color:#f87171; margin-top:6px; font-weight:600;">Accès restreint aux fonctionnalités</div>`}
 </div>
-<button class="btn btn-primary" onclick="GourmetBilling.checkout('pro_monthly', '${email}')" style="width:100%; padding:1rem; font-size:1.1rem; font-weight:700; border-radius:12px; background:linear-gradient(135deg, #6366f1, #4f46e5); color:#fff; border:none; cursor:pointer; margin-bottom:1rem; box-shadow:0 10px 20px -5px rgba(99,102,241,0.4);">
-Commencer l'essai gratuit (14 jours)
+<button class="btn btn-primary" onclick="${buttonAction}" style="width:100%; padding:1rem; font-size:1.1rem; font-weight:700; border-radius:12px; background:linear-gradient(135deg, #6366f1, #4f46e5); color:#fff; border:none; cursor:pointer; margin-bottom:1rem; box-shadow:0 10px 20px -5px rgba(99,102,241,0.4);">
+${buttonText}
 </button>
 <button id="authOverlayLogoutBtn" style="background:none; border:none; color:#94a3b8; cursor:pointer; font-size:0.9rem; text-decoration:underline;">
 Se déconnecter
 </button>
 </div>
 `;
-document.body.appendChild(overlay);
 const logoutBtn = document.getElementById('authOverlayLogoutBtn');
 if (logoutBtn) {
 logoutBtn.addEventListener('click', () => {
@@ -3749,14 +3830,63 @@ location.reload();
 }
 });
 }
-['mainNav', 'mobileNavBar', 'appMain', 'hubSection'].forEach(id => {
-const el = document.getElementById(id);
-if (el) el.style.display = 'none';
-});
 }
 function removeSubscriptionRequiredOverlay() {
 const overlay = document.getElementById('stripeSubscriptionRequiredOverlay');
 if (overlay) overlay.remove();
+}
+function showTrialCountdownBanner(daysLeft) {
+let banner = document.getElementById('trialCountdownBanner');
+if (!banner) {
+banner = document.createElement('div');
+banner.id = 'trialCountdownBanner';
+banner.style.cssText = `
+position: fixed;
+bottom: 24px;
+left: 50%;
+transform: translateX(-50%);
+z-index: 9999;
+background: rgba(30, 41, 59, 0.85);
+backdrop-filter: blur(12px);
+-webkit-backdrop-filter: blur(12px);
+border: 1px solid rgba(99, 102, 241, 0.3);
+border-radius: 9999px;
+padding: 10px 24px;
+display: flex;
+align-items: center;
+gap: 16px;
+box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(99, 102, 241, 0.1);
+font-family: Inter, sans-serif;
+font-size: 0.9rem;
+color: #fff;
+transition: all 0.3s ease;
+`;
+document.body.appendChild(banner);
+}
+banner.innerHTML = `
+<span style="display: flex; align-items: center; gap: 8px;">
+<span style="font-size: 1.1rem;">⏳</span>
+<span>Il vous reste <strong style="color: #a5b4fc;">${daysLeft} jour${daysLeft > 1 ? 's' : ''}</strong> d'essai gratuit</span>
+</span>
+<button onclick="GourmetBilling.openCustomerPortal()" style="
+background: linear-gradient(135deg, #6366f1, #4f46e5);
+color: #fff;
+border: none;
+border-radius: 9999px;
+padding: 6px 16px;
+font-size: 0.8rem;
+font-weight: 700;
+cursor: pointer;
+box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+transition: all 0.2s ease;
+" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+S'abonner
+</button>
+`;
+}
+function removeTrialCountdownBanner() {
+const banner = document.getElementById('trialCountdownBanner');
+if (banner) banner.remove();
 }
 function checkAuth() {
 const user = window.AuthUI?.getCurrentUser();
@@ -3777,6 +3907,28 @@ return;
 }
 removeSubscriptionRequiredOverlay();
 console.info('🔓 Authentification confirmée, déverrouillage de l\'interface...');
+(async () => {
+try {
+if (window.GourmetBilling && typeof window.GourmetBilling.checkSubscriptionStatus === 'function') {
+const subStatus = await window.GourmetBilling.checkSubscriptionStatus();
+if (subStatus.status === 'trialing' && subStatus.trial_end) {
+const trialEndMs = new Date(subStatus.trial_end).getTime();
+const nowMs = Date.now();
+const diffMs = trialEndMs - nowMs;
+if (diffMs > 0) {
+const daysLeft = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+showTrialCountdownBanner(daysLeft);
+} else {
+removeTrialCountdownBanner();
+}
+} else {
+removeTrialCountdownBanner();
+}
+}
+} catch (err) {
+console.error('Error handling trial countdown banner:', err);
+}
+})();
 const wasPending = document.body.classList.contains('auth-pending');
 document.body.classList.remove('auth-pending');
 const isMobile = window.innerWidth <= 768;

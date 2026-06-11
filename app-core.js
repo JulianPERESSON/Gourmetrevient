@@ -933,26 +933,9 @@ async function saveInventory() {
   const userKey = getUserInventoryKey();
   localStorage.setItem(userKey, JSON.stringify(APP.inventory));
 
-  if (navigator.onLine && window.gourmetSupabase) {
-    try {
-      const { data: { session } } = await gourmetSupabase.auth.getSession();
-      const userId = session?.user?.id;
-      if (userId) {
-        for (const item of APP.inventory) {
-          await gourmetSupabase.from('ingredients').upsert({
-            id: item.id,
-            user_id: userId,
-            nom: item.name,            // colonne réelle : 'nom'
-            stock_actuel: item.stock,
-            unite: item.unit,
-            prix_unitaire: item.price,
-            seuil_alerte: item.alertThreshold,
-            updated_at: new Date().toISOString()
-          });
-        }
-      }
-    } catch (e) {
-      console.warn('[saveInventory] Cloud save failed:', e.message);
+  if (window.GourmetSync) {
+    for (const item of APP.inventory) {
+      await GourmetSync.sauvegarderIngredient(item);
     }
   }
 }
@@ -1095,5 +1078,78 @@ function newRecipe() {
 
   goToStep(0);
 }
+
+// ============================================================================
+// ONBOARDING STARTER DATA SEEDING
+// ============================================================================
+
+window.importStarterPack = async function() {
+  const toastFn = typeof showToast === 'function' ? showToast : console.log;
+  toastFn("Importation des données de base... ⏳", "info");
+
+  // 1. List of 20 basic ingredients to seed (from DEFAULT_INGREDIENT_DB)
+  const basicNames = [
+    'Farine T45', 'Farine T55', 'Beurre doux', 'Beurre AOP', 'Sucre semoule',
+    'Sucre glace', 'Lait entier', 'Œufs entiers', 'Jaunes d\'œufs', 'Blancs d\'œufs',
+    'Crème 35% MG', 'Chocolat noir 64%', 'Maïzena', 'Poudre d\'amandes', 'Vanille (gousse)',
+    'Sel', 'Levure fraîche', 'Levure chimique', 'Gélatine en feuilles (Or)', 'Mascarpone'
+  ];
+
+  let addedIngCount = 0;
+  if (typeof DEFAULT_INGREDIENT_DB !== 'undefined') {
+    basicNames.forEach(name => {
+      const exists = APP.inventory.some(item => item.name.toLowerCase() === name.toLowerCase());
+      if (!exists) {
+        const ing = DEFAULT_INGREDIENT_DB.find(db => db.name.toLowerCase() === name.toLowerCase());
+        if (ing) {
+          APP.inventory.push({
+            id: 'inv_' + Math.random().toString(36).substr(2, 9),
+            name: ing.name,
+            stock: 0, // stock initialized to 0
+            unit: ing.unit,
+            price: ing.pricePerUnit, // at national average price
+            alertThreshold: ing.unit === 'g' || ing.unit === 'ml' ? 1000 : 5,
+            lastUpdate: new Date().toISOString()
+          });
+          addedIngCount++;
+        }
+      }
+    });
+  }
+
+  // 2. Add Éclair au Chocolat model recipe if not exists
+  let addedRecipe = false;
+  if (typeof RECIPES !== 'undefined') {
+    const eclair = RECIPES.find(r => r.id === 'eclair');
+    if (eclair) {
+      const exists = APP.savedRecipes.some(saved => saved.name.toLowerCase() === eclair.name.toLowerCase());
+      if (!exists) {
+        const copy = JSON.parse(JSON.stringify(eclair));
+        copy.savedAt = new Date().toISOString();
+        copy.margin = 70; // 70% standard margin
+        if (typeof calcFullCost === 'function') {
+          copy.costs = calcFullCost(copy.margin, copy);
+        }
+        APP.savedRecipes.push(copy);
+        addedRecipe = true;
+      }
+    }
+  }
+
+  // Save changes locally and to Supabase
+  if (addedIngCount > 0) {
+    await saveInventory();
+  }
+  if (addedRecipe) {
+    await saveSavedRecipes();
+  }
+
+  // Refresh UI
+  if (typeof renderInventory === 'function') renderInventory();
+  if (typeof renderSavedRecipes === 'function') renderSavedRecipes();
+  if (typeof updateDashboard === 'function') updateDashboard();
+
+  toastFn(`🎉 Pack importé : ${addedIngCount} ingrédients de base et 1 recette modèle ajoutée !`, 'success');
+};
 
 // ============================================================================
