@@ -20,6 +20,8 @@
 -- (ordre respectant les dépendances de clés étrangères)
 -- ════════════════════════════════════════════════════════════
 
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
 DROP TABLE IF EXISTS public.pertes                CASCADE;
 DROP TABLE IF EXISTS public.haccp_nettoyage       CASCADE;
 DROP TABLE IF EXISTS public.haccp_temperatures    CASCADE;
@@ -32,12 +34,14 @@ DROP TABLE IF EXISTS public.fournisseurs          CASCADE;
 DROP TABLE IF EXISTS public.commandes             CASCADE;
 DROP TABLE IF EXISTS public.clients               CASCADE;
 DROP TABLE IF EXISTS public.ingredients           CASCADE;
+DROP TABLE IF EXISTS public.used_trials           CASCADE;
 DROP TABLE IF EXISTS public.subscriptions         CASCADE;
 DROP TABLE IF EXISTS public.recipes               CASCADE;
 DROP TABLE IF EXISTS public.profiles              CASCADE;
 
 -- Supprimer les vieilles fonctions si elles existent
 DROP FUNCTION IF EXISTS public.handle_new_user()  CASCADE;
+DROP FUNCTION IF EXISTS public.check_phone_exists(text) CASCADE;
 DROP FUNCTION IF EXISTS public.update_updated_at_column() CASCADE;
 DROP FUNCTION IF EXISTS public.update_updated_at() CASCADE;
 DROP FUNCTION IF EXISTS public.set_updated_at()   CASCADE;
@@ -82,8 +86,10 @@ CREATE TABLE public.profiles (
   gender               text,
   role                 text,
   stripe_customer_id   text,
+  phone                text,
   updated_at           timestamptz DEFAULT now(),
-  created_at           timestamptz DEFAULT now()
+  created_at           timestamptz DEFAULT now(),
+  CONSTRAINT profiles_phone_unique UNIQUE (phone)
 );
 
 CREATE TRIGGER trg_profiles_updated_at
@@ -431,6 +437,15 @@ CREATE INDEX idx_subscriptions_stripe_sub ON public.subscriptions(stripe_subscri
 CREATE INDEX idx_subscriptions_trial_end  ON public.subscriptions(trial_end)
   WHERE trial_end IS NOT NULL;
 
+-- ════════════════════════════════════════════════════════════
+-- ÉTAPE 16B — TABLE USED_TRIALS (Anti-Fraude Essais)
+-- ════════════════════════════════════════════════════════════
+
+CREATE TABLE public.used_trials (
+  phone_hash  text        PRIMARY KEY,
+  created_at  timestamptz DEFAULT now()
+);
+
 CREATE TRIGGER trg_subscriptions_updated_at
   BEFORE UPDATE ON public.subscriptions
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
@@ -455,6 +470,7 @@ ALTER TABLE public.team_members        ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.staff_leaves        ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.deliveries          ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.subscriptions       ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.used_trials          ENABLE ROW LEVEL SECURITY;
 
 
 -- ════════════════════════════════════════════════════════════
@@ -490,20 +506,93 @@ CREATE POLICY "subscriptions_service" ON public.subscriptions FOR ALL  USING (au
 
 
 -- ════════════════════════════════════════════════════════════
+-- ÉTAPE 18B — RPC public.check_phone_exists pour validation
+-- ════════════════════════════════════════════════════════════
+
+CREATE OR REPLACE FUNCTION public.check_phone_exists(p_phone TEXT)
+RETURNS BOOLEAN
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_normalized_digits TEXT;
+  v_phone_hash TEXT;
+  v_exists BOOLEAN;
+BEGIN
+  -- Nettoyer le numéro (conserver uniquement les chiffres)
+  v_normalized_digits := regexp_replace(p_phone, '[^\d]', '', 'g');
+  
+  -- Si moins de 9 chiffres, ce n'est pas un numéro valide
+  IF length(v_normalized_digits) < 9 THEN
+    RETURN FALSE;
+  END IF;
+  
+  -- Extraire les 9 derniers chiffres (normalisation internationale/nationale)
+  v_normalized_digits := right(v_normalized_digits, 9);
+  
+  -- Calculer le hash SHA-256
+  v_phone_hash := encode(digest(v_normalized_digits, 'sha256'), 'hex');
+  
+  -- Vérifier s'il est déjà associé à un profil actif, ou dans la table des essais consommés
+  SELECT EXISTS (
+    SELECT 1 FROM public.profiles 
+    WHERE right(regexp_replace(phone, '[^\d]', '', 'g'), 9) = v_normalized_digits
+    UNION
+    SELECT 1 FROM public.used_trials 
+    WHERE phone_hash = v_phone_hash
+  ) INTO v_exists;
+  
+  RETURN v_exists;
+END;
+$$ LANGUAGE plpgsql;
+
+GRANT EXECUTE ON FUNCTION public.check_phone_exists(TEXT) TO anon, authenticated;
+
+-- ════════════════════════════════════════════════════════════
 -- ÉTAPE 19 — TRIGGER : Création automatique du profil
 -- ════════════════════════════════════════════════════════════
 
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS trigger AS $$
+DECLARE
+  v_raw_phone TEXT;
+  v_normalized_digits TEXT;
+  v_phone_hash TEXT;
 BEGIN
-  INSERT INTO public.profiles (id, email, full_name, plan)
+  v_raw_phone := new.raw_user_meta_data->>'phone';
+  
+  IF v_raw_phone IS NOT NULL AND v_raw_phone <> '' THEN
+    -- Nettoyer et normaliser le numéro (9 derniers chiffres)
+    v_normalized_digits := right(regexp_replace(v_raw_phone, '[^\d]', '', 'g'), 9);
+    
+    IF length(v_normalized_digits) >= 9 THEN
+      v_phone_hash := encode(digest(v_normalized_digits, 'sha256'), 'hex');
+      
+      -- Verification anti-abus d'essais multiples
+      IF EXISTS (SELECT 1 FROM public.used_trials WHERE phone_hash = v_phone_hash) THEN
+        RAISE EXCEPTION 'Ce numéro de téléphone a déjà été utilisé pour une période d''essai.';
+      END IF;
+      
+      -- Insérer le hash dans used_trials
+      INSERT INTO public.used_trials (phone_hash)
+      VALUES (v_phone_hash)
+      ON CONFLICT DO NOTHING;
+    END IF;
+  END IF;
+
+  INSERT INTO public.profiles (id, email, full_name, plan, phone)
   VALUES (
     new.id,
     new.email,
     new.raw_user_meta_data->>'full_name',
-    'free'
+    'free',
+    v_raw_phone
   )
-  ON CONFLICT (id) DO NOTHING;
+  ON CONFLICT (id) DO UPDATE SET
+    email = EXCLUDED.email,
+    full_name = EXCLUDED.full_name,
+    phone = EXCLUDED.phone;
+
   RETURN new;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
