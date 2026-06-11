@@ -34,6 +34,7 @@ DROP TABLE IF EXISTS public.fournisseurs          CASCADE;
 DROP TABLE IF EXISTS public.commandes             CASCADE;
 DROP TABLE IF EXISTS public.clients               CASCADE;
 DROP TABLE IF EXISTS public.ingredients           CASCADE;
+DROP TABLE IF EXISTS public.recette_sous_recettes CASCADE;
 DROP TABLE IF EXISTS public.used_trials           CASCADE;
 DROP TABLE IF EXISTS public.subscriptions         CASCADE;
 DROP TABLE IF EXISTS public.recipes               CASCADE;
@@ -446,6 +447,29 @@ CREATE TABLE public.used_trials (
   created_at  timestamptz DEFAULT now()
 );
 
+-- ════════════════════════════════════════════════════════════
+-- ÉTAPE 16C — TABLE RECETTE_SOUS_RECETTES (Sous-Recettes)
+-- ════════════════════════════════════════════════════════════
+
+CREATE TABLE public.recette_sous_recettes (
+  id                  uuid          PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id             uuid          NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  recette_parente_id  uuid          NOT NULL REFERENCES public.recipes(id) ON DELETE CASCADE,
+  recette_enfant_id   uuid          NOT NULL REFERENCES public.recipes(id) ON DELETE CASCADE,
+  quantite_utilisee   numeric(10,3) NOT NULL,
+  rendement           numeric(5,2)  DEFAULT 100,
+  updated_at          timestamptz   DEFAULT now(),
+  created_at          timestamptz   DEFAULT now(),
+  CONSTRAINT uq_parente_enfant UNIQUE (recette_parente_id, recette_enfant_id)
+);
+
+CREATE INDEX idx_recette_sous_recettes_user_id ON public.recette_sous_recettes(user_id);
+CREATE INDEX idx_recette_sous_recettes_parente ON public.recette_sous_recettes(recette_parente_id);
+
+CREATE TRIGGER trg_recette_sous_recettes_updated_at
+  BEFORE UPDATE ON public.recette_sous_recettes
+  FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+
 CREATE TRIGGER trg_subscriptions_updated_at
   BEFORE UPDATE ON public.subscriptions
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
@@ -471,6 +495,7 @@ ALTER TABLE public.staff_leaves        ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.deliveries          ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.subscriptions       ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.used_trials          ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.recette_sous_recettes ENABLE ROW LEVEL SECURITY;
 
 
 -- ════════════════════════════════════════════════════════════
@@ -503,6 +528,9 @@ CREATE POLICY "deliveries_own"        ON public.deliveries          FOR ALL USIN
 -- Subscriptions
 CREATE POLICY "subscriptions_read"    ON public.subscriptions FOR SELECT USING (auth.uid() = user_id);
 CREATE POLICY "subscriptions_service" ON public.subscriptions FOR ALL  USING (auth.role() = 'service_role');
+
+-- Recette Sous-Recettes
+CREATE POLICY "recette_sous_recettes_own" ON public.recette_sous_recettes FOR ALL USING (auth.uid() = user_id);
 
 
 -- ════════════════════════════════════════════════════════════
