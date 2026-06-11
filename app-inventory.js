@@ -729,25 +729,14 @@ async function saveIngredientConfig() {
 
 function loadSuppliers() {
   const saved = localStorage.getItem('gourmet_suppliers');
-  APP.suppliers = saved ? JSON.parse(saved) : [
-    { id: 1, name: 'Metro Cash & Carry', contact: '01 02 03 04 05', email: 'contact@metro.fr', categories: ['Général', 'Frais'], leadTime: 2 },
-    { id: 2, name: 'Valrhona (Chocolat)', contact: '04 75 07 60 60', email: 'serviceclient@valrhona.fr', categories: ['Chocolat', 'Décoration'], leadTime: 5 },
-    { id: 3, name: 'Grands Moulins de Paris', contact: '01 49 59 75 00', email: 'commercial@gmp.fr', categories: ['Farine', 'Céréales'], leadTime: 3 },
-    { id: 4, name: 'Fruits Rouge Co.', contact: '03 23 28 49 49', email: 'pro@fruitsrouge.com', categories: ['Purées', 'Coulis', 'Surgelés'], leadTime: 4 },
-    { id: 5, name: 'Laiterie Echiré', contact: '05 49 25 70 03', email: 'contact@echire-aop.fr', categories: ['Beurre AOP', 'Crème'], leadTime: 3 },
-    { id: 6, name: 'Vanille & Co', contact: '02 40 12 34 56', email: 'vanille@pro-reunion.re', categories: ['Vanille', 'Epices'], leadTime: 7 },
-    { id: 7, name: 'PCB Création', contact: '03 88 58 75 75', email: 'orders@pcb-creation.fr', categories: ['Décoration', 'Colorants'], leadTime: 4 },
-    { id: 8, name: 'Matfer Bourgeat', contact: '01 43 62 60 40', email: 'info@matferbourgeat.com', categories: ['Matériel Ops'], leadTime: 5 }
-  ];
+  APP.suppliers = saved ? JSON.parse(saved) : [];
   if (!saved) saveSuppliers();
 
-  // Charger les fournisseurs cloud en arrière-plan et les fusionner avec les démos locaux
+  // Charger les fournisseurs cloud en arrière-plan
   if (navigator.onLine && window.GourmetSync) {
     GourmetSync.chargerFournisseurs().then(cloudSuppliers => {
-      if (cloudSuppliers !== null && cloudSuppliers.length > 0) {
-        // Garder les démos locaux (id numériques 1-8) + ajouter les fournisseurs cloud
-        const demos = APP.suppliers.filter(s => typeof s.id === 'number' && s.id <= 8);
-        APP.suppliers = [...demos, ...cloudSuppliers];
+      if (cloudSuppliers !== null) {
+        APP.suppliers = cloudSuppliers;
         localStorage.setItem('gourmet_suppliers', JSON.stringify(APP.suppliers));
         if (typeof renderSuppliers === 'function') renderSuppliers();
       }
@@ -757,10 +746,8 @@ function loadSuppliers() {
 
 function saveSuppliers() {
   localStorage.setItem('gourmet_suppliers', JSON.stringify(APP.suppliers));
-  // Syncer uniquement les fournisseurs non-démos (uuid)
   if (window.GourmetSync) {
-    const isValidUUID = str => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str);
-    APP.suppliers.filter(s => isValidUUID(s.id)).forEach(s => GourmetSync.sauvegarderFournisseur(s).catch(() => {}));
+    APP.suppliers.forEach(s => GourmetSync.sauvegarderFournisseur(s).catch(() => {}));
   }
 }
 

@@ -877,6 +877,10 @@ function renderWasteAnalysis() {
 
   // Render waste chart
   renderWasteChart(logs);
+
+  if (typeof window.renderWasteMonthlyReport === 'function') {
+    window.renderWasteMonthlyReport();
+  }
 }
 
 function renderWasteChart(logs) {
@@ -908,27 +912,31 @@ function renderWasteChart(logs) {
 
   // Monthly Report
   const reportEl = document.getElementById('wasteMonthlyReport');
-  if (reportEl && logs.length > 0) {
-    const wasteByReason = {};
-    let maxReason = '';
-    let maxVal = 0;
-    logs.forEach(l => {
-      wasteByReason[l.reason] = (wasteByReason[l.reason] || 0) + (l.lossValue || 0);
-      if (wasteByReason[l.reason] > maxVal) { maxVal = wasteByReason[l.reason]; maxReason = l.reason; }
-    });
-    const totalLoss = Object.values(wasteByReason).reduce((a, b) => a + b, 0);
-    const reasonLabel = reasonLabels[maxReason] || maxReason;
-    reportEl.innerHTML = `
-      <div style="background:rgba(239, 68, 68, 0.05); padding:1rem; border-radius:12px; border:1px dashed rgba(239, 68, 68, 0.2); text-align:center; margin-bottom:1rem;">
-        <div style="font-size:1.8rem; font-weight:800; color:#ef4444;">${totalLoss.toFixed(2)} €</div>
-        <div style="font-size:0.65rem; text-transform:uppercase; color:var(--text-muted);">Perte ce mois-ci</div>
-      </div>
-      <div style="display:flex; justify-content:space-between; padding:0.6rem; background:rgba(197, 165, 90, 0.03); border-radius:8px; margin-bottom:0.5rem;">
-        <span style="font-size:0.75rem;">Cause n°1 :</span>
-        <span style="font-size:0.75rem; font-weight:700;">${reasonLabel}</span>
-      </div>
-      <p style="font-size:0.7rem; color:var(--text-muted); font-style:italic;">ℹ️ Les ${reasonLabel.toLowerCase()} sont votre premier levier d'optimisation.</p>
-    `;
+  if (reportEl) {
+    if (typeof window.renderWasteMonthlyReport === 'function') {
+      window.renderWasteMonthlyReport();
+    } else if (logs.length > 0) {
+      const wasteByReason = {};
+      let maxReason = '';
+      let maxVal = 0;
+      logs.forEach(l => {
+        wasteByReason[l.reason] = (wasteByReason[l.reason] || 0) + (l.lossValue || 0);
+        if (wasteByReason[l.reason] > maxVal) { maxVal = wasteByReason[l.reason]; maxReason = l.reason; }
+      });
+      const totalLoss = Object.values(wasteByReason).reduce((a, b) => a + b, 0);
+      const reasonLabel = reasonLabels[maxReason] || maxReason;
+      reportEl.innerHTML = `
+        <div style="background:rgba(239, 68, 68, 0.05); padding:1rem; border-radius:12px; border:1px dashed rgba(239, 68, 68, 0.2); text-align:center; margin-bottom:1rem;">
+          <div style="font-size:1.8rem; font-weight:800; color:#ef4444;">${totalLoss.toFixed(2)} €</div>
+          <div style="font-size:0.65rem; text-transform:uppercase; color:var(--text-muted);">Perte ce mois-ci</div>
+        </div>
+        <div style="display:flex; justify-content:space-between; padding:0.6rem; background:rgba(197, 165, 90, 0.03); border-radius:8px; margin-bottom:0.5rem;">
+          <span style="font-size:0.75rem;">Cause n°1 :</span>
+          <span style="font-size:0.75rem; font-weight:700;">${reasonLabel}</span>
+        </div>
+        <p style="font-size:0.7rem; color:var(--text-muted); font-style:italic;">ℹ️ Les ${reasonLabel.toLowerCase()} sont votre premier levier d'optimisation.</p>
+      `;
+    }
   }
 
   if (data.length === 0) {
@@ -975,7 +983,7 @@ function loadWasteLogs() {
   // Charger depuis Supabase en arrière-plan
   if (navigator.onLine && window.GourmetSync) {
     GourmetSync.chargerPertes().then(cloudLogs => {
-      if (cloudLogs !== null && cloudLogs.length > 0) {
+      if (cloudLogs !== null) {
         APP.wasteLogs = cloudLogs;
         localStorage.setItem(STORAGE_KEYS.wasteLogs, JSON.stringify(APP.wasteLogs));
         if (typeof renderWasteAnalysis === 'function') renderWasteAnalysis();

@@ -576,33 +576,7 @@ window.renderWasteMonthlyReport = function() {
   const container = document.getElementById('wasteMonthlyReport');
   if (!container) return;
   
-  let wasteLog = JSON.parse(localStorage.getItem('gourmet_waste_log') || '[]');
-  
-  // Inject Demo Data for WOW effect if empty
-  if (wasteLog.length === 0) {
-    const defaultRecipes = APP.savedRecipes || [];
-    const recipeName1 = defaultRecipes.length > 0 ? defaultRecipes[0].name : "Paris-Brest";
-    const recipeName2 = defaultRecipes.length > 1 ? defaultRecipes[1].name : "Tarte Citron";
-    
-    wasteLog = [
-      {
-        id: "w_demo_1", date: new Date().toISOString(), recipeIdx: 0, recipeName: recipeName1,
-        qty: 12, reason: "invendu", value: 34.50, notes: "Mauvaise météo"
-      },
-      {
-        id: "w_demo_2", date: new Date(Date.now() - 86400000*2).toISOString(), recipeIdx: 1, recipeName: recipeName2,
-        qty: 3, reason: "casse", value: 8.40, notes: "Chute en vitrine"
-      },
-      {
-        id: "w_demo_3", date: new Date(Date.now() - 86400000*5).toISOString(), recipeIdx: 0, recipeName: recipeName1,
-        qty: 5, reason: "degustation", value: 14.20, notes: "Influenceurs"
-      }
-    ];
-    localStorage.setItem('gourmet_waste_log', JSON.stringify(wasteLog));
-    
-    // Also trigger update of the chart and history
-    if (typeof renderWasteAnalysis === 'function') setTimeout(renderWasteAnalysis, 100);
-  }
+  let wasteLog = window.APP && window.APP.wasteLogs ? window.APP.wasteLogs : [];
   
   // Group by month
   const byMonth = {};
@@ -611,7 +585,7 @@ window.renderWasteMonthlyReport = function() {
     const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
     if (!byMonth[key]) byMonth[key] = { items: [], totalValue: 0, totalQty: 0, byReason: {}, byRecipe: {} };
     
-    const value = parseFloat(w.value) || 0;
+    const value = parseFloat(w.lossValue || w.value) || 0;
     byMonth[key].items.push(w);
     byMonth[key].totalValue += value;
     byMonth[key].totalQty += (parseInt(w.qty) || 1);
@@ -628,13 +602,15 @@ window.renderWasteMonthlyReport = function() {
   });
   
   const months = Object.keys(byMonth).sort().reverse();
+  if (months.length === 0) {
+    const now = new Date();
+    const currentYearMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+    byMonth[currentYearMonth] = { items: [], totalValue: 0, totalQty: 0, byReason: {}, byRecipe: {} };
+    months.push(currentYearMonth);
+  }
+  
   const currentMonth = months[0];
   const data = byMonth[currentMonth];
-  
-  if (!data) {
-    container.innerHTML = '<p style="text-align:center; padding:2rem; color:var(--text-muted);">Aucune donnée pour ce mois.</p>';
-    return;
-  }
   
   // Find worst recipe
   const worstRecipe = Object.entries(data.byRecipe).sort((a, b) => b[1] - a[1])[0];

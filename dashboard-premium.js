@@ -17,6 +17,9 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function seedDemoData() {
+    if (window.AuthUI && typeof window.AuthUI.getCurrentUser === 'function' && window.AuthUI.getCurrentUser()) {
+        return;
+    }
     if (localStorage.getItem('gourmet_demo_mode') !== 'true') return;
     if (localStorage.getItem('gourmet_demo_seeded') === 'true') return;
     

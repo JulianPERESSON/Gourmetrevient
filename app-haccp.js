@@ -83,41 +83,7 @@ function loadHaccpLogs() {
     if (!Array.isArray(APP.haccpLogs.reception)) APP.haccpLogs.reception = [];
     if (!Array.isArray(APP.haccpLogs.clean)) APP.haccpLogs.clean = [];
 
-    let dataChanged = false;
-    const now = new Date();
-    const isDemo = localStorage.getItem('gourmet_demo_mode') === 'true';
-
-    if (isDemo && (APP.haccpLogs.temp.length === 0 || APP.haccpLogs._demoVersion !== 3)) {
-      APP.haccpLogs.temp = [
-        { id: 't_demo1', date: new Date(now - 1000 * 60 * 60 * 2).toISOString(), equipKey: 'haccp.equip.frigo1', val: 3.2, user: 'Julian', action: null, shift: 'matin' },
-        { id: 't_demo2', date: new Date(now - 1000 * 60 * 60 * 14).toISOString(), equipKey: 'haccp.equip.frigo2', val: 4.5, user: 'Julian', action: null, shift: 'soir' },
-        { id: 't_demo3', date: new Date(now - 1000 * 60 * 60 * 26).toISOString(), equipKey: 'haccp.equip.congelateur', val: -18.5, user: 'Julian', action: null, shift: 'matin' }
-      ];
-      dataChanged = true;
-    }
-
-    if (isDemo && (APP.haccpLogs.reception.length === 0 || APP.haccpLogs._demoVersion !== 3)) {
-      APP.haccpLogs.reception = [
-        { id: 'r_demo1', date: new Date(now - 1000 * 60 * 60 * 3).toISOString(), supplier: 'Métro', temp: 2.5, hygiene: 'ok' },
-        { id: 'r_demo2', date: new Date(now - 1000 * 60 * 60 * 24 * 2).toISOString(), supplier: 'Pomona Passion Froid', temp: 3.1, hygiene: 'ok' },
-        { id: 'r_demo3', date: new Date(now - 1000 * 60 * 60 * 24 * 5).toISOString(), supplier: 'Transgourmet', temp: 6.8, hygiene: 'ko' }
-      ];
-      dataChanged = true;
-    }
-
-    if (isDemo && (APP.haccpLogs.trace.length === 0 || APP.haccpLogs._demoVersion !== 3)) {
-      APP.haccpLogs.trace = [
-        { id: 'tr_demo1', lot: 'L260301', product: 'Éclair Chocolat', date: new Date(now - 1000 * 60 * 60 * 24).toISOString(), exp: '2026-03-06', qty: '50' },
-        { id: 'tr_demo2', lot: 'L260302', product: 'Tarte Citron Meringuée', date: new Date(now - 1000 * 60 * 60 * 12).toISOString(), exp: '2026-03-07', qty: '12' },
-        { id: 'tr_demo3', lot: 'L260303', product: 'Paris-Brest', date: new Date(now - 1000 * 60 * 60 * 48).toISOString(), exp: '2026-03-05', qty: '24' }
-      ];
-      dataChanged = true;
-    }
-
-    if (dataChanged) {
-      APP.haccpLogs._demoVersion = 4;
-      try { saveHaccpLogs(); } catch(e) {}
-    }
+    // No demo data seeding
   } catch (err) {
     console.error('CRITICAL HACCP LOAD FIX:', err);
   }
@@ -249,16 +215,7 @@ function renderTempLogs() {
   const container = document.getElementById('tempLogsBody');
   if (!container) return;
 
-  // Injection forcée de la dernière chance au moment du rendu !!!
-  if (!APP.haccpLogs.temp || APP.haccpLogs.temp.length === 0) {
-    const now = new Date();
-    APP.haccpLogs.temp = [
-      { id: 't_demo1', date: new Date(now - 1000 * 60 * 60 * 2).toISOString(), equipKey: 'haccp.equip.frigo1', val: 3.2, user: 'Julian', action: null, shift: 'matin' },
-      { id: 't_demo2', date: new Date(now - 1000 * 60 * 60 * 14).toISOString(), equipKey: 'haccp.equip.frigo2', val: 4.5, user: 'Julian', action: null, shift: 'soir' },
-      { id: 't_demo3', date: new Date(now - 1000 * 60 * 60 * 26).toISOString(), equipKey: 'haccp.equip.congelateur', val: -18.5, user: 'Julian', action: null, shift: 'matin' }
-    ];
-    try { saveHaccpLogs(); } catch(e){}
-  }
+  if (!APP.haccpLogs.temp) APP.haccpLogs.temp = [];
 
   if (!APP.haccpLogs.temp || APP.haccpLogs.temp.length === 0) {
     container.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:2rem; color:var(--text-muted);">' + t('haccp.temp.empty') + '</td></tr>';
@@ -365,15 +322,7 @@ function addReceptionLog() {
 function renderReceptionLogs() {
   var container = document.getElementById('receptionLogsBody');
   if (!container) return;
-  if (!APP.haccpLogs.reception || APP.haccpLogs.reception.length === 0) {
-    const now = new Date();
-    APP.haccpLogs.reception = [
-      { id: 'r_demo1', date: new Date(now - 1000 * 60 * 60 * 3).toISOString(), supplier: 'Métro', temp: 2.5, hygiene: 'ok' },
-      { id: 'r_demo2', date: new Date(now - 1000 * 60 * 60 * 24 * 2).toISOString(), supplier: 'Pomona Passion Froid', temp: 3.1, hygiene: 'ok' },
-      { id: 'r_demo3', date: new Date(now - 1000 * 60 * 60 * 24 * 5).toISOString(), supplier: 'Transgourmet', temp: 6.8, hygiene: 'ko' }
-    ];
-    try { saveHaccpLogs(); } catch(e){}
-  }
+  if (!APP.haccpLogs.reception) APP.haccpLogs.reception = [];
   if (!APP.haccpLogs.reception || APP.haccpLogs.reception.length === 0) {
     container.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:2rem; color:var(--text-muted);">' + t('haccp.reception.empty') + '</td></tr>';
     return;
@@ -403,10 +352,10 @@ function renderCleaningChecklist() {
   if (!APP.haccpLogs.clean || APP.haccpLogs.clean.length === 0) {
     APP.haccpLogs.clean = [
       { id: 'cl_1', areaKey: 'haccp.clean.area1', area: 'Postes de Travail', icon: '🔪', done: false },
-      { id: 'cl_2', areaKey: 'haccp.clean.area2', area: 'Sols & Caniveaux', icon: '🧼', done: true },
+      { id: 'cl_2', areaKey: 'haccp.clean.area2', area: 'Sols & Caniveaux', icon: '🧼', done: false },
       { id: 'cl_3', areaKey: 'haccp.clean.area3', area: 'Enceintes Froides', icon: '❄️', done: false },
       { id: 'cl_4', areaKey: 'haccp.clean.area4', area: 'Plongerie', icon: '🚿', done: false },
-      { id: 'cl_5', areaKey: 'haccp.clean.area5', area: 'Sanitaires', icon: '🚽', done: true },
+      { id: 'cl_5', areaKey: 'haccp.clean.area5', area: 'Sanitaires', icon: '🚽', done: false },
       { id: 'cl_6', areaKey: 'haccp.clean.area6', area: 'Réserve Sèche', icon: '📦', done: false }
     ];
     try { saveHaccpLogs(); } catch(e){}
@@ -456,15 +405,7 @@ function toggleCleaning(id) {
 function renderTraceability() {
   const container = document.getElementById('traceLogsBody');
   if (!container) return;
-  if (!APP.haccpLogs.trace || APP.haccpLogs.trace.length === 0) {
-    const now = new Date();
-    APP.haccpLogs.trace = [
-      { id: 'tr_demo1', lot: 'L-260301-ECL-129', product: 'Éclair Chocolat', date: new Date(now - 1000 * 60 * 60 * 24).toISOString(), exp: '2026-03-06', qty: '50 portions', operator: 'Chef Julian' },
-      { id: 'tr_demo2', lot: 'L-260302-TAR-248', product: 'Tarte Citron Meringuée', date: new Date(now - 1000 * 60 * 60 * 12).toISOString(), exp: '2026-03-07', qty: '12 portions', operator: 'Chef' },
-      { id: 'tr_demo3', lot: 'L-260303-PAR-847', product: 'Paris-Brest', date: new Date(now - 1000 * 60 * 60 * 48).toISOString(), exp: '2026-03-05', qty: '24 portions', operator: 'Chef Julian' }
-    ];
-    try { saveHaccpLogs(); } catch(e){}
-  }
+  if (!APP.haccpLogs.trace) APP.haccpLogs.trace = [];
   filterTraceLogs();
 }
 

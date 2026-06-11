@@ -56,7 +56,7 @@ const LogisticsManager = (() => {
         if (!navigator.onLine || !window.GourmetSync) return;
         try {
             const cloudDeliveries = await GourmetSync.chargerDeliveries();
-            if (cloudDeliveries !== null && cloudDeliveries.length > 0) {
+            if (cloudDeliveries !== null) {
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(cloudDeliveries));
                 hydrateLogistics();
                 if (typeof hydratePremiumDashboard === 'function') hydratePremiumDashboard();
