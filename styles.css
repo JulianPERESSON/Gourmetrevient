@@ -5144,11 +5144,46 @@ select.form-input {
   overflow-x: auto;
 }
 
+.premium-table {
+  width: 100% !important;
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  background: white;
+  font-size: 0.95rem;
+}
+
 .premium-table th {
-  background: var(--bg-body) !important;
+  background: linear-gradient(135deg, var(--bg-body), var(--bg-alt)) !important;
   color: var(--text-main) !important;
   font-weight: 800 !important;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  padding: 1.2rem 1.4rem !important;
   border-bottom: 2px solid var(--surface-border) !important;
+  white-space: nowrap;
+}
+
+.premium-table td {
+  padding: 1.2rem 1.4rem !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+  vertical-align: middle;
+  color: var(--text-main);
+}
+
+.premium-table tbody tr {
+  transition: background 0.2s ease;
+}
+
+.premium-table tbody tr:hover {
+  background: rgba(99, 102, 241, 0.04) !important;
+}
+
+.premium-table tbody tr:last-child td {
+  border-bottom: none;
 }
 
 .row-alert {

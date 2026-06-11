@@ -1542,7 +1542,7 @@
         </button>
         <div class="dropdown-content" id="profileDropdown">
           <button id="btnChangePin" data-i18n="nav.my_profile">👤 Mon Profil</button>
-          <button id="btnManageBilling" onclick="window.GourmetBilling.openCustomerPortal()" style="border-top: 1px solid var(--surface-border); margin-top: 5px; padding-top: 10px; color: var(--accent); font-weight: 700;">💳 Mon Abonnement</button>
+          <button id="btnManageBilling" onclick="showBillingModal()" style="border-top: 1px solid var(--surface-border); margin-top: 5px; padding-top: 10px; color: var(--accent); font-weight: 700;">💳 Factures & Abonnement</button>
           <button id="btnLogout" class="logout-link" data-i18n="nav.logout">🚪 Déconnexion</button>
         </div>
       </div>
@@ -1777,10 +1777,7 @@
             <span class="tab-pill-emoji">🧴</span>
             <span data-i18n="mgmt.tab.quality">Qualité & Pertes</span>
           </button>
-          <button class="mgmt-tab-pill" id="mgmtTabBilling" onclick="switchMgmtTab('billing')">
-            <span class="tab-pill-emoji">💳</span>
-            <span data-i18n="nav.billing">Facturation</span>
-          </button>
+
           <button class="mgmt-tab-pill" id="mgmtTabProTools" onclick="switchMgmtTab('protools')">
             <span class="tab-pill-emoji">🛠️</span>
             <span data-i18n="mgmt.tab.protools">Outils Pro (INCO/OCR)</span>
@@ -1895,8 +1892,7 @@
                   </div>
                </aside>
 
-               <!-- Main Content Area -->
-               <main style="padding: 2.5rem; overflow-y: auto; max-height: 800px;">
+               <main style="padding: 2.5rem 3.5rem; flex: 1;">
                   
                   <!-- Sub-View: Dashboard -->
                   <div id="qualityViewWasteDash" class="quality-subview">
@@ -1911,42 +1907,45 @@
                      </div>
 
                      <!-- KPI Row -->
-                     <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:1.5rem; margin-bottom:2.5rem;">
-                        <div class="v2-kpi-card danger" style="background: white; padding: 1.8rem; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.03);">
-                           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
-                              <span style="font-size:0.75rem; font-weight:800; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px;">Valeur des Pertes</span>
-                              <span style="font-size:1.5rem;">🛒</span>
+                     <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:2rem; margin-bottom:3rem;">
+                        <div class="v2-kpi-card danger" style="background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(16px); padding: 2.2rem 2rem; border-radius: 24px; border: 1px solid rgba(239, 68, 68, 0.25); box-shadow: 0 15px 35px rgba(239, 68, 68, 0.05); transition: all 0.3s ease; position: relative;">
+                           <div style="position: absolute; top: 0; right: 0; width: 80px; height: 80px; background: radial-gradient(circle at top right, rgba(239, 68, 68, 0.1), transparent 70%); pointer-events: none;"></div>
+                           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.2rem;">
+                              <span style="font-size:0.75rem; font-weight:800; color:var(--text-muted); text-transform:uppercase; letter-spacing:1.5px;">Valeur des Pertes</span>
+                              <span style="font-size:1.8rem; filter: drop-shadow(0 4px 8px rgba(239, 68, 68, 0.2));">🛒</span>
                            </div>
-                           <div style="font-size:2rem; font-weight:900; color:var(--danger);" id="totalWasteValue">0.00 </div>
-                           <div style="font-size:0.75rem; color:var(--text-muted); margin-top:8px;">Cumul mensuel brut</div>
+                           <div style="font-size:2.4rem; font-weight:900; color:#ef4444; font-family: var(--font-display); letter-spacing: -0.5px; line-height: 1.1;" id="totalWasteValue">0.00 €</div>
+                           <div style="font-size:0.75rem; color:var(--text-muted); margin-top:10px; font-weight: 600;">Cumul mensuel brut</div>
                         </div>
-                        <div class="v2-kpi-card warning" style="background: white; padding: 1.8rem; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.03);">
-                           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
-                              <span style="font-size:0.75rem; font-weight:800; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px;">Érosion Marge</span>
-                              <span style="font-size:1.5rem;">📉</span>
+                        <div class="v2-kpi-card warning" style="background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(16px); padding: 2.2rem 2rem; border-radius: 24px; border: 1px solid rgba(245, 158, 11, 0.25); box-shadow: 0 15px 35px rgba(245, 158, 11, 0.05); transition: all 0.3s ease; position: relative;">
+                           <div style="position: absolute; top: 0; right: 0; width: 80px; height: 80px; background: radial-gradient(circle at top right, rgba(245, 158, 11, 0.1), transparent 70%); pointer-events: none;"></div>
+                           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.2rem;">
+                              <span style="font-size:0.75rem; font-weight:800; color:var(--text-muted); text-transform:uppercase; letter-spacing:1.5px;">Érosion Marge</span>
+                              <span style="font-size:1.8rem; filter: drop-shadow(0 4px 8px rgba(245, 158, 11, 0.2));">📉</span>
                            </div>
-                           <div style="font-size:2rem; font-weight:900; color:var(--secondary);" id="impactMarginValue">-0.00%</div>
-                           <div style="font-size:0.75rem; color:var(--text-muted); margin-top:8px;">Impact sur bénéfice réel</div>
+                           <div style="font-size:2.4rem; font-weight:900; color:#f59e0b; font-family: var(--font-display); letter-spacing: -0.5px; line-height: 1.1;" id="impactMarginValue">-0.00%</div>
+                           <div style="font-size:0.75rem; color:var(--text-muted); margin-top:10px; font-weight: 600;">Impact sur bénéfice réel</div>
                         </div>
-                        <div class="v2-kpi-card info" style="background: white; padding: 1.8rem; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.03);">
-                           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
-                              <span style="font-size:0.75rem; font-weight:800; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px;">Volume Alertes</span>
-                              <span style="font-size:1.5rem;">🚨</span>
+                        <div class="v2-kpi-card info" style="background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(16px); padding: 2.2rem 2rem; border-radius: 24px; border: 1px solid rgba(99, 102, 241, 0.25); box-shadow: 0 15px 35px rgba(99, 102, 241, 0.05); transition: all 0.3s ease; position: relative;">
+                           <div style="position: absolute; top: 0; right: 0; width: 80px; height: 80px; background: radial-gradient(circle at top right, rgba(99, 102, 241, 0.1), transparent 70%); pointer-events: none;"></div>
+                           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.2rem;">
+                              <span style="font-size:0.75rem; font-weight:800; color:var(--text-muted); text-transform:uppercase; letter-spacing:1.5px;">Volume Alertes</span>
+                              <span style="font-size:1.8rem; filter: drop-shadow(0 4px 8px rgba(99, 102, 241, 0.2));">🚨</span>
                            </div>
-                           <div style="font-size:2rem; font-weight:900; color:var(--primary);" id="totalWasteCount">0</div>
-                           <div style="font-size:0.75rem; color:var(--text-muted); margin-top:8px;">Nombre de déclarations</div>
+                           <div style="font-size:2.4rem; font-weight:900; color:#6366f1; font-family: var(--font-display); letter-spacing: -0.5px; line-height: 1.1;" id="totalWasteCount">0</div>
+                           <div style="font-size:0.75rem; color:var(--text-muted); margin-top:10px; font-weight: 600;">Nombre de déclarations</div>
                         </div>
                      </div>
 
-                     <div style="display:grid; grid-template-columns: 1fr 1fr; gap:2rem;">
-                        <div class="mgmt-glass-card" style="padding: 2rem; background: white; border-radius:24px;">
-                           <h3 style="margin:0 0 1.5rem 0; font-family:var(--font-display); font-size:1.2rem; color:var(--primary);">📊 Répartition par Cause</h3>
-                           <div style="height:280px; position:relative;">
+                     <div style="display:grid; grid-template-columns: 1.2fr 1fr; gap:2.5rem;">
+                        <div class="mgmt-glass-card" style="padding: 2.5rem; background: rgba(255,255,255,0.75); backdrop-filter: blur(16px); border-radius:24px; border: 1px solid rgba(99, 102, 241, 0.15); box-shadow: 0 15px 35px rgba(0,0,0,0.02);">
+                           <h3 style="margin:0 0 1.5rem 0; font-family:var(--font-display); font-size:1.3rem; color:var(--primary); display:flex; align-items:center; gap:8px;"><span>📊</span> Répartition par Cause</h3>
+                           <div style="height:300px; position:relative;">
                               <canvas id="wasteChartCanvas"></canvas>
                            </div>
                         </div>
-                        <div class="mgmt-glass-card" style="padding: 2rem; background: white; border-radius:24px;">
-                           <h3 style="margin:0 0 1.5rem 0; font-family:var(--font-display); font-size:1.2rem; color:var(--primary);"> Rapport d'Analyse</h3>
+                        <div class="mgmt-glass-card" style="padding: 2.5rem; background: rgba(255,255,255,0.75); backdrop-filter: blur(16px); border-radius:24px; border: 1px solid rgba(99, 102, 241, 0.15); box-shadow: 0 15px 35px rgba(0,0,0,0.02);">
+                           <h3 style="margin:0 0 1.5rem 0; font-family:var(--font-display); font-size:1.3rem; color:var(--primary); display:flex; align-items:center; gap:8px;"><span>📈</span> Rapport d'Analyse</h3>
                            <div id="wasteMonthlyReport">
                               <!-- JS Populated -->
                            </div>
@@ -4781,6 +4780,45 @@
     </div>
   </div>
 
+  <!-- Billing & Subscription Modal -->
+  <div id="billingModal" class="modal-overlay" style="display:none; z-index: 10010;">
+    <div class="modal-card" style="max-width: 950px; width: 90%; background: var(--surface); border-radius: var(--radius-xl); box-shadow: var(--shadow-lg); overflow: hidden; border: 1px solid rgba(255,255,255,0.2);">
+      <div class="modal-header">
+        <h3 style="margin:0; font-family:var(--font-display); font-size:1.35rem; color:var(--primary); display:flex; align-items:center; gap:10px;">
+          <span>💳</span> <span data-i18n="nav.billing">Factures & Abonnement</span>
+        </h3>
+        <button onclick="closeBillingModal()" style="background:none; border:none; cursor:pointer; font-size:1.5rem; color:var(--text-muted); transition:color 0.2s; padding:0; display:flex; align-items:center; justify-content:center;">✖</button>
+      </div>
+      <div class="modal-body" style="padding: 2.5rem;">
+         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2rem; flex-wrap: wrap; gap: 1rem;">
+            <div>
+               <h4 style="margin:0; font-size:1.15rem; color:var(--text-main); font-weight:800;">Espace Client Pro</h4>
+               <p style="color:var(--text-muted); margin:5px 0 0 0; font-size: 0.88rem;">Consultez vos reçus et gérez votre abonnement en toute sécurité via notre partenaire de paiement Stripe.</p>
+            </div>
+            <button class="btn btn-primary" onclick="window.GourmetBilling.openCustomerPortal()" style="border-radius:15px; padding:0.8rem 1.8rem; font-weight:800; font-size: 0.92rem; box-shadow: 0 4px 12px rgba(99,102,241,0.2);"> Gérer via Stripe</button>
+         </div>
+
+         <div class="table-responsive" style="background: rgba(255,255,255,0.4); border-radius: 20px; border: 1px solid rgba(0,0,0,0.05); overflow: hidden; margin-top: 1.5rem;">
+            <table class="premium-table" style="width: 100%; min-width: 700px;">
+               <thead>
+                  <tr>
+                     <th>Date</th>
+                     <th>N° Facture</th>
+                     <th>Description</th>
+                     <th>Montant</th>
+                     <th>Statut</th>
+                     <th>Action</th>
+                  </tr>
+               </thead>
+               <tbody id="billingHistoryBody">
+                  <!-- Tranches factures JS -->
+               </tbody>
+            </table>
+         </div>
+      </div>
+    </div>
+  </div>
+
   <!-- ROLE MODIFICATION MODAL -->
   <div id="roleModal" class="modal-overlay" style="display:none;">
     <div class="modal-card" style="max-width: 400px;">
@@ -5370,10 +5408,14 @@
         if (protoolsBtn) protoolsBtn.classList.add('active');
       }
       else if (tab === 'billing') {
-        document.getElementById('mgmtViewBilling').style.display = 'block';
-        const billingBtn = document.getElementById('mgmtTabBilling');
-        if (billingBtn) billingBtn.classList.add('active');
-        if (typeof GourmetBilling.renderBillingHistory === 'function') GourmetBilling.renderBillingHistory();
+        showBillingModal();
+        const dashboardBtn = document.getElementById('mgmtTabDashboard');
+        if (dashboardBtn) {
+          dashboardBtn.classList.add('active');
+          document.getElementById('mgmtViewDashboard').style.display = 'block';
+          if (typeof renderStats === 'function') renderStats();
+          if (typeof renderObjectives === 'function') renderObjectives();
+        }
       }
       else if (tab === 'production') {
         document.getElementById('mgmtViewProduction').style.display = 'block';
@@ -5454,6 +5496,21 @@
     window.showProTools = showProTools;
     window.hideAllApps = hideAllApps;
     window.switchQualitySubTab = switchQualitySubTab;
+
+    function showBillingModal() {
+      const dropdown = document.getElementById('profileDropdown');
+      if (dropdown) dropdown.classList.remove('show');
+      window.openModal('billingModal');
+      if (window.GourmetBilling && typeof window.GourmetBilling.renderBillingHistory === 'function') {
+        window.GourmetBilling.renderBillingHistory();
+      }
+    }
+    window.showBillingModal = showBillingModal;
+
+    function closeBillingModal() {
+      window.closeModal('billingModal');
+    }
+    window.closeBillingModal = closeBillingModal;
 
   </script>
 
