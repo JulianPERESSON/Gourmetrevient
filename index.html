@@ -1782,11 +1782,11 @@
             <span data-i18n="nav.billing">Facturation</span>
           </button>
           <button class="mgmt-tab-pill" id="mgmtTabProTools" onclick="switchMgmtTab('protools')">
-            <span class="tab-pill-emoji"> </span>
+            <span class="tab-pill-emoji">🛠️</span>
             <span data-i18n="mgmt.tab.protools">Outils Pro (INCO/OCR)</span>
           </button>
           <button class="mgmt-tab-pill" id="mgmtTabLogistics" onclick="switchMgmtTab('logistics')">
-            <span class="tab-pill-emoji"></span>
+            <span class="tab-pill-emoji">🚚</span>
             <span>Logistique</span>
           </button>
         </div>
@@ -1851,7 +1851,7 @@
               <div class="mgmt-export-bar" id="shoppingExportBar" style="display:none;">
                 <div class="export-summary" id="shoppingExportSummary"></div>
                 <div class="mgmt-export-actions">
-                  <button class="btn btn-sm btn-outline" onclick="exportShoppingCSV()" data-i18n="mgmt.shopping.export_csv">🎚️ CSV</button>
+                  <button class="btn btn-sm btn-outline" onclick="exportShoppingCSV()" data-i18n="mgmt.shopping.export_csv">🎚️  CSV</button>
                   <button class="btn btn-sm btn-primary" onclick="window.print()" data-i18n="ui.btn.print"> Imprimer</button>
                 </div>
               </div>
@@ -1866,7 +1866,7 @@
                <!-- Sidebar Sidebar -->
                <aside class="premium-sidebar" style="background: rgba(255,255,255,0.3); border-right: 1px solid rgba(99, 102, 241, 0.1); padding: 2rem 1.5rem;">
                   <div style="margin-bottom: 2.5rem; padding: 0 0.5rem;">
-                     <h3 style="margin:0; font-family:var(--font-display); font-size:1.2rem; color:var(--primary);">🛡️ Qualité Pro</h3>
+                     <h3 style="margin:0; font-family:var(--font-display); font-size:1.2rem; color:var(--primary);">🛡️  Qualité Pro</h3>
                      <p style="font-size:0.75rem; color:var(--text-muted); margin:5px 0 0 0;">Maîtrise des pertes & INCO</p>
                   </div>
                   
@@ -1876,11 +1876,11 @@
                         <span style="font-weight:700; font-size:0.9rem; color:var(--text-main);">Cockpit Pertes</span>
                      </button>
                      <button class="sidebar-pill" onclick="switchQualitySubTab('waste-log')" style="display:flex; align-items:center; gap:12px; width:100%; padding:1rem; border:none; background:none; border-radius:15px; cursor:pointer; transition:all 0.3s;">
-                        <span style="font-size:1.2rem;"></span>
+                        <span style="font-size:1.2rem;">📝</span>
                         <span style="font-weight:700; font-size:0.9rem; color:var(--text-main);">Saisie Signalement</span>
                      </button>
                      <button class="sidebar-pill" onclick="switchQualitySubTab('allergens')" style="display:flex; align-items:center; gap:12px; width:100%; padding:1rem; border:none; background:none; border-radius:15px; cursor:pointer; transition:all 0.3s;">
-                        <span style="font-size:1.2rem;"></span>
+                        <span style="font-size:1.2rem;">🚫</span>
                         <span style="font-weight:700; font-size:0.9rem; color:var(--text-main);">Matrice Allergènes</span>
                      </button>
                      <button class="sidebar-pill" onclick="switchQualitySubTab('history')" style="display:flex; align-items:center; gap:12px; width:100%; padding:1rem; border:none; background:none; border-radius:15px; cursor:pointer; transition:all 0.3s;">
@@ -1923,7 +1923,7 @@
                         <div class="v2-kpi-card warning" style="background: white; padding: 1.8rem; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.03);">
                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
                               <span style="font-size:0.75rem; font-weight:800; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px;">Érosion Marge</span>
-                              <span style="font-size:1.5rem;"></span>
+                              <span style="font-size:1.5rem;">📉</span>
                            </div>
                            <div style="font-size:2rem; font-weight:900; color:var(--secondary);" id="impactMarginValue">-0.00%</div>
                            <div style="font-size:0.75rem; color:var(--text-muted); margin-top:8px;">Impact sur bénéfice réel</div>
@@ -1931,7 +1931,7 @@
                         <div class="v2-kpi-card info" style="background: white; padding: 1.8rem; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.03);">
                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
                               <span style="font-size:0.75rem; font-weight:800; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px;">Volume Alertes</span>
-                              <span style="font-size:1.5rem;"></span>
+                              <span style="font-size:1.5rem;">🚨</span>
                            </div>
                            <div style="font-size:2rem; font-weight:900; color:var(--primary);" id="totalWasteCount">0</div>
                            <div style="font-size:0.75rem; color:var(--text-muted); margin-top:8px;">Nombre de déclarations</div>
@@ -2062,7 +2062,7 @@
           <div class="mgmt-glass-card" style="padding:2rem;">
             <div class="mgmt-card-header header-centered">
                <div class="mgmt-card-title">
-                  <div class="title-icon icon-green">🛡️</div>
+                  <div class="title-icon icon-green">🛡️ </div>
                   <div>
                     <h3 data-i18n="mgmt.allergens.title">Matrice des Allergènes (Règlement INCO)</h3>
                     <p data-i18n="mgmt.allergens.desc">Suivi automatique des 14 allergènes majeurs pour l'affichage obligatoire.</p>
@@ -2124,20 +2124,20 @@
 
             <!-- INCO Label Card -->
             <div class="protools-card" onclick="openINCoGenerator()">
-              <div class="protools-card-icon" style="background:rgba(16,185,129,0.1); color:#10b981;">·</div>
+              <div class="protools-card-icon" style="background:rgba(16,185,129,0.1); color:#10b981;">🏷️</div>
               <div class="protools-card-body">
                 <h3 data-i18n="inco.card.title">Étiquettes INCO</h3>
                 <p data-i18n="inco.card.desc">Générez des étiquettes réglementaires conformes UE n°1169/2011 avec allergènes en gras.</p>
               </div>
               <div class="protools-card-footer">
-                <span class="protools-tag">Format 60×40mm</span>
+                <span class="protools-tag">Format 60× 40mm</span>
                 <span class="protools-arrow">→</span>
               </div>
             </div>
 
             <!-- Vitrine Label Card -->
             <div class="protools-card" onclick="openVitrineLabels()">
-              <div class="protools-card-icon" style="background:rgba(236,72,153,0.1); color:#ec4899;">·</div>
+              <div class="protools-card-icon" style="background:rgba(236,72,153,0.1); color:#ec4899;">🏷️</div>
               <div class="protools-card-body">
                 <h3>Étiquettes de Vitrine</h3>
                 <p>Créez des étiquettes de vente élégantes avec prix, allergènes simplifiés et votre logo.</p>
@@ -2150,7 +2150,7 @@
 
             <!-- Supply Management Card -->
             <div class="protools-card" onclick="switchMgmtTab('shopping')">
-              <div class="protools-card-icon" style="background:rgba(59,130,246,0.1); color:#3b82f6;"></div>
+              <div class="protools-card-icon" style="background:rgba(59,130,246,0.1); color:#3b82f6;">📦</div>
               <div class="protools-card-body">
                 <h3 data-i18n="mgmt.tab.shopping">Approvisionnement</h3>
                 <p data-i18n="mgmt.shopping.desc">Gérez vos besoins matières, planifiez vos commandes et optimisez vos stocks.</p>
@@ -2176,7 +2176,7 @@
 
             <!-- Master Converter Card -->
             <div class="protools-card" id="mcProToolCard" onclick="openMasterConverter()">
-              <div class="protools-card-icon" style="background:rgba(99,102,241,0.10); color:var(--accent-dark);">🎚️</div>
+              <div class="protools-card-icon" style="background:rgba(99,102,241,0.10); color:var(--accent-dark);">📐</div>
               <div class="protools-card-body">
                 <h3>Master Converter</h3>
                 <p>Adaptez instantanément une recette d'un cercle 18cm vers un cadre 24cm. Coefficient géométrique + quantités recalculées.</p>
@@ -2235,7 +2235,7 @@
                      <p id="v2MarginAnalysis" style="font-size:0.75rem; color:var(--text-muted); margin-top:1rem; text-align:center;"></p>
                   </div>
                   <div class="mgmt-glass-card" style="padding:1.5rem;">
-                     <h3 style="font-size:1rem; margin:0 0 1rem 0; font-family:var(--font-display);">🏆 Top 5 Performance</h3>
+                     <h3 style="font-size:1rem; margin:0 0 1rem 0; font-family:var(--font-display);"> 🏆 Top 5 Performance</h3>
                      <div style="height:220px;"><canvas id="v2PerformanceChart"></canvas></div>
                   </div>
                </div>
@@ -2287,7 +2287,7 @@
                <div class="mgmt-glass-card" style="padding:1.5rem; background:rgba(99, 102, 241, 0.05); border:1px solid rgba(99, 102, 241, 0.3) !important;">
                   <h3 style="font-size:1.1rem; margin:0 0 1rem 0; display:flex; align-items:center; gap:0.5rem;"><span>🧠 Assistant de Labo IA</span></h3>
                   <p id="statsInsightText" style="font-size:0.85rem; line-height:1.6; color:var(--text-secondary);">
-                    Chargement des prévisions... </p></div><div class="pastry-timer" style="background:var(--surface); border:1px solid var(--surface-border); border-radius:12px; padding:1rem; text-align:center;"><div style="font-size:0.6rem; text-transform:uppercase; color:var(--text-muted); font-weight:700; margin-bottom:5px;">â²ïÂ¸ Minuteur de Labo</div><div id="timerDisplay" style="font-family:monospace; font-size:1.8rem; font-weight:800; color:var(--primary); margin-bottom:10px;">00:00</div><div style="display:flex; justify-content:center; gap:0.5rem;"><button class="btn btn-sm btn-outline" style="padding:4px 10px;" onclick="window.adjustTimer(5)">+5m</button><button class="btn btn-sm btn-primary" style="padding:4px 15px;" id="btnTimerToggle" onclick="window.toggleTimer()">Start</button><button class="btn btn-sm btn-outline" style="padding:4px 10px;" onclick="window.resetTimer()">Reset</button></div></div>
+                    Chargement des prévisions... </p></div><div class="pastry-timer" style="background:var(--surface); border:1px solid var(--surface-border); border-radius:12px; padding:1rem; text-align:center;"><div style="font-size:0.6rem; text-transform:uppercase; color:var(--text-muted); font-weight:700; margin-bottom:5px;">⏱️ Minuteur de Labo</div><div id="timerDisplay" style="font-family:monospace; font-size:1.8rem; font-weight:800; color:var(--primary); margin-bottom:10px;">00:00</div><div style="display:flex; justify-content:center; gap:0.5rem;"><button class="btn btn-sm btn-outline" style="padding:4px 10px;" onclick="window.adjustTimer(5)">+5m</button><button class="btn btn-sm btn-primary" style="padding:4px 15px;" id="btnTimerToggle" onclick="window.toggleTimer()">Start</button><button class="btn btn-sm btn-outline" style="padding:4px 10px;" onclick="window.resetTimer()">Reset</button></div></div>
                   </p>
                </div>
                
