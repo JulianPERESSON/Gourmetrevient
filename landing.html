@@ -45,9 +45,9 @@
     "url": "https://gourmetrevient.fr",
     "offers": {
       "@type": "Offer",
-      "price": "0",
+      "price": "29.99",
       "priceCurrency": "EUR",
-      "description": "Plan gratuit disponible — Plan Pro à 29,99€/mois"
+      "description": "Abonnement unique Pro Chef à 29,99€/mois HT avec 14 jours d'essai gratuit"
     },
     "aggregateRating": {
       "@type": "AggregateRating",
@@ -613,6 +613,209 @@
       transform: translateX(10px);
       box-shadow: 0 10px 30px rgba(0,0,0,0.05);
     }
+
+    /* --- NEW PREMIUM SINGLE PRICING SECTION --- */
+    .pricing {
+      background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%) !important;
+      padding: 8rem 0;
+    }
+    .pricing-container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+    .premium-pricing-card {
+      background: #0f172a;
+      background: radial-gradient(circle at 100% 0%, #1e293b 0%, #0f172a 100%);
+      border-radius: 28px;
+      box-shadow: 0 25px 60px -15px rgba(15, 23, 42, 0.4), 0 0 50px rgba(79, 70, 229, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      overflow: hidden;
+      display: grid;
+      grid-template-columns: 1.15fr 1.35fr;
+      position: relative;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .premium-pricing-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 35px 70px -15px rgba(15, 23, 42, 0.5), 0 0 60px rgba(79, 70, 229, 0.2);
+      border-color: rgba(79, 70, 229, 0.35);
+    }
+    @media (max-width: 850px) {
+      .premium-pricing-card {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    .pricing-action-side {
+      padding: 4.5rem 3.5rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      background: linear-gradient(135deg, rgba(30, 41, 59, 0.4) 0%, rgba(15, 23, 42, 0.7) 100%);
+      border-right: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    @media (max-width: 850px) {
+      .pricing-action-side {
+        border-right: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        padding: 3.5rem 2.5rem;
+      }
+    }
+    
+    .pricing-badge-popular {
+      background: linear-gradient(90deg, #4f46e5, #10b981);
+      color: white;
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      padding: 6px 16px;
+      border-radius: 99px;
+      display: inline-block;
+      align-self: flex-start;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 4px 14px rgba(79, 70, 229, 0.25);
+    }
+    
+    .pricing-plan-name {
+      font-family: var(--font-display);
+      font-size: 2.5rem;
+      font-weight: 850;
+      color: white;
+      margin-bottom: 0.75rem;
+      letter-spacing: -0.5px;
+    }
+    
+    .pricing-plan-desc {
+      font-size: 0.98rem;
+      color: #94a3b8;
+      margin-bottom: 2.5rem;
+      line-height: 1.6;
+    }
+    
+    .pricing-price-box {
+      margin-bottom: 2.5rem;
+    }
+    
+    .pricing-amount {
+      font-family: var(--font-display);
+      font-size: 3.8rem;
+      font-weight: 900;
+      color: white;
+      line-height: 1;
+      letter-spacing: -1px;
+    }
+    
+    .pricing-amount span {
+      font-size: 1.25rem;
+      color: #94a3b8;
+      font-weight: 500;
+      letter-spacing: 0;
+    }
+    
+    .pricing-btn-primary {
+      background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+      color: white !important;
+      text-align: center;
+      font-size: 1.15rem;
+      font-weight: 700;
+      padding: 1.15rem 2rem;
+      border-radius: 16px;
+      text-decoration: none;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 10px 25px -5px rgba(79, 70, 229, 0.35);
+      border: none;
+      cursor: pointer;
+      display: block;
+      width: 100%;
+    }
+    
+    .pricing-btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 15px 30px -5px rgba(79, 70, 229, 0.55);
+      filter: brightness(1.1);
+    }
+    
+    .pricing-trial-note {
+      text-align: center;
+      font-size: 0.82rem;
+      color: #64748b;
+      margin-top: 1.2rem;
+      font-weight: 500;
+    }
+    
+    .pricing-features-side {
+      padding: 4.5rem 3.5rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    @media (max-width: 850px) {
+      .pricing-features-side {
+        padding: 3.5rem 2.5rem;
+      }
+    }
+    
+    .pricing-features-title {
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      font-weight: 750;
+      color: white;
+      margin-bottom: 2rem;
+      letter-spacing: 0.5px;
+    }
+    
+    .pricing-features-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    
+    .pricing-feature-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      font-size: 0.98rem;
+      color: #cbd5e1;
+      line-height: 1.5;
+    }
+    
+    .pricing-feature-icon {
+      flex-shrink: 0;
+      width: 22px;
+      height: 22px;
+      background: rgba(16, 185, 129, 0.15);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #10b981;
+      font-size: 0.8rem;
+      font-weight: 900;
+      margin-top: 2px;
+      box-shadow: 0 0 10px rgba(16, 185, 129, 0.1);
+    }
+    
+    .vs-competitors-box {
+      margin-top: 4rem;
+      text-align: center;
+      background: rgba(255, 255, 255, 0.7);
+      border: 1px solid rgba(226, 232, 240, 0.8);
+      padding: 1.8rem 2.5rem;
+      border-radius: 24px;
+      font-size: 0.98rem;
+      color: #475569;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.01);
+      backdrop-filter: blur(8px);
+      max-width: 850px;
+      margin-left: auto;
+      margin-right: auto;
+      line-height: 1.6;
+    }
   </style>
   <link rel="canonical" href="https://gourmetrevient.fr/landing.html" />
 </head>
@@ -845,74 +1048,82 @@
     </div>
   </section>
 
-    <section class="pricing" id="pricing" style="padding: 8rem 0; background: white;">
-    <div class="container">
-      <div class="section-header" style="text-align: center; margin-bottom: 5rem;">
-        <span class="hero-badge">Tarification simple</span>
-        <h2>Tarifs simples et transparents</h2>
-        <p>14 jours d'essai offerts sur tous les plans payants. Sans engagement.</p>
+  <section class="pricing" id="pricing">
+    <div class="pricing-container">
+      <div class="section-header" style="text-align: center; margin-bottom: 4rem;">
+        <span class="hero-badge">Tarification unique</span>
+        <h2 style="font-size: 2.8rem; margin-top: 1rem; margin-bottom: 1rem; color: #0f172a; font-family: var(--font-display); font-weight: 800;">Un seul plan complet pour votre laboratoire</h2>
+        <p style="color: #64748b; font-size: 1.15rem; max-width: 600px; margin: 0 auto;">Bénéficiez de toutes les fonctionnalités sans restriction. Essayez gratuitement pendant 14 jours.</p>
       </div>
 
-      <div class="pricing-grid"> <!-- 3 colonnes -->
-
-        <!-- Plan Gratuit -->
-        <div class="plan-card">
-          <h3>Découverte</h3>
-          <p class="price">0 € <span>/ mois</span></p>
-          <p class="desc">Pour tester sans risque</p>
-          <ul>
-            <li><span style="color: #10b981;">✓</span> 5 recettes max</li>
-            <li><span style="color: #10b981;">✓</span> Calculateur de coût basique</li>
-            <li><span style="color: #10b981;">✓</span> 1 relevé HACCP / jour</li>
-            <li><span style="color: #ef4444;">✗</span> Exports PDF</li>
-            <li><span style="color: #ef4444;">✗</span> Sync cloud</li>
-          </ul>
-          <a href="index.html?tab=signup" class="btn-secondary">Commencer gratuitement</a>
+      <div class="premium-pricing-card">
+        <!-- Côté gauche : Prix & CTA -->
+        <div class="pricing-action-side">
+          <span class="pricing-badge-popular">Abonnement Unique</span>
+          <h3 class="pricing-plan-name">Pro Chef</h3>
+          <p class="pricing-plan-desc">Pour les artisans boulangers et pâtissiers qui veulent piloter la rentabilité et l'hygiène de leur laboratoire.</p>
+          
+          <div class="pricing-price-box">
+            <div class="pricing-amount">29,99 € <span>/ mois HT</span></div>
+            <p style="color: #cbd5e1; font-size: 0.85rem; margin-top: 0.5rem; font-weight: 600;">✨ 14 jours d'essai gratuit • Sans engagement</p>
+          </div>
+          
+          <a href="index.html?tab=signup" class="pricing-btn-primary btn-primary btn-shine">Démarrer mon essai gratuit</a>
+          <p class="pricing-trial-note">Aucune carte bancaire requise pour commencer l'essai</p>
         </div>
 
-        <!-- Plan Pro — mis en avant -->
-        <div class="plan-card featured">
-          <span class="badge-popular">Le plus populaire</span>
-          <h3>Pro Chef</h3>
-          <p class="price">29,99 € <span>/ mois HT</span></p>
-          <p class="desc">Pour les artisans qui veulent tout piloter</p>
-          <ul>
-            <li><span style="color: #10b981;">✓</span> Recettes & ingrédients illimités</li>
-            <li><span style="color: #10b981;">✓</span> Sous-recettes imbriquées</li>
-            <li><span style="color: #10b981;">✓</span> HACCP Pro complet</li>
-            <li><span style="color: #10b981;">✓</span> Planning & équipe</li>
-            <li><span style="color: #10b981;">✓</span> CRM & commandes</li>
-            <li><span style="color: #10b981;">✓</span> Exports PDF premium</li>
-            <li><span style="color: #10b981;">✓</span> Sync cloud multi-appareils</li>
-            <li><span style="color: #10b981;">✓</span> Devis avec signature client</li>
-            <li><span style="color: #10b981;">✓</span> Calendrier saisonnier</li>
-            <li><span style="color: #10b981;">✓</span> Support prioritaire 7j/7</li>
+        <!-- Côté droit : Fonctionnalités -->
+        <div class="pricing-features-side">
+          <h4 class="pricing-features-title">Tout est inclus dans l'abonnement :</h4>
+          <ul class="pricing-features-list">
+            <li class="pricing-feature-item">
+              <span class="pricing-feature-icon">✓</span>
+              <span><strong>Recettes & ingrédients illimités</strong> (coûts de revient automatisés en temps réel)</span>
+            </li>
+            <li class="pricing-feature-item">
+              <span class="pricing-feature-icon">✓</span>
+              <span><strong>Sous-recettes imbriquées</strong> (mises à jour récursives automatiques)</span>
+            </li>
+            <li class="pricing-feature-item">
+              <span class="pricing-feature-icon">✓</span>
+              <span><strong>Module HACCP Pro complet</strong> (relevés de températures et traçabilité digitaux)</span>
+            </li>
+            <li class="pricing-feature-item">
+              <span class="pricing-feature-icon">✓</span>
+              <span><strong>Planning de production & équipe</strong> (gestion des tâches et congés)</span>
+            </li>
+            <li class="pricing-feature-item">
+              <span class="pricing-feature-icon">✓</span>
+              <span><strong>CRM & Commandes clients</strong> (suivi et historique)</span>
+            </li>
+            <li class="pricing-feature-item">
+              <span class="pricing-feature-icon">✓</span>
+              <span><strong>Devis professionnels</strong> (génération de PDF avec signature client)</span>
+            </li>
+            <li class="pricing-feature-item">
+              <span class="pricing-feature-icon">✓</span>
+              <span><strong>Synchronisation Cloud instantanée</strong> (multi-appareils PC, tablette, mobile)</span>
+            </li>
+            <li class="pricing-feature-item">
+              <span class="pricing-feature-icon">✓</span>
+              <span><strong>Exports PDF premium</strong> (fiches techniques, relevés sanitaires, allergènes)</span>
+            </li>
+            <li class="pricing-feature-item">
+              <span class="pricing-feature-icon">✓</span>
+              <span><strong>Calendrier saisonnier interactif</strong> (fruits et légumes)</span>
+            </li>
+            <li class="pricing-feature-item">
+              <span class="pricing-feature-icon">✓</span>
+              <span><strong>Support prioritaire 7j/7</strong> par email et messagerie</span>
+            </li>
           </ul>
-          <a href="index.html?tab=signup" class="btn-primary">Démarrer 14 jours gratuits</a>
         </div>
-
-        <!-- Plan Labo -->
-        <div class="plan-card">
-          <h3>Labo Pro</h3>
-          <p class="price">49,99 € <span>/ mois HT</span></p>
-          <p class="desc">Pour les équipes et laboratoires</p>
-          <ul>
-            <li><span style="color: #10b981;">✓</span> Tout du plan Pro Chef</li>
-            <li><span style="color: #10b981;">✓</span> Jusqu'à 5 comptes équipe</li>
-            <li><span style="color: #10b981;">✓</span> Onboarding personnalisé</li>
-            <li><span style="color: #10b981;">✓</span> Support WhatsApp dédié</li>
-            <li><span style="color: #10b981;">✓</span> Rapport mensuel automatique</li>
-            <li><span style="color: #10b981;">✓</span> Export données sur demande</li>
-          </ul>
-          <a href="mailto:contact@gourmetrevient.fr" class="btn-secondary">Nous contacter</a>
-        </div>
-
       </div>
 
       <!-- Comparatif vs concurrence -->
-      <div class="vs-competitors">
-        <p>💡 <strong>Koust</strong> facture 69-79 €/mois pour moins de fonctionnalités.<br>
-        GourmetRevient vous offre plus, spécialement conçu pour la pâtisserie-boulangerie artisanale.</p>
+      <div class="vs-competitors-box">
+        <p>💡 <strong>GourmetRevient</strong> vous offre l'équivalent de plusieurs outils (Koust, Hygiène, Planning) réunis en un seul.<br>
+        Notre tarif est fixe et transparent : <strong>29,99 €/mois HT</strong> contre 69 € à 119 €/mois chez les logiciels industriels concurrents.</p>
       </div>
 
     </div>

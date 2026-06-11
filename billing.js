@@ -61,7 +61,7 @@ const GourmetBilling = {
             const inPeriod  = periodEnd > now;
 
             const subscription_active =
-                data.status === 'active' &&
+                (data.status === 'active' || data.status === 'trialing') &&
                 data.plan_type !== 'free' &&
                 (inPeriod || inTrial);
 
