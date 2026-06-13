@@ -82,7 +82,7 @@ CREATE TABLE public.profiles (
   full_name            text,
   avatar_url           text,
   plan                 text        DEFAULT 'free'
-                                   CHECK (plan IN ('free','pro','labo','admin')),
+                                   CHECK (plan IN ('free','pro','admin')),
   subscription_status  text        DEFAULT 'inactive',
   gender               text,
   role                 text,

@@ -84,7 +84,7 @@ const AuthUI = (() => {
 
   function checkPlan(feature) {
     const plan = getCurrentPlan();
-    if (plan === 'admin' || plan === 'pro' || plan === 'labo') return true;
+    if (plan === 'admin' || plan === 'pro') return true;
     
     const freeFeatures = ['base_calc'];
     if (freeFeatures.includes(feature)) return true;

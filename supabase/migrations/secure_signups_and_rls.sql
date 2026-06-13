@@ -36,44 +36,44 @@ DROP POLICY IF EXISTS "deliveries_own" ON public.deliveries;
 DROP POLICY IF EXISTS "recette_sous_recettes_own" ON public.recette_sous_recettes;
 
 CREATE POLICY "recipes_own" ON public.recipes FOR ALL USING (
-  auth.uid() = user_id AND (SELECT plan FROM public.profiles WHERE id = auth.uid()) IN ('pro', 'labo', 'admin')
+  auth.uid() = user_id AND (SELECT plan FROM public.profiles WHERE id = auth.uid()) IN ('pro', 'admin')
 );
 CREATE POLICY "ingredients_own" ON public.ingredients FOR ALL USING (
-  auth.uid() = user_id AND (SELECT plan FROM public.profiles WHERE id = auth.uid()) IN ('pro', 'labo', 'admin')
+  auth.uid() = user_id AND (SELECT plan FROM public.profiles WHERE id = auth.uid()) IN ('pro', 'admin')
 );
 CREATE POLICY "ingredient_prices_own" ON public.ingredient_prices FOR ALL USING (
-  auth.uid() = user_id AND (SELECT plan FROM public.profiles WHERE id = auth.uid()) IN ('pro', 'labo', 'admin')
+  auth.uid() = user_id AND (SELECT plan FROM public.profiles WHERE id = auth.uid()) IN ('pro', 'admin')
 );
 CREATE POLICY "clients_own" ON public.clients FOR ALL USING (
-  auth.uid() = user_id AND (SELECT plan FROM public.profiles WHERE id = auth.uid()) IN ('pro', 'labo', 'admin')
+  auth.uid() = user_id AND (SELECT plan FROM public.profiles WHERE id = auth.uid()) IN ('pro', 'admin')
 );
 CREATE POLICY "commandes_own" ON public.commandes FOR ALL USING (
-  auth.uid() = user_id AND (SELECT plan FROM public.profiles WHERE id = auth.uid()) IN ('pro', 'labo', 'admin')
+  auth.uid() = user_id AND (SELECT plan FROM public.profiles WHERE id = auth.uid()) IN ('pro', 'admin')
 );
 CREATE POLICY "fournisseurs_own" ON public.fournisseurs FOR ALL USING (
-  auth.uid() = user_id AND (SELECT plan FROM public.profiles WHERE id = auth.uid()) IN ('pro', 'labo', 'admin')
+  auth.uid() = user_id AND (SELECT plan FROM public.profiles WHERE id = auth.uid()) IN ('pro', 'admin')
 );
 CREATE POLICY "planning_own" ON public.planning_production FOR ALL USING (
-  auth.uid() = user_id AND (SELECT plan FROM public.profiles WHERE id = auth.uid()) IN ('pro', 'labo', 'admin')
+  auth.uid() = user_id AND (SELECT plan FROM public.profiles WHERE id = auth.uid()) IN ('pro', 'admin')
 );
 CREATE POLICY "haccp_temp_own" ON public.haccp_temperatures FOR ALL USING (
-  auth.uid() = user_id AND (SELECT plan FROM public.profiles WHERE id = auth.uid()) IN ('pro', 'labo', 'admin')
+  auth.uid() = user_id AND (SELECT plan FROM public.profiles WHERE id = auth.uid()) IN ('pro', 'admin')
 );
 CREATE POLICY "haccp_clean_own" ON public.haccp_nettoyage FOR ALL USING (
-  auth.uid() = user_id AND (SELECT plan FROM public.profiles WHERE id = auth.uid()) IN ('pro', 'labo', 'admin')
+  auth.uid() = user_id AND (SELECT plan FROM public.profiles WHERE id = auth.uid()) IN ('pro', 'admin')
 );
 CREATE POLICY "pertes_own" ON public.pertes FOR ALL USING (
-  auth.uid() = user_id AND (SELECT plan FROM public.profiles WHERE id = auth.uid()) IN ('pro', 'labo', 'admin')
+  auth.uid() = user_id AND (SELECT plan FROM public.profiles WHERE id = auth.uid()) IN ('pro', 'admin')
 );
 CREATE POLICY "team_own" ON public.team_members FOR ALL USING (
-  auth.uid() = user_id AND (SELECT plan FROM public.profiles WHERE id = auth.uid()) IN ('pro', 'labo', 'admin')
+  auth.uid() = user_id AND (SELECT plan FROM public.profiles WHERE id = auth.uid()) IN ('pro', 'admin')
 );
 CREATE POLICY "leaves_own" ON public.staff_leaves FOR ALL USING (
-  auth.uid() = user_id AND (SELECT plan FROM public.profiles WHERE id = auth.uid()) IN ('pro', 'labo', 'admin')
+  auth.uid() = user_id AND (SELECT plan FROM public.profiles WHERE id = auth.uid()) IN ('pro', 'admin')
 );
 CREATE POLICY "deliveries_own" ON public.deliveries FOR ALL USING (
-  auth.uid() = user_id AND (SELECT plan FROM public.profiles WHERE id = auth.uid()) IN ('pro', 'labo', 'admin')
+  auth.uid() = user_id AND (SELECT plan FROM public.profiles WHERE id = auth.uid()) IN ('pro', 'admin')
 );
 CREATE POLICY "recette_sous_recettes_own" ON public.recette_sous_recettes FOR ALL USING (
-  auth.uid() = user_id AND (SELECT plan FROM public.profiles WHERE id = auth.uid()) IN ('pro', 'labo', 'admin')
+  auth.uid() = user_id AND (SELECT plan FROM public.profiles WHERE id = auth.uid()) IN ('pro', 'admin')
 );
