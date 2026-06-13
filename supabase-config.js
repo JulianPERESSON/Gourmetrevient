@@ -59,9 +59,11 @@ async function initApp() {
             
             if (profile) {
                 setCurrentUser(profile);
-                // Déclenche la migration du localStorage vers Supabase une seule fois
-                if (typeof GourmetSync !== 'undefined') {
-                    GourmetSync.migrerLocalStorageVersSupabase();
+                // Déclenche la migration du localStorage vers Supabase uniquement pour les abonnés (pro, labo, admin)
+                if (typeof GourmetSync !== 'undefined' && ['pro', 'labo', 'admin'].includes(profile.plan)) {
+                    GourmetSync.migrerLocalStorageVersSupabase().catch(err => {
+                        console.error('Erreur migration LocalStorage:', err);
+                    });
                 }
             } else {
                 // Fallback si le trigger n'a pas encore créé le profil
