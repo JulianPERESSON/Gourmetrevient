@@ -180,11 +180,20 @@ function checkAuth() {
     removeSubscriptionRequiredOverlay();
     console.info('🔓 Authentification confirmée, déverrouillage de l\'interface...');
 
-    // Asynchronously handle trial countdown banner
+    // Vérification asynchrone complète et en temps réel de l'abonnement
     (async () => {
       try {
         if (window.GourmetBilling && typeof window.GourmetBilling.checkSubscriptionStatus === 'function') {
           const subStatus = await window.GourmetBilling.checkSubscriptionStatus();
+          
+          // Sécurité renforcée : Si pas admin et abonnement non actif, on bloque l'accès immédiatement
+          if (!isAdminBypass && !subStatus.subscription_active) {
+            console.info('🔒 Abonnement expiré ou invalide détecté en arrière-plan. Blocage immédiat.');
+            showSubscriptionRequiredOverlay(user.email);
+            removeTrialCountdownBanner();
+            return;
+          }
+
           if (subStatus.status === 'trialing' && subStatus.trial_end) {
             const trialEndMs = new Date(subStatus.trial_end).getTime();
             const nowMs = Date.now();
@@ -200,7 +209,7 @@ function checkAuth() {
           }
         }
       } catch (err) {
-        console.error('Error handling trial countdown banner:', err);
+        console.error('Error handling subscription validation:', err);
       }
     })();
     const wasPending = document.body.classList.contains('auth-pending');

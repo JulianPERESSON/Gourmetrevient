@@ -1,7 +1,7 @@
 /* 
   =============================================================================
   GourmetRevient Application Bundle (Production)
-  Généré automatiquement le : 2026-06-13T13:15:50.859Z
+  Généré automatiquement le : 2026-06-13T13:24:29.085Z
   =============================================================================
 */
 
@@ -3911,6 +3911,12 @@ console.info('🔓 Authentification confirmée, déverrouillage de l\'interface.
 try {
 if (window.GourmetBilling && typeof window.GourmetBilling.checkSubscriptionStatus === 'function') {
 const subStatus = await window.GourmetBilling.checkSubscriptionStatus();
+if (!isAdminBypass && !subStatus.subscription_active) {
+console.info('🔒 Abonnement expiré ou invalide détecté en arrière-plan. Blocage immédiat.');
+showSubscriptionRequiredOverlay(user.email);
+removeTrialCountdownBanner();
+return;
+}
 if (subStatus.status === 'trialing' && subStatus.trial_end) {
 const trialEndMs = new Date(subStatus.trial_end).getTime();
 const nowMs = Date.now();
@@ -3926,7 +3932,7 @@ removeTrialCountdownBanner();
 }
 }
 } catch (err) {
-console.error('Error handling trial countdown banner:', err);
+console.error('Error handling subscription validation:', err);
 }
 })();
 const wasPending = document.body.classList.contains('auth-pending');
