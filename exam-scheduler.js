@@ -179,7 +179,7 @@
 
   function render(grid, recipes) {
     const res = document.getElementById('schedulerResult'); if(!res) return;
-    let h = `<div class="g-wrap"><table class="g-tbl"><thead><tr><th class="g-hd-t">Temps</th>`;
+    let h = `<div class="g-wrap"><table class="g-tbl"><thead><tr><th class="g-hd-t">${t('scheduler.col.time', 'Temps')}</th>`;
     recipes.forEach(r => h += `<th class="g-hd-r">${r.icon} ${r.name}</th>`);
     h += `</tr></thead><tbody>`;
     for (let s = 0; s < grid.length; s++) {
@@ -201,7 +201,7 @@
       }
       h += `</tr>`;
     }
-    h += `</tbody></table></div><div class="route-tactique"><h3>🎯 Feuille de Route Tactique</h3>`;
+    h += `</tbody></table></div><div class="route-tactique"><h3>${t('scheduler.route.title', '🗺️ Route Tactique')}</h3>`;
     let path = []; grid.forEach(row => row.forEach(cell => { if(cell && cell.type==='MANUAL' && !path.includes(cell.n)) path.push(cell.n); }));
     path.forEach((s, i) => h += `<div class="route-step"><div class="step-num">${i+1}</div><div>${s}</div></div>`);
     h += `</div>`;
@@ -210,11 +210,11 @@
 
   window.generateSchedule = function() {
     const cbs = document.querySelectorAll('#schedulerRecipeList input:checked');
-    if (!cbs.length) { if (typeof showToast === 'function') showToast('Choisissez vos recettes !', 'warning'); return; }
+    if (!cbs.length) { if (typeof showToast === 'function') showToast(t('scheduler.toast.select_first', 'Choisissez vos recettes !'), 'warning'); return; }
     const type = document.querySelector('input[name="examType"]:checked').value;
     const sel = (DB[type]||[]).filter(r => Array.from(cbs).some(c => c.value === r.id));
     render(schedule(sel, type), sel);
-    if (typeof showToast === 'function') showToast('✅ Chronogramme optimisé généré !', 'success');
+    if (typeof showToast === 'function') showToast(t('scheduler.toast.generated', '✅ Chronogramme optimisé généré !'), 'success');
   };
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => switchExamType('EP1'));

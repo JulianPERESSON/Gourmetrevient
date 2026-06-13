@@ -25,16 +25,16 @@ window.openRecipeComparator = function() {
     modal.innerHTML = `
       <div class="modal-content glass-panel" style="max-width:1000px; width:95%; max-height:90vh; overflow-y:auto;">
         <div class="modal-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
-          <h3 style="margin:0;">⚖️ Comparateur de Recettes</h3>
+          <h3 style="margin:0;">${t('comp.title', 'Comparateur de Recettes')}</h3>
           <button class="btn-icon" onclick="window.closeModal('recipeComparatorModal');">✕</button>
         </div>
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; margin-bottom:1.5rem;">
           <div class="form-group">
-            <label style="font-weight:700; margin-bottom:0.5rem; display:block;">📗 Recette A</label>
+            <label style="font-weight:700; margin-bottom:0.5rem; display:block;">${t('comp.recipeA', 'Recette A')}</label>
             <select id="compareRecipeA" class="form-input" onchange="runRecipeComparison()"></select>
           </div>
           <div class="form-group">
-            <label style="font-weight:700; margin-bottom:0.5rem; display:block;">📕 Recette B</label>
+            <label style="font-weight:700; margin-bottom:0.5rem; display:block;">${t('comp.recipeB', 'Recette B')}</label>
             <select id="compareRecipeB" class="form-input" onchange="runRecipeComparison()"></select>
           </div>
         </div>
@@ -48,7 +48,7 @@ window.openRecipeComparator = function() {
   const libRecipes = typeof RECIPES !== 'undefined' ? RECIPES : [];
   const allRecipes = [...recipes, ...libRecipes];
   
-  const optionsHTML = '<option value="">— Sélectionner —</option>' + 
+  const optionsHTML = `<option value="">${t('comp.select', '— Sélectionner —')}</option>` + 
     allRecipes.map((r, i) => `<option value="${i}">${r.name}</option>`).join('');
   
   document.getElementById('compareRecipeA').innerHTML = optionsHTML;
@@ -56,7 +56,7 @@ window.openRecipeComparator = function() {
   document.getElementById('comparisonResults').innerHTML = `
     <div style="text-align:center; padding:3rem; color:var(--text-muted);">
       <div style="font-size:3rem; margin-bottom:1rem;">⚖️</div>
-      <p>Sélectionnez deux recettes pour comparer leurs coûts, leurs marges et leur composition.</p>
+      <p>${t('comp.hint', 'Sélectionnez deux recettes pour comparer leurs coûts, leurs marges et leur composition.')}</p>
     </div>`;
   
   window.openModal('recipeComparatorModal');
@@ -78,19 +78,19 @@ window.runRecipeComparison = function() {
   const costsB = typeof calcFullCost === 'function' ? calcFullCost(rB.margin || 70, rB) : (rB.costs || {});
   
   const metrics = [
-    { label: 'Coût matière total', keyA: costsA.totalMaterial, keyB: costsB.totalMaterial, unit: '€', lower: true },
-    { label: 'Coût par portion', keyA: costsA.costPerPortion, keyB: costsB.costPerPortion, unit: '€', lower: true },
-    { label: 'Prix de vente', keyA: costsA.sellingPrice, keyB: costsB.sellingPrice, unit: '€', lower: false },
-    { label: 'Marge brute', keyA: costsA.marginPct, keyB: costsB.marginPct, unit: '%', lower: false },
-    { label: 'Marge par portion', keyA: costsA.marginPerPortion, keyB: costsB.marginPerPortion, unit: '€', lower: false },
-    { label: 'Temps total (min)', keyA: (rA.prepTime||0)+(rA.cookTime||0), keyB: (rB.prepTime||0)+(rB.cookTime||0), unit: 'min', lower: true },
-    { label: 'Ingrédients', keyA: (rA.ingredients||[]).length, keyB: (rB.ingredients||[]).length, unit: '', lower: true },
+    { label: t('comp.metric.totalMaterial', 'Coût matière total'), keyA: costsA.totalMaterial, keyB: costsB.totalMaterial, unit: '€', lower: true },
+    { label: t('comp.metric.costPerPortion', 'Coût par portion'), keyA: costsA.costPerPortion, keyB: costsB.costPerPortion, unit: '€', lower: true },
+    { label: t('comp.metric.sellingPrice', 'Prix de vente'), keyA: costsA.sellingPrice, keyB: costsB.sellingPrice, unit: '€', lower: false },
+    { label: t('comp.metric.grossMargin', 'Marge brute'), keyA: costsA.marginPct, keyB: costsB.marginPct, unit: '%', lower: false },
+    { label: t('comp.metric.marginPerPortion', 'Marge par portion'), keyA: costsA.marginPerPortion, keyB: costsB.marginPerPortion, unit: '€', lower: false },
+    { label: t('comp.metric.totalTime', 'Temps total (min)'), keyA: (rA.prepTime||0)+(rA.cookTime||0), keyB: (rB.prepTime||0)+(rB.cookTime||0), unit: 'min', lower: true },
+    { label: t('comp.metric.ingredients', 'Ingrédients'), keyA: (rA.ingredients||[]).length, keyB: (rB.ingredients||[]).length, unit: '', lower: true },
   ];
   
   container.innerHTML = `
     <div style="border:1px solid var(--surface-border); border-radius:var(--radius); overflow:hidden;">
       <div style="display:grid; grid-template-columns:2fr 1fr 1fr; background:var(--bg-alt); padding:0.8rem 1rem; font-weight:700; font-size:0.8rem; text-transform:uppercase; letter-spacing:0.05em; border-bottom:1px solid var(--surface-border);">
-        <span>Critère</span>
+        <span>${t('comp.col.criterion', 'Critère')}</span>
         <span style="text-align:center; color:var(--primary);">📗 ${rA.name}</span>
         <span style="text-align:center; color:var(--danger);">📕 ${rB.name}</span>
       </div>
@@ -113,11 +113,11 @@ window.runRecipeComparison = function() {
       }).join('')}
     </div>
     <div style="margin-top:1.5rem; padding:1.2rem; background:var(--bg-alt); border-radius:var(--radius); border-left:4px solid var(--accent);">
-      <div style="font-weight:700; margin-bottom:0.5rem;">💡 Recommandation</div>
+      <div style="font-weight:700; margin-bottom:0.5rem;">${t('comp.recommendation', 'Recommandation')}</div>
       <p style="font-size:0.9rem; color:var(--text-secondary); margin:0;">
         ${costsA.marginPct > costsB.marginPct 
-          ? `<strong>${rA.name}</strong> offre une meilleure marge (+${(costsA.marginPct - costsB.marginPct).toFixed(1)} pts). ${costsA.totalMaterial < costsB.totalMaterial ? 'Elle est aussi moins coûteuse en matière première.' : `Cependant, <strong>${rB.name}</strong> a un coût matière inférieur de ${(costsA.totalMaterial - costsB.totalMaterial).toFixed(2)}€.`}`
-          : `<strong>${rB.name}</strong> offre une meilleure marge (+${(costsB.marginPct - costsA.marginPct).toFixed(1)} pts). ${costsB.totalMaterial < costsA.totalMaterial ? 'Elle est aussi moins coûteuse en matière première.' : `Cependant, <strong>${rA.name}</strong> a un coût matière inférieur de ${(costsB.totalMaterial - costsA.totalMaterial).toFixed(2)}€.`}`
+          ? `<strong>${rA.name}</strong> ${t('comp.offers_better_margin', 'offre une meilleure marge')} (+${(costsA.marginPct - costsB.marginPct).toFixed(1)} pts). ${costsA.totalMaterial < costsB.totalMaterial ? t('comp.also_cheaper', 'Elle est aussi moins coûteuse en matière première.') : `${t('comp.however', 'Cependant,')} <strong>${rB.name}</strong> ${t('comp.lower_cost_by', 'a un coût matière inférieur de')} ${(costsA.totalMaterial - costsB.totalMaterial).toFixed(2)}€.`}`
+          : `<strong>${rB.name}</strong> ${t('comp.offers_better_margin', 'offre une meilleure marge')} (+${(costsB.marginPct - costsA.marginPct).toFixed(1)} pts). ${costsB.totalMaterial < costsA.totalMaterial ? t('comp.also_cheaper', 'Elle est aussi moins coûteuse en matière première.') : `${t('comp.however', 'Cependant,')} <strong>${rA.name}</strong> ${t('comp.lower_cost_by', 'a un coût matière inférieur de')} ${(costsB.totalMaterial - costsA.totalMaterial).toFixed(2)}€.`}`
         }
       </p>
     </div>
@@ -194,23 +194,23 @@ function showMarginAlertBanner(alerts) {
   const critical = alerts.filter(a => a.severity === 'critical');
   banner.innerHTML = `
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.8rem;">
-      <span style="font-weight:700; font-size:1rem;">🚨 Alertes Rentabilité</span>
+      <span style="font-weight:700; font-size:1rem;">${t('alert.margin.title', 'Alertes Rentabilité')}</span>
       <button onclick="this.closest('#marginAlertBanner').remove();" style="background:none; border:none; color:white; font-size:1.2rem; cursor:pointer;">✕</button>
     </div>
     <div style="font-size:0.85rem; line-height:1.6;">
       ${alerts.slice(0, 3).map(a => `
         <div style="padding:0.4rem 0; border-bottom:1px solid rgba(255,255,255,0.08);">
-          <span style="color:${a.severity === 'critical' ? '#ef4444' : '#f59e0b'};">${a.severity === 'critical' ? '💀' : '⚠️'}</span>
-          <strong>${a.recipe}</strong> — marge ${a.margin}% 
-          <span style="font-size:0.75rem; opacity:0.7;">(objectif: ${a.threshold}%)</span>
-          <br><span style="font-size:0.75rem; opacity:0.6;">Poste principal : ${a.topIngredient} (${a.topIngredientPct}% du coût)</span>
+          <span style="color:${a.severity === 'critical' ? '#ef4444' : '#f59e0b'};"> ${a.severity === 'critical' ? '💀' : '⚠️'}</span>
+          <strong>${a.recipe}</strong> — ${t('alert.margin.label', 'marge')} ${a.margin}% 
+          <span style="font-size:0.75rem; opacity:0.7;">(${t('alert.margin.target', 'objectif:')} ${a.threshold}%)</span>
+          <br><span style="font-size:0.75rem; opacity:0.6;">${t('alert.margin.top_cost', 'Poste principal :')} ${a.topIngredient} (${a.topIngredientPct}% ${t('alert.margin.of_cost', 'du coût')})</span>
         </div>
       `).join('')}
-      ${alerts.length > 3 ? `<div style="font-size:0.75rem; opacity:0.6; margin-top:0.5rem;">+${alerts.length - 3} autres alertes</div>` : ''}
+      ${alerts.length > 3 ? `<div style="font-size:0.75rem; opacity:0.6; margin-top:0.5rem;">${t('alert.margin.more', '+{n} autres alertes', {n: alerts.length - 3})}</div>` : ''}
     </div>
     <button onclick="openRecipeComparator(); this.closest('#marginAlertBanner').remove();" 
       class="btn btn-sm" style="margin-top:0.8rem; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); color:white; width:100%; padding:8px; border-radius:8px; cursor:pointer;">
-      ⚖️ Ouvrir le Comparateur
+      ${t('alert.margin.open_comparator', 'Ouvrir le Comparateur')}
     </button>
   `;
   
@@ -240,7 +240,7 @@ window.analyzeWorkload = function() {
   ) || '[]');
   
   if (plan.length === 0) {
-    if (typeof showToast === 'function') showToast('Aucune production planifiée.', 'info');
+    if (typeof showToast === 'function') showToast(t('workload.empty', 'Aucune production planifiée.'), 'info');
     return;
   }
   
@@ -272,9 +272,9 @@ window.analyzeWorkload = function() {
   const hoursPerPerson = totalHours / teamSize;
   const workDaysNeeded = Math.ceil(hoursPerPerson / 8); // 8h work day
   
-  let status = 'ok', statusIcon = '✅', statusText = 'Charge maîtrisée';
-  if (hoursPerPerson > 16) { status = 'critical'; statusIcon = '🔴'; statusText = 'Surcharge critique'; }
-  else if (hoursPerPerson > 10) { status = 'warning'; statusIcon = '⚠️'; statusText = 'Charge élevée'; }
+  let status = 'ok', statusIcon = '✅', statusText = t('workload.status.ok', 'Charge maîtrisée');
+  if (hoursPerPerson > 16) { status = 'critical'; statusIcon = '🔴'; statusText = t('workload.status.critical', 'Surcharge critique'); }
+  else if (hoursPerPerson > 10) { status = 'warning'; statusIcon = '⚠️'; statusText = t('workload.status.warning', 'Charge élevée'); }
   
   // Render in a modal
   let modal = document.getElementById('workloadModal');
@@ -287,27 +287,26 @@ window.analyzeWorkload = function() {
   
   modal.innerHTML = `
     <div class="modal-content glass-panel" style="max-width:700px; width:95%; max-height:90vh; overflow-y:auto;">
-      <div class="modal-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
-        <h3 style="margin:0;">📊 Analyse de Charge</h3>
+        <h3 style="margin:0;">${t('workload.title', 'Analyse de Charge')}</h3>
         <button class="btn-icon" onclick="window.closeModal('workloadModal');">✕</button>
       </div>
       
       <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:1rem; margin-bottom:1.5rem;">
         <div style="text-align:center; padding:1rem; background:var(--bg-alt); border-radius:var(--radius); border:1px solid var(--surface-border);">
           <div style="font-size:1.8rem; font-weight:800; color:var(--accent);">${totalHours.toFixed(1)}h</div>
-          <div style="font-size:0.75rem; color:var(--text-muted); font-weight:600;">Heures totales</div>
+          <div style="font-size:0.75rem; color:var(--text-muted); font-weight:600;">${t('workload.total_hours', 'Heures totales')}</div>
         </div>
         <div style="text-align:center; padding:1rem; background:var(--bg-alt); border-radius:var(--radius); border:1px solid var(--surface-border);">
           <div style="font-size:1.8rem; font-weight:800; color:var(--primary);">${teamSize}</div>
-          <div style="font-size:0.75rem; color:var(--text-muted); font-weight:600;">Pâtissier(s)</div>
+          <div style="font-size:0.75rem; color:var(--text-muted); font-weight:600;">${t('workload.bakers', 'Pâtissier(s)')}</div>
         </div>
         <div style="text-align:center; padding:1rem; background:var(--bg-alt); border-radius:var(--radius); border:1px solid var(--surface-border);">
-          <div style="font-size:1.8rem; font-weight:800; color:${status === 'critical' ? 'var(--danger)' : (status === 'warning' ? '#f59e0b' : 'var(--success)')};">${hoursPerPerson.toFixed(1)}h</div>
-          <div style="font-size:0.75rem; color:var(--text-muted); font-weight:600;">/ personne</div>
+          <div style="font-size:1.8rem; font-weight:800; color:${status === 'critical' ? 'var(--danger)' : (status === 'warning' ? '#f59e0b' : 'var(--success)')};"> ${hoursPerPerson.toFixed(1)}h</div>
+          <div style="font-size:0.75rem; color:var(--text-muted); font-weight:600;">${t('workload.per_person', '/ personne')}</div>
         </div>
         <div style="text-align:center; padding:1rem; background:var(--bg-alt); border-radius:var(--radius); border:1px solid var(--surface-border);">
           <div style="font-size:1.8rem; font-weight:800;">${workDaysNeeded}</div>
-          <div style="font-size:0.75rem; color:var(--text-muted); font-weight:600;">Jour(s) néc.</div>
+          <div style="font-size:0.75rem; color:var(--text-muted); font-weight:600;">${t('workload.days_needed', 'Jour(s) néc.')}</div>
         </div>
       </div>
       
@@ -315,17 +314,17 @@ window.analyzeWorkload = function() {
         <div style="font-weight:700; font-size:1rem;">${statusIcon} ${statusText}</div>
         <p style="font-size:0.85rem; margin:0.5rem 0 0; color:var(--text-secondary);">
           ${status === 'critical' 
-            ? `Attention : ${hoursPerPerson.toFixed(1)}h de travail par personne dépassent largement une journée de 8h. Envisagez de répartir la production sur ${workDaysNeeded} jours ou de renforcer l'équipe.`
+            ? t('workload.msg.exceed', '{h}h par personne dépassent 8h/j. Répartissez sur {days} jours.', {h: hoursPerPerson.toFixed(1), days: workDaysNeeded})
             : (status === 'warning' 
-              ? `La charge est élevée mais gérable. Prévoyez ${workDaysNeeded} jour(s) plein pour finaliser la production.`
-              : `La charge est parfaitement répartie. Votre équipe peut absorber cette production sur ${workDaysNeeded} jour(s).`)
+              ? t('workload.msg.high', 'Charge élevée mais gérable. Prévoyez {days} jour(s).', {days: workDaysNeeded})
+              : t('workload.msg.ok', 'Charge bien répartie. Votre équipe peut absorber la production en {days} jour(s).', {days: workDaysNeeded}))
           }
         </p>
       </div>
       
       <div style="border:1px solid var(--surface-border); border-radius:var(--radius); overflow:hidden;">
         <div style="display:grid; grid-template-columns:2fr 0.5fr 1fr 1fr 1fr; background:var(--bg-alt); padding:0.6rem 1rem; font-weight:700; font-size:0.75rem; text-transform:uppercase; letter-spacing:0.05em;">
-          <span>Recette</span><span style="text-align:center;">Qté</span><span style="text-align:center;">Prép</span><span style="text-align:center;">Cuisson</span><span style="text-align:center;">Total</span>
+          <span>${t('comp.col.recipe', 'Recette')}</span><span style="text-align:center;">${t('col.qty', 'Qté')}</span><span style="text-align:center;">${t('workload.col.prep', 'Prép')}</span><span style="text-align:center;">${t('workload.col.cook', 'Cuisson')}</span><span style="text-align:center;">${t('col.total', 'Total')}</span>
         </div>
         ${breakdown.map(b => `
           <div style="display:grid; grid-template-columns:2fr 0.5fr 1fr 1fr 1fr; padding:0.6rem 1rem; border-top:1px solid var(--surface-border); font-size:0.85rem;">
@@ -476,13 +475,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (proToolsGrid && !document.getElementById('comparatorProCard')) {
       proToolsGrid.insertAdjacentHTML('beforeend', `
         <div class="protools-card" onclick="openRecipeComparator()" id="comparatorProCard">
-          <div class="protools-card-icon" style="background:rgba(245,158,11,0.1); color:#f59e0b;">⚖️</div>
+          <div class="protools-card-icon" style="background:rgba(99,102,241,0.1); color:#6366f1;">⚖️</div>
           <div class="protools-card-body">
-            <h3>Comparateur de Recettes</h3>
-            <p>Comparez deux recettes côte à côte : coûts, marges, temps de production et composition.</p>
+            <h3>${t('comp.card.title', 'Comparateur de Recettes')}</h3>
+            <p>${t('comp.card.desc', 'Comparez deux recettes côte à côte : coûts, marges, temps de production et composition.')}</p>
           </div>
           <div class="protools-card-footer">
-            <span class="protools-tag">Analyse</span>
+            <span class="protools-tag">${t('tag.analysis', 'Analyse')}</span>
             <span class="protools-arrow">→</span>
           </div>
         </div>
@@ -492,8 +491,8 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="protools-card" onclick="analyzeWorkload()" id="workloadProCard">
           <div class="protools-card-icon" style="background:rgba(99,102,241,0.1); color:#6366f1;">📊</div>
           <div class="protools-card-body">
-            <h3>Charge de Travail</h3>
-            <p>Analysez si votre équipe peut absorber le volume de production planifié dans les délais.</p>
+            <h3>${t('workload.card.title', 'Charge de Travail')}</h3>
+            <p>${t('workload.card.desc', 'Analysez si votre équipe peut absorber le volume de production planifié dans les délais.')}</p>
           </div>
           <div class="protools-card-footer">
             <span class="protools-tag">Planning</span>
@@ -501,8 +500,6 @@ document.addEventListener('DOMContentLoaded', () => {
           </div>
         </div>
       `);
-
-
     }
     
     // Check margin alerts after everything is loaded
@@ -535,17 +532,17 @@ window.openVitrineLabels = function() {
   modal.innerHTML = `
     <div class="modal-content glass-panel" style="max-width:900px; width:95%; max-height:90vh; overflow-y:auto;">
       <div class="modal-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
-        <h3 style="margin:0;">🏷️ Étiquettes de Vitrine</h3>
+        <h3 style="margin:0;">${t('vitrine.title', 'Étiquettes de Vitrine')}</h3>
         <button class="btn-icon" onclick="window.closeModal('vitrineLabelsModal');">✕</button>
       </div>
       
       <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:1.5rem;">
-        Sélectionnez les produits à étiqueter. Chaque étiquette contiendra le nom, le prix, les allergènes et un QR code renvoyant vers la fiche produit.
+        ${t('vitrine.desc', 'Sélectionnez les produits à étiqueter. Chaque étiquette contiendra le nom, le prix, les allergènes et un QR code renvoyant vers la fiche produit.')}
       </p>
       
       <div style="display:flex; gap:0.5rem; margin-bottom:1.5rem; flex-wrap:wrap;">
-        <button class="btn btn-sm btn-outline" onclick="toggleAllVitrineCheckboxes(true)">✅ Tout sélectionner</button>
-        <button class="btn btn-sm btn-outline" onclick="toggleAllVitrineCheckboxes(false)">❌ Tout désélectionner</button>
+        <button class="btn btn-sm btn-outline" onclick="toggleAllVitrineCheckboxes(true)">${t('vitrine.select_all', 'Tout sélectionner')}</button>
+        <button class="btn btn-sm btn-outline" onclick="toggleAllVitrineCheckboxes(false)">${t('vitrine.deselect_all', 'Tout désélectionner')}</button>
       </div>
       
       <div id="vitrineRecipeList" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:1rem; margin-bottom:2rem;">
@@ -568,8 +565,8 @@ window.openVitrineLabels = function() {
       </div>
       
       <div style="display:flex; gap:0.75rem; flex-wrap:wrap;">
-        <button class="btn btn-primary" onclick="generateVitrineLabels()">🖨️ Générer les étiquettes</button>
-        <button class="btn btn-outline" onclick="printVitrineLabels()">🖨️ Imprimer</button>
+        <button class="btn btn-primary" onclick="generateVitrineLabels()">${t('vitrine.generate', 'Générer les étiquettes')}</button>
+        <button class="btn btn-outline" onclick="printVitrineLabels()">${t('ui.btn.print', 'Imprimer')}</button>
       </div>
       
       <div id="vitrinePreview" style="margin-top:1.5rem;"></div>
@@ -586,7 +583,7 @@ window.toggleAllVitrineCheckboxes = function(state) {
 window.generateVitrineLabels = function() {
   const checks = document.querySelectorAll('.vitrine-check:checked');
   if (checks.length === 0) {
-    showToast('Sélectionnez au moins un produit.', 'warning');
+    showToast(t('vitrine.select_min', 'Sélectionnez au moins un produit.'), 'warning');
     return;
   }
   
@@ -682,7 +679,7 @@ window.generateVitrineLabels = function() {
           <div style="font-size:1rem; font-weight:700; color:#0f172a;">€</div>
           <div style="font-size:0.7rem; color:#94a3b8; font-weight:600; margin-left:2px;">TTC</div>
           
-          ${!isSingle ? `<div style="font-size:0.75rem; color:#64748b; font-weight:600; margin-left:5px;">/ la part</div>` : ''}
+          ${!isSingle ? `<div style="font-size:0.75rem; color:#64748b; font-weight:600; margin-left:5px;">${t('vitrine.per_portion', '/ la part')}</div>` : ''}
           
           ${nutri ? `
             <div style="margin-left:auto; display:flex; align-items:center; background:#f8fafc; padding:4px 8px; border-radius:20px; border:1px solid #f1f5f9;">
@@ -695,18 +692,18 @@ window.generateVitrineLabels = function() {
         <div style="margin-top:auto;">
           ${allergens.length > 0 ? `
             <div style="font-size:0.7rem; color:#dc2626; font-weight:700; line-height:1.4; padding:6px 10px; background:#fef2f2; border-radius:8px; border:1px solid #fee2e2;">
-              ⚠️ Allergènes : <span style="font-weight:600;">${allergens.join(', ')}</span>
+              ⚠️ ${t('vitrine.allergens', 'Allergènes :')} <span style="font-weight:600;">${allergens.join(', ')}</span>
             </div>
           ` : `
             <div style="font-size:0.7rem; color:#059669; font-weight:700; padding:6px 10px; background:#ecfdf5; border-radius:8px; border:1px solid #d1fae5; display:flex; align-items:center; gap:6px;">
-              <span style="font-size:1rem;">✓</span> Aucun allergène majeur
+              <span style="font-size:1rem;">✓</span> ${t('vitrine.no_allergen', 'Aucun allergène majeur')}
             </div>
           `}
         </div>
         
         <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px; padding-top:8px; border-top:1px dashed #e2e8f0;">
            <div style="font-size:0.6rem; color:#94a3b8; font-weight:600;">${shopName}</div>
-           <div style="font-size:0.55rem; color:#64748b; font-style:italic;">Scannez pour la composition</div>
+           <div style="font-size:0.55rem; color:#64748b; font-style:italic;">${t('vitrine.scan_hint', 'Scannez pour la composition')}</div>
         </div>
       </div>
     `;
@@ -716,8 +713,8 @@ window.generateVitrineLabels = function() {
   if (preview) {
     preview.innerHTML = `
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
-        <div style="font-weight:800; font-size:1rem; color:var(--primary);">Aperçu de vos étiquettes (${checks.length})</div>
-        <div style="font-size:0.75rem; color:var(--text-muted);">Prêtes pour impression laser ou jet d'encre</div>
+        <div style="font-weight:800; font-size:1rem; color:var(--primary);">${t('vitrine.preview', 'Aperçu de vos étiquettes ({n})', {n: checks.length})}</div>
+        <div style="font-size:0.75rem; color:var(--text-muted);">${t('vitrine.print_ready', 'Prêtes pour impression laser ou jet d\'encre')}</div>
       </div>
       <div id="vitrinePrintZone" style="display:flex; flex-wrap:wrap; gap:1.5rem; justify-content:center; padding:1rem; background:rgba(0,0,0,0.02); border-radius:12px;">
         ${labelsHTML}
@@ -727,19 +724,19 @@ window.generateVitrineLabels = function() {
     setTimeout(renderRealQRs, 100);
   }
   
-  showToast(`${checks.length} étiquette(s) générée(s) !`, 'success');
+  showToast(t('vitrine.generated', '{n} étiquette(s) générée(s) !', {n: checks.length}), 'success');
 };
 
 window.printVitrineLabels = function() {
   const zone = document.getElementById('vitrinePrintZone');
   if (!zone || zone.children.length === 0) {
-    showToast('Générez d\'abord les étiquettes.', 'warning');
+    showToast(t('vitrine.generate_first', 'Générez d\'abord les étiquettes.'), 'warning');
     return;
   }
   
   const printWin = window.open('', '_blank');
   printWin.document.write(`<!DOCTYPE html>
-<html><head><title>Étiquettes Vitrine</title>
+<html><head><title>${t('vitrine.print_title', 'Étiquettes Vitrine')}</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }

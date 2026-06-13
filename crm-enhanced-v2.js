@@ -53,50 +53,50 @@ function openInvoiceGenerator(orderId = null) {
     modal.innerHTML = `
     <div class="modal-content glass-panel" style="max-width:780px; width:95%; max-height:92vh; overflow-y:auto;">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
-        <h3 style="margin:0; font-size:1.3rem;">📄 Générateur de Devis / Facture</h3>
+        <h3 style="margin:0; font-size:1.3rem;">${t('inv.generator.title', '📄 Générateur de Devis / Facture')}</h3>
         <button class="btn-icon" onclick="window.closeModal('invoiceGeneratorModal');">✕</button>
       </div>
 
       <!-- Type Toggle -->
       <div style="display:flex; gap:0.5rem; margin-bottom:1.5rem; background:var(--bg-alt); padding:6px; border-radius:14px;">
-        <button id="invTypeBtnDevis" onclick="setInvoiceType('devis')" style="flex:1; padding:10px; border-radius:10px; border:none; cursor:pointer; background:var(--accent); color:#fff; font-weight:700; transition:all 0.2s;">📋 Devis</button>
-        <button id="invTypeBtnFacture" onclick="setInvoiceType('facture')" style="flex:1; padding:10px; border-radius:10px; border:none; cursor:pointer; background:transparent; color:var(--text-secondary); font-weight:600; transition:all 0.2s;">🧾 Facture</button>
+        <button id="invTypeBtnDevis" onclick="setInvoiceType('devis')" style="flex:1; padding:10px; border-radius:10px; border:none; cursor:pointer; background:var(--accent); color:#fff; font-weight:700; transition:all 0.2s;">${t('inv.type.quote', '📋 Devis')}</button>
+        <button id="invTypeBtnFacture" onclick="setInvoiceType('facture')" style="flex:1; padding:10px; border-radius:10px; border:none; cursor:pointer; background:transparent; color:var(--text-secondary); font-weight:600; transition:all 0.2s;">${t('inv.type.invoice', '🧾 Facture')}</button>
       </div>
       <input type="hidden" id="invDocType" value="devis">
 
       <!-- Form Grid -->
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1rem;">
         <div class="form-group">
-          <label class="form-label">Client *</label>
+          <label class="form-label">${t('inv.form.client', 'Client *')}</label>
           <select id="invClientSel" class="form-input" onchange="prefillInvoiceFromClient()">
-            <option value="">— Sélectionner un client —</option>
+            <option value="">${t('inv.form.select_client', '— Sélectionner un client —')}</option>
             ${clients.map(c => `<option value="${c.id}" ${selectedOrder && selectedOrder.clientId === c.id ? 'selected' : ''}>${_escHtml(c.name)}</option>`).join('')}
           </select>
         </div>
         <div class="form-group">
-          <label class="form-label">Commande liée (optionnel)</label>
+          <label class="form-label">${t('inv.form.linked_order', 'Commande liée (optionnel)')}</label>
           <select id="invOrderSel" class="form-input" onchange="prefillInvoiceFromOrder()">
-            <option value="">— Aucune —</option>
+            <option value="">${t('inv.form.none', '— Aucune —')}</option>
             ${orders.map(o => {
                 const client = clients.find(c => c.id === o.clientId);
-                return `<option value="${o.id}" ${selectedOrder && selectedOrder.id === o.id ? 'selected' : ''}>${client ? _escHtml(client.name) : 'Client inconnu'} — ${_escHtml(o.products || '').substring(0, 30)}</option>`;
+                return `<option value="${o.id}" ${selectedOrder && selectedOrder.id === o.id ? 'selected' : ''}>${client ? _escHtml(client.name) : t('inv.form.unknown_client', 'Client inconnu')} — ${_escHtml(o.products || '').substring(0, 30)}</option>`;
             }).join('')}
           </select>
         </div>
         <div class="form-group">
-          <label class="form-label">N° Document</label>
+          <label class="form-label">${t('inv.form.doc_number', 'N° Document')}</label>
           <input type="text" id="invNumber" class="form-input" value="${_generateDocNumber()}">
         </div>
         <div class="form-group">
-          <label class="form-label">Date du document</label>
+          <label class="form-label">${t('inv.form.doc_date', 'Date du document')}</label>
           <input type="date" id="invDate" class="form-input" value="${new Date().toISOString().split('T')[0]}">
         </div>
         <div class="form-group">
-          <label class="form-label">Validité / Échéance (jours)</label>
+          <label class="form-label">${t('inv.form.validity', 'Validité / Échéance (jours)')}</label>
           <input type="number" id="invValidity" class="form-input" value="30" min="1">
         </div>
         <div class="form-group">
-          <label class="form-label">Coordonnées de votre boutique</label>
+          <label class="form-label">${t('inv.form.shop_address', 'Coordonnées de votre boutique')}</label>
           <input type="text" id="invShopAddress" class="form-input" placeholder="12 rue du Four, 75001 Paris" value="${localStorage.getItem('gourmet_shop_address') || ''}">
         </div>
       </div>
@@ -104,122 +104,122 @@ function openInvoiceGenerator(orderId = null) {
       <!-- Line Items -->
       <div style="margin-bottom:1rem;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.7rem;">
-          <label class="form-label" style="margin:0;">Lignes de prestation</label>
-          <button class="btn btn-sm btn-outline" onclick="addInvoiceLine()">✚ Ajouter</button>
+          <label class="form-label" style="margin:0;">${t('inv.lines.label', 'Lignes de prestation')}</label>
+          <button class="btn btn-sm btn-outline" onclick="addInvoiceLine()">${t('inv.lines.add', '✚ Ajouter')}</button>
         </div>
         <div id="invLinesContainer">
           <div style="display:grid; grid-template-columns:3fr 1fr 1fr 1fr 36px; gap:6px; font-size:0.75rem; font-weight:700; text-transform:uppercase; color:var(--text-muted); padding:0 4px; margin-bottom:4px;">
-            <span>Description</span><span>Qté</span><span>Prix U. (€)</span><span>Total</span><span></span>
+            <span>${t('inv.col.desc', 'Description')}</span><span>${t('col.qty', 'Qté')}</span><span>${t('inv.col.unit_price', 'Prix U. (€)')}</span><span>${t('col.total', 'Total')}</span><span></span>
           </div>
           <!-- Lines inserted by JS -->
         </div>
         <div style="text-align:right; margin-top:0.8rem; padding:0.8rem; background:var(--bg-alt); border-radius:10px;">
           <div style="display:flex; justify-content:flex-end; gap:2rem; font-size:0.9rem;">
-            <span>Sous-total HT :</span><strong id="invSubtotal">0,00 €</strong>
+            <span>${t('inv.subtotal', 'Sous-total HT :')}</span><strong id="invSubtotal">0,00 €</strong>
           </div>
           <div style="display:flex; justify-content:flex-end; gap:2rem; font-size:0.9rem; margin-top:4px;">
-            <span>TVA (10%) :</span><strong id="invTVA">0,00 €</strong>
+            <span>${t('inv.tva', 'TVA (10%) :')}</span><strong id="invTVA">0,00 €</strong>
           </div>
           <div style="display:flex; justify-content:flex-end; gap:2rem; font-size:1.1rem; font-weight:900; color:var(--accent); margin-top:8px; border-top:2px solid var(--surface-border); padding-top:8px;">
-            <span>Total TTC :</span><strong id="invTotal">0,00 €</strong>
+            <span>${t('inv.total_ttc', 'Total TTC :')}</span><strong id="invTotal">0,00 €</strong>
           </div>
         </div>
       </div>
 
       <!-- 🎂 Commande Spéciale (Événementiel) -->
       <div style="background:var(--bg-alt); padding:1rem; border-radius:14px; border:1px solid var(--surface-border); margin-bottom:1rem;">
-        <h4 style="margin:0 0 0.8rem; font-size:0.9rem; color:var(--primary);">🎂 Commande Spéciale (Événementiel)</h4>
+        <h4 style="margin:0 0 0.8rem; font-size:0.9rem; color:var(--primary);">${t('inv.event.title', '🎂 Commande Spéciale (Événementiel)')}</h4>
         <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:0.8rem;">
           <div class="form-group" style="margin:0;">
-            <label class="form-label" style="font-size:0.75rem;">Type d'événement</label>
+            <label class="form-label" style="font-size:0.75rem;">${t('inv.event.type', 'Type d\'événement')}</label>
             <select id="invEventType" class="form-input">
-              <option value="">— Aucun —</option>
-              <option value="Mariage">👰 Mariage</option>
-              <option value="Baptême">👼 Baptême</option>
-              <option value="Anniversaire">🎉 Anniversaire</option>
-              <option value="Autre">✨ Autre Événement</option>
+              <option value="">${t('inv.event.none', '— Aucun —')}</option>
+              <option value="Mariage">${t('inv.event.wedding', '👰 Mariage')}</option>
+              <option value="Baptême">${t('inv.event.baptism', '👼 Baptême')}</option>
+              <option value="Anniversaire">${t('inv.event.birthday', '🎉 Anniversaire')}</option>
+              <option value="Autre">${t('inv.event.other', '✨ Autre Événement')}</option>
             </select>
           </div>
           <div class="form-group" style="margin:0;">
-            <label class="form-label" style="font-size:0.75rem;">Lieu & Heure de livraison</label>
+            <label class="form-label" style="font-size:0.75rem;">${t('inv.event.delivery_details', 'Lieu & Heure de livraison')}</label>
             <input type="text" id="invDeliveryDetails" class="form-input" placeholder="ex: Château du Lac, 14h">
           </div>
           <div class="form-group" style="margin:0;">
-            <label class="form-label" style="font-size:0.75rem;">Thème / Couleurs</label>
+            <label class="form-label" style="font-size:0.75rem;">${t('inv.event.theme', 'Thème / Couleurs')}</label>
             <input type="text" id="invEventTheme" class="form-input" placeholder="ex: Rose et Blanc, Bohème">
           </div>
       </div>
 
       <!-- 📊 Seuil de Rentabilité & Frais Fixes de l'Événement -->
       <div style="background:var(--bg-alt); padding:1rem; border-radius:14px; border:1px solid var(--surface-border); margin-bottom:1rem;">
-        <h4 style="margin:0 0 0.8rem; font-size:0.9rem; color:var(--primary);">📊 Seuil de Rentabilité & Frais Fixes de l'Événement</h4>
+        <h4 style="margin:0 0 0.8rem; font-size:0.9rem; color:var(--primary);">${t('inv.breakeven.title', '📊 Seuil de Rentabilité & Frais Fixes de l\'Événement')}</h4>
         <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:0.8rem; margin-bottom:1rem;">
           <div class="form-group" style="margin:0;">
-            <label class="form-label" style="font-size:0.75rem;">Coût Livraison / Transport (€ HT)</label>
+            <label class="form-label" style="font-size:0.75rem;">${t('inv.breakeven.delivery_cost', 'Coût Livraison / Transport (€ HT)')}</label>
             <input type="number" id="invDeliveryCost" class="form-input" placeholder="0.00" value="0" min="0" step="5">
           </div>
           <div class="form-group" style="margin:0;">
-            <label class="form-label" style="font-size:0.75rem;">Frais Personnel / Service (€ HT)</label>
+            <label class="form-label" style="font-size:0.75rem;">${t('inv.breakeven.staff_cost', 'Frais Personnel / Service (€ HT)')}</label>
             <input type="number" id="invStaffingCost" class="form-input" placeholder="0.00" value="0" min="0" step="10">
           </div>
           <div class="form-group" style="margin:0;">
-            <label class="form-label" style="font-size:0.75rem;">Frais Divers / Logistique (€ HT)</label>
+            <label class="form-label" style="font-size:0.75rem;">${t('inv.breakeven.overhead', 'Frais Divers / Logistique (€ HT)')}</label>
             <input type="number" id="invEventOverheads" class="form-input" placeholder="0.00" value="0" min="0" step="5">
           </div>
         </div>
 
         <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 0.8rem; padding: 0.8rem; background: var(--surface); border-radius: 10px; border: 1px solid var(--surface-border); text-align: center;">
           <div>
-            <div style="font-size: 0.68rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">CA de l'événement</div>
+            <div style="font-size: 0.68rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">${t('inv.breakeven.revenue', 'CA de l\'événement')}</div>
             <div id="simEventRevenue" style="font-size: 1.05rem; font-weight: 800; color: var(--text-primary); margin-top: 2px;">0,00 €</div>
           </div>
           <div>
-            <div style="font-size: 0.68rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Coût variable total</div>
+            <div style="font-size: 0.68rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">${t('inv.breakeven.variable_cost', 'Coût variable total')}</div>
             <div id="simVariableCost" style="font-size: 1.05rem; font-weight: 800; color: var(--text-primary); margin-top: 2px;">0,00 €</div>
           </div>
           <div>
-            <div style="font-size: 0.68rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Total Frais Fixes</div>
+            <div style="font-size: 0.68rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">${t('inv.breakeven.fixed_cost', 'Total Frais Fixes')}</div>
             <div id="simFixedCost" style="font-size: 1.05rem; font-weight: 800; color: var(--text-primary); margin-top: 2px;">0,00 €</div>
           </div>
           <div>
-            <div style="font-size: 0.68rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Seuil Rentabilité HT</div>
+            <div style="font-size: 0.68rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">${t('inv.breakeven.break_even', 'Seuil Rentabilité HT')}</div>
             <div id="simBreakEven" style="font-size: 1.05rem; font-weight: 800; color: var(--accent); margin-top: 2px;">0,00 €</div>
           </div>
           <div>
-            <div style="font-size: 0.68rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Bénéfice Net HT</div>
+            <div style="font-size: 0.68rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">${t('inv.breakeven.net_profit', 'Bénéfice Net HT')}</div>
             <div id="simNetMargin" style="font-size: 1.05rem; font-weight: 800; color: var(--success); margin-top: 2px;">0,00 €</div>
           </div>
         </div>
 
         <div id="simStatus" style="margin-top: 0.8rem; text-align: center;">
-          <span class="badge" style="background:var(--surface-border); color:var(--text-muted);">En attente de chiffrage</span>
+          <span class="badge" style="background:var(--surface-border); color:var(--text-muted);">${t('inv.breakeven.pending', 'En attente de chiffrage')}</span>
         </div>
       </div>
 
       <!-- ⚡ Chiffrage rapide depuis vos Recettes -->
       <div style="background:var(--bg-alt); padding:1rem; border-radius:14px; border:1px solid var(--surface-border); margin-bottom:1rem;">
-        <h4 style="margin:0 0 0.8rem; font-size:0.9rem; color:var(--primary);">⚡ Chiffrage rapide depuis vos Recettes</h4>
+        <h4 style="margin:0 0 0.8rem; font-size:0.9rem; color:var(--primary);">${t('inv.fast_recipe.title', '⚡ Chiffrage rapide depuis vos Recettes')}</h4>
         <div style="display:grid; grid-template-columns:2fr 1fr 1fr; gap:0.8rem; align-items:flex-end;">
           <div class="form-group" style="margin:0;">
-            <label class="form-label" style="font-size:0.75rem;">Recette de base</label>
+            <label class="form-label" style="font-size:0.75rem;">${t('inv.fast_recipe.label', 'Recette de base')}</label>
             <select id="invFastRecipeSel" class="form-input">
-              <option value="">— Sélectionner une recette —</option>
+              <option value="">${t('inco.select', '— Sélectionner une recette —')}</option>
               ${((window.APP && window.APP.savedRecipes) || []).map(r => `<option value="${r.id}">${_escHtml(r.name)}</option>`).join('')}
             </select>
           </div>
           <div class="form-group" style="margin:0;">
-            <label class="form-label" style="font-size:0.75rem;">Nb parts / pièces</label>
+            <label class="form-label" style="font-size:0.75rem;">${t('inv.fast_recipe.qty_label', 'Nb parts / pièces')}</label>
             <input type="number" id="invFastRecipeQty" class="form-input" value="10" min="1">
           </div>
-          <button class="btn btn-outline btn-full" onclick="window.addFastRecipeToInvoice()" style="height:42px; border-color:var(--primary); color:var(--primary); font-weight:700;">✚ Insérer</button>
+          <button class="btn btn-outline btn-full" onclick="window.addFastRecipeToInvoice()" style="height:42px; border-color:var(--primary); color:var(--primary); font-weight:700;">${t('inv.fast_recipe.insert', '✚ Insérer')}</button>
         </div>
       </div>
 
       <!-- 📸 Photo de Référence / Croquis -->
       <div style="background:var(--bg-alt); padding:1rem; border-radius:14px; border:1px solid var(--surface-border); margin-bottom:1rem; display:grid; grid-template-columns:1fr 120px; gap:1rem; align-items:center;">
         <div>
-          <h4 style="margin:0 0 0.4rem; font-size:0.9rem; color:var(--primary);">📸 Photo de Référence / Croquis</h4>
-          <p style="font-size:0.75rem; color:var(--text-secondary); margin-bottom:0.8rem;">Associez une photo d'inspiration ou un croquis de votre création.</p>
+          <h4 style="margin:0 0 0.4rem; font-size:0.9rem; color:var(--primary);">${t('inv.photo.title', '📸 Photo de Référence / Croquis')}</h4>
+          <p style="font-size:0.75rem; color:var(--text-secondary); margin-bottom:0.8rem;">${t('inv.photo.desc', 'Associez une photo d\'inspiration ou un croquis de votre création.')}</p>
           <input type="file" id="invPhotoFile" accept="image/*" class="form-input" style="padding:6px 10px;" onchange="window.handleDevisPhotoUpload(this)">
         </div>
         <div id="invPhotoPreview" style="width:100px; height:100px; border:2px dashed var(--surface-border); border-radius:10px; display:flex; align-items:center; justify-content:center; overflow:hidden;">
@@ -230,8 +230,8 @@ function openInvoiceGenerator(orderId = null) {
       <!-- ✍️ Signature Numérique Client -->
       <div style="background:var(--bg-alt); padding:1rem; border-radius:14px; border:1px solid var(--surface-border); margin-bottom:1rem;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.8rem;">
-          <h4 style="margin:0; font-size:0.9rem; color:var(--primary);">✍️ Signature Numérique Client</h4>
-          <button class="btn btn-sm btn-outline" onclick="window.clearSignatureCanvas()" style="padding:4px 10px; font-size:0.75rem;">✕ Effacer</button>
+          <h4 style="margin:0; font-size:0.9rem; color:var(--primary);">${t('inv.signature.title', '✍️ Signature Numérique Client')}</h4>
+          <button class="btn btn-sm btn-outline" onclick="window.clearSignatureCanvas()" style="padding:4px 10px; font-size:0.75rem;">${t('inv.signature.clear', '✕ Effacer')}</button>
         </div>
         <div style="border:1px solid var(--surface-border); background:#fff; border-radius:10px; overflow:hidden;">
           <canvas id="signatureCanvas" height="120" style="width:100%; display:block; cursor:crosshair;"></canvas>
@@ -240,14 +240,14 @@ function openInvoiceGenerator(orderId = null) {
 
       <!-- Notes + Signature block for devis -->
       <div class="form-group" style="margin-bottom:1.5rem;">
-        <label class="form-label">Conditions / Mentions légales</label>
+        <label class="form-label">${t('inv.notes.label', 'Conditions / Mentions légales')}</label>
         <textarea id="invNotes" class="form-input" rows="3" style="resize:vertical;">${_getDefaultInvoiceNotes()}</textarea>
       </div>
 
       <div style="display:flex; gap:0.8rem; flex-wrap:wrap;">
-        <button class="btn btn-primary" onclick="generateInvoicePDF()">📥 Générer le PDF</button>
-        <button class="btn btn-outline" onclick="previewInvoice()">👁️ Aperçu HTML</button>
-        <button class="btn btn-outline" onclick="window.closeModal('invoiceGeneratorModal');">Annuler</button>
+        <button class="btn btn-primary" onclick="generateInvoicePDF()">${t('inv.btn.generate_pdf', '📥 Générer le PDF')}</button>
+        <button class="btn btn-outline" onclick="previewInvoice()">${t('inv.btn.preview', '👁️ Aperçu HTML')}</button>
+        <button class="btn btn-outline" onclick="window.closeModal('invoiceGeneratorModal');">${t('inv.btn.cancel', 'Annuler')}</button>
       </div>
     </div>`;
 
@@ -410,13 +410,13 @@ function _renderInvoiceLines() {
     container.innerHTML = '';
     if (header) container.appendChild(header);
     else {
-        container.innerHTML = `<div style="display:grid; grid-template-columns:3fr 1fr 1fr 1fr 36px; gap:6px; font-size:0.75rem; font-weight:700; text-transform:uppercase; color:var(--text-muted); padding:0 4px; margin-bottom:4px;"><span>Description</span><span>Qté</span><span>Prix U. (€)</span><span>Total</span><span></span></div>`;
+        container.innerHTML = `<div style="display:grid; grid-template-columns:3fr 1fr 1fr 1fr 36px; gap:6px; font-size:0.75rem; font-weight:700; text-transform:uppercase; color:var(--text-muted); padding:0 4px; margin-bottom:4px;"><span>\${t('inv.col.desc', 'Description')}</span><span>\${t('col.qty', 'Qté')}</span><span>\${t('inv.col.unit_price', 'Prix U. (€)')}</span><span>\${t('col.total', 'Total')}</span><span></span></div>`;
     }
     _invoiceLines.forEach(line => {
         const div = document.createElement('div');
         div.style.cssText = 'display:grid; grid-template-columns:3fr 1fr 1fr 1fr 36px; gap:6px; margin-bottom:6px; align-items:center;';
         div.innerHTML = `
-          <input type="text" class="form-input" value="${_escHtml(line.desc)}" placeholder="Description du produit/service" oninput="updateInvoiceLine(${line.id}, 'desc', this.value)" style="font-size:0.85rem; padding:8px 10px;">
+          <input type="text" class="form-input" value="\${_escHtml(line.desc)}" placeholder="\${t('inv.col.desc', 'Description')}" oninput="updateInvoiceLine(\${line.id}, 'desc', this.value)" style="font-size:0.85rem; padding:8px 10px;">
           <input type="number" class="form-input" value="${line.qty}" min="0.5" step="0.5" oninput="updateInvoiceLine(${line.id}, 'qty', this.value)" style="font-size:0.85rem; padding:8px 10px; text-align:center;">
           <input type="number" class="form-input" value="${line.unitPrice}" min="0" step="0.01" oninput="updateInvoiceLine(${line.id}, 'unitPrice', this.value)" style="font-size:0.85rem; padding:8px 10px; text-align:right;">
           <span style="font-size:0.9rem; font-weight:700; text-align:right; color:var(--text-primary);">${(line.qty * line.unitPrice).toFixed(2)} €</span>
@@ -481,19 +481,19 @@ function _updateEventBreakEven() {
     }
     
     if (el('simBreakEven')) {
-        el('simBreakEven').textContent = tMc > 0 ? fmt(breakEvenPoint) : 'Non atteignable';
+        el('simBreakEven').textContent = tMc > 0 ? fmt(breakEvenPoint) : t('inv.non_atteignable', 'Non atteignable');
     }
 
     // Render status badge
     if (el('simStatus')) {
         if (revenue === 0) {
-            el('simStatus').innerHTML = '<span class="badge" style="background:var(--surface-border); color:var(--text-muted); padding:4px 8px; border-radius:4px;">En attente de chiffrage</span>';
+            el('simStatus').innerHTML = `<span class="badge" style="background:var(--surface-border); color:var(--text-muted); padding:4px 8px; border-radius:4px;">\${t('inv.breakeven.pending', 'En attente de chiffrage')}</span>`;
         } else if (netProfit > 0) {
-            el('simStatus').innerHTML = `<span class="badge success" style="background:rgba(16,185,129,0.1); color:#10b981; padding:6px 10px; border-radius:6px; font-weight:700;">✅ Événement rentable (+${Math.round(marginOnVariablePct)}% de marge variable)</span>`;
+            el('simStatus').innerHTML = `<span class="badge success" style="background:rgba(16,185,129,0.1); color:#10b981; padding:6px 10px; border-radius:6px; font-weight:700;">✅ \${t('inv.status.profitable', 'Événement rentable')} (+\${Math.round(marginOnVariablePct)}% \${t('alert.margin.label', 'marge')} variable)</span>`;
         } else if (netProfit === 0 && fixedCosts > 0) {
-            el('simStatus').innerHTML = '<span class="badge warning" style="background:rgba(245,158,11,0.1); color:#f59e0b; padding:6px 10px; border-radius:6px; font-weight:700;">⚖️ Équilibre parfait</span>';
+            el('simStatus').innerHTML = `<span class="badge warning" style="background:rgba(245,158,11,0.1); color:#f59e0b; padding:6px 10px; border-radius:6px; font-weight:700;">\${t('inv.status.balanced', '⚖️ Équilibre parfait')}</span>`;
         } else {
-            el('simStatus').innerHTML = `<span class="badge danger" style="background:rgba(239,68,68,0.1); color:#ef4444; padding:6px 10px; border-radius:6px; font-weight:700;">⚠️ Déficitaire (CA requis : ${fmt(breakEvenPoint)})</span>`;
+            el('simStatus').innerHTML = `<span class="badge danger" style="background:rgba(239,68,68,0.1); color:#ef4444; padding:6px 10px; border-radius:6px; font-weight:700;">\${t('inv.status.deficit', '⚠️ Déficitaire')} (\${t('inv.status.required_ca', 'CA requis :')} \${fmt(breakEvenPoint)})</span>`;
         }
     }
 }

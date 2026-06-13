@@ -15,9 +15,9 @@ function afficherEtatVideRadar() {
   tbody.innerHTML = `
     <tr>
       <td colspan="5" style="text-align:center; padding:2rem; color:var(--color-muted); font-size:13px; line-height:2;">
-        📦 Aucun passage grossiste planifié<br>
+        \${t('logistics.empty', '📦 Aucun passage grossiste planifié')}<br>
         <button onclick="ouvrirFormulaireRadar()" style="margin-top:8px; background:#4f46e5; color:#fff; border:none; padding:8px 16px; border-radius:8px; cursor:pointer; font-size:13px;">
-          + Ajouter un passage
+          \${t('logistics.add_passage', '+ Ajouter un passage')}
         </button>
       </td>
     </tr>`;
@@ -78,18 +78,18 @@ const LogisticsManager = (() => {
 
         listBody.innerHTML = deliveries.map(d => `
             <tr>
-                <td style="font-weight:600;">${d.supplier}</td>
-                <td>${d.eta || '—'}</td>
-                <td style="font-size:0.85rem; color:var(--text-muted);">${d.items || '—'}</td>
+                <td style="font-weight:600;">\${d.supplier}</td>
+                <td>\${d.eta || '—'}</td>
+                <td style="font-size:0.85rem; color:var(--text-muted);">\${d.items || '—'}</td>
                 <td>
-                    <span class="badge" style="background:${getStatusColor(d.status)}; color:white; padding:2px 8px; border-radius:50px; font-size:0.75rem;">
-                        ${d.status === 'planned' ? 'Planifié' : (d.status === 'confirmed' ? 'Confirmé' : 'Livré')}
+                    <span class="badge" style="background:\${getStatusColor(d.status)}; color:white; padding:2px 8px; border-radius:50px; font-size:0.75rem;">
+                        \${d.status === 'planned' ? t('logistics.status.planned', 'Planifié') : (d.status === 'confirmed' ? t('logistics.status.confirmed', 'Confirmé') : t('logistics.status.delivered', 'Livré'))}
                     </span>
                 </td>
                 <td>
-                    <button class="btn btn-sm btn-outline" onclick="LogisticsManager.deleteDelivery('${d.id}')" title="Supprimer">🗑️</button>
-                    <button class="btn btn-sm btn-outline" onclick="LogisticsManager.toggleStatus('${d.id}')" title="Changer statut">🔄</button>
-                    <button class="btn btn-sm btn-outline" onclick="LogisticsManager.exportDelivery('${d.id}')" title="Exporter PDF">📄</button>
+                    <button class="btn btn-sm btn-outline" onclick="LogisticsManager.deleteDelivery('\${d.id}')" title="\${t('logistics.btn.delete', 'Supprimer')}">🗑️</button>
+                    <button class="btn btn-sm btn-outline" onclick="LogisticsManager.toggleStatus('\${d.id}')" title="\${t('logistics.btn.toggle', 'Changer statut')}">🔄</button>
+                    <button class="btn btn-sm btn-outline" onclick="LogisticsManager.exportDelivery('\${d.id}')" title="\${t('logistics.btn.export', 'Exporter PDF')}">📄</button>
                 </td>
             </tr>
         `).join('');
@@ -122,7 +122,7 @@ const LogisticsManager = (() => {
     }
 
     function deleteDelivery(id) {
-        if (!confirm('Supprimer ce passage ?')) return;
+        if (!confirm(t('logistics.confirm.delete', 'Supprimer ce passage ?'))) return;
         const deliveries = getDeliveries().filter(d => d.id !== id);
         localStorage.setItem(STORAGE_KEY, JSON.stringify(deliveries));
         // Supprimer du cloud
@@ -154,35 +154,35 @@ const LogisticsManager = (() => {
             <div style="padding:40px; font-family:sans-serif; color:#333;">
                 <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #6366f1; padding-bottom:20px; margin-bottom:30px;">
                     <div>
-                        <h1 style="margin:0; color:#6366f1;">BON DE COMMANDE</h1>
-                        <p style="margin:5px 0; color:#666;">GourmetRevient — Logistique</p>
+                        <h1 style="margin:0; color:#6366f1;">\${t('logistics.pdf.title', 'BON DE COMMANDE')}</h1>
+                        <p style="margin:5px 0; color:#666;">\${t('logistics.pdf.subtitle', 'GourmetRevient — Logistique')}</p>
                     </div>
                     <div style="text-align:right;">
-                        <p style="margin:0; font-weight:bold;">Date: ${new Date().toLocaleDateString('fr-FR')}</p>
-                        <p style="margin:5px 0;">Réf: CMD-${d.id.substring(0,8)}</p>
+                        <p style="margin:0; font-weight:bold;">\${t('logistics.pdf.date', 'Date :')} \${new Date().toLocaleDateString('fr-FR')}</p>
+                        <p style="margin:5px 0;">\${t('logistics.pdf.ref', 'Réf :')} CMD-\${d.id.substring(0,8)}</p>
                     </div>
                 </div>
 
                 <div style="margin-bottom:40px; background:#f8fafc; padding:20px; border-radius:12px;">
-                    <h3 style="margin-top:0; color:#1e293b;">Fournisseur / Grossiste</h3>
-                    <p style="margin:5px 0; font-size:1.2rem; font-weight:bold;">${d.supplier}</p>
-                    <p style="margin:5px 0; color:#64748b;">Heure de passage prévue: ${d.eta || 'Non spécifiée'}</p>
+                    <h3 style="margin-top:0; color:#1e293b;">\${t('logistics.pdf.supplier', 'Fournisseur / Grossiste')}</h3>
+                    <p style="margin:5px 0; font-size:1.2rem; font-weight:bold;">\${d.supplier}</p>
+                    <p style="margin:5px 0; color:#64748b;">\${t('logistics.pdf.eta', 'Heure de passage prévue :')} \${d.eta || t('logistics.pdf.not_specified', 'Non spécifiée')}</p>
                 </div>
 
                 <div style="margin-bottom:40px;">
-                    <h3 style="border-bottom:1px solid #e2e8f0; padding-bottom:10px; color:#1e293b;">Articles attendus / Instructions</h3>
+                    <h3 style="border-bottom:1px solid #e2e8f0; padding-bottom:10px; color:#1e293b;">\${t('logistics.pdf.items_title', 'Articles attendus / Instructions')}</h3>
                     <div style="padding:15px; background:#fff; border:1px solid #e2e8f0; border-radius:8px; min-height:100px;">
-                        ${d.items ? d.items.replace(/\n/g, '<br>') : 'Aucun article spécifié.'}
+                        \${d.items ? d.items.replace(/\\n/g, '<br>') : t('logistics.pdf.no_items', 'Aucun article spécifié.')}
                     </div>
                 </div>
 
                 <div style="margin-top:100px; display:flex; justify-content:space-between;">
                     <div style="text-align:center; width:200px;">
-                        <p style="margin-bottom:40px; color:#64748b;">Signature Client</p>
+                        <p style="margin-bottom:40px; color:#64748b;">\${t('logistics.pdf.sig_client', 'Signature Client')}</p>
                         <div style="border-bottom:1px solid #94a3b8;"></div>
                     </div>
                     <div style="text-align:center; width:200px;">
-                        <p style="margin-bottom:40px; color:#64748b;">Signature Livreur</p>
+                        <p style="margin-bottom:40px; color:#64748b;">\${t('logistics.pdf.sig_driver', 'Signature Livreur')}</p>
                         <div style="border-bottom:1px solid #94a3b8;"></div>
                     </div>
                 </div>
@@ -211,10 +211,10 @@ setTimeout(() => LogisticsManager.loadFromCloud(), 2500);
 
 // Modal Logic
 window.openAddDeliveryModal = function() {
-    const supplier = prompt("Nom du grossiste / commercial :");
+    const supplier = prompt(t('logistics.prompt.supplier', 'Nom du grossiste / commercial :'));
     if (!supplier) return;
-    const eta = prompt("Heure de passage (ex: 08h00 - 10h00) :", "08h00");
-    const items = prompt("Articles ou motif de visite :");
+    const eta = prompt(t('logistics.prompt.eta', 'Heure de passage (ex: 08h00 - 10h00) :'), "08h00");
+    const items = prompt(t('logistics.prompt.items', 'Articles ou motif de visite :'));
     
     LogisticsManager.addDelivery({ supplier, eta, items });
 };
