@@ -123,7 +123,12 @@ serve(async (req) => {
   } catch (error) {
     console.error('Stripe Error:', error)
     return new Response(
-      JSON.stringify({ error: error.message, stack: error.stack }),
+      JSON.stringify({ 
+        error: error.message, 
+        stack: error.stack,
+        keyPrefix: stripeSecretKey ? stripeSecretKey.substring(0, 8) : "null",
+        keyLength: stripeSecretKey ? stripeSecretKey.length : 0
+      }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 },
     )
   }

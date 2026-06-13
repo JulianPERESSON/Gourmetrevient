@@ -147,7 +147,7 @@ const GourmetBilling = {
     /**
      * Redirige l'utilisateur vers Stripe Checkout pour s'abonner
      */
-    async checkout(planKey, optionalEmail = null) {
+    async checkout(planKey, optionalEmail = null, optionalUserId = null) {
         // Détermine le Price ID : soit une clé (pro_monthly/yearly), soit l'ID direct
         let priceId = planKey;
         if (planKey === 'pro_monthly') priceId = this.CONFIG.pricing.pro.monthly;
@@ -160,14 +160,16 @@ const GourmetBilling = {
 
         // Récupère l'utilisateur s'il est connecté (optionnel)
         let userEmail = optionalEmail;
-        let userId = null;
+        let userId = optionalUserId;
         try {
-            const client = window.supabase; 
-            if (client) {
-                const { data: { user } } = await client.auth.getUser();
-                if (user) { 
-                    if (!userEmail) userEmail = user.email; 
-                    userId = user.id; 
+            if (!userId) {
+                const client = window.gourmetSupabase || window.supabase; 
+                if (client) {
+                    const { data: { user } } = await client.auth.getUser();
+                    if (user) { 
+                        if (!userEmail) userEmail = user.email; 
+                        userId = user.id; 
+                    }
                 }
             }
         } catch(e) { /* non connecté, on continue quand même */ }

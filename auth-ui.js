@@ -501,7 +501,8 @@ const AuthUI = (() => {
           first_name: firstName,
           last_name: lastName,
           full_name: `${firstName} ${lastName}`,
-          phone: phone
+          phone: phone,
+          phone_number: phone
         } 
       }
     });
@@ -520,7 +521,7 @@ const AuthUI = (() => {
         if (window.GourmetBilling) {
           // On redirige vers Stripe pour le plan Pro (avec essai 14j configuré sur Stripe)
           // On passe l'email pour pré-remplir le formulaire Stripe
-          await window.GourmetBilling.checkout('pro_monthly', email);
+          await window.GourmetBilling.checkout('pro_monthly', email, data.user?.id);
         } else {
           document.getElementById('authModal')?.remove();
           _showConfirmationMessage(email);

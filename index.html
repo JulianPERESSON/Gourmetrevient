@@ -1342,7 +1342,7 @@
           email,
           password: pass,
           options: {
-            data: { first_name: firstName, last_name: lastName, phone: phone }
+            data: { first_name: firstName, last_name: lastName, phone: phone, phone_number: phone }
           }
         });
 
@@ -1350,7 +1350,7 @@
 
         // Redirection vers Stripe via billing.js
         if (typeof GourmetBilling !== 'undefined') {
-          await GourmetBilling.checkout('pro_monthly', email);
+          await GourmetBilling.checkout('pro_monthly', email, data.user?.id);
         } else {
           alert("Inscription réussie ! Veuillez vous connecter.");
           switchManualTab('login');
