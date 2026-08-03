@@ -1,7 +1,7 @@
 /* 
   =============================================================================
   GourmetRevient Application Bundle (Production)
-  Généré automatiquement le : 2026-08-03T10:25:24.311Z
+  Généré automatiquement le : 2026-08-03T10:30:56.562Z
   =============================================================================
 */
 
@@ -6359,7 +6359,7 @@ toggleOmniSearch();
 });
 window.addEventListener('load', () => {
 if ('serviceWorker' in navigator) {
-navigator.serviceWorker.register('./sw.js?v=13.0.2').then(reg => {
+navigator.serviceWorker.register('./sw.js?v=13.0.3').then(reg => {
 setInterval(() => {
 reg.update();
 }, 1000 * 60 * 60);
@@ -6375,20 +6375,9 @@ showToast("🔄 Mise à jour disponible — rechargez pour l'appliquer.", "info"
 };
 };
 }).catch(err => console.warn('[SW] Register error:', err));
-let refreshing = false;
 navigator.serviceWorker.addEventListener('controllerchange', () => {
-if (refreshing) return;
-const lastReload = sessionStorage.getItem('sw_last_reload');
-const now = Date.now();
-if (lastReload && (now - parseInt(lastReload)) < 2000) {
-console.warn('[SW] Loop detected, skipping reload.');
-return;
-}
-refreshing = true;
-sessionStorage.setItem('sw_last_reload', now.toString());
-setTimeout(() => {
-window.location.reload();
-}, 500);
+sessionStorage.removeItem('sw_last_reload');
+console.info('[SW] Nouvelle version active. Elle sera utilisée sans rechargement forcé.');
 });
 navigator.serviceWorker.addEventListener('message', ({ data }) => {
 if (!data) return;

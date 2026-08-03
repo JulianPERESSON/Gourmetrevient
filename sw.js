@@ -1,9 +1,9 @@
 // =============================================================================
 // GourmetRevient Service Worker — v4.0 (PWA Optimisée)
-// Stratégie : Network-First shell critique + cache hors ligne + IDB Queue
+// Stratégie : navigation fraîche et bornée + shell rapide en cache + IDB Queue
 // =============================================================================
 
-const CACHE_VERSION = '13.0.2'; // Reliable auth boot + fresh application shell
+const CACHE_VERSION = '13.0.3'; // Bounded loading + no automatic reload loop
 const CACHE_STATIC  = `gourmet-static-v${CACHE_VERSION}`;
 const CACHE_RUNTIME = `gourmet-runtime-v${CACHE_VERSION}`;
 const CACHE_FONTS   = `gourmet-fonts-v${CACHE_VERSION}`;
@@ -124,6 +124,17 @@ async function clearOp(id) {
   });
 }
 
+async function fetchWithTimeout(resource, options = {}, timeoutMs = 6000) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    return await fetch(resource, { ...options, signal: controller.signal });
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 // ── INSTALL — Précache shell + Google Fonts ──────────────────────────────────
 self.addEventListener('install', (event) => {
   self.skipWaiting();
@@ -133,7 +144,9 @@ self.addEventListener('install', (event) => {
       caches.open(CACHE_STATIC).then((cache) =>
         Promise.allSettled(
           PRECACHE_ASSETS.map(url =>
-            cache.add(url).catch(e => console.warn('[SW] Précache ignoré:', url, e.message))
+            fetchWithTimeout(url, { cache: 'reload' }, 8000)
+              .then(response => response.ok ? cache.put(url, response) : null)
+              .catch(e => console.warn('[SW] Précache ignoré:', url, e.message))
           )
         )
       ),
@@ -141,7 +154,7 @@ self.addEventListener('install', (event) => {
       caches.open(CACHE_FONTS).then((cache) =>
         Promise.allSettled(
           GOOGLE_FONTS_URLS.map(url =>
-            fetch(url, { mode: 'cors' })
+            fetchWithTimeout(url, { mode: 'cors' }, 6000)
               .then(r => r.ok ? cache.put(url, r) : null)
               .catch(e => console.warn('[SW] Font CSS non mis en cache (offline ?):', url))
           )
@@ -190,12 +203,10 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // ── Stratégie 2 : contenu critique à jour, avec repli hors ligne ───────────
+  // ── Stratégie 2 : navigation à jour, shell immédiat depuis le cache ────────
   if (url.origin === self.location.origin) {
     const needsFreshVersion = request.mode === 'navigate'
-      || request.destination === 'document'
-      || request.destination === 'script'
-      || request.destination === 'style';
+      || request.destination === 'document';
 
     event.respondWith(
       needsFreshVersion
@@ -219,7 +230,7 @@ async function fontCacheFirst(request) {
   const cached = await cache.match(request, { ignoreSearch: true });
   if (cached) return cached;
   try {
-    const networkResponse = await fetch(request, { mode: 'cors' });
+    const networkResponse = await fetchWithTimeout(request, { mode: 'cors' }, 6000);
     if (networkResponse && networkResponse.status === 200) {
       // Cloner avant de mettre en cache (les fichiers .woff2 sont opaques)
       cache.put(request, networkResponse.clone());
@@ -235,7 +246,7 @@ async function cacheFirstWithNetworkFallback(request) {
   const cached = await caches.match(request, { ignoreSearch: true });
   if (cached) return cached;
   try {
-    const networkResponse = await fetch(request);
+    const networkResponse = await fetchWithTimeout(request);
     if (networkResponse && networkResponse.status === 200) {
       const cache = await caches.open(CACHE_STATIC);
       cache.put(request, networkResponse.clone());
@@ -258,7 +269,7 @@ async function cacheFirstWithNetworkFallback(request) {
 // fonctionnement hors ligne si le réseau est réellement indisponible.
 async function networkFirstWithCacheFallback(request) {
   try {
-    const networkResponse = await fetch(request);
+    const networkResponse = await fetchWithTimeout(request, {}, 5000);
     if (networkResponse && networkResponse.status === 200) {
       const cache = await caches.open(CACHE_STATIC);
       cache.put(request, networkResponse.clone());
@@ -282,7 +293,7 @@ async function networkFirstWithCacheFallback(request) {
 async function staleWhileRevalidate(request, cacheName = CACHE_RUNTIME) {
   const cache  = await caches.open(cacheName);
   const cached = await cache.match(request, { ignoreSearch: true });
-  const networkPromise = fetch(request).then((networkResponse) => {
+  const networkPromise = fetchWithTimeout(request).then((networkResponse) => {
     if (networkResponse && networkResponse.status === 200) {
       cache.put(request, networkResponse.clone());
     }

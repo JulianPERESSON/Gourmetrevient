@@ -34,7 +34,7 @@ document.addEventListener('keydown', (e) => {
 window.addEventListener('load', () => {
   if ('serviceWorker' in navigator) {
     // Register the SW. Using a versioned URL helps force updates.
-    navigator.serviceWorker.register('./sw.js?v=13.0.2').then(reg => {
+    navigator.serviceWorker.register('./sw.js?v=13.0.3').then(reg => {
       // Check for updates periodically
       setInterval(() => {
         reg.update();
@@ -54,26 +54,12 @@ window.addEventListener('load', () => {
       };
     }).catch(err => console.warn('[SW] Register error:', err));
 
-    // Handle the 'controllerchange' event to reload when the new SW takes control
-    let refreshing = false;
+    // La nouvelle version prend le relais sans recharger la page en cours.
+    // Un rechargement automatique ici pouvait créer une boucle visible dans
+    // l'onglet lorsque plusieurs fichiers hors ligne se mettaient à jour.
     navigator.serviceWorker.addEventListener('controllerchange', () => {
-      if (refreshing) return;
-      
-      // Safety check: avoid reload loops
-      const lastReload = sessionStorage.getItem('sw_last_reload');
-      const now = Date.now();
-      if (lastReload && (now - parseInt(lastReload)) < 2000) {
-        console.warn('[SW] Loop detected, skipping reload.');
-        return;
-      }
-      
-      refreshing = true;
-      sessionStorage.setItem('sw_last_reload', now.toString());
-      
-      // Add a small delay to avoid rapid reload loops and let the user see the notification
-      setTimeout(() => {
-        window.location.reload();
-      }, 500);
+      sessionStorage.removeItem('sw_last_reload');
+      console.info('[SW] Nouvelle version active. Elle sera utilisée sans rechargement forcé.');
     });
 
     // Handle messages from the SW (e.g. for offline sync)
