@@ -34,7 +34,7 @@ document.addEventListener('keydown', (e) => {
 window.addEventListener('load', () => {
   if ('serviceWorker' in navigator) {
     // Register the SW. Using a versioned URL helps force updates.
-    navigator.serviceWorker.register('./sw.js').then(reg => {
+    navigator.serviceWorker.register('./sw.js?v=13.0.2').then(reg => {
       // Check for updates periodically
       setInterval(() => {
         reg.update();
@@ -1346,6 +1346,11 @@ function launchProductionFromRecipe() {
   const dismissTime = 2800;
 
   setTimeout(() => {
+    if (window.GourmetBoot && typeof window.GourmetBoot.dismissSplash === 'function') {
+      window.GourmetBoot.dismissSplash();
+      return;
+    }
+
     splash.classList.add('fade-out');
     setTimeout(() => {
       splash.style.display = 'none';

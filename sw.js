@@ -1,9 +1,9 @@
 // =============================================================================
 // GourmetRevient Service Worker — v4.0 (PWA Optimisée)
-// Stratégie : Cache-First assets statiques + SWR Google Fonts/CDN + IDB Queue
+// Stratégie : Network-First shell critique + cache hors ligne + IDB Queue
 // =============================================================================
 
-const CACHE_VERSION = '13.0.1'; // Auth entry reliability + tablet-first shell
+const CACHE_VERSION = '13.0.2'; // Reliable auth boot + fresh application shell
 const CACHE_STATIC  = `gourmet-static-v${CACHE_VERSION}`;
 const CACHE_RUNTIME = `gourmet-runtime-v${CACHE_VERSION}`;
 const CACHE_FONTS   = `gourmet-fonts-v${CACHE_VERSION}`;
@@ -190,9 +190,18 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // ── Stratégie 2 : Cache-First pour assets du shell (même origine) ──────────
+  // ── Stratégie 2 : contenu critique à jour, avec repli hors ligne ───────────
   if (url.origin === self.location.origin) {
-    event.respondWith(cacheFirstWithNetworkFallback(request));
+    const needsFreshVersion = request.mode === 'navigate'
+      || request.destination === 'document'
+      || request.destination === 'script'
+      || request.destination === 'style';
+
+    event.respondWith(
+      needsFreshVersion
+        ? networkFirstWithCacheFallback(request)
+        : cacheFirstWithNetworkFallback(request)
+    );
     return;
   }
 
@@ -240,6 +249,31 @@ async function cacheFirstWithNetworkFallback(request) {
         headers: { 'Content-Type': 'text/html; charset=utf-8' }
       });
     }
+    return new Response('', { status: 503 });
+  }
+}
+
+// Network-First pour éviter qu'une ancienne interface ou un ancien script
+// d'authentification reste servi après une mise à jour. Le cache conserve le
+// fonctionnement hors ligne si le réseau est réellement indisponible.
+async function networkFirstWithCacheFallback(request) {
+  try {
+    const networkResponse = await fetch(request);
+    if (networkResponse && networkResponse.status === 200) {
+      const cache = await caches.open(CACHE_STATIC);
+      cache.put(request, networkResponse.clone());
+    }
+    return networkResponse;
+  } catch {
+    const cached = await caches.match(request, { ignoreSearch: true });
+    if (cached) return cached;
+
+    if (request.mode === 'navigate' || request.destination === 'document') {
+      const fallback = await caches.match('./index.html', { ignoreSearch: true })
+                    || await caches.match('./landing.html', { ignoreSearch: true });
+      if (fallback) return fallback;
+    }
+
     return new Response('', { status: 503 });
   }
 }

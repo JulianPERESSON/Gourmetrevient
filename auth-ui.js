@@ -9,6 +9,7 @@ const AuthUI = (() => {
 
   let _currentUser = null;
   let _currentPlan = 'free';
+  let _authSyncId = 0;
 
   function isAuthorized(user) {
     return Boolean(user);
@@ -18,24 +19,85 @@ const AuthUI = (() => {
     return Boolean(user) && _currentPlan === 'admin';
   }
 
+  function _withTimeout(request, timeoutMs, fallbackValue) {
+    return Promise.race([
+      Promise.resolve(request),
+      new Promise((resolve) => setTimeout(() => resolve(fallbackValue), timeoutMs))
+    ]);
+  }
+
+  function _dismissStartupSplash() {
+    if (window.GourmetBoot && typeof window.GourmetBoot.dismissSplash === 'function') {
+      window.GourmetBoot.dismissSplash();
+      return;
+    }
+
+    const splash = document.getElementById('premiumSplash');
+    if (splash) splash.style.display = 'none';
+  }
+
   // ── VÉRIFICATION ABONNEMENT SUPABASE ────────────────────────────────────────
   async function _checkSubscription(user) {
     if (!user) return 'free';
     try {
-      const { data, error } = await Promise.race([
-        supabase
+      const client = window.gourmetSupabase || window.supabase;
+      if (!client?.from) return 'free';
+
+      const { data, error } = await _withTimeout(
+        client
           .from('profiles')
           .select('plan, subscription_status')
           .eq('id', user.id)
           .single(),
-        new Promise((resolve) => setTimeout(
-          () => resolve({ data: null, error: new Error('Délai de vérification dépassé') }),
-          10000
-        ))
-      ]);
-      if (error || !data) return 'free';
-      return data.plan || 'free';
+        6000,
+        { data: null, error: new Error('Délai de vérification dépassé') }
+      );
+
+      if (!error && data?.plan) return data.plan;
+
+      // Le profil peut être créé avec un léger délai. Une souscription Stripe
+      // déjà active reste alors une source d'autorisation valide.
+      if (window.GourmetBilling && typeof window.GourmetBilling.checkSubscriptionStatus === 'function') {
+        const status = await _withTimeout(
+          window.GourmetBilling.checkSubscriptionStatus(),
+          6000,
+          { subscription_active: false, plan: 'free' }
+        );
+        if (status?.subscription_active) return status.plan || 'pro';
+      }
+
+      return 'free';
     } catch(e) { return 'free'; }
+  }
+
+  async function _applySession(session, event = 'INITIAL_SESSION') {
+    const syncId = ++_authSyncId;
+    const nextUser = session?.user || null;
+    let nextPlan = 'free';
+
+    if (nextUser) {
+      console.info('🔐 Utilisateur détecté :', nextUser.email);
+      nextPlan = await _checkSubscription(nextUser);
+    }
+
+    // Une notification d'authentification plus récente a la priorité.
+    if (syncId !== _authSyncId) return;
+
+    _currentUser = nextUser;
+    _currentPlan = nextPlan;
+    window.GOURMET_PLAN = nextPlan;
+
+    _renderButton();
+    _updateUI(_currentUser);
+    if (typeof window.checkAuth === 'function') window.checkAuth();
+    _dismissStartupSplash();
+
+    if (event === 'SIGNED_IN') {
+      console.info('%c[Auth] ✅ Connecté :', 'color:#10b981', _currentUser?.email);
+      window.dispatchEvent(new CustomEvent('gourmet:authSuccess', { detail: { user: _currentUser } }));
+    }
+    if (event === 'SIGNED_OUT') console.info('%c[Auth] 👋 Déconnecté', 'color:#f59e0b');
+    if (event === 'TOKEN_REFRESHED') console.info('%c[Auth] 🔄 Token rafraîchi', 'color:#6366f1');
   }
 
   function checkPlan(feature) {
@@ -68,47 +130,37 @@ const AuthUI = (() => {
   async function init() {
     console.log('🔐 AuthUI : Initialisation...');
 
-    gourmetSupabase.auth.onAuthStateChange(async (event, session) => {
-      _currentUser = session?.user || null;
+    try {
+      const client = window.gourmetSupabase;
+      if (!client?.auth) throw new Error('Service de connexion indisponible');
 
-      // Autorisation : Admin ou tout utilisateur avec un abonnement valide
-      // (La vérification du plan se fait juste après)
-      if (_currentUser) {
-        console.info('🔐 Utilisateur détecté :', _currentUser.email);
-      }
+      // La callback Supabase doit rester synchrone. Les requêtes déclenchées
+      // depuis une callback async peuvent conserver le verrou d'auth ouvert.
+      client.auth.onAuthStateChange((event, session) => {
+        window.setTimeout(() => {
+          _applySession(session, event).catch((error) => {
+            console.error('[Auth] Synchronisation de session impossible :', error);
+            _dismissStartupSplash();
+          });
+        }, 0);
+      });
 
-      if (_currentUser) {
-        _currentPlan = await _checkSubscription(_currentUser);
-        window.GOURMET_PLAN = _currentPlan;
-        console.info(`[Auth] Plan actif : ${_currentPlan}`);
-      } else {
-        _currentPlan = 'free';
-        window.GOURMET_PLAN = 'free';
-      }
-
-      _updateUI(_currentUser);
+      const sessionResult = await _withTimeout(
+        client.auth.getSession(),
+        7000,
+        { data: { session: null }, error: new Error('Délai de session dépassé') }
+      );
+      await _applySession(sessionResult?.data?.session || null);
+    } catch (error) {
+      console.error('[Auth] Initialisation impossible :', error);
+      _currentUser = null;
+      _currentPlan = 'free';
+      window.GOURMET_PLAN = 'free';
+      _renderButton();
+      _updateUI(null);
       if (typeof window.checkAuth === 'function') window.checkAuth();
-
-      if (event === 'SIGNED_IN') {
-        console.info('%c[Auth] ✅ Connecté :', 'color:#10b981', _currentUser?.email);
-        window.dispatchEvent(new CustomEvent('gourmet:authSuccess', { detail: { user: _currentUser } }));
-      }
-      if (event === 'SIGNED_OUT') console.info('%c[Auth] 👋 Déconnecté', 'color:#f59e0b');
-      if (event === 'TOKEN_REFRESHED') console.info('%c[Auth] 🔄 Token rafraîchi', 'color:#6366f1');
-    });
-
-    // Vérification de la session existante au chargement
-    const { data: { session } } = await gourmetSupabase.auth.getSession();
-    _currentUser = session?.user || null;
-    
-    if (_currentUser) {
-      _currentPlan = await _checkSubscription(_currentUser);
-      window.GOURMET_PLAN = _currentPlan;
+      _dismissStartupSplash();
     }
-
-    _renderButton();
-    _updateUI(_currentUser);
-    if (typeof window.checkAuth === 'function') window.checkAuth();
 
     // Les liens publics de connexion/inscription utilisent le formulaire initial
     // rendu dans index.html. Ne pas ouvrir un second modal concurrent ici.

@@ -1,7 +1,7 @@
 /* 
   =============================================================================
   GourmetRevient Application Bundle (Production)
-  Généré automatiquement le : 2026-08-03T10:18:32.945Z
+  Généré automatiquement le : 2026-08-03T10:25:24.311Z
   =============================================================================
 */
 
@@ -3757,13 +3757,24 @@ showToast(i18n.t('orders.export_success'));
 }
 
 // --- MODULE: app-auth.js ---
+function dismissStartupSplash() {
+if (window.GourmetBoot && typeof window.GourmetBoot.dismissSplash === 'function') {
+window.GourmetBoot.dismissSplash();
+return;
+}
+const splash = document.getElementById('premiumSplash');
+if (splash) splash.style.display = 'none';
+}
 async function showSubscriptionRequiredOverlay(email) {
+dismissStartupSplash();
+const manualOverlay = document.getElementById('authManualOverlay');
+if (manualOverlay) manualOverlay.style.display = 'none';
 let overlay = document.getElementById('stripeSubscriptionRequiredOverlay');
 if (overlay) return;
 overlay = document.createElement('div');
 overlay.id = 'stripeSubscriptionRequiredOverlay';
 overlay.className = 'glass-modal-overlay';
-overlay.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15,23,42,0.85); backdrop-filter:blur(16px); z-index:99999; display:flex; justify-content:center; align-items:center; color:#fff; font-family:Inter, sans-serif;';
+overlay.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15,23,42,0.85); backdrop-filter:blur(16px); z-index:100004; display:flex; justify-content:center; align-items:center; color:#fff; font-family:Inter, sans-serif; overflow-y:auto; padding:16px;';
 overlay.innerHTML = `
 <div style="background:var(--surface, #1e293b); border:1px solid var(--border, #334155); border-radius:24px; padding:3rem; max-width:480px; width:90%; text-align:center; box-shadow:0 25px 50px -12px rgba(0,0,0,0.5); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1.5rem;">
 <div class="spinner-premium" style="width:40px; height:40px; border:3px solid rgba(99,102,241,0.2); border-top-color:#6366f1; border-radius:50%; animation:spin 1s linear infinite;"></div>
@@ -3780,7 +3791,7 @@ try {
 if (window.GourmetBilling && typeof window.GourmetBilling.checkSubscriptionStatus === 'function') {
 subStatus = await Promise.race([
 window.GourmetBilling.checkSubscriptionStatus(),
-new Promise((resolve) => setTimeout(() => resolve(subStatus), 10000))
+new Promise((resolve) => setTimeout(() => resolve(subStatus), 6000))
 ]);
 }
 } catch (err) {
@@ -3892,6 +3903,7 @@ const banner = document.getElementById('trialCountdownBanner');
 if (banner) banner.remove();
 }
 function checkAuth() {
+dismissStartupSplash();
 const user = window.AuthUI?.getCurrentUser();
 if (user) {
 const isProOrAdmin = window.AuthUI && typeof window.AuthUI.isPro === 'function' ? window.AuthUI.isPro() : false;
@@ -6347,7 +6359,7 @@ toggleOmniSearch();
 });
 window.addEventListener('load', () => {
 if ('serviceWorker' in navigator) {
-navigator.serviceWorker.register('./sw.js').then(reg => {
+navigator.serviceWorker.register('./sw.js?v=13.0.2').then(reg => {
 setInterval(() => {
 reg.update();
 }, 1000 * 60 * 60);
@@ -7397,6 +7409,10 @@ const splash = document.getElementById('premiumSplash');
 if (!splash) return;
 const dismissTime = 2800;
 setTimeout(() => {
+if (window.GourmetBoot && typeof window.GourmetBoot.dismissSplash === 'function') {
+window.GourmetBoot.dismissSplash();
+return;
+}
 splash.classList.add('fade-out');
 setTimeout(() => {
 splash.style.display = 'none';

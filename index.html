@@ -93,14 +93,14 @@
   <link rel="stylesheet" href="./css/commercial-features.css?v=2.1.0" />
   <link rel="stylesheet" href="./css/auth-premium.css" />
   <link rel="stylesheet" href="./css/rgpd-banner.css" />
-  <link rel="stylesheet" href="./css/tablet-first.css?v=13.0.1" />
+  <link rel="stylesheet" href="./css/tablet-first.css?v=13.0.2" />
   <!-- Libraries for new features -->
   <script src="./lib/chart.min.js" defer></script>
   <!-- Supabase SDK -->
   <script src="./lib/supabase.min.js" defer></script>
   <script src="./supabase-config.js" defer></script>
   <script src="./supabase-sync.js" defer></script>
-  <script src="./tablet-ux.js?v=13.0.1" defer></script>
+  <script src="./tablet-ux.js?v=13.0.2" defer></script>
   <!-- ··························································
        STRIPE RETURN HANDLER — Détection ?success=true / ?canceled=true
        ························································ -->
@@ -1182,6 +1182,26 @@
       <div class="splash-progress-bar"></div>
     </div>
   </div>
+
+  <script>
+    // Ce garde-fou est volontairement indépendant du gros fichier applicatif :
+    // même si un module secondaire échoue, l'écran de démarrage ne peut pas
+    // masquer indéfiniment la connexion ou le message d'abonnement.
+    (function installBootGuard() {
+      function dismissSplash() {
+        const splash = document.getElementById('premiumSplash');
+        if (!splash || splash.style.display === 'none') return;
+        splash.classList.add('fade-out');
+        splash.setAttribute('aria-hidden', 'true');
+        window.setTimeout(() => {
+          splash.style.display = 'none';
+        }, 650);
+      }
+
+      window.GourmetBoot = Object.assign(window.GourmetBoot || {}, { dismissSplash });
+      window.setTimeout(dismissSplash, 4200);
+    })();
+  </script>
 
   <!-- °Chocolate Rain Container (for celebrations) -->
   <div id="chocolateRainContainer"></div>
@@ -5601,7 +5621,7 @@
   <script src="./data.js?v=2.2.6" defer></script>
   <script src="./i18n.js?v=3.6.2" defer></script>
   <script src="./security.js?v=11.5.0" defer></script>
-  <script src="./auth-ui.js?v=13.0.1" defer></script>
+  <script src="./auth-ui.js?v=13.0.2" defer></script>
   <script src="./billing.js?v=11.5.0" defer></script>
   <script src="./cloud-sync.js?v=11.5.0" defer></script>
   <script>
@@ -5609,7 +5629,7 @@
       const isLocal = ['localhost', '127.0.0.1'].includes(window.location.hostname) || window.location.protocol === 'file:';
       const isDevQuery = new URLSearchParams(window.location.search).get('dev') === 'true';
       const isDev = isLocal || isDevQuery;
-      const version = '13.0.1';
+      const version = '13.0.2';
       
       if (isDev) {
         const devFiles = [

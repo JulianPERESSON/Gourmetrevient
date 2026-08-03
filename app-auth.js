@@ -4,14 +4,29 @@
 // AUTHENTICATION — Bridged to AuthUI.js (Supabase)
 // ============================================================================
 
+function dismissStartupSplash() {
+  if (window.GourmetBoot && typeof window.GourmetBoot.dismissSplash === 'function') {
+    window.GourmetBoot.dismissSplash();
+    return;
+  }
+
+  const splash = document.getElementById('premiumSplash');
+  if (splash) splash.style.display = 'none';
+}
+
 async function showSubscriptionRequiredOverlay(email) {
+  dismissStartupSplash();
+
+  const manualOverlay = document.getElementById('authManualOverlay');
+  if (manualOverlay) manualOverlay.style.display = 'none';
+
   let overlay = document.getElementById('stripeSubscriptionRequiredOverlay');
   if (overlay) return;
 
   overlay = document.createElement('div');
   overlay.id = 'stripeSubscriptionRequiredOverlay';
   overlay.className = 'glass-modal-overlay';
-  overlay.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15,23,42,0.85); backdrop-filter:blur(16px); z-index:99999; display:flex; justify-content:center; align-items:center; color:#fff; font-family:Inter, sans-serif;';
+  overlay.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15,23,42,0.85); backdrop-filter:blur(16px); z-index:100004; display:flex; justify-content:center; align-items:center; color:#fff; font-family:Inter, sans-serif; overflow-y:auto; padding:16px;';
   
   // State: Loading initially
   overlay.innerHTML = `
@@ -34,7 +49,7 @@ async function showSubscriptionRequiredOverlay(email) {
     if (window.GourmetBilling && typeof window.GourmetBilling.checkSubscriptionStatus === 'function') {
       subStatus = await Promise.race([
         window.GourmetBilling.checkSubscriptionStatus(),
-        new Promise((resolve) => setTimeout(() => resolve(subStatus), 10000))
+        new Promise((resolve) => setTimeout(() => resolve(subStatus), 6000))
       ]);
     }
   } catch (err) {
@@ -159,6 +174,7 @@ function removeTrialCountdownBanner() {
 }
 
 function checkAuth() {
+  dismissStartupSplash();
   const user = window.AuthUI?.getCurrentUser();
 
   if (user) {
