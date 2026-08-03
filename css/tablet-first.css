@@ -84,6 +84,15 @@ body.tablet-drawer-open {
   overflow: hidden;
 }
 
+/* Auth routes must stay usable even while the large application bundle loads. */
+html.auth-entry #premiumSplash {
+  display: none !important;
+}
+
+html.auth-entry #authManualOverlay {
+  z-index: 100001 !important;
+}
+
 /* Give touch users explicit alternatives to drag-and-drop. */
 .asm-touch-order {
   display: none;
@@ -407,8 +416,11 @@ body.tablet-drawer-open {
     min-width: 760px;
   }
 
-  .modal-overlay {
+  .modal-overlay,
+  .glass-modal-overlay {
     padding: clamp(0.65rem, 2vw, 1.25rem) !important;
+    overflow-y: auto;
+    overscroll-behavior: contain;
   }
 
   :where(.modal-content, .modal-card, .modal-box, .auth-modal-box) {
@@ -608,7 +620,8 @@ body.tablet-drawer-open {
     flex: 1 1 100%;
   }
 
-  .modal-overlay {
+  .modal-overlay,
+  .glass-modal-overlay {
     align-items: flex-end !important;
     padding: 0 !important;
   }

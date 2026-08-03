@@ -68,8 +68,14 @@
   <!-- Redirection immédiate vers la landing page si non connecté -->
   <script>
     (function() {
-      // On ne redirige pas si on est en train de se connecter (action=login)
-      if (window.location.search.includes('action=login') || window.location.search.includes('tab=signup')) return;
+      const params = new URLSearchParams(window.location.search);
+      const isAuthEntry = params.get('action') === 'login' || params.get('tab') === 'signup';
+
+      // Affiche immédiatement le formulaire, sans attendre le chargement de toute l'application.
+      if (isAuthEntry) {
+        document.documentElement.classList.add('auth-entry');
+        return;
+      }
       
       const isAuth = Boolean(localStorage.getItem('sb-hogfrddigcojdmjjpbno-auth-token'));
       
@@ -87,14 +93,14 @@
   <link rel="stylesheet" href="./css/commercial-features.css?v=2.1.0" />
   <link rel="stylesheet" href="./css/auth-premium.css" />
   <link rel="stylesheet" href="./css/rgpd-banner.css" />
-  <link rel="stylesheet" href="./css/tablet-first.css?v=13.0.0" />
+  <link rel="stylesheet" href="./css/tablet-first.css?v=13.0.1" />
   <!-- Libraries for new features -->
   <script src="./lib/chart.min.js" defer></script>
   <!-- Supabase SDK -->
   <script src="./lib/supabase.min.js" defer></script>
   <script src="./supabase-config.js" defer></script>
   <script src="./supabase-sync.js" defer></script>
-  <script src="./tablet-ux.js?v=13.0.0" defer></script>
+  <script src="./tablet-ux.js?v=13.0.1" defer></script>
   <!-- ··························································
        STRIPE RETURN HANDLER — Détection ?success=true / ?canceled=true
        ························································ -->
@@ -1244,12 +1250,52 @@
   <script>
     let currentManualTab = 'login';
 
+    function getSupabaseClient() {
+      const client = window.gourmetSupabase || window.supabase;
+      return client?.auth ? client : null;
+    }
+
+    function waitForSupabaseClient(timeoutMs = 8000) {
+      const readyClient = getSupabaseClient();
+      if (readyClient) return Promise.resolve(readyClient);
+
+      return new Promise((resolve, reject) => {
+        const startedAt = Date.now();
+        const timer = window.setInterval(() => {
+          const client = getSupabaseClient();
+          if (client) {
+            window.clearInterval(timer);
+            resolve(client);
+          } else if (Date.now() - startedAt >= timeoutMs) {
+            window.clearInterval(timer);
+            reject(new Error("Le service de connexion ne répond pas. Vérifiez votre réseau puis réessayez."));
+          }
+        }, 150);
+      });
+    }
+
+    function withAuthDeadline(request, timeoutMs = 15000) {
+      return Promise.race([
+        Promise.resolve(request),
+        new Promise((_, reject) => window.setTimeout(
+          () => reject(new Error("Le service met trop de temps à répondre. Réessayez dans quelques instants.")),
+          timeoutMs
+        ))
+      ]);
+    }
+
     function switchManualTab(tab) {
       currentManualTab = tab;
       const signupFields = document.getElementById('signupFieldsManual');
       const confirmField = document.getElementById('confirmPassFieldManual');
       const btn = document.getElementById('authBtnManual');
       const discovery = document.getElementById('discoveryZoneManual');
+      const status = document.getElementById('authErrorManual');
+
+      if (status) {
+        status.className = 'auth-error';
+        status.style.display = 'none';
+      }
       
       document.getElementById('tabManualLogin').classList.toggle('active', tab === 'login');
       document.getElementById('tabManualSignup').classList.toggle('active', tab === 'signup');
@@ -1321,13 +1367,29 @@
         return;
       }
 
+      if (pass.length < 8) {
+        errorDiv.innerText = "Le mot de passe doit contenir au moins 8 caractères.";
+        errorDiv.style.display = 'block';
+        return;
+      }
+
       btn.disabled = true;
-      btn.innerText = "Vérification...";
+      btn.innerText = "Initialisation...";
+      errorDiv.style.display = 'none';
 
       try {
+        const client = await waitForSupabaseClient();
+        btn.innerText = "Vérification...";
+
         // Vérification de l'unicité du téléphone via RPC
-        const { data: phoneExists, error: phoneErr } = await supabase.rpc('check_phone_exists', { p_phone: phoneClean });
-        if (phoneErr) throw phoneErr;
+        const { data: phoneExists, error: phoneErr } = await withAuthDeadline(
+          client.rpc('check_phone_exists', { p_phone: phoneClean }),
+          12000
+        );
+        // Cette vérification complémentaire peut ne pas être disponible sur
+        // toutes les versions du serveur. Elle ne doit jamais bloquer une
+        // inscription légitime : la création du compte reste validée côté Supabase.
+        if (phoneErr) console.warn('Vérification préalable du téléphone indisponible :', phoneErr.message);
         if (phoneExists) {
           errorDiv.innerText = "Ce numéro de téléphone a déjà été utilisé pour une période d'essai.";
           errorDiv.style.display = 'block';
@@ -1339,25 +1401,36 @@
         btn.innerText = "Création en cours...";
 
         // On utilise la même logique que AuthUI pour la redirection Stripe
-        const { data, error } = await supabase.auth.signUp({
+        const { data, error } = await withAuthDeadline(client.auth.signUp({
           email,
           password: pass,
           options: {
             data: { first_name: firstName, last_name: lastName, phone: phone, phone_number: phone }
           }
-        });
+        }), 18000);
 
         if (error) throw error;
 
-        // Redirection vers Stripe via billing.js
-        if (typeof GourmetBilling !== 'undefined') {
-          await GourmetBilling.checkout('pro_monthly', email, data.user?.id);
-        } else {
-          alert("Inscription réussie ! Veuillez vous connecter.");
+        // Supabase peut exiger la confirmation de l'email avant de créer une session.
+        if (!data?.session?.access_token) {
           switchManualTab('login');
+          errorDiv.className = 'auth-success';
+          errorDiv.innerText = "Compte créé. Consultez votre email pour le confirmer, puis connectez-vous.";
+          errorDiv.style.display = 'block';
+        } else if (window.GourmetBilling) {
+          await window.GourmetBilling.checkout('pro_monthly', email, data.user?.id);
+        } else {
+          switchManualTab('login');
+          errorDiv.className = 'auth-success';
+          errorDiv.innerText = "Compte créé. Vous pouvez maintenant vous connecter.";
+          errorDiv.style.display = 'block';
         }
+
+        btn.disabled = false;
+        btn.innerText = currentManualTab === 'login' ? "Se connecter" : "Créer mon compte";
       } catch (err) {
-        errorDiv.innerText = err.message;
+        errorDiv.className = 'auth-error';
+        errorDiv.innerText = err?.message || "Impossible de créer le compte pour le moment.";
         errorDiv.style.display = 'block';
         btn.disabled = false;
         btn.innerText = "Créer mon compte";
@@ -1378,18 +1451,17 @@
       }
 
       try {
-        const client = window.gourmetSupabase || window.supabase;
-        if (!client || !client.auth) {
-          btn.disabled = true;
-          btn.textContent = "Initialisation...";
-          setTimeout(loginDirect, 500);
-          return;
-        }
-
         btn.disabled = true;
+        btn.textContent = "Initialisation...";
+        err.style.display = "none";
+
+        const client = await waitForSupabaseClient();
         btn.textContent = "Connexion...";
         
-        const { data, error } = await client.auth.signInWithPassword({ email, password: pass });
+        const { data, error } = await withAuthDeadline(
+          client.auth.signInWithPassword({ email, password: pass }),
+          18000
+        );
 
         if (error) {
           err.textContent = error.message;
@@ -1401,11 +1473,12 @@
           console.info(' Connexion réussie, déblocage immédiat.');
           
           // Supprime l'écran de chargement s'il est encore là
-          const splash = document.getElementById('splash-screen');
+          const splash = document.getElementById('premiumSplash');
           if (splash) splash.remove();
 
           document.getElementById('authManualOverlay').style.display = 'none';
           document.body.classList.remove('auth-pending');
+          document.documentElement.classList.remove('auth-entry');
           
           if (typeof window.checkAuth === 'function') window.checkAuth();
           else location.reload(); 
@@ -1440,7 +1513,7 @@
         const overlay = document.getElementById('authManualOverlay');
         if (overlay) overlay.style.display = 'none';
         
-        const splash = document.getElementById('splash-screen');
+        const splash = document.getElementById('premiumSplash');
         if (splash) splash.remove();
       }
     }, 500);
@@ -5528,7 +5601,7 @@
   <script src="./data.js?v=2.2.6" defer></script>
   <script src="./i18n.js?v=3.6.2" defer></script>
   <script src="./security.js?v=11.5.0" defer></script>
-  <script src="./auth-ui.js?v=11.5.0" defer></script>
+  <script src="./auth-ui.js?v=13.0.1" defer></script>
   <script src="./billing.js?v=11.5.0" defer></script>
   <script src="./cloud-sync.js?v=11.5.0" defer></script>
   <script>
@@ -5536,7 +5609,7 @@
       const isLocal = ['localhost', '127.0.0.1'].includes(window.location.hostname) || window.location.protocol === 'file:';
       const isDevQuery = new URLSearchParams(window.location.search).get('dev') === 'true';
       const isDev = isLocal || isDevQuery;
-      const version = '13.0.0';
+      const version = '13.0.1';
       
       if (isDev) {
         const devFiles = [

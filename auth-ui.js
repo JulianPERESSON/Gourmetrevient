@@ -22,11 +22,17 @@ const AuthUI = (() => {
   async function _checkSubscription(user) {
     if (!user) return 'free';
     try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('plan, subscription_status')
-        .eq('id', user.id)
-        .single();
+      const { data, error } = await Promise.race([
+        supabase
+          .from('profiles')
+          .select('plan, subscription_status')
+          .eq('id', user.id)
+          .single(),
+        new Promise((resolve) => setTimeout(
+          () => resolve({ data: null, error: new Error('Délai de vérification dépassé') }),
+          10000
+        ))
+      ]);
       if (error || !data) return 'free';
       return data.plan || 'free';
     } catch(e) { return 'free'; }
@@ -104,11 +110,8 @@ const AuthUI = (() => {
     _updateUI(_currentUser);
     if (typeof window.checkAuth === 'function') window.checkAuth();
 
-    // Ouverture automatique du modal si demandé par l'URL (Inscription)
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('tab') === 'signup' && !_currentUser) {
-      setTimeout(() => showModal('signup'), 500);
-    }
+    // Les liens publics de connexion/inscription utilisent le formulaire initial
+    // rendu dans index.html. Ne pas ouvrir un second modal concurrent ici.
   }
 
 

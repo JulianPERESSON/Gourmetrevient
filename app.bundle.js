@@ -1,7 +1,7 @@
 /* 
   =============================================================================
   GourmetRevient Application Bundle (Production)
-  Généré automatiquement le : 2026-08-02T12:32:39.480Z
+  Généré automatiquement le : 2026-08-03T10:18:32.945Z
   =============================================================================
 */
 
@@ -3778,7 +3778,10 @@ if (el) el.style.display = 'none';
 let subStatus = { plan: 'free', status: 'inactive', subscription_active: false, has_subscription: false };
 try {
 if (window.GourmetBilling && typeof window.GourmetBilling.checkSubscriptionStatus === 'function') {
-subStatus = await window.GourmetBilling.checkSubscriptionStatus();
+subStatus = await Promise.race([
+window.GourmetBilling.checkSubscriptionStatus(),
+new Promise((resolve) => setTimeout(() => resolve(subStatus), 10000))
+]);
 }
 } catch (err) {
 console.error('Error fetching subscription status in overlay:', err);

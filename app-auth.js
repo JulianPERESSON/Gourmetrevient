@@ -32,7 +32,10 @@ async function showSubscriptionRequiredOverlay(email) {
   let subStatus = { plan: 'free', status: 'inactive', subscription_active: false, has_subscription: false };
   try {
     if (window.GourmetBilling && typeof window.GourmetBilling.checkSubscriptionStatus === 'function') {
-      subStatus = await window.GourmetBilling.checkSubscriptionStatus();
+      subStatus = await Promise.race([
+        window.GourmetBilling.checkSubscriptionStatus(),
+        new Promise((resolve) => setTimeout(() => resolve(subStatus), 10000))
+      ]);
     }
   } catch (err) {
     console.error('Error fetching subscription status in overlay:', err);
