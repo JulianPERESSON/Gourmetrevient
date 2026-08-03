@@ -691,20 +691,21 @@ function exportShoppingCSV() {
 
 // --- Allergen Matrix ---
 function renderAllergenMatrix() {
-  const table = document.getElementById('allergenMatrixTable');
-  if (!table) return;
+  const tables = Array.from(document.querySelectorAll('[data-allergen-matrix]'));
+  if (!tables.length) return;
+  const renderTables = (content) => tables.forEach((table) => { table.innerHTML = content; });
 
   // Aggregate saved and reference recipes
   const recipes = [...(APP.savedRecipes || []), ...(typeof RECIPES !== 'undefined' ? RECIPES : [])];
   
   if (recipes.length === 0) {
-    table.innerHTML = `<tr><td colspan="15" style="text-align:center; padding:3rem;">
+    renderTables(`<tr><td colspan="15" style="text-align:center; padding:3rem;">
       <div class="mgmt-empty-state">
         <div class="empty-icon">\ud83d\udee1\ufe0f</div>
         <h4>Aucune recette d\u00e9tect\u00e9e</h4>
         <p>Enregistrez des recettes pour g\u00e9n\u00e9rer la matrice.</p>
       </div>
-    </td></tr>`;
+    </td></tr>`);
     return;
   }
 
@@ -768,7 +769,7 @@ function renderAllergenMatrix() {
   });
 
   html += `</tbody>`;
-  table.innerHTML = html;
+  renderTables(html);
 }
 
 // --- Waste Tracking ---
@@ -1580,19 +1581,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // --- Allergen Matrix (Character Safe) ---
 function renderAllergenMatrix() {
-  const table = document.getElementById('allergenMatrixTable');
-  if (!table) return;
+  const tables = Array.from(document.querySelectorAll('[data-allergen-matrix]'));
+  if (!tables.length) return;
+  const renderTables = (content) => tables.forEach((table) => { table.innerHTML = content; });
 
   const recipes = [...(APP.savedRecipes || []), ...(typeof RECIPES !== 'undefined' ? RECIPES : [])];
   
   if (recipes.length === 0) {
-    table.innerHTML = `<tr><td colspan="15" style="text-align:center; padding:3rem;">
+    renderTables(`<tr><td colspan="15" style="text-align:center; padding:3rem;">
       <div class="mgmt-empty-state">
         <div class="empty-icon">\ud83d\udee1\ufe0f</div>
         <h4>Aucune recette d\u00e9tect\u00e9e</h4>
         <p>Enregistrez des recettes pour g\u00e9n\u00e9rer la matrice.</p>
       </div>
-    </td></tr>`;
+    </td></tr>`);
     return;
   }
 
@@ -1654,7 +1656,7 @@ function renderAllergenMatrix() {
   });
 
   html += `</tbody>`;
-  table.innerHTML = html;
+  renderTables(html);
 }
 
 // ============================================================================

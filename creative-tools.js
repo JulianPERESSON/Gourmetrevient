@@ -390,7 +390,7 @@ function initAssemblyPalette() {
   Object.keys(categories).forEach(function(cat) {
     html += '<div style="font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);padding:.3rem 0;margin-top:.5rem;">' + cat + '</div>';
     categories[cat].forEach(function(comp) {
-      html += '<div class="assembly-palette-item" draggable="true" data-component-id="' + comp.id + '" ondragstart="onAssemblyDragStart(event,\'' + comp.id + '\')">' +
+      html += '<div class="assembly-palette-item" draggable="true" role="button" tabindex="0" data-component-id="' + comp.id + '" aria-label="Ajouter ' + comp.name + '" onclick="addAssemblyComponentById(\'' + comp.id + '\')" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();addAssemblyComponentById(\'' + comp.id + '\')}" ondragstart="onAssemblyDragStart(event,\'' + comp.id + '\')">' +
         '<span class="asm-icon">' + comp.icon + '</span>' +
         '<div class="asm-info"><span class="asm-name">' + comp.name + '</span><span class="asm-height">' + comp.height + ' cm</span></div></div>';
     });
@@ -401,6 +401,11 @@ function initAssemblyPalette() {
 function onAssemblyDragStart(e, componentId) {
   e.dataTransfer.setData('text/plain', componentId);
   e.dataTransfer.effectAllowed = 'copy';
+}
+
+function addAssemblyComponentById(componentId) {
+  var comp = ASSEMBLY_COMPONENTS.find(function(c) { return c.id === componentId; });
+  if (comp) addAssemblyLayer(comp);
 }
 
 function initAssemblyDragDrop() {
@@ -438,6 +443,17 @@ function duplicateAssemblyLayer(instanceId) {
   newLayer.instanceId = 'layer_' + Date.now() + '_' + Math.random().toString(36).substr(2,4);
   const idx = assemblyLayers.indexOf(layer);
   assemblyLayers.splice(idx + 1, 0, newLayer);
+  renderAssemblyCanvas();
+  renderCrossSection();
+}
+
+function moveAssemblyLayer(instanceId, direction) {
+  var index = assemblyLayers.findIndex(function(layer) { return layer.instanceId === instanceId; });
+  if (index < 0) return;
+  var target = index + direction;
+  if (target < 0 || target >= assemblyLayers.length) return;
+  var moved = assemblyLayers.splice(index, 1)[0];
+  assemblyLayers.splice(target, 0, moved);
   renderAssemblyCanvas();
   renderCrossSection();
 }
@@ -535,6 +551,8 @@ function renderAssemblyCanvas() {
           '<span class="asm-row-meta">' + layer.height + ' cm • ' + Math.round(weightG) + 'g' + (hasAnnot ? ' • 📌' : '') + '</span>' +
         '</div>' +
         '<div class="asm-row-actions">' +
+          '<button class="asm-row-btn asm-touch-order" onclick="event.stopPropagation(); moveAssemblyLayer(\'' + layer.instanceId + '\',-1)" title="Monter" aria-label="Monter cette couche">↑</button>' +
+          '<button class="asm-row-btn asm-touch-order" onclick="event.stopPropagation(); moveAssemblyLayer(\'' + layer.instanceId + '\',1)" title="Descendre" aria-label="Descendre cette couche">↓</button>' +
           '<button class="asm-row-btn" onclick="event.stopPropagation(); duplicateAssemblyLayer(\'' + layer.instanceId + '\')" title="Dupliquer">👯</button>' +
           '<button class="asm-row-btn" onclick="event.stopPropagation(); removeAssemblyLayer(\'' + layer.instanceId + '\')" title="Supprimer">✕</button>' +
         '</div>' +

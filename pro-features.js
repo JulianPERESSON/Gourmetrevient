@@ -819,7 +819,7 @@ function setupAutoSync() {
   };
 
   // 3. Initial pull if auth is already valid
-  if (localStorage.getItem('gourmet_auth') === 'true') {
+  if (window.AuthUI?.getCurrentUser?.()) {
      syncFromCloud();
   }
 }

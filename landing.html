@@ -63,6 +63,7 @@
   <meta property="og:title" content="GourmetRevient — Le Copilote des Artisans Pâtissiers">
   <meta property="og:description" content="Gerez votre boulangerie-pâtisserie comme un chef : coût de revient, HACCP, Planning et CRM. Essai gratuit 14 jours.">
   <meta property="og:image" content="https://gourmetrevient.fr/img/og-preview.png">
+  <meta property="og:image:alt" content="Aperçu du cockpit GourmetRevient pour artisans boulangers-pâtissiers">
 
   <!-- Twitter -->
   <meta property="twitter:card" content="summary_large_image">
@@ -77,7 +78,7 @@
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/rgpd-banner.css">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="./lib/supabase.min.js"></script>
   <script src="./supabase-config.js"></script>
   
   <style>
@@ -1228,7 +1229,7 @@
     window.addEventListener('DOMContentLoaded', updateSocialCounter);
 
     (function() {
-      const isAuth = localStorage.getItem('gourmet_auth') === 'true' || localStorage.getItem('sb-hogfrddigcojdmjjpbno-auth-token');
+      const isAuth = Boolean(localStorage.getItem('sb-hogfrddigcojdmjjpbno-auth-token'));
       if (isAuth) {
         // Met à jour les boutons pour les utilisateurs déjà connectés
         const ctaBtns = document.querySelectorAll('.btn-primary');

@@ -182,6 +182,10 @@
 
 (function initSpecularCards() {
   document.addEventListener('DOMContentLoaded', () => {
+    const lowMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const touchOnly = window.matchMedia('(hover: none), (pointer: coarse)').matches;
+    if (lowMotion || touchOnly) return;
+
     // 2a. Specular Light Effect
     document.addEventListener('mousemove', (e) => {
       const cards = document.querySelectorAll('.cockpit-card, .mgmt-glass-card, .priority-card, .ai-expert-card, .production-main-card, .stock-compact-card, .business-compact-card, .activity-compact-card, .crm-kpi-card, .saved-card');

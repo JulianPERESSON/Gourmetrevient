@@ -1,6 +1,5 @@
 // AUTHENTICATION
 // ============================================================================
-
 // ============================================================================
 // AUTHENTICATION — Bridged to AuthUI.js (Supabase)
 // ============================================================================
@@ -158,20 +157,12 @@ function removeTrialCountdownBanner() {
 
 function checkAuth() {
   const user = window.AuthUI?.getCurrentUser();
-  const isLegacyAuth = localStorage.getItem('gourmet_auth') === 'true';
 
-  if (user || isLegacyAuth) {
+  if (user) {
     // Vérifier l'abonnement
     const isProOrAdmin = window.AuthUI && typeof window.AuthUI.isPro === 'function' ? window.AuthUI.isPro() : false;
-    const name = localStorage.getItem('gourmet_current_user') || '';
-    const lowerName = name.toLowerCase().trim();
-    const isAdminBypass = ['ju 2503', 'ju', 'support@gourmetrevient.fr', 'contact', 'julian', 'julian peresson', 'julian31.peresson@gmail.com', 'contact@gourmetrevient.fr', 'julianperesson@gmail.com', 'peresson', 'julia'].includes(lowerName) ||
-      lowerName.includes('julian') ||
-      lowerName.includes('peresson') ||
-      lowerName.includes('julia') ||
-      lowerName === 'ju';
 
-    if (!isProOrAdmin && !isAdminBypass && user) {
+    if (!isProOrAdmin) {
       console.info('🔒 Abonnement requis. Accès bloqué.');
       showSubscriptionRequiredOverlay(user.email);
       return;
@@ -187,7 +178,7 @@ function checkAuth() {
           const subStatus = await window.GourmetBilling.checkSubscriptionStatus();
           
           // Sécurité renforcée : Si pas admin et abonnement non actif, on bloque l'accès immédiatement
-          if (!isAdminBypass && !subStatus.subscription_active) {
+          if (!subStatus.subscription_active) {
             console.info('🔒 Abonnement expiré ou invalide détecté en arrière-plan. Blocage immédiat.');
             showSubscriptionRequiredOverlay(user.email);
             removeTrialCountdownBanner();
@@ -290,23 +281,6 @@ function updateDashboard() {
   const headerName = $('#userNameHeader');
   if (headerName) headerName.textContent = displayName;
 
-  // Gestion du plan pour l'utilisateur local
-  const lowerNameLocal = name.toLowerCase().trim();
-  const isAdminLocal = ['ju 2503', 'ju', 'support@gourmetrevient.fr', 'contact', 'julian', 'julian peresson', 'julian31.peresson@gmail.com', 'contact@gourmetrevient.fr', 'julianperesson@gmail.com', 'peresson', 'julia'].includes(lowerNameLocal) ||
-    lowerNameLocal.includes('julian') ||
-    lowerNameLocal.includes('peresson') ||
-    lowerNameLocal.includes('julia') ||
-    lowerNameLocal === 'ju';
-  if (isAdminLocal) {
-    window.GOURMET_PLAN = 'admin';
-    const proBtn = document.getElementById('btnSubscribePro');
-    if (proBtn) {
-      proBtn.classList.add('btn-pro-active');
-      proBtn.innerHTML = '<span>⭐ Pro</span>';
-      proBtn.onclick = () => { if(typeof showToast === 'function') showToast('✨ Mode Administrateur Actif', 'info'); };
-    }
-  }
-
   // Bridge to the premium dashboard if available
   if (typeof hydratePremiumDashboard === 'function') {
     hydratePremiumDashboard();
@@ -333,17 +307,9 @@ function updateDashboard() {
     if (avatar) avatar.textContent = '👨‍🍳';
     if (hAvatar) hAvatar.textContent = '👨‍🍳';
   }
-
-  // Update Admin Tab Visibility
   const navAdmin = $('#navAdmin');
   if (navAdmin) {
-    const isJulianAdmin = ['ju 2503', 'ju', 'support@gourmetrevient.fr', 'contact', 'julian', 'julian peresson', 'julian31.peresson@gmail.com', 'contact@gourmetrevient.fr', 'julianperesson@gmail.com', 'peresson', 'julia'].includes(userKey.trim()) ||
-      userKey.includes('julian') ||
-      userKey.includes('peresson') ||
-      userKey.includes('julia') ||
-      userKey.trim() === 'ju';
-    const isAdmin = isJulianAdmin || (userKey === 'ju 2503') || (userKey === 'ju' && userData?.isAdmin) || (userKey === 'ju' && userData?.pin === '2503');
-    navAdmin.style.display = isAdmin ? 'block' : 'none';
+    navAdmin.style.display = window.AuthUI?.isAdminUser?.() ? 'block' : 'none';
   }
 
   // 1. Update Date
@@ -481,7 +447,6 @@ function renderTodayTeam() {
     `;
   }).join('');
 }
-
 // ============================================================================
 // CHEF TIPS SYSTEM
 // ============================================================================

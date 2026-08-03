@@ -218,6 +218,9 @@ const GourmetOnboarding = {
 
   init() {
     if (localStorage.getItem(this.STORAGE_KEY)) return;
+    // The desktop tour points at dropdowns that are intentionally replaced by
+    // the bottom navigation on tablets and phones.
+    if (window.matchMedia('(max-width: 1180px)').matches) return;
     setTimeout(() => this.start(), 2000);
   },
 

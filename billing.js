@@ -26,16 +26,6 @@ const GourmetBilling = {
      * Politique : subscription_active = (status === 'active' ET plan_type !== 'free')
      */
     async checkSubscriptionStatus() {
-        const name = localStorage.getItem('gourmet_current_user') || '';
-        const lowerName = name.toLowerCase().trim();
-        const isAdminBypass = localStorage.getItem('gourmet_auth') === 'true' && (
-          ['ju 2503', 'ju', 'support@gourmetrevient.fr', 'contact', 'julian', 'julian peresson', 'julian31.peresson@gmail.com', 'contact@gourmetrevient.fr', 'julianperesson@gmail.com', 'peresson', 'julia'].includes(lowerName) ||
-          lowerName.includes('julian') ||
-          lowerName.includes('peresson') ||
-          lowerName.includes('julia') ||
-          lowerName === 'ju'
-        );
-        if (isAdminBypass) return { plan: 'admin', status: 'active', subscription_active: true, has_subscription: true, trial_expired: false };
 
         const client = window.gourmetSupabase || window.supabase;
         if (!client) return { plan: 'free', status: 'inactive', subscription_active: false, has_subscription: false, trial_expired: false };
@@ -43,6 +33,22 @@ const GourmetBilling = {
         try {
             const { data: { user }, error: authErr } = await client.auth.getUser();
             if (authErr || !user) return { plan: 'free', status: 'inactive', subscription_active: false, has_subscription: false, trial_expired: false };
+
+            const { data: profile } = await client
+                .from('profiles')
+                .select('plan')
+                .eq('id', user.id)
+                .maybeSingle();
+
+            if (profile?.plan === 'admin') {
+                return {
+                    plan: 'admin',
+                    status: 'active',
+                    subscription_active: true,
+                    has_subscription: true,
+                    trial_expired: false
+                };
+            }
 
             const { data, error } = await client
                 .from('subscriptions')
@@ -88,16 +94,6 @@ const GourmetBilling = {
      * Priorité : AuthUI.isPro() (mémorisé) > checkSubscriptionStatus() (fresh)
      */
     async isPro() {
-        const name = localStorage.getItem('gourmet_current_user') || '';
-        const lowerName = name.toLowerCase().trim();
-        const isAdminBypass = localStorage.getItem('gourmet_auth') === 'true' && (
-          ['ju 2503', 'ju', 'support@gourmetrevient.fr', 'contact', 'julian', 'julian peresson', 'julian31.peresson@gmail.com', 'contact@gourmetrevient.fr', 'julianperesson@gmail.com', 'peresson', 'julia'].includes(lowerName) ||
-          lowerName.includes('julian') ||
-          lowerName.includes('peresson') ||
-          lowerName.includes('julia') ||
-          lowerName === 'ju'
-        );
-        if (isAdminBypass) return true;
 
         // 1. Vérification rapide via AuthUI (déjà chargé en mémoire)
         if (window.AuthUI && typeof window.AuthUI.isPro === 'function') {
@@ -161,10 +157,13 @@ const GourmetBilling = {
         // Récupère l'utilisateur s'il est connecté (optionnel)
         let userEmail = optionalEmail;
         let userId = optionalUserId;
+        let authToken = null;
         try {
-            if (!userId) {
-                const client = window.gourmetSupabase || window.supabase; 
-                if (client) {
+            const client = window.gourmetSupabase || window.supabase;
+            if (client) {
+                const { data: { session } } = await client.auth.getSession();
+                authToken = session?.access_token || null;
+                if (!userId) {
                     const { data: { user } } = await client.auth.getUser();
                     if (user) { 
                         if (!userEmail) userEmail = user.email; 
@@ -175,6 +174,14 @@ const GourmetBilling = {
         } catch(e) { /* non connecté, on continue quand même */ }
 
         // Appel direct à la Edge Function Supabase (plus fiable que le SDK)
+        if (!authToken) {
+            toastFn('Connectez-vous pour activer votre abonnement Pro.', 'warning');
+            if (window.AuthUI && typeof window.AuthUI.showModal === 'function') {
+                window.AuthUI.showModal('login');
+            }
+            return;
+        }
+
         const SUPABASE_URL = 'https://hogfrddigcojdmjjpbno.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_9iePEQdGSdnjXaw4I1s0Nw_wyitVBla';
         const FUNCTION_URL = `${SUPABASE_URL}/functions/v1/create-checkout-session`;
@@ -184,10 +191,10 @@ const GourmetBilling = {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                    'Authorization': `Bearer ${authToken}`,
                     'apikey': SUPABASE_ANON_KEY
                 },
-                body: JSON.stringify({ priceId, userEmail, userId })
+                body: JSON.stringify({ priceId })
             });
 
             const data = await response.json();
@@ -223,17 +230,11 @@ const GourmetBilling = {
             const client = window.gourmetSupabase || window.supabase;
             if (!client) throw new Error("Client Supabase non initialisé");
 
+            const { data: { session } } = await client.auth.getSession();
             const { data: { user } } = await client.auth.getUser();
             
-            // Cas spécial : Authentification Admin Prioritaire (via localStorage)
-            const isAdminBypass = localStorage.getItem('gourmet_auth') === 'true';
-
-            if (!user) {
-                if (isAdminBypass) {
-                    toastFn("Le portail Stripe est désactivé en mode 'Admin Prioritaire'. Veuillez vous connecter avec un compte client réel pour le tester.", "warning");
-                } else {
-                    toastFn("Vous devez être connecté via Supabase pour gérer votre abonnement.", "error");
-                }
+            if (!session?.access_token || !user) {
+                toastFn("Vous devez être connecté via Supabase pour gérer votre abonnement.", "error");
                 return;
             }
 
@@ -241,10 +242,10 @@ const GourmetBilling = {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                    'Authorization': `Bearer ${session.access_token}`,
                     'apikey': SUPABASE_ANON_KEY
                 },
-                body: JSON.stringify({ userId: user.id })
+                body: JSON.stringify({})
             });
 
             const data = await response.json();
@@ -316,17 +317,18 @@ const GourmetBilling = {
      * Renders the billing history table in mgmtViewBilling
      */
     async renderBillingHistory() {
-        const container = document.getElementById('billingHistoryBody');
-        if (!container) return;
+        const containers = Array.from(document.querySelectorAll('[data-billing-history]'));
+        if (!containers.length) return;
+        const renderHistory = (content) => containers.forEach((container) => { container.innerHTML = content; });
 
-        container.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:2rem;">⏳ Chargement de l\'historique...</td></tr>';
+        renderHistory('<tr><td colspan="6" style="text-align:center; padding:2rem;">⏳ Chargement de l\'historique...</td></tr>');
 
         try {
             const status = await this.checkSubscriptionStatus();
             const { data: { user } } = await (window.gourmetSupabase || window.supabase).auth.getUser();
 
             if (!status.subscription_active && !user) {
-                container.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:2rem; color:var(--text-muted);">Connectez-vous pour voir vos factures.</td></tr>';
+                renderHistory('<tr><td colspan="6" style="text-align:center; padding:2rem; color:var(--text-muted);">Connectez-vous pour voir vos factures.</td></tr>');
                 return;
             }
 
@@ -344,11 +346,11 @@ const GourmetBilling = {
             }
 
             if (history.length === 0) {
-                container.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:2rem; color:var(--text-muted);">Aucune facture trouvée.</td></tr>';
+                renderHistory('<tr><td colspan="6" style="text-align:center; padding:2rem; color:var(--text-muted);">Aucune facture trouvée.</td></tr>');
                 return;
             }
 
-            container.innerHTML = history.map(inv => `
+            renderHistory(history.map(inv => `
                 <tr>
                     <td style="font-weight:600;">${new Date(inv.date).toLocaleDateString('fr-FR')}</td>
                     <td style="font-family:monospace; font-weight:700; color:var(--primary);">${inv.id}</td>
@@ -361,11 +363,11 @@ const GourmetBilling = {
                         </button>
                     </td>
                 </tr>
-            `).join('');
+            `).join(''));
 
         } catch (err) {
             console.error('Error rendering billing history:', err);
-            container.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:2rem; color:var(--danger);">Erreur lors du chargement.</td></tr>';
+            renderHistory('<tr><td colspan="6" style="text-align:center; padding:2rem; color:var(--danger);">Erreur lors du chargement.</td></tr>');
         }
     },
 

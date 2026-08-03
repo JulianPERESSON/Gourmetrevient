@@ -490,6 +490,9 @@ function buildPlanLegend(groups) {
 // DRAG AND DROP
 function pOnMouseDown(e) {
     const canvas = document.getElementById('planCanvas');
+    if (e.pointerId !== undefined && canvas.setPointerCapture) {
+        canvas.setPointerCapture(e.pointerId);
+    }
     const rect = canvas.getBoundingClientRect();
     const [mx, my] = pPxToM(e.clientX - rect.left, e.clientY - rect.top);
     for (let i = planPlaced.length - 1; i >= 0; i--) {
@@ -515,11 +518,16 @@ function pOnMouseMove(e) {
     drawPlan2D();
 }
 
-function pOnMouseUp() {
+function pOnMouseUp(e) {
     if (planDragging === null) return;
     planDragging = null;
     const canvas = document.getElementById('planCanvas');
-    if (canvas) canvas.style.cursor = 'grab';
+    if (canvas) {
+        canvas.style.cursor = 'grab';
+        if (e && e.pointerId !== undefined && canvas.hasPointerCapture?.(e.pointerId)) {
+            canvas.releasePointerCapture(e.pointerId);
+        }
+    }
     savePlanPlacements();
     drawPlan2D();
     renderDevis();
@@ -706,10 +714,11 @@ function initLabConfigurator() {
 
     const c = document.getElementById('planCanvas');
     if (c) {
-        c.addEventListener('mousedown', pOnMouseDown);
-        c.addEventListener('mousemove', pOnMouseMove);
-        c.addEventListener('mouseup', pOnMouseUp);
-        c.addEventListener('mouseleave', pOnMouseUp);
+        c.style.touchAction = 'none';
+        c.addEventListener('pointerdown', pOnMouseDown);
+        c.addEventListener('pointermove', pOnMouseMove);
+        c.addEventListener('pointerup', pOnMouseUp);
+        c.addEventListener('pointercancel', pOnMouseUp);
     }
 
     const bgtn = document.getElementById('btnGenerate');

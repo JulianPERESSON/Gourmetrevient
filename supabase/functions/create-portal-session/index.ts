@@ -6,7 +6,6 @@ const stripeSecretKey = Deno.env.get("STRIPE_SECRET_KEY") || "";
 const supabaseUrl = Deno.env.get("SUPABASE_URL") || "";
 const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY") || "";
 const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
-const proMonthlyPriceId = Deno.env.get("STRIPE_PRO_MONTHLY_PRICE_ID") || "price_1Tef08INXyAsJzvqQ6ZJ9Kl4";
 
 const stripe = new Stripe(stripeSecretKey, {
   httpClient: Stripe.createFetchHttpClient(),
@@ -46,7 +45,7 @@ serve(async (req) => {
   }
 
   if (req.method !== "POST") {
-    return json(req, { error: "Méthode non autorisée" }, 405);
+    return json(req, { error: "Methode non autorisee" }, 405);
   }
 
   try {
@@ -60,60 +59,31 @@ serve(async (req) => {
       return json(req, { error: "Connexion requise" }, 401);
     }
 
-    const { priceId } = await req.json();
-    if (priceId !== proMonthlyPriceId) {
-      return json(req, { error: "Offre inconnue" }, 400);
+    const serviceClient = createClient(supabaseUrl, supabaseServiceKey);
+    const { data: subscription, error: subscriptionError } = await serviceClient
+      .from("subscriptions")
+      .select("stripe_customer_id")
+      .eq("user_id", user.id)
+      .maybeSingle();
+
+    if (subscriptionError) {
+      console.error("Portal subscription lookup error:", subscriptionError);
+      return json(req, { error: "Impossible d'ouvrir le portail client" }, 500);
     }
 
-    const serviceClient = createClient(supabaseUrl, supabaseServiceKey);
-    let trialEndTimestamp: number | null = null;
-
-    const { data: profile, error: profileErr } = await serviceClient
-      .from("profiles")
-      .select("created_at")
-      .eq("id", user.id)
-      .single();
-
-    if (!profileErr && profile?.created_at) {
-      const { data: existingSub } = await serviceClient
-        .from("subscriptions")
-        .select("id, status")
-        .eq("user_id", user.id)
-        .maybeSingle();
-
-      if (!existingSub) {
-        const signupDate = new Date(profile.created_at);
-        const trialEndDate = new Date(signupDate.getTime() + 14 * 24 * 60 * 60 * 1000);
-        const remainingSeconds = Math.floor((trialEndDate.getTime() - Date.now()) / 1000);
-
-        if (remainingSeconds >= 172800) {
-          trialEndTimestamp = Math.floor(trialEndDate.getTime() / 1000);
-        }
-      }
+    if (!subscription?.stripe_customer_id) {
+      return json(req, { error: "Aucun abonnement Stripe associe a ce compte" }, 404);
     }
 
     const origin = getOrigin(req);
-    const sessionOptions: any = {
-      line_items: [{ price: priceId, quantity: 1 }],
-      mode: "subscription",
-      success_url: `${origin}/index.html?success=true&session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${origin}/index.html?canceled=true`,
-      allow_promotion_codes: true,
-      customer_email: user.email,
-      metadata: { userId: user.id },
-      subscription_data: {
-        metadata: { userId: user.id },
-      },
-    };
+    const session = await stripe.billingPortal.sessions.create({
+      customer: subscription.stripe_customer_id,
+      return_url: `${origin}/index.html?billing=portal`,
+    });
 
-    if (trialEndTimestamp) {
-      sessionOptions.subscription_data.trial_end = trialEndTimestamp;
-    }
-
-    const session = await stripe.checkout.sessions.create(sessionOptions);
     return json(req, { url: session.url });
   } catch (error) {
-    console.error("Checkout session error:", error);
-    return json(req, { error: "Impossible de créer la session de paiement" }, 500);
+    console.error("Portal session error:", error);
+    return json(req, { error: "Impossible d'ouvrir le portail client" }, 500);
   }
 });

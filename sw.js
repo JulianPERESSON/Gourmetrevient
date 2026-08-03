@@ -3,7 +3,7 @@
 // Stratégie : Cache-First assets statiques + SWR Google Fonts/CDN + IDB Queue
 // =============================================================================
 
-const CACHE_VERSION = '12.6.0'; // Localized CDNs for 100% offline support
+const CACHE_VERSION = '13.0.0'; // Tablet-first navigation, touch and responsive shell
 const CACHE_STATIC  = `gourmet-static-v${CACHE_VERSION}`;
 const CACHE_RUNTIME = `gourmet-runtime-v${CACHE_VERSION}`;
 const CACHE_FONTS   = `gourmet-fonts-v${CACHE_VERSION}`;
@@ -19,7 +19,9 @@ const PRECACHE_ASSETS = [
   './legal.html',
   './blog.html',
   './styles.css',
+  './css/tablet-first.css',
   './app.bundle.js',
+  './tablet-ux.js',
   './data.js',
   './blog-data.js',
   './i18n.js',
@@ -33,6 +35,8 @@ const PRECACHE_ASSETS = [
   './equipment.js',
   './master-converter.js',
   './premium-effects.js',
+  './onboarding.js',
+  './roadmap-v2-features.js',
   './pro-features.js',
   './commercial-features.js',
   './billing.js',

@@ -37,7 +37,7 @@ window.openModal = function(id) {
   ];
   if (closeOnBackdrop.includes(id) && !m._backdropHandlerBound) {
     let mousedownOnSelf = false;
-    m.addEventListener('mousedown', (e) => {
+    m.addEventListener('pointerdown', (e) => {
       // Le clic doit impérativement commencer sur le fond du modal lui-même
       mousedownOnSelf = (e.target === m);
     });

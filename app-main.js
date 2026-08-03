@@ -307,7 +307,7 @@ function bindEvents() {
 
   // Handle responsive navigation on resize
   window.addEventListener('resize', () => {
-    if (localStorage.getItem('gourmet_auth') === 'true') {
+    if (window.AuthUI?.getCurrentUser?.()) {
       const mainNav = $('#mainNav');
       const mobNav = $('#mobileNavBar');
       if (window.innerWidth <= 768) {

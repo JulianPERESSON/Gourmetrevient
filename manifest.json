@@ -1,8 +1,9 @@
 {
   "name": "GourmetRevient Pro",
   "short_name": "GourmetRev",
-  "description": "Calculateur professionnel de coût de revient, gestion d'équipe et agencement de laboratoire pour artisans pâtissiers.",
+  "description": "Calculateur professionnel de coût de revient, gestion d'équipe et pilotage de laboratoire pour artisans boulangers-pâtissiers.",
   "start_url": "./index.html?source=pwa",
+  "scope": "./",
   "display": "standalone",
   "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
   "background_color": "#faf9f6",
@@ -27,25 +28,25 @@
   ],
   "shortcuts": [
     {
-      "name": "Nouvelle Recette",
+      "name": "Nouvelle recette",
       "short_name": "Recette",
       "description": "Créer une nouvelle recette",
       "url": "./index.html?action=new-recipe",
-      "icons": [{ "src": "./img/macaron.jpg", "sizes": "96x96" }]
+      "icons": [{ "src": "./img/macaron.jpg", "sizes": "96x96", "type": "image/jpeg" }]
     },
     {
-      "name": "Dashboard",
+      "name": "Cockpit",
       "short_name": "Cockpit",
       "description": "Accéder au cockpit de pilotage",
       "url": "./index.html?action=dashboard",
-      "icons": [{ "src": "./img/macaron.jpg", "sizes": "96x96" }]
+      "icons": [{ "src": "./img/macaron.jpg", "sizes": "96x96", "type": "image/jpeg" }]
     },
     {
       "name": "Inventaire",
       "short_name": "Stock",
       "description": "Gérer les stocks et les prix",
       "url": "./index.html?action=inventory",
-      "icons": [{ "src": "./img/macaron.jpg", "sizes": "96x96" }]
+      "icons": [{ "src": "./img/macaron.jpg", "sizes": "96x96", "type": "image/jpeg" }]
     }
   ],
   "screenshots": [],

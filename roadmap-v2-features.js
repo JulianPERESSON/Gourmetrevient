@@ -70,10 +70,20 @@ window.handleDevisPhotoUpload = function(input) {
 window._initSignatureCanvas = function() {
     const canvas = document.getElementById('signatureCanvas');
     if (!canvas) return;
+    if (canvas.dataset.signatureReady === 'true') return;
+    canvas.dataset.signatureReady = 'true';
     const ctx = canvas.getContext('2d');
     
-    // Size to container
-    canvas.width = canvas.parentElement.clientWidth;
+    // Crisp, correctly scaled drawing on high-density tablet screens.
+    const width = canvas.parentElement.clientWidth;
+    const height = canvas.clientHeight || 150;
+    const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.style.width = `${width}px`;
+    canvas.style.height = `${height}px`;
+    canvas.style.touchAction = 'none';
+    canvas.width = Math.round(width * pixelRatio);
+    canvas.height = Math.round(height * pixelRatio);
+    ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
     ctx.strokeStyle = '#1e293b';
     ctx.lineWidth = 2;
     ctx.lineCap = 'round';
@@ -82,19 +92,19 @@ window._initSignatureCanvas = function() {
     let lastX = 0;
     let lastY = 0;
     
-    function getMousePos(e) {
+    function getPointerPos(e) {
         const rect = canvas.getBoundingClientRect();
-        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
         return {
-            x: clientX - rect.left,
-            y: clientY - rect.top
+            x: e.clientX - rect.left,
+            y: e.clientY - rect.top
         };
     }
     
     function startDrawing(e) {
+        if (e.pointerType === 'mouse' && e.button !== 0) return;
         drawing = true;
-        const pos = getMousePos(e);
+        canvas.setPointerCapture?.(e.pointerId);
+        const pos = getPointerPos(e);
         lastX = pos.x;
         lastY = pos.y;
         e.preventDefault();
@@ -102,7 +112,7 @@ window._initSignatureCanvas = function() {
     
     function draw(e) {
         if (!drawing) return;
-        const pos = getMousePos(e);
+        const pos = getPointerPos(e);
         ctx.beginPath();
         ctx.moveTo(lastX, lastY);
         ctx.lineTo(pos.x, pos.y);
@@ -112,18 +122,17 @@ window._initSignatureCanvas = function() {
         e.preventDefault();
     }
     
-    function stopDrawing() {
+    function stopDrawing(e) {
         drawing = false;
+        if (e?.pointerId !== undefined && canvas.hasPointerCapture?.(e.pointerId)) {
+            canvas.releasePointerCapture(e.pointerId);
+        }
     }
     
-    canvas.addEventListener('mousedown', startDrawing);
-    canvas.addEventListener('mousemove', draw);
-    canvas.addEventListener('mouseup', stopDrawing);
-    canvas.addEventListener('mouseleave', stopDrawing);
-    
-    canvas.addEventListener('touchstart', startDrawing);
-    canvas.addEventListener('touchmove', draw);
-    canvas.addEventListener('touchend', stopDrawing);
+    canvas.addEventListener('pointerdown', startDrawing);
+    canvas.addEventListener('pointermove', draw);
+    canvas.addEventListener('pointerup', stopDrawing);
+    canvas.addEventListener('pointercancel', stopDrawing);
 };
 
 window.clearSignatureCanvas = function() {

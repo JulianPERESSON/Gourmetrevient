@@ -338,7 +338,7 @@ function showAutocomplete(input, listEl, idx) {
   listEl.classList.add('show');
 
   listEl.querySelectorAll('.autocomplete-item').forEach(item => {
-    item.addEventListener('mousedown', (e) => {
+    item.addEventListener('pointerdown', (e) => {
       e.preventDefault();
       const ing = APP.recipe.ingredients[idx];
       ing.name = item.dataset.name;

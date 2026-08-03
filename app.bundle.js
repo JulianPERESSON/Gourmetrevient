@@ -1,7 +1,7 @@
 /* 
   =============================================================================
   GourmetRevient Application Bundle (Production)
-  Généré automatiquement le : 2026-06-13T13:24:29.085Z
+  Généré automatiquement le : 2026-08-02T12:32:39.480Z
   =============================================================================
 */
 
@@ -300,7 +300,7 @@ const closeOnBackdrop = [
 ];
 if (closeOnBackdrop.includes(id) && !m._backdropHandlerBound) {
 let mousedownOnSelf = false;
-m.addEventListener('mousedown', (e) => {
+m.addEventListener('pointerdown', (e) => {
 mousedownOnSelf = (e.target === m);
 });
 m.addEventListener('click', (e) => {
@@ -1451,7 +1451,7 @@ return `
 }).join('');
 listEl.classList.add('show');
 listEl.querySelectorAll('.autocomplete-item').forEach(item => {
-item.addEventListener('mousedown', (e) => {
+item.addEventListener('pointerdown', (e) => {
 e.preventDefault();
 const ing = APP.recipe.ingredients[idx];
 ing.name = item.dataset.name;
@@ -3890,17 +3890,9 @@ if (banner) banner.remove();
 }
 function checkAuth() {
 const user = window.AuthUI?.getCurrentUser();
-const isLegacyAuth = localStorage.getItem('gourmet_auth') === 'true';
-if (user || isLegacyAuth) {
+if (user) {
 const isProOrAdmin = window.AuthUI && typeof window.AuthUI.isPro === 'function' ? window.AuthUI.isPro() : false;
-const name = localStorage.getItem('gourmet_current_user') || '';
-const lowerName = name.toLowerCase().trim();
-const isAdminBypass = ['ju 2503', 'ju', 'support@gourmetrevient.fr', 'contact', 'julian', 'julian peresson', 'julian31.peresson@gmail.com', 'contact@gourmetrevient.fr', 'julianperesson@gmail.com', 'peresson', 'julia'].includes(lowerName) ||
-lowerName.includes('julian') ||
-lowerName.includes('peresson') ||
-lowerName.includes('julia') ||
-lowerName === 'ju';
-if (!isProOrAdmin && !isAdminBypass && user) {
+if (!isProOrAdmin) {
 console.info('🔒 Abonnement requis. Accès bloqué.');
 showSubscriptionRequiredOverlay(user.email);
 return;
@@ -3911,7 +3903,7 @@ console.info('🔓 Authentification confirmée, déverrouillage de l\'interface.
 try {
 if (window.GourmetBilling && typeof window.GourmetBilling.checkSubscriptionStatus === 'function') {
 const subStatus = await window.GourmetBilling.checkSubscriptionStatus();
-if (!isAdminBypass && !subStatus.subscription_active) {
+if (!subStatus.subscription_active) {
 console.info('🔒 Abonnement expiré ou invalide détecté en arrière-plan. Blocage immédiat.');
 showSubscriptionRequiredOverlay(user.email);
 removeTrialCountdownBanner();
@@ -3998,21 +3990,6 @@ const welcome = $('#welcomeUserName');
 if (welcome) welcome.textContent = displayName;
 const headerName = $('#userNameHeader');
 if (headerName) headerName.textContent = displayName;
-const lowerNameLocal = name.toLowerCase().trim();
-const isAdminLocal = ['ju 2503', 'ju', 'support@gourmetrevient.fr', 'contact', 'julian', 'julian peresson', 'julian31.peresson@gmail.com', 'contact@gourmetrevient.fr', 'julianperesson@gmail.com', 'peresson', 'julia'].includes(lowerNameLocal) ||
-lowerNameLocal.includes('julian') ||
-lowerNameLocal.includes('peresson') ||
-lowerNameLocal.includes('julia') ||
-lowerNameLocal === 'ju';
-if (isAdminLocal) {
-window.GOURMET_PLAN = 'admin';
-const proBtn = document.getElementById('btnSubscribePro');
-if (proBtn) {
-proBtn.classList.add('btn-pro-active');
-proBtn.innerHTML = '<span>⭐ Pro</span>';
-proBtn.onclick = () => { if(typeof showToast === 'function') showToast('✨ Mode Administrateur Actif', 'info'); };
-}
-}
 if (typeof hydratePremiumDashboard === 'function') {
 hydratePremiumDashboard();
 }
@@ -4035,13 +4012,7 @@ if (hAvatar) hAvatar.textContent = '👨‍🍳';
 }
 const navAdmin = $('#navAdmin');
 if (navAdmin) {
-const isJulianAdmin = ['ju 2503', 'ju', 'support@gourmetrevient.fr', 'contact', 'julian', 'julian peresson', 'julian31.peresson@gmail.com', 'contact@gourmetrevient.fr', 'julianperesson@gmail.com', 'peresson', 'julia'].includes(userKey.trim()) ||
-userKey.includes('julian') ||
-userKey.includes('peresson') ||
-userKey.includes('julia') ||
-userKey.trim() === 'ju';
-const isAdmin = isJulianAdmin || (userKey === 'ju 2503') || (userKey === 'ju' && userData?.isAdmin) || (userKey === 'ju' && userData?.pin === '2503');
-navAdmin.style.display = isAdmin ? 'block' : 'none';
+navAdmin.style.display = window.AuthUI?.isAdminUser?.() ? 'block' : 'none';
 }
 const locale = (typeof getLang === 'function') ? (getLang() === 'en' ? 'en-GB' : (getLang() === 'es' ? 'es-ES' : 'fr-FR')) : 'fr-FR';
 const dateEl = $('#dashDateHeader');
@@ -6890,17 +6861,18 @@ URL.revokeObjectURL(url);
 showToast(t('mgmt.shopping.export_success') || "Liste exportée en CSV !", "success");
 }
 function renderAllergenMatrix() {
-const table = document.getElementById('allergenMatrixTable');
-if (!table) return;
+const tables = Array.from(document.querySelectorAll('[data-allergen-matrix]'));
+if (!tables.length) return;
+const renderTables = (content) => tables.forEach((table) => { table.innerHTML = content; });
 const recipes = [...(APP.savedRecipes || []), ...(typeof RECIPES !== 'undefined' ? RECIPES : [])];
 if (recipes.length === 0) {
-table.innerHTML = `<tr><td colspan="15" style="text-align:center; padding:3rem;">
+renderTables(`<tr><td colspan="15" style="text-align:center; padding:3rem;">
 <div class="mgmt-empty-state">
 <div class="empty-icon">\ud83d\udee1\ufe0f</div>
 <h4>Aucune recette d\u00e9tect\u00e9e</h4>
 <p>Enregistrez des recettes pour g\u00e9n\u00e9rer la matrice.</p>
 </div>
-</td></tr>`;
+</td></tr>`);
 return;
 }
 const allAllergens = [
@@ -6957,7 +6929,7 @@ ${foundAllergens.has(a.key) ? '\u25cf' : '\u2014'}
 `;
 });
 html += `</tbody>`;
-table.innerHTML = html;
+renderTables(html);
 }
 function populateWasteDropdown() {
 const select = document.getElementById('wasteRecipeSelect');
@@ -7557,17 +7529,18 @@ localStorage.setItem('gourmet_recipe_draft', JSON.stringify(draftToSave));
 }, 15000);
 });
 function renderAllergenMatrix() {
-const table = document.getElementById('allergenMatrixTable');
-if (!table) return;
+const tables = Array.from(document.querySelectorAll('[data-allergen-matrix]'));
+if (!tables.length) return;
+const renderTables = (content) => tables.forEach((table) => { table.innerHTML = content; });
 const recipes = [...(APP.savedRecipes || []), ...(typeof RECIPES !== 'undefined' ? RECIPES : [])];
 if (recipes.length === 0) {
-table.innerHTML = `<tr><td colspan="15" style="text-align:center; padding:3rem;">
+renderTables(`<tr><td colspan="15" style="text-align:center; padding:3rem;">
 <div class="mgmt-empty-state">
 <div class="empty-icon">\ud83d\udee1\ufe0f</div>
 <h4>Aucune recette d\u00e9tect\u00e9e</h4>
 <p>Enregistrez des recettes pour g\u00e9n\u00e9rer la matrice.</p>
 </div>
-</td></tr>`;
+</td></tr>`);
 return;
 }
 const allAllergens = [
@@ -7624,7 +7597,7 @@ ${foundAllergens.has(a.key) ? '\u25cf' : '\u2014'}
 `;
 });
 html += `</tbody>`;
-table.innerHTML = html;
+renderTables(html);
 }
 window.openPriceComparator = function() {
 const modal = document.getElementById('priceComparatorModal');
@@ -7974,7 +7947,7 @@ if (typeof renderSharedList === 'function') renderSharedList();
 });
 }
 window.addEventListener('resize', () => {
-if (localStorage.getItem('gourmet_auth') === 'true') {
+if (window.AuthUI?.getCurrentUser?.()) {
 const mainNav = $('#mainNav');
 const mobNav = $('#mobileNavBar');
 if (window.innerWidth <= 768) {
